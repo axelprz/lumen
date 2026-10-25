@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Hostile manifest: must be rejected without reading the external entity. -->
+<!DOCTYPE DiPManifest [ <!ENTITY secret SYSTEM "file:///C:/Windows/win.ini"> ]>
+<DiPManifest version="4.0">
+  <contentIDs><contentID>&secret;</contentID></contentIDs>
+</DiPManifest>
