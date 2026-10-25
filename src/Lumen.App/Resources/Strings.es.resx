@@ -127,4 +127,7 @@
   <data name="Settings_Steam_Removed" xml:space="preserve">
     <value>Se quitaron los datos de tu cuenta de Steam de esta PC.</value>
   </data>
+  <data name="Settings_Steam_KeyHint" xml:space="preserve">
+    <value>Cuando Steam pida un nombre de dominio, sirve cualquiera (por ejemplo localhost): Lumen no lo usa.</value>
+  </data>
 </root>
