@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Lumen.App.Services;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
 using Microsoft.Extensions.Logging;
@@ -14,8 +15,13 @@ namespace Lumen.App.ViewModels;
 /// <summary>Library page: shows cached entries immediately, then rescans in the background.</summary>
 public sealed partial class LibraryViewModel : ObservableObject
 {
+    // Upper bound for one drag & drop, so dropping a whole folder's contents can't open dozens of dialogs.
+    private const int MaxDroppedItems = 10;
+
     private readonly LibraryService _library;
     private readonly LaunchService _launcher;
+    private readonly IManualItemStore _manualItems;
+    private readonly IDialogService _dialogs;
     private readonly ILocalizer _localizer;
     private readonly ILogger<LibraryViewModel> _logger;
     private readonly IReadOnlyDictionary<string, string> _storeNames;
@@ -33,11 +39,15 @@ public sealed partial class LibraryViewModel : ObservableObject
         LibraryService library,
         LaunchService launcher,
         IEnumerable<ILibraryProvider> providers,
+        IManualItemStore manualItems,
+        IDialogService dialogs,
         ILocalizer localizer,
         ILogger<LibraryViewModel> logger)
     {
         _library = library;
         _launcher = launcher;
+        _manualItems = manualItems;
+        _dialogs = dialogs;
         _localizer = localizer;
         _logger = logger;
         _storeNames = providers.ToDictionary(p => p.Source, p => p.DisplayName, StringComparer.Ordinal);
@@ -107,18 +117,89 @@ public sealed partial class LibraryViewModel : ObservableObject
         }
     }
 
+    /// <summary>Opens the add dialog, optionally prefilled with a dropped/pasted file or URL.</summary>
+    [RelayCommand]
+    private async Task AddManualItemAsync(string? prefillTarget)
+    {
+        var editor = new ManualItemEditorViewModel(_dialogs, _localizer, prefillTarget: prefillTarget);
+        if (_dialogs.ShowManualItemEditor(editor) && editor.Result is { } item)
+        {
+            await SaveManualItemAsync(item);
+        }
+    }
+
+    /// <summary>Files or URLs dropped on the library: each opens the add dialog so the user confirms it.</summary>
+    public async Task AddFromDropAsync(IEnumerable<string> targets)
+    {
+        foreach (var target in targets.Where(t => !string.IsNullOrWhiteSpace(t)).Take(MaxDroppedItems))
+        {
+            await AddManualItemAsync(target);
+        }
+    }
+
+    private async Task EditManualItemAsync(LibraryEntry entry)
+    {
+        var existing = (await _manualItems.GetAllAsync(CancellationToken.None)).FirstOrDefault(i => i.Ref == entry.Ref);
+        if (existing is null)
+        {
+            return;
+        }
+
+        var editor = new ManualItemEditorViewModel(_dialogs, _localizer, existing);
+        if (_dialogs.ShowManualItemEditor(editor) && editor.Result is { } item)
+        {
+            await SaveManualItemAsync(item);
+        }
+    }
+
+    private async Task RemoveManualItemAsync(LibraryEntry entry)
+    {
+        var message = string.Format(CultureInfo.CurrentCulture, _localizer["Manual_RemoveConfirm"], entry.Title);
+        if (!_dialogs.Confirm(_localizer["Manual_RemoveConfirmTitle"], message) || !Guid.TryParse(entry.Ref.ExternalId, out var id))
+        {
+            return;
+        }
+
+        await _manualItems.RemoveAsync(id, CancellationToken.None);
+        await _library.ScanSourceAsync(ManualItem.Source, CancellationToken.None);
+    }
+
+    private async Task SaveManualItemAsync(ManualItem item)
+    {
+        try
+        {
+            await _manualItems.SaveAsync(item, CancellationToken.None);
+            await _library.ScanSourceAsync(ManualItem.Source, CancellationToken.None);
+        }
+        catch (Exception ex)
+        {
+            LogManualSaveFailed(ex);
+            Notice = _localizer["Manual_SaveFailed"];
+        }
+    }
+
     private void Rebuild()
     {
         Items.Clear();
         foreach (var entry in _library.Entries)
         {
-            var store = _storeNames.GetValueOrDefault(entry.Ref.Source, entry.Ref.Source);
-            Items.Add(new LibraryTileViewModel(entry, store, _localizer, new AsyncRelayCommand(() => RunPrimaryActionAsync(entry))));
+            var isManual = entry.Ref.Source == ManualItem.Source;
+            var store = isManual
+                ? _localizer["Store_Manual"]
+                : _storeNames.GetValueOrDefault(entry.Ref.Source, entry.Ref.Source);
+            var commands = new TileCommands(
+                new AsyncRelayCommand(() => RunPrimaryActionAsync(entry), () => LaunchService.PrimaryAction(entry) is not null),
+                isManual ? new AsyncRelayCommand(() => EditManualItemAsync(entry)) : null,
+                isManual ? new AsyncRelayCommand(() => RemoveManualItemAsync(entry)) : null);
+            Items.Add(new LibraryTileViewModel(entry, store, _localizer, commands));
         }
 
         OnPropertyChanged(nameof(CountText));
         OnPropertyChanged(nameof(IsEmpty));
     }
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Could not save a manual item")]
+    private partial void LogManualSaveFailed(Exception exception);
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Could not load the cached library")]
     private partial void LogCacheFailed(Exception exception);

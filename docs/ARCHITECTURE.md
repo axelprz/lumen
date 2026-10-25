@@ -111,7 +111,7 @@ public interface IAccountConnector                 // Epic, GOG, Steam (Family S
 
 `ProviderResult` carries entries **plus** non-fatal diagnostics and a status: `Ok`, `Partial` (some items unreadable), `NotAvailable` (store not installed), `NotConfigured` (needs key/login), `Failed`. A provider must never throw out of a scan: catch, log, return what it could read.
 
-`LibraryService` runs every provider in parallel with a 30 s timeout per scan (and still contains a provider that throws). Per source it combines the installed scan with the owned scan: installed entries win, owned ones fill in as `NotInstalled`. A `Failed` scan falls back to the matching part of the previous cache, so a broken provider never wipes the library; `NotAvailable`/`NotConfigured` are real answers and do clear stale entries. Results are persisted per source and published sorted by title.
+`LibraryService.ScanSourceAsync(source)` rescans a single provider (used after editing manual items, so Steam isn't queried again). `LibraryService` runs every provider in parallel with a 30 s timeout per scan (and still contains a provider that throws). Per source it combines the installed scan with the owned scan: installed entries win, owned ones fill in as `NotInstalled`. A `Failed` scan falls back to the matching part of the previous cache, so a broken provider never wipes the library; `NotAvailable`/`NotConfigured` are real answers and do clear stale entries. Results are persisted per source and published sorted by title.
 
 ### Starting points per store (verify on a real machine before relying on them)
 
@@ -127,7 +127,7 @@ public interface IAccountConnector                 // Epic, GOG, Steam (Family S
 | Battle.net | `%ProgramData%\Battle.net\Agent\product.db` (protobuf) or uninstall registry entries; map product codes (data file). | `Battle.net.exe --exec="launch {code}"` |
 | Start menu | `%ProgramData%\Microsoft\Windows\Start Menu\Programs` and `%AppData%\Microsoft\Windows\Start Menu\Programs`, recursive `.lnk`/`.url`. Resolve target via IShellLink. | Shell execute the `.lnk` |
 | AppsFolder | Enumerate `shell:AppsFolder` (packaged apps with AUMIDs). Skip games already found by the Xbox provider. | `shell:AppsFolder\{AUMID}` |
-| Manual | SQLite | as configured |
+| Manual | SQLite `manual_items` (migration 0004, same shape as `config.json → manualItems` for M8 sync). Targets: `.exe`, `.lnk`, `.url` files (absolute path, `%ENV%` allowed) or a URL. URL schemes that run code or abuse Windows protocol handlers are refused (`file`, `javascript`, `ms-msdt`, `search-ms`, … — list in `ManualItemValidator.BlockedSchemes`). A file missing on this PC is listed as "not found" with no action, never deleted. Added via dialog or drag & drop; drops always open the dialog so the user confirms (max 10 per drop). | `.exe` with optional arguments (working dir = exe folder), `.lnk`/`.url` shell-executed as-is, URLs via the shell |
 
 Rules: providers only **read** store files; never write into a store's folder or registry. Junk filters and title-cleanup lists live in `src/Lumen.Providers/Data/*.json`.
 
