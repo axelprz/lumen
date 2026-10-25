@@ -1,0 +1,12 @@
+{
+  "LocalMachine": {
+    "SOFTWARE\\WOW6432Node\\Ubisoft\\Launcher": { "InstallDir": "C:/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/" },
+    "SOFTWARE\\WOW6432Node\\Ubisoft\\Launcher\\Installs\\4001": { "InstallDir": "C:/Program Files (x86)/Ubisoft/Ubisoft Game Launcher/games/Sample Odyssey/" },
+    "SOFTWARE\\WOW6432Node\\Ubisoft\\Launcher\\Installs\\4002": { "InstallDir": "D:/Ubisoft/Untitled Racer/" },
+    "SOFTWARE\\WOW6432Node\\Ubisoft\\Launcher\\Installs\\4003": { "InstallDir": "D:/Ubisoft/Removed Game/" },
+    "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Uplay Install 4001": {
+      "DisplayName": "Sample Odyssey", "Publisher": "Ubisoft", "InstallLocation": "C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\games\\Sample Odyssey"
+    },
+    "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Uplay Install 4003": { "DisplayName": "Removed Game" }
+  }
+}

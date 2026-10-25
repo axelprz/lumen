@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<game manifestVersion="3.0">
+  <metadata>
+    <localeInfo locale="en_US">
+      <title>Sample Legacy (manifest title)</title>
+    </localeInfo>
+  </metadata>
+  <contentIDs>
+    <contentID>  2000001  </contentID>
+  </contentIDs>
+</game>

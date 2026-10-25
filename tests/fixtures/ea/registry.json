@@ -1,0 +1,23 @@
+{
+  "LocalMachine": {
+    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{00000000-0000-0000-0000-00000000ea01}": {
+      "DisplayName": "Sample FC", "Publisher": "Electronic Arts", "InstallLocation": "C:\\Program Files\\EA Games\\Sample FC\\",
+      "UninstallString": "\"C:\\Program Files\\Common Files\\EAInstaller\\Sample FC\\Cleanup.exe\" uninstall_game -autologging"
+    },
+    "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Sample Legacy": {
+      "DisplayName": "Sample Legacy", "Publisher": "Electronic Arts, Inc.", "InstallLocation": "D:\\Origin Games\\Sample Legacy",
+      "UninstallString": "\"D:\\Origin Games\\Sample Legacy\\uninstall.exe\""
+    },
+    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{00000000-0000-0000-0000-00000000ea03}": {
+      "DisplayName": "Hostile Manifest", "InstallLocation": "C:\\Program Files\\EA Games\\Hostile",
+      "UninstallString": "\"C:\\Program Files\\Common Files\\EAInstaller\\Hostile\\Cleanup.exe\" uninstall_game"
+    },
+    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{00000000-0000-0000-0000-00000000ea04}": {
+      "DisplayName": "EA app", "Publisher": "Electronic Arts", "InstallLocation": "C:\\Program Files\\Electronic Arts\\EA Desktop",
+      "UninstallString": "\"C:\\ProgramData\\EA Desktop\\EAUninstall.exe\""
+    },
+    "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Unrelated Tool": {
+      "DisplayName": "Unrelated Tool", "Publisher": "Someone Else", "InstallLocation": "C:\\Tools\\Unrelated"
+    }
+  }
+}

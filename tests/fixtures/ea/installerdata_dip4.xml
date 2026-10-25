@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DiPManifest version="4.0">
+  <buildMetaData>
+    <featureFlags autoUpdateEnabled="1" />
+  </buildMetaData>
+  <contentIDs>
+    <contentID>1000001</contentID>
+    <contentID>1000002</contentID>
+  </contentIDs>
+  <gameTitles>
+    <gameTitle locale="es_ES">Muestra FC</gameTitle>
+    <gameTitle locale="en_US">Sample FC (manifest title)</gameTitle>
+  </gameTitles>
+  <runtime>
+    <launcher uid="launcher1">
+      <filePath>[HKEY_LOCAL_MACHINE\SOFTWARE\EA Sports\Sample FC\Install Dir]SampleFC.exe</filePath>
+      <trial>0</trial>
+    </launcher>
+  </runtime>
+</DiPManifest>

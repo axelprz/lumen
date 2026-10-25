@@ -1,0 +1,24 @@
+{
+  "LocalMachine": {
+    "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Overwatch": {
+      "DisplayName": "Overwatch", "Publisher": "Blizzard Entertainment", "InstallLocation": "C:\\Program Files (x86)\\Overwatch",
+      "UninstallString": "\"C:\\ProgramData\\Battle.net\\Agent\\Blizzard Uninstaller.exe\" --lang=enUS --uid=prometheus --displayname=\"Overwatch\""
+    },
+    "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\World of Warcraft Classic": {
+      "DisplayName": "World of Warcraft Classic", "Publisher": "Blizzard Entertainment", "InstallLocation": "D:\\Games\\World of Warcraft",
+      "UninstallString": "\"C:\\ProgramData\\Battle.net\\Agent\\Blizzard Uninstaller.exe\" --lang=enUS --uid=wow_classic --displayname=\"World of Warcraft Classic\""
+    },
+    "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Future Game": {
+      "DisplayName": "Future Blizzard Game", "Publisher": "Blizzard Entertainment", "InstallLocation": "D:\\Games\\Future",
+      "UninstallString": "\"C:\\ProgramData\\Battle.net\\Agent\\Blizzard Uninstaller.exe\" --lang=enUS --uid=newthing --displayname=\"Future Blizzard Game\""
+    },
+    "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Diablo IV": {
+      "DisplayName": "Diablo IV", "Publisher": "Blizzard Entertainment", "InstallLocation": "D:\\Games\\Diablo IV (removed)",
+      "UninstallString": "\"C:\\ProgramData\\Battle.net\\Agent\\Blizzard Uninstaller.exe\" --lang=enUS --uid=fenris --displayname=\"Diablo IV\""
+    },
+    "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Battle.net": {
+      "DisplayName": "Battle.net", "Publisher": "Blizzard Entertainment", "InstallLocation": "C:\\Program Files (x86)\\Battle.net",
+      "UninstallString": "\"C:\\Program Files (x86)\\Battle.net\\Battle.net Uninstaller.exe\" --lang=enUS"
+    }
+  }
+}
