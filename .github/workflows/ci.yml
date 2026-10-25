@@ -46,12 +46,3 @@ jobs:
           name: test-results-windows
           path: TestResults
           if-no-files-found: ignore
-
-  docker:
-    name: Build & test (Docker)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build and test in the dev container image
-        run: docker build --target test .
