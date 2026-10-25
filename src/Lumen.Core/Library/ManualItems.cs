@@ -47,7 +47,7 @@ public enum ManualItemError
 }
 
 /// <summary>Turns user input (typed, browsed or dropped) into a valid <see cref="ManualItem"/>.</summary>
-public static class ManualItemValidator
+public static partial class ManualItemValidator
 {
     public const int MaxTitleLength = 120;
     public const int MaxArgumentsLength = 2000;
@@ -75,10 +75,27 @@ public static class ManualItemValidator
         return colon > 1 && Uri.TryCreate(target, UriKind.Absolute, out _);
     }
 
+    /// <summary>
+    /// Cleans user input: trims quotes/spaces and turns a bare web address typed without a scheme
+    /// (<c>github.com/user/repo</c>, <c>www.example.com</c>) into <c>https://…</c>. File paths are left alone.
+    /// </summary>
+    public static string NormalizeTarget(string? target)
+    {
+        var t = target?.Trim().Trim('"').Trim() ?? string.Empty;
+        if (t.Length == 0 || LooksLikeUrl(t) || IsAbsoluteWindowsPath(t) || t.Contains('\\', StringComparison.Ordinal) || t.StartsWith('%'))
+        {
+            return t;
+        }
+
+        return BareDomainPattern().IsMatch(t) && !NotATld.Contains(BareHost(t)[(BareHost(t).LastIndexOf('.') + 1)..])
+            ? "https://" + t
+            : t;
+    }
+
     public static ManualItemError Validate(string? title, string? target, string? arguments)
     {
         title = title?.Trim();
-        target = target?.Trim().Trim('"');
+        target = NormalizeTarget(target);
         arguments = string.IsNullOrWhiteSpace(arguments) ? null : arguments.Trim();
 
         if (string.IsNullOrEmpty(title))
@@ -138,7 +155,7 @@ public static class ManualItemValidator
             throw new ArgumentException($"Invalid manual item: {error}.");
         }
 
-        target = target.Trim().Trim('"');
+        target = NormalizeTarget(target);
         var args = string.IsNullOrWhiteSpace(arguments) ? null : arguments.Trim();
         return LooksLikeUrl(target)
             ? new ManualItem(id, kind, title.Trim(), null, target, null)
@@ -148,7 +165,7 @@ public static class ManualItemValidator
     /// <summary>A sensible default title for a dropped/browsed target: file name or URL host.</summary>
     public static string SuggestTitle(string target)
     {
-        target = target.Trim().Trim('"');
+        target = NormalizeTarget(target);
         if (LooksLikeUrl(target))
         {
             var uri = new Uri(target);
@@ -187,4 +204,20 @@ public static class ManualItemValidator
     private static bool SchemePattern(string scheme) =>
         scheme.Length > 1 && char.IsAsciiLetterLower(scheme[0])
         && scheme.All(c => char.IsAsciiLetterLower(c) || char.IsAsciiDigit(c) || c is '+' or '.' or '-');
+
+    // "notepad.exe" looks like a host name too; these endings mean a file, not a website.
+    private static readonly HashSet<string> NotATld = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "exe", "lnk", "url", "bat", "cmd", "ps1", "msi", "scr", "vbs", "js", "jar", "dll", "txt", "ini",
+    };
+
+    private static string BareHost(string target)
+    {
+        var end = target.IndexOfAny(['/', '?', '#', ':']);
+        return end < 0 ? target : target[..end];
+    }
+
+    // host.with.dots[:port][/path...] where the last label is letters only (a TLD).
+    [System.Text.RegularExpressions.GeneratedRegex(@"^(?:[a-z0-9-]+\.)+[a-z]{2,63}(?::\d{1,5})?(?:[/?#].*)?$", System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.CultureInvariant)]
+    private static partial System.Text.RegularExpressions.Regex BareDomainPattern();
 }

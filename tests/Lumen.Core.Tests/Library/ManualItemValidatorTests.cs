@@ -80,6 +80,36 @@ public sealed class ManualItemValidatorTests
     }
 
     [Theory]
+    [InlineData("github.com/axelprz/lumen", "https://github.com/axelprz/lumen")]
+    [InlineData("  www.example.com  ", "https://www.example.com")]
+    [InlineData("example.com", "https://example.com")]
+    [InlineData("store.example.co.uk/game?id=1", "https://store.example.co.uk/game?id=1")]
+    [InlineData("https://example.com", "https://example.com")]
+    [InlineData("steam://rungameid/1", "steam://rungameid/1")]
+    [InlineData("notepad.exe", "notepad.exe")]
+    [InlineData("game.lnk", "game.lnk")]
+    [InlineData(@"C:\Games\a.exe", @"C:\Games\a.exe")]
+    [InlineData(@"""C:\Games\a.exe""", @"C:\Games\a.exe")]
+    [InlineData(@"games\a.exe", @"games\a.exe")]
+    [InlineData(@"%USERPROFILE%\a.exe", @"%USERPROFILE%\a.exe")]
+    [InlineData("just words", "just words")]
+    public void NormalizeTarget(string input, string expected)
+    {
+        ManualItemValidator.NormalizeTarget(input).ShouldBe(expected);
+    }
+
+    [Fact]
+    public void BareDomain_IsAcceptedAndSavedAsHttps()
+    {
+        ManualItemValidator.Validate("Lumen", "github.com/axelprz/lumen", null).ShouldBe(ManualItemError.None);
+
+        var item = ManualItemValidator.Create(Guid.NewGuid(), ItemKind.App, "Lumen", "github.com/axelprz/lumen", null);
+
+        item.Url.ShouldBe("https://github.com/axelprz/lumen");
+        ManualItemValidator.SuggestTitle("github.com/axelprz/lumen").ShouldBe("github.com");
+    }
+
+    [Theory]
     [InlineData(@"C:\a.exe", false)]
     [InlineData(@"C:/a.exe", false)]
     [InlineData(@"\\server\share\a.exe", false)]
