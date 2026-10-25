@@ -15,7 +15,8 @@ public sealed class EpicProvider(IRegistryReader registry, IFileSystem fileSyste
 {
     public const string SourceId = "epic";
 
-    // VERIFY: starting points from ARCHITECTURE §4, not yet checked on a machine with Epic installed.
+    // Verified on Windows 11 (2026-10): manifests live in %ProgramData%\Epic\EpicGamesLauncher\Data\Manifests;
+    // the AppDataPath value below was absent there, so it is only an override for custom data folders.
     internal const string RegistryKey = @"SOFTWARE\WOW6432Node\Epic Games\EpicGamesLauncher";
     internal const string RegistryValue = "AppDataPath";
 
@@ -27,7 +28,7 @@ public sealed class EpicProvider(IRegistryReader registry, IFileSystem fileSyste
 
     public ProviderCapabilities Capabilities => ProviderCapabilities.InstalledScan;
 
-    /// <summary>VERIFY: launcher URI format from community documentation (Heroic/Legendary/Playnite).</summary>
+    /// <summary>Launcher URI; verified on Windows 11 (2026-10): starts the game through the Epic launcher.</summary>
     public static LaunchSpec LaunchFor(string appName, string? catalogNamespace, string? catalogItemId) =>
         new(LaunchKind.Uri, $"com.epicgames.launcher://apps/{AppPath(appName, catalogNamespace, catalogItemId)}?action=launch&silent=true");
 

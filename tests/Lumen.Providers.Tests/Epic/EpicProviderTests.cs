@@ -8,8 +8,7 @@ using Lumen.Providers.Tests.Fakes;
 
 namespace Lumen.Providers.Tests.Epic;
 
-// VERIFY: fixtures follow the manifest format documented by Legendary/Heroic/Playnite; not yet compared
-// with a real Epic install.
+// Fixtures are synthetic but follow the real manifest format (compared with a real install, 2026-10).
 public sealed class EpicProviderTests
 {
     private const string DefaultManifests = @"C:\ProgramData\Epic\EpicGamesLauncher\Data\Manifests";

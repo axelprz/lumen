@@ -7,8 +7,7 @@ using Lumen.Providers.Tests.Fakes;
 
 namespace Lumen.Providers.Tests.Gog;
 
-// VERIFY: the registry snapshot follows the layout documented for GOG installers/Galaxy; not yet compared
-// with a real GOG install.
+// The registry snapshot is synthetic but follows the real layout (compared with a real install, 2026-10).
 public sealed class GogProviderTests
 {
     private const string Galaxy = @"C:\Program Files (x86)\GOG Galaxy\GalaxyClient.exe";
@@ -29,7 +28,7 @@ public sealed class GogProviderTests
 
         var result = await Provider().ScanInstalledAsync(CancellationToken.None);
 
-        result.Entries.Select(e => e.Ref.ToString()).Order().ShouldBe(["gog:1000000001", "gog:1000000005"]);
+        result.Entries.Select(e => e.Ref.ToString()).Order().ShouldBe(["gog:1000000001", "gog:1000000005", "gog:1000000006"]);
         result.Status.ShouldBe(ProviderStatus.Partial); // the key without a name is a warning
         result.Diagnostics.ShouldContain(d => d.Severity == DiagnosticSeverity.Info && d.Message.Contains("Uninstalled Leftover"));
     }
@@ -65,6 +64,21 @@ public sealed class GogProviderTests
     }
 
     [Fact]
+    public async Task EmptyDependsOnAndLaunchParam_AreABaseGameWithoutArgs()
+    {
+        // Real installs write these values as empty strings rather than omitting them.
+        Arrange(withGalaxy: false);
+
+        var game = (await Provider().ScanInstalledAsync(CancellationToken.None)).Entries.Single(e => e.Ref.ExternalId == "1000000006");
+
+        game.Launch.ShouldBe(new LaunchSpec(
+            LaunchKind.Executable,
+            @"C:\Program Files\GOG Galaxy\Games\Empty Values Sample\redist\Launcher.exe",
+            null,
+            @"C:\Program Files\GOG Galaxy\Games\Empty Values Sample\redist"));
+    }
+
+    [Fact]
     public async Task GalaxyRegisteredButMissing_FallsBackToExe()
     {
         Arrange(withGalaxy: false);
@@ -97,6 +111,7 @@ public sealed class GogProviderTests
 
         _fs.AddDirectory(@"C:\GOG Games\Retro Sample");
         _fs.AddDirectory(@"D:\Games\GOG\Adventure Sample");
+        _fs.AddDirectory(@"C:\Program Files\GOG Galaxy\Games\Empty Values Sample");
         _fs.AddDirectory(@"C:\GOG Games\No Name");
     }
 }
