@@ -1,0 +1,20 @@
+"AppState"
+{
+	"appid"		"1000012"
+	"Universe"		"1"
+	"name"		"Half Downloaded"
+	"StateFlags"		"1026"
+	"installdir"		"half_downloaded"
+	"LastUpdated"		"1790000000"
+	"LastPlayed"		"0"
+	"SizeOnDisk"		"1048576"
+	"LastOwner"		"0"
+	"InstalledDepots"
+	{
+		"1000013"
+		{
+			"manifest"		"1"
+			"size"		"1048576"
+		}
+	}
+}

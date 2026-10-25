@@ -40,4 +40,37 @@
   <data name="Startup_Error_Message" xml:space="preserve">
     <value>Algo salió mal al iniciar Lumen. Los detalles quedaron en el registro en %LOCALAPPDATA%\Lumen\logs.</value>
   </data>
+  <data name="Action_Play" xml:space="preserve">
+    <value>Jugar</value>
+  </data>
+  <data name="Action_Install" xml:space="preserve">
+    <value>Instalar</value>
+  </data>
+  <data name="Library_Rescan" xml:space="preserve">
+    <value>Volver a escanear</value>
+  </data>
+  <data name="Library_Scanning" xml:space="preserve">
+    <value>Escaneando…</value>
+  </data>
+  <data name="Library_Count" xml:space="preserve">
+    <value>{0} elementos</value>
+  </data>
+  <data name="Library_Empty" xml:space="preserve">
+    <value>Todavía no se encontraron juegos. Lumen busca los juegos de Steam instalados en esta PC; pronto se suman más tiendas y elementos manuales.</value>
+  </data>
+  <data name="Library_NotInstalled" xml:space="preserve">
+    <value>No instalado</value>
+  </data>
+  <data name="Library_ScanProblems" xml:space="preserve">
+    <value>Algunos elementos de {0} no se pudieron leer. Los detalles están en el registro.</value>
+  </data>
+  <data name="Library_ScanFailed" xml:space="preserve">
+    <value>No se pudo escanear la biblioteca. Los detalles están en el registro.</value>
+  </data>
+  <data name="Library_LaunchFailed" xml:space="preserve">
+    <value>No se pudo iniciar {0}.</value>
+  </data>
+  <data name="Library_CountOne" xml:space="preserve">
+    <value>1 elemento</value>
+  </data>
 </root>

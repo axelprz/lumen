@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "description": "Steam app ids that are tools/runtimes, not games or apps the user launches. Data, not code: extend freely.",
+  "appIds": [
+    228980,
+    1070560,
+    1391110,
+    1628350,
+    1493710,
+    2180100,
+    1826330,
+    1161040
+  ],
+  "notes": {
+    "228980": "Steamworks Common Redistributables",
+    "1070560": "Steam Linux Runtime 1.0 (scout)",
+    "1391110": "Steam Linux Runtime 2.0 (soldier)",
+    "1628350": "Steam Linux Runtime 3.0 (sniper)",
+    "1493710": "Proton Experimental",
+    "2180100": "Proton Hotfix",
+    "1826330": "Proton EasyAntiCheat Runtime",
+    "1161040": "Proton BattlEye Runtime"
+  }
+}

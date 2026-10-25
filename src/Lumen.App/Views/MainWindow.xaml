@@ -5,6 +5,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:l="clr-namespace:Lumen.App.Localization"
         xmlns:vm="clr-namespace:Lumen.App.ViewModels"
+        xmlns:views="clr-namespace:Lumen.App.Views"
         Title="{l:Loc App_Title}"
         Width="1280"
         Height="800"
@@ -50,14 +51,17 @@
       </DockPanel>
     </Border>
 
-    <!-- Content: placeholder page per section until each milestone fills it in -->
+    <!-- Content: the selected section's page, picked by view-model type -->
     <ContentControl Grid.Column="1"
-                    Content="{Binding SelectedSection}"
+                    Content="{Binding SelectedSection.Page}"
                     Focusable="False">
-      <ContentControl.ContentTemplate>
-        <DataTemplate DataType="{x:Type vm:SectionViewModel}">
-          <StackPanel Margin="48,40">
-            <TextBlock Text="{Binding Title}"
+      <ContentControl.Resources>
+        <DataTemplate DataType="{x:Type vm:LibraryViewModel}">
+          <views:LibraryView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:PlaceholderPageViewModel}">
+          <StackPanel Margin="40,32">
+            <TextBlock Text="{Binding Section.Title}"
                        Style="{StaticResource Lumen.Text.PageTitle}" />
             <TextBlock Text="{l:Loc Placeholder_ComingSoon}"
                        Foreground="{DynamicResource Lumen.Brush.TextMuted}"
@@ -65,7 +69,7 @@
                        Margin="0,12,0,0" />
           </StackPanel>
         </DataTemplate>
-      </ContentControl.ContentTemplate>
+      </ContentControl.Resources>
     </ContentControl>
   </Grid>
 </Window>

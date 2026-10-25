@@ -40,4 +40,37 @@
   <data name="Startup_Error_Message" xml:space="preserve">
     <value>Something went wrong while starting Lumen. Details were written to the log in %LOCALAPPDATA%\Lumen\logs.</value>
   </data>
+  <data name="Action_Play" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="Action_Install" xml:space="preserve">
+    <value>Install</value>
+  </data>
+  <data name="Library_Rescan" xml:space="preserve">
+    <value>Rescan</value>
+  </data>
+  <data name="Library_Scanning" xml:space="preserve">
+    <value>Scanning…</value>
+  </data>
+  <data name="Library_Count" xml:space="preserve">
+    <value>{0} items</value>
+  </data>
+  <data name="Library_Empty" xml:space="preserve">
+    <value>No games found yet. Lumen looks for Steam games installed on this PC; more stores and manual items are coming.</value>
+  </data>
+  <data name="Library_NotInstalled" xml:space="preserve">
+    <value>Not installed</value>
+  </data>
+  <data name="Library_ScanProblems" xml:space="preserve">
+    <value>Some items from {0} could not be read. Details are in the log.</value>
+  </data>
+  <data name="Library_ScanFailed" xml:space="preserve">
+    <value>The library could not be scanned. Details are in the log.</value>
+  </data>
+  <data name="Library_LaunchFailed" xml:space="preserve">
+    <value>Could not start {0}.</value>
+  </data>
+  <data name="Library_CountOne" xml:space="preserve">
+    <value>1 item</value>
+  </data>
 </root>

@@ -24,7 +24,7 @@ docs/
   PLAN-v1.md  ARCHITECTURE.md  schemas/  examples/
 ```
 
-Rule: **everything that can be pure stays out of the Windows projects** so it builds and tests on any OS (including Linux CI agents). Windows-only access (registry, file system locations under `%ProgramData%`, processes, AppX, shell) is abstracted behind interfaces in `Lumen.Core` and implemented in `Lumen.Platform.Windows`. Providers receive those abstractions, so a provider test feeds fixture data instead of a real registry.
+Rule: **everything that can be pure stays out of the Windows projects** so it builds and tests on any OS (including Linux CI agents). Windows-only access (registry, file system locations under `%ProgramData%`, processes, AppX, shell) is abstracted behind interfaces in `Lumen.Core` and implemented in `Lumen.Platform.Windows`. Providers receive those abstractions, so a provider test feeds fixture data instead of a real registry. They live in `Lumen.Core.Platform`: `IRegistryReader` (read-only), `IFileSystem` (read-only; `PhysicalFileSystem` is the real one), `ILauncher` (`ShellLauncher` in Platform.Windows, shell-execute as the current user, never `runas`).
 
 Dependency direction: `App → Platform.Windows → Providers → Data → Core` (each may depend only on things to its right; `App` composes everything).
 
@@ -52,7 +52,7 @@ NuGet audit runs on restore and, with warnings as errors, a package with a known
 // Stable identity across machines and syncs: "{source}:{externalId}"
 // e.g. "steam:570", "epic:Fortnite", "gog:1207658924", "xbox:{PackageFamilyName}!{AppId}",
 //      "startmenu:{relative .lnk path, normalized}", "manual:{guid}"
-public readonly record struct ItemRef(string Source, string ExternalId);
+public readonly record struct ItemRef(string Source, string ExternalId);   // Source: lowercase [a-z0-9]+; parsed on the first ':'
 
 public enum ItemKind { Game, App }
 public enum InstallState { Installed, NotInstalled, Unknown }
@@ -109,13 +109,15 @@ public interface IAccountConnector                 // Epic, GOG (v1)
 }
 ```
 
-`ProviderResult` carries entries **plus** non-fatal diagnostics. A provider must never throw out of a scan: catch, log, return what it could read.
+`ProviderResult` carries entries **plus** non-fatal diagnostics and a status: `Ok`, `Partial` (some items unreadable), `NotAvailable` (store not installed), `NotConfigured` (needs key/login), `Failed`. A provider must never throw out of a scan: catch, log, return what it could read.
+
+`LibraryService` runs every provider in parallel with a 30 s timeout per scan (and still contains a provider that throws). Per source it combines the installed scan with the owned scan: installed entries win, owned ones fill in as `NotInstalled`. A `Failed` scan falls back to the matching part of the previous cache, so a broken provider never wipes the library; `NotAvailable`/`NotConfigured` are real answers and do clear stale entries. Results are persisted per source and published sorted by title.
 
 ### Starting points per store (verify on a real machine before relying on them)
 
 | Store | Installed detection | Launch / install |
 |---|---|---|
-| Steam | Install path from `HKCU\Software\Valve\Steam\SteamPath`; libraries in `steamapps\libraryfolders.vdf`; each game in `steamapps\appmanifest_{appid}.acf` (`name`, `installdir`, `StateFlags`). Owned: `IPlayerService/GetOwnedGames/v1` with `include_appinfo=1&include_played_free_games=1` (key + SteamID64). Exclude tools/redistributables (e.g. appid 228980). | `steam://rungameid/{appid}`, `steam://install/{appid}` |
+| Steam | **Verified (M1, Windows 11):** `SteamPath` is lowercase with forward slashes; `libraryfolders.vdf` uses the `"libraryfolders" { "0" { "path" ... } }` format (the pre-2021 `"1" "D:\..."` form is also parsed); manifests have `StateFlags` (bit 4 = fully installed; others are skipped) and `LastPlayed` (unix seconds, kept in `Extra`). Install path from `HKCU\Software\Valve\Steam\SteamPath`; libraries in `steamapps\libraryfolders.vdf`; each game in `steamapps\appmanifest_{appid}.acf` (`name`, `installdir`, `StateFlags`). Owned: `IPlayerService/GetOwnedGames/v1` with `include_appinfo=1&include_played_free_games=1` (key + SteamID64). Exclude tools/redistributables (e.g. appid 228980) — list in `src/Lumen.Providers/Data/steam-excluded-apps.json`. | `steam://rungameid/{appid}`, `steam://install/{appid}` |
 | Epic | `%ProgramData%\Epic\EpicGamesLauncher\Data\Manifests\*.item` (JSON: `DisplayName`, `AppName`, `CatalogNamespace`, `CatalogItemId`, `InstallLocation`, `LaunchExecutable`). Owned (login): Epic library service via the launcher OAuth flow used by Legendary/Heroic — research and document current endpoints. | `com.epicgames.launcher://apps/{namespace}%3A{catalogItemId}%3A{appName}?action=launch&silent=true`; install: same with `action=install` (verify) |
 | GOG | `HKLM\SOFTWARE\WOW6432Node\GOG.com\Games\{gameID}` (`gameName`, `path`, `exe`, `launchCommand`). Owned (login): GOG embed API with the Galaxy client flow (research current endpoints). | Galaxy: `GalaxyClient.exe /command=runGame /gameId={id} /path="{path}"`; fallback: exe directly. Install: open Galaxy to the game. |
 | Xbox / MS Store | `Windows.Management.Deployment.PackageManager.FindPackagesForUser("")`; a package is a game if its install location contains `MicrosoftGame.config` (or it is registered as a game). Read AppId from the manifest. | `explorer.exe shell:AppsFolder\{PackageFamilyName}!{AppId}` |
@@ -151,6 +153,8 @@ SteamGridDB API v2: `https://www.steamgriddb.com/api/v2` with `Authorization: Be
 Tables (initial): `entries` (provider output cache), `items`, `item_entries`, `merge_rules`, `overrides`, `playtime_sessions`, `steam_playtime`, `ignored_apps`, `secrets`, `routine_trust` (routine id → sha256 + approved_at), `settings_local`, `schema_version`.
 
 Migrations are hand-written SQL files embedded in `Lumen.Data` as `Migrations/NNNN_lower_snake_name.sql` (versions contiguous from 1). `MigrationRunner` creates `schema_version` itself, applies each pending migration in its own transaction on startup (before the main window opens), and refuses a database whose version is newer than the app knows. `0001_initial` only creates `settings_local`; every other table is added by the milestone that first uses it, so its columns are designed with real code in hand. Connections use WAL, `foreign_keys=ON` and a 5 s busy timeout.
+
+`entries` (migration 0002): one row per provider entry, primary key `(source, external_id)`; enums stored as text (`Game`, `Installed`, ...), launch/install specs and `Extra` as JSON. Rows a newer Lumen wrote with unknown values are skipped on read. A source is always replaced as a whole, in one transaction.
 
 ### Portable — JSON (sync folder, or `%APPDATA%\Lumen\portable` when no sync folder is set)
 ```

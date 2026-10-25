@@ -1,0 +1,20 @@
+"AppState"
+{
+	"appid"		"1000010"
+	"Universe"		"1"
+	"name"		"Sample Quest"
+	"StateFlags"		"4"
+	"installdir"		"Sample Quest"
+	"LastUpdated"		"1790000000"
+	"LastPlayed"		"1790001000"
+	"SizeOnDisk"		"1048576"
+	"LastOwner"		"0"
+	"InstalledDepots"
+	{
+		"1000011"
+		{
+			"manifest"		"1"
+			"size"		"1048576"
+		}
+	}
+}
