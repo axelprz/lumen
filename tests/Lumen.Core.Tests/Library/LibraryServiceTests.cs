@@ -128,6 +128,30 @@ public sealed class LibraryServiceTests
     }
 
     [Fact]
+    public async Task ScanSource_OnlyRunsThatProvider()
+    {
+        var steamScans = 0;
+        var steam = new FakeProvider("steam")
+        {
+            Installed = _ =>
+            {
+                steamScans++;
+                return Task.FromResult(ProviderResult.FromScan([Game("steam", "1", "Steam game")], []));
+            },
+        };
+        var manual = new FakeProvider("manual").WithInstalled(Game("manual", "a", "Manual one"));
+        var service = Service(steam, manual);
+        await service.ScanAsync(CancellationToken.None);
+
+        manual.WithInstalled(Game("manual", "a", "Manual one"), Game("manual", "b", "Manual two"));
+        var reports = await service.ScanSourceAsync("manual", CancellationToken.None);
+
+        steamScans.ShouldBe(1);
+        reports.Single().Source.ShouldBe("manual");
+        service.Entries.Select(e => e.Title).ShouldBe(["Manual one", "Manual two", "Steam game"]);
+    }
+
+    [Fact]
     public async Task LoadCached_PublishesCacheContent()
     {
         _cache.BySource["steam"] = [Game("steam", "1", "From cache")];

@@ -56,7 +56,7 @@
     <value>{0} elementos</value>
   </data>
   <data name="Library_Empty" xml:space="preserve">
-    <value>Todavía no se encontraron juegos. Lumen busca los juegos de Steam instalados en esta PC; pronto se suman más tiendas y elementos manuales.</value>
+    <value>Todavía no hay juegos. Lumen encuentra tus juegos de Steam solo; también podés agregar cualquier juego o app con Agregar, o arrastrando acá un .exe, un acceso directo o un link.</value>
   </data>
   <data name="Library_NotInstalled" xml:space="preserve">
     <value>No instalado</value>
@@ -129,5 +129,89 @@
   </data>
   <data name="Settings_Steam_KeyHint" xml:space="preserve">
     <value>Cuando Steam pida un nombre de dominio, sirve cualquiera (por ejemplo localhost): Lumen no lo usa.</value>
+  </data>
+  <data name="Library_Add" xml:space="preserve">
+    <value>Agregar</value>
+  </data>
+  <data name="Library_NotAvailable" xml:space="preserve">
+    <value>No está en esta PC</value>
+  </data>
+  <data name="Action_Unavailable" xml:space="preserve">
+    <value>No disponible</value>
+  </data>
+  <data name="Store_Manual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="Tile_Edit" xml:space="preserve">
+    <value>Editar…</value>
+  </data>
+  <data name="Tile_Remove" xml:space="preserve">
+    <value>Quitar de la biblioteca</value>
+  </data>
+  <data name="Manual_AddTitle" xml:space="preserve">
+    <value>Agregar un juego o app</value>
+  </data>
+  <data name="Manual_EditTitle" xml:space="preserve">
+    <value>Editar</value>
+  </data>
+  <data name="Manual_KindGame" xml:space="preserve">
+    <value>Juego</value>
+  </data>
+  <data name="Manual_KindApp" xml:space="preserve">
+    <value>App</value>
+  </data>
+  <data name="Manual_TitleLabel" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="Manual_TargetLabel" xml:space="preserve">
+    <value>Archivo (.exe, .lnk, .url) o dirección web</value>
+  </data>
+  <data name="Manual_Browse" xml:space="preserve">
+    <value>Examinar…</value>
+  </data>
+  <data name="Manual_ArgsLabel" xml:space="preserve">
+    <value>Argumentos de inicio (opcional, solo .exe)</value>
+  </data>
+  <data name="Manual_Save" xml:space="preserve">
+    <value>Guardar</value>
+  </data>
+  <data name="Manual_Cancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="Manual_FileFilter" xml:space="preserve">
+    <value>Programas y accesos directos (*.exe;*.lnk;*.url)|*.exe;*.lnk;*.url</value>
+  </data>
+  <data name="Manual_RemoveConfirmTitle" xml:space="preserve">
+    <value>Quitar de la biblioteca</value>
+  </data>
+  <data name="Manual_RemoveConfirm" xml:space="preserve">
+    <value>¿Quitar "{0}" de Lumen? El archivo en sí no se toca.</value>
+  </data>
+  <data name="Manual_SaveFailed" xml:space="preserve">
+    <value>No se pudo guardar el elemento. Los detalles están en el registro.</value>
+  </data>
+  <data name="Manual_Error_TitleMissing" xml:space="preserve">
+    <value>Ingresá un nombre.</value>
+  </data>
+  <data name="Manual_Error_TitleTooLong" xml:space="preserve">
+    <value>El nombre puede tener hasta 120 caracteres.</value>
+  </data>
+  <data name="Manual_Error_TargetMissing" xml:space="preserve">
+    <value>Elegí un archivo o ingresá una dirección web.</value>
+  </data>
+  <data name="Manual_Error_UnsupportedFileType" xml:space="preserve">
+    <value>Solo se pueden agregar archivos .exe, .lnk y .url.</value>
+  </data>
+  <data name="Manual_Error_RelativePath" xml:space="preserve">
+    <value>Usá la ruta completa, por ejemplo C:\Juegos\juego.exe.</value>
+  </data>
+  <data name="Manual_Error_UnsupportedUrl" xml:space="preserve">
+    <value>Este tipo de dirección no está permitido, por tu seguridad.</value>
+  </data>
+  <data name="Manual_Error_ArgumentsTooLong" xml:space="preserve">
+    <value>Los argumentos pueden tener hasta 2000 caracteres.</value>
+  </data>
+  <data name="Manual_Error_ArgumentsNotAllowed" xml:space="preserve">
+    <value>Los argumentos de inicio solo funcionan con archivos .exe.</value>
   </data>
 </root>

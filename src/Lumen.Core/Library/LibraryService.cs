@@ -54,12 +54,19 @@ public sealed partial class LibraryService
         Publish(cached);
     }
 
-    public async Task<IReadOnlyList<ProviderScanReport>> ScanAsync(CancellationToken ct)
+    /// <summary>Scans every provider.</summary>
+    public Task<IReadOnlyList<ProviderScanReport>> ScanAsync(CancellationToken ct) => ScanCoreAsync(_providers, ct);
+
+    /// <summary>Scans only the provider for <paramref name="source"/> (e.g. after editing manual items), leaving the rest as they are.</summary>
+    public Task<IReadOnlyList<ProviderScanReport>> ScanSourceAsync(string source, CancellationToken ct) =>
+        ScanCoreAsync(_providers.Where(p => p.Source == source).ToList(), ct);
+
+    private async Task<IReadOnlyList<ProviderScanReport>> ScanCoreAsync(IReadOnlyList<ILibraryProvider> providers, CancellationToken ct)
     {
         await _scanLock.WaitAsync(ct).ConfigureAwait(false);
         try
         {
-            var reports = await Task.WhenAll(_providers.Select(p => ScanProviderAsync(p, ct))).ConfigureAwait(false);
+            var reports = await Task.WhenAll(providers.Select(p => ScanProviderAsync(p, ct))).ConfigureAwait(false);
 
             var bySource = Entries.GroupBy(e => e.Ref.Source).ToDictionary(g => g.Key, g => (IReadOnlyList<LibraryEntry>)g.ToList());
             foreach (var report in reports)

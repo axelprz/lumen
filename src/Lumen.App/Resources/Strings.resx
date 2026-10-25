@@ -56,7 +56,7 @@
     <value>{0} items</value>
   </data>
   <data name="Library_Empty" xml:space="preserve">
-    <value>No games found yet. Lumen looks for Steam games installed on this PC; more stores and manual items are coming.</value>
+    <value>No games yet. Lumen finds your Steam games by itself; you can also add any game or app with Add, or by dragging an .exe, a shortcut or a link here.</value>
   </data>
   <data name="Library_NotInstalled" xml:space="preserve">
     <value>Not installed</value>
@@ -129,5 +129,89 @@
   </data>
   <data name="Settings_Steam_KeyHint" xml:space="preserve">
     <value>When Steam asks for a domain name, any name works (for example localhost): Lumen doesn't use it.</value>
+  </data>
+  <data name="Library_Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Library_NotAvailable" xml:space="preserve">
+    <value>Not found on this PC</value>
+  </data>
+  <data name="Action_Unavailable" xml:space="preserve">
+    <value>Unavailable</value>
+  </data>
+  <data name="Store_Manual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="Tile_Edit" xml:space="preserve">
+    <value>Edit…</value>
+  </data>
+  <data name="Tile_Remove" xml:space="preserve">
+    <value>Remove from library</value>
+  </data>
+  <data name="Manual_AddTitle" xml:space="preserve">
+    <value>Add a game or app</value>
+  </data>
+  <data name="Manual_EditTitle" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Manual_KindGame" xml:space="preserve">
+    <value>Game</value>
+  </data>
+  <data name="Manual_KindApp" xml:space="preserve">
+    <value>App</value>
+  </data>
+  <data name="Manual_TitleLabel" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Manual_TargetLabel" xml:space="preserve">
+    <value>File (.exe, .lnk, .url) or web address</value>
+  </data>
+  <data name="Manual_Browse" xml:space="preserve">
+    <value>Browse…</value>
+  </data>
+  <data name="Manual_ArgsLabel" xml:space="preserve">
+    <value>Launch arguments (optional, .exe only)</value>
+  </data>
+  <data name="Manual_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Manual_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Manual_FileFilter" xml:space="preserve">
+    <value>Programs and shortcuts (*.exe;*.lnk;*.url)|*.exe;*.lnk;*.url</value>
+  </data>
+  <data name="Manual_RemoveConfirmTitle" xml:space="preserve">
+    <value>Remove from library</value>
+  </data>
+  <data name="Manual_RemoveConfirm" xml:space="preserve">
+    <value>Remove "{0}" from Lumen? The file itself is not touched.</value>
+  </data>
+  <data name="Manual_SaveFailed" xml:space="preserve">
+    <value>The item could not be saved. Details are in the log.</value>
+  </data>
+  <data name="Manual_Error_TitleMissing" xml:space="preserve">
+    <value>Enter a name.</value>
+  </data>
+  <data name="Manual_Error_TitleTooLong" xml:space="preserve">
+    <value>The name can have up to 120 characters.</value>
+  </data>
+  <data name="Manual_Error_TargetMissing" xml:space="preserve">
+    <value>Choose a file or enter a web address.</value>
+  </data>
+  <data name="Manual_Error_UnsupportedFileType" xml:space="preserve">
+    <value>Only .exe, .lnk and .url files can be added.</value>
+  </data>
+  <data name="Manual_Error_RelativePath" xml:space="preserve">
+    <value>Use the full path, for example C:\Games\game.exe.</value>
+  </data>
+  <data name="Manual_Error_UnsupportedUrl" xml:space="preserve">
+    <value>This kind of address isn't allowed, for your safety.</value>
+  </data>
+  <data name="Manual_Error_ArgumentsTooLong" xml:space="preserve">
+    <value>Launch arguments can have up to 2000 characters.</value>
+  </data>
+  <data name="Manual_Error_ArgumentsNotAllowed" xml:space="preserve">
+    <value>Launch arguments only work with .exe files.</value>
   </data>
 </root>

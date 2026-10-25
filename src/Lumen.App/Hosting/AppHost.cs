@@ -14,7 +14,9 @@ using Lumen.Data.Migrations;
 using Lumen.Core.Settings;
 using Lumen.Platform.Windows;
 using Lumen.Platform.Windows.Security;
+using Lumen.Providers.Manual;
 using Lumen.Providers.Steam;
+using Lumen.App.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -70,6 +72,9 @@ public static class AppHost
         // Library
         builder.Services.AddSingleton<SteamProvider>();
         builder.Services.AddSingleton<ILibraryProvider>(sp => sp.GetRequiredService<SteamProvider>());
+        builder.Services.AddSingleton<IManualItemStore, SqliteManualItemStore>();
+        builder.Services.AddSingleton<ILibraryProvider, ManualItemsProvider>();
+        builder.Services.AddSingleton<IDialogService, DialogService>();
         builder.Services.AddSingleton<ILibraryCache, SqliteLibraryCache>();
         builder.Services.AddSingleton(sp => new LibraryService(
             sp.GetServices<ILibraryProvider>(),
