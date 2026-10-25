@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Lumen.App.Hosting;
 using Lumen.App.Localization;
+using Lumen.App.ViewModels;
 using Lumen.App.Views;
 using Lumen.Core.Localization;
 using Lumen.Platform.Windows;
@@ -51,7 +52,11 @@ public partial class App : Application
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
             await ShutdownAsync(exitCode: 1).ConfigureAwait(true);
+            return;
         }
+
+        // The window is already visible: show the cached library, then rescan in the background.
+        await _host.Services.GetRequiredService<LibraryViewModel>().InitializeAsync(CancellationToken.None).ConfigureAwait(true);
     }
 
     protected override void OnExit(ExitEventArgs e)

@@ -5,9 +5,13 @@ using Lumen.App.Localization;
 using Lumen.App.ViewModels;
 using Lumen.App.Views;
 using Lumen.Core;
+using Lumen.Core.Library;
 using Lumen.Core.Localization;
+using Lumen.Core.Platform;
 using Lumen.Data;
 using Lumen.Data.Migrations;
+using Lumen.Platform.Windows;
+using Lumen.Providers.Steam;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -41,6 +45,21 @@ public static class AppHost
         builder.Services.AddSingleton<MigrationRunner>();
         builder.Services.AddHostedService<DatabaseInitializer>();
 
+        // Platform (read-only registry/files, shell launching)
+        builder.Services.AddSingleton<IRegistryReader, WindowsRegistryReader>();
+        builder.Services.AddSingleton<IFileSystem, PhysicalFileSystem>();
+        builder.Services.AddSingleton<ILauncher, ShellLauncher>();
+
+        // Library
+        builder.Services.AddSingleton<ILibraryProvider, SteamProvider>();
+        builder.Services.AddSingleton<ILibraryCache, SqliteLibraryCache>();
+        builder.Services.AddSingleton(sp => new LibraryService(
+            sp.GetServices<ILibraryProvider>(),
+            sp.GetRequiredService<ILibraryCache>(),
+            sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<LibraryService>>()));
+        builder.Services.AddSingleton<LaunchService>();
+
+        builder.Services.AddSingleton<LibraryViewModel>();
         builder.Services.AddSingleton<ShellViewModel>();
         builder.Services.AddSingleton<MainWindow>();
 

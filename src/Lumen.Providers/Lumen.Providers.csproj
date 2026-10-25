@@ -6,4 +6,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Lumen.Core\Lumen.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- Junk filters, exclusion lists, title cleanup: data, not code. -->
+    <EmbeddedResource Include="Data\*.json" LogicalName="Lumen.Providers.Data.%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Lumen.Providers.Tests" />
+  </ItemGroup>
 </Project>

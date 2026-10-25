@@ -15,18 +15,19 @@ public enum ShellSection
     Settings,
 }
 
-/// <summary>One sidebar entry. Each section gets its own page view model in later milestones.</summary>
+/// <summary>One sidebar entry and the page it shows.</summary>
 public sealed class SectionViewModel : ObservableObject
 {
     private readonly ILocalizer _localizer;
     private readonly string _titleKey;
 
-    public SectionViewModel(ShellSection section, string titleKey, string iconGlyph, ILocalizer localizer)
+    public SectionViewModel(ShellSection section, string titleKey, string iconGlyph, ILocalizer localizer, object? page = null)
     {
         Section = section;
         _titleKey = titleKey;
         IconGlyph = iconGlyph;
         _localizer = localizer;
+        Page = page ?? new PlaceholderPageViewModel(this);
         _localizer.CultureChanged += (_, _) => OnPropertyChanged(nameof(Title));
     }
 
@@ -36,4 +37,7 @@ public sealed class SectionViewModel : ObservableObject
     public string IconGlyph { get; }
 
     public string Title => _localizer[_titleKey];
+
+    /// <summary>The view model shown in the content area; views are picked by DataTemplate type.</summary>
+    public object Page { get; }
 }
