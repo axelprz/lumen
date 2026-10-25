@@ -20,6 +20,9 @@
   <SolidColorBrush x:Key="Lumen.Brush.Text" Color="{StaticResource Lumen.Color.Text}" />
   <SolidColorBrush x:Key="Lumen.Brush.TextMuted" Color="{StaticResource Lumen.Color.TextMuted}" />
   <SolidColorBrush x:Key="Lumen.Brush.Accent" Color="{StaticResource Lumen.Color.Accent}" />
+  <SolidColorBrush x:Key="Lumen.Brush.Success" Color="#FF5CC98B" />
+  <SolidColorBrush x:Key="Lumen.Brush.Warning" Color="#FFE0B44C" />
+  <SolidColorBrush x:Key="Lumen.Brush.Error" Color="#FFF2766B" />
 
   <FontFamily x:Key="Lumen.Font.Icons">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
 

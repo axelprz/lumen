@@ -55,7 +55,8 @@ public partial class App : Application
             return;
         }
 
-        // The window is already visible: show the cached library, then rescan in the background.
+        // The window is already visible: load settings, show the cached library, then rescan in the background.
+        await _host.Services.GetRequiredService<SettingsViewModel>().InitializeAsync(CancellationToken.None).ConfigureAwait(true);
         await _host.Services.GetRequiredService<LibraryViewModel>().InitializeAsync(CancellationToken.None).ConfigureAwait(true);
     }
 

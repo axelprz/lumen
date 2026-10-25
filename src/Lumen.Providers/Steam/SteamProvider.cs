@@ -4,14 +4,20 @@
 using System.Globalization;
 using Lumen.Core.Library;
 using Lumen.Core.Platform;
+using Lumen.Core.Settings;
 
 namespace Lumen.Providers.Steam;
 
 /// <summary>
-/// Steam: installed games from the local library folders (no login). Owned-not-installed games arrive
-/// with the Steam Web API integration. Only reads Steam's files and registry.
+/// Steam: installed games from the local library folders (no login), plus owned games from the Steam
+/// Web API when the user supplied a key and SteamID64. Only reads Steam's files and registry.
 /// </summary>
-public sealed class SteamProvider(IRegistryReader registry, IFileSystem fileSystem) : ILibraryProvider
+public sealed class SteamProvider(
+    IRegistryReader registry,
+    IFileSystem fileSystem,
+    ISecretStore secrets,
+    ILocalSettings settings,
+    SteamWebApi webApi) : ILibraryProvider
 {
     public const string SourceId = "steam";
 
@@ -28,7 +34,7 @@ public sealed class SteamProvider(IRegistryReader registry, IFileSystem fileSyst
 
     public string DisplayName => "Steam";
 
-    public ProviderCapabilities Capabilities => ProviderCapabilities.InstalledScan;
+    public ProviderCapabilities Capabilities => ProviderCapabilities.InstalledScan | ProviderCapabilities.OwnedLibrary;
 
     public static LaunchSpec LaunchFor(string appId) => new(LaunchKind.Uri, $"steam://rungameid/{appId}");
 
@@ -65,8 +71,70 @@ public sealed class SteamProvider(IRegistryReader registry, IFileSystem fileSyst
         }
     }
 
-    public Task<ProviderResult> ScanOwnedAsync(CancellationToken ct) =>
-        Task.FromResult(ProviderResult.NotConfigured("Steam owned library is not configured."));
+    public async Task<ProviderResult> ScanOwnedAsync(CancellationToken ct)
+    {
+        try
+        {
+            var apiKey = await secrets.GetAsync(SecretNames.SteamWebApiKey, ct).ConfigureAwait(false);
+            var steamId = await settings.GetAsync(LocalSettingKeys.SteamId64, ct).ConfigureAwait(false);
+            if (string.IsNullOrWhiteSpace(apiKey) || steamId is null || !SteamWebApi.IsValidSteamId64(steamId))
+            {
+                return ProviderResult.NotConfigured("Steam Web API key or SteamID64 not set.");
+            }
+
+            var result = await webApi.GetOwnedGamesAsync(apiKey, steamId, ct).ConfigureAwait(false);
+            return result.Error switch
+            {
+                SteamApiError.None => ProviderResult.FromScan(ToEntries(result.Games), []),
+                SteamApiError.PrivateProfile => new ProviderResult(
+                    ProviderStatus.Partial,
+                    [],
+                    [new ProviderDiagnostic(DiagnosticSeverity.Warning, "Steam returned no games: the profile's game details are private.")]),
+                SteamApiError.InvalidKey => ProviderResult.Failed($"Steam rejected the Web API key (HTTP {result.Detail})."),
+                _ => ProviderResult.Failed($"Steam Web API unavailable ({result.Error}: {result.Detail})."),
+            };
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            return ProviderResult.Failed("Steam: could not read the owned library.", ex);
+        }
+    }
+
+    /// <summary>Checks a key/SteamID pair without saving anything (Settings → Steam → Save and test).</summary>
+    public Task<SteamOwnedGamesResult> TestConnectionAsync(string apiKey, string steamId64, CancellationToken ct) =>
+        webApi.GetOwnedGamesAsync(apiKey, steamId64, ct);
+
+    internal IReadOnlyList<LibraryEntry> ToEntries(IEnumerable<SteamOwnedGame> games) =>
+        games
+            .Where(g => !_excluded.Contains(g.AppId))
+            .DistinctBy(g => g.AppId)
+            .Select(g =>
+            {
+                var extra = new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["appid"] = g.AppId,
+                    ["playtimeMinutes"] = g.PlaytimeMinutes.ToString(CultureInfo.InvariantCulture),
+                };
+                if (g.LastPlayedUnix > 0)
+                {
+                    extra["lastPlayed"] = g.LastPlayedUnix.ToString(CultureInfo.InvariantCulture);
+                }
+
+                return new LibraryEntry(
+                    new ItemRef(SourceId, g.AppId),
+                    ItemKind.Game,
+                    g.Name,
+                    InstallState.NotInstalled,
+                    null,
+                    LaunchFor(g.AppId),
+                    InstallFor(g.AppId),
+                    extra);
+            })
+            .ToList();
 
     internal string? FindSteamPath()
     {

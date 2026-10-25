@@ -59,6 +59,9 @@
         <DataTemplate DataType="{x:Type vm:LibraryViewModel}">
           <views:LibraryView />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+          <views:SettingsView />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:PlaceholderPageViewModel}">
           <StackPanel Margin="40,32">
             <TextBlock Text="{Binding Section.Title}"
