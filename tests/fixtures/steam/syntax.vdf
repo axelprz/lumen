@@ -1,7 +1,7 @@
 // Comment line
 "Root"
 {
-	"quoted"		"value with \"quotes\" and \backslash\\"
+	"quoted"		"value with \"quotes\" and \\backslash\\"
 	"newline"		"a\nb"
 	unquoted		token
 	"conditional"		"win"		[$WIN32]

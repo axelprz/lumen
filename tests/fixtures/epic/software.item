@@ -1,0 +1,2 @@
+{ "AppName": "PaintToolApp", "DisplayName": "Paint Tool", "CatalogNamespace": "toolns", "CatalogItemId": "0000000000000000000000000000bbbb",
+  "AppCategories": [ "public", "software", "applications" ], "InstallLocation": "C:/Program Files/Epic Games/PaintTool", "bIsIncompleteInstall": false }

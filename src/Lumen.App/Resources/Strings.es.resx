@@ -56,7 +56,7 @@
     <value>{0} elementos</value>
   </data>
   <data name="Library_Empty" xml:space="preserve">
-    <value>Todavía no hay juegos. Lumen encuentra tus juegos de Steam solo; también podés agregar cualquier juego o app con Agregar, o arrastrando acá un .exe, un acceso directo o un link.</value>
+    <value>Todavía no hay juegos. Lumen encuentra solo los juegos instalados con Steam, Epic Games y GOG; también podés agregar cualquier juego o app con Agregar, o arrastrando acá un .exe, un acceso directo o un link.</value>
   </data>
   <data name="Library_NotInstalled" xml:space="preserve">
     <value>No instalado</value>

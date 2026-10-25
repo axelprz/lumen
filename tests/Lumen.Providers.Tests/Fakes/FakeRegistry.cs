@@ -16,6 +16,25 @@ internal sealed class FakeRegistry : IRegistryReader
         return this;
     }
 
+    /// <summary>Loads a registry snapshot fixture: { "LocalMachine": { "key\\path": { "value": "data" } } }.</summary>
+    public FakeRegistry LoadFixture(string fixture)
+    {
+        using var doc = System.Text.Json.JsonDocument.Parse(Fixtures.Read(fixture));
+        foreach (var hive in doc.RootElement.EnumerateObject())
+        {
+            var parsedHive = Enum.Parse<RegistryHive>(hive.Name);
+            foreach (var key in hive.Value.EnumerateObject())
+            {
+                foreach (var value in key.Value.EnumerateObject())
+                {
+                    Set(parsedHive, key.Name, value.Name, value.Value.GetString() ?? string.Empty);
+                }
+            }
+        }
+
+        return this;
+    }
+
     public string? GetString(RegistryHive hive, string keyPath, string valueName) =>
         _values.GetValueOrDefault(Key(hive, keyPath, valueName));
 
@@ -24,8 +43,8 @@ internal sealed class FakeRegistry : IRegistryReader
         var prefix = $"{hive}\\{keyPath.TrimEnd('\\')}\\";
         return _values.Keys
             .Where(k => k.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-            .Select(k => k[prefix.Length..].Split('\\')[0])
-            .Where(name => name.Length > 0 && !name.Contains('|', StringComparison.Ordinal))
+            .Select(k => k[prefix.Length..].Split('\\', '|')[0])
+            .Where(name => name.Length > 0)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
     }

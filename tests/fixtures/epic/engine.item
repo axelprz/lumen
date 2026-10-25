@@ -1,0 +1,2 @@
+{ "AppName": "UE_5.4", "DisplayName": "Unreal Engine 5.4", "CatalogNamespace": "ue", "CatalogItemId": "0000000000000000000000000000dddd",
+  "AppCategories": [ "public", "engines" ], "InstallLocation": "C:\\Program Files\\Epic Games\\UE_5.4" }

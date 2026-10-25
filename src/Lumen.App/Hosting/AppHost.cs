@@ -14,6 +14,8 @@ using Lumen.Data.Migrations;
 using Lumen.Core.Settings;
 using Lumen.Platform.Windows;
 using Lumen.Platform.Windows.Security;
+using Lumen.Providers.Epic;
+using Lumen.Providers.Gog;
 using Lumen.Providers.Manual;
 using Lumen.Providers.Steam;
 using Lumen.App.Services;
@@ -53,6 +55,7 @@ public static class AppHost
         // Platform (read-only registry/files, shell launching)
         builder.Services.AddSingleton<IRegistryReader, WindowsRegistryReader>();
         builder.Services.AddSingleton<IFileSystem, PhysicalFileSystem>();
+        builder.Services.AddSingleton<IKnownFolders, WindowsKnownFolders>();
         builder.Services.AddSingleton<ILauncher, ShellLauncher>();
 
         // Settings and secrets (DPAPI, CurrentUser). Secrets are never logged or synced.
@@ -72,6 +75,8 @@ public static class AppHost
         // Library
         builder.Services.AddSingleton<SteamProvider>();
         builder.Services.AddSingleton<ILibraryProvider>(sp => sp.GetRequiredService<SteamProvider>());
+        builder.Services.AddSingleton<ILibraryProvider, EpicProvider>();
+        builder.Services.AddSingleton<ILibraryProvider, GogProvider>();
         builder.Services.AddSingleton<IManualItemStore, SqliteManualItemStore>();
         builder.Services.AddSingleton<ILibraryProvider, ManualItemsProvider>();
         builder.Services.AddSingleton<IDialogService, DialogService>();
