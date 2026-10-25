@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Lumen.Providers\Lumen.Providers.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Fixture-driven tests: synthetic/anonymized store files live in tests/fixtures/<store>/. -->
+    <None Include="..\fixtures\**\*" LinkBase="fixtures" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

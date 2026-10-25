@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Store/app providers' parsing logic. Pure and testable; OS access comes through Lumen.Core abstractions. -->
+  <PropertyGroup>
+    <RootNamespace>Lumen.Providers</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lumen.Core\Lumen.Core.csproj" />
+  </ItemGroup>
+</Project>

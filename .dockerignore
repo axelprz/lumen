@@ -1,0 +1,17 @@
+# Keep host build output (Windows bin/obj) and local data out of the build context.
+**/bin/
+**/obj/
+artifacts/
+TestResults/
+publish/
+Releases/
+.git/
+.vs/
+.vscode/
+.idea/
+*.user
+*.db
+*.db-shm
+*.db-wal
+*.log
+.env

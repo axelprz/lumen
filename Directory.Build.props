@@ -1,0 +1,29 @@
+<Project>
+  <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+  <!-- Copyright (C) 2026 Axel Ismael Perez (AxelPRZ) -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <!-- Lets the whole solution (including WPF) build on Linux, e.g. inside Docker. WPF still only runs on Windows. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <Deterministic>true</Deterministic>
+    <Authors>Axel Ismael Perez (AxelPRZ)</Authors>
+    <Copyright>Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)</Copyright>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!--
+    Set by docker-compose.yml / the devcontainer: put all build output in a volume so Linux builds in the
+    container never mix with Windows bin/obj on the host (and host bin/obj never get compiled in).
+  -->
+  <PropertyGroup Condition="'$(LUMEN_ARTIFACTS_PATH)' != ''">
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath>$(LUMEN_ARTIFACTS_PATH)</ArtifactsPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);bin/**;obj/**</DefaultItemExcludes>
+  </PropertyGroup>
+</Project>

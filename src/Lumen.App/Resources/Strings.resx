@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English (neutral) UI strings. Every key must also exist in Strings.es.resx. -->
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="App_Title" xml:space="preserve">
+    <value>Lumen</value>
+  </data>
+  <data name="Nav_Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="Nav_Library" xml:space="preserve">
+    <value>Library</value>
+  </data>
+  <data name="Nav_Collections" xml:space="preserve">
+    <value>Collections</value>
+  </data>
+  <data name="Nav_Routines" xml:space="preserve">
+    <value>Routines</value>
+  </data>
+  <data name="Nav_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Placeholder_ComingSoon" xml:space="preserve">
+    <value>Coming soon.</value>
+  </data>
+  <data name="Startup_Error_Title" xml:space="preserve">
+    <value>Lumen could not start</value>
+  </data>
+  <data name="Startup_Error_Message" xml:space="preserve">
+    <value>Something went wrong while starting Lumen. Details were written to the log in %LOCALAPPDATA%\Lumen\logs.</value>
+  </data>
+</root>

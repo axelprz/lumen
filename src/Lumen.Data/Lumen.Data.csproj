@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- SQLite repositories and hand-written SQL migrations. -->
+  <PropertyGroup>
+    <RootNamespace>Lumen.Data</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lumen.Core\Lumen.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Explicit logical names so ordering/parsing never depends on MSBuild's resource-name mangling. -->
+    <EmbeddedResource Include="Migrations\*.sql" LogicalName="Lumen.Data.Migrations.%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

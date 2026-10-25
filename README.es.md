@@ -40,7 +40,18 @@ dotnet build
 dotnet test
 ```
 
-Requiere el SDK de .NET 10. La estructura del proyecto está en [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Requiere el SDK de .NET 10. Para abrir la app: `dotnet run --project src/Lumen.App` (solo Windows).
+
+### Con Docker (sin instalar el SDK)
+
+```powershell
+docker build --target test .              # compila todo y corre los tests
+docker compose run --rm dev               # shell con el SDK y el repo montado en /src
+```
+
+También podés abrir el repo en VS Code con "Reopen in Container" (`.devcontainer/`). El contenedor sirve para compilar y testear; la app WPF solo se puede abrir en Windows.
+
+La estructura del proyecto está en [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Licencia
 
