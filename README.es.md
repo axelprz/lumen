@@ -21,7 +21,8 @@ Lumen es un launcher gratuito y de código abierto para Windows que reúne todos
 
 - Todo corre localmente. Sin servidores de Lumen, sin telemetría, sin publicidad.
 - Los archivos de los launchers solo se **leen**, nunca se modifican.
-- Los logins a cuentas son **opcionales**. Tokens y API keys se cifran con DPAPI de Windows y nunca salen de tu PC salvo para hablar con el servicio al que pertenecen.
+- Los logins a cuentas son **opcionales**. Tokens y API keys se cifran con DPAPI de Windows y nunca salen de tu PC salvo para hablar con el servicio al que pertenecen. Lumen nunca te pide la contraseña de Steam: iniciás sesión aprobando un código QR en la app de Steam.
+- DPAPI protege tus keys de otros usuarios de Windows y de una copia del disco o de la base de datos. No puede protegerlas de un malware que ya esté corriendo con tu propio usuario de Windows. **Desconectar** en Configuración revoca el inicio de sesión en la tienda y lo borra de tu PC.
 - La v1 no carga plugins ni temas de terceros.
 - Las rutinas importadas se muestran completas y hay que aprobarlas antes de poder ejecutarlas.
 

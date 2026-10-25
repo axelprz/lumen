@@ -40,7 +40,7 @@ The WPF app only runs on Windows. When working from a non-Windows environment, k
 
 ## Security rules (non-negotiable)
 
-1. **No secrets in the repo.** API keys (Steam, SteamGridDB) and account tokens (Epic, GOG) are entered by the user and stored with DPAPI (`DataProtectionScope.CurrentUser`). Never log them, never sync them, never put them in URLs that get logged.
+1. **No secrets in the repo.** API keys (Steam, SteamGridDB) and account tokens (Epic, GOG, Steam sign-in) are entered by the user and stored with DPAPI (`DataProtectionScope.CurrentUser`). Never log them, never sync them, never put them in URLs that get logged. Sign-in flows follow PLAN-v1 §4.8 (no passwords when avoidable, refresh token only, revoke on disconnect, transparent in Settings).
 2. **Read-only toward stores.** Never write to a store's files, folders or registry keys.
 3. **No elevation.** Nothing requires or requests admin.
 4. **No telemetry, no analytics, no remote config.** Network calls only to: Steam Web API, Steam CDN, SteamGridDB, Epic/GOG auth and library endpoints, GitHub Releases.
