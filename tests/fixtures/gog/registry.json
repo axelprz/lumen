@@ -1,0 +1,24 @@
+{
+  "LocalMachine": {
+    "SOFTWARE\\WOW6432Node\\GOG.com\\GalaxyClient": { "clientExecutable": "GalaxyClient.exe" },
+    "SOFTWARE\\WOW6432Node\\GOG.com\\GalaxyClient\\paths": { "client": "C:\\Program Files (x86)\\GOG Galaxy" },
+    "SOFTWARE\\WOW6432Node\\GOG.com\\Games\\1000000001": {
+      "gameID": "1000000001", "gameName": "Retro Sample", "path": "C:\\GOG Games\\Retro Sample",
+      "exe": "C:\\GOG Games\\Retro Sample\\retro.exe", "launchParam": "-fullscreen", "workingDir": "C:\\GOG Games\\Retro Sample\\bin",
+      "launchCommand": "\"C:\\GOG Games\\Retro Sample\\retro.exe\" -fullscreen"
+    },
+    "SOFTWARE\\WOW6432Node\\GOG.com\\Games\\1000000002": {
+      "gameID": "1000000002", "gameName": "Retro Sample - Soundtrack", "path": "C:\\GOG Games\\Retro Sample", "dependsOn": "1000000001"
+    },
+    "SOFTWARE\\WOW6432Node\\GOG.com\\Games\\1000000003": {
+      "gameID": "1000000003", "gameName": "Uninstalled Leftover", "path": "C:\\GOG Games\\Gone", "exe": "C:\\GOG Games\\Gone\\gone.exe"
+    },
+    "SOFTWARE\\WOW6432Node\\GOG.com\\Games\\1000000004": {
+      "gameID": "1000000004", "path": "C:\\GOG Games\\No Name"
+    },
+    "SOFTWARE\\WOW6432Node\\GOG.com\\Games\\1000000005": {
+      "gameID": "1000000005", "gameName": "Adventure Sample", "path": "D:/Games/GOG/Adventure Sample/",
+      "exe": "D:/Games/GOG/Adventure Sample/adventure.exe"
+    }
+  }
+}

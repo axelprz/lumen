@@ -1,0 +1,2 @@
+{ "AppName": "SampleQuestExpansion", "DisplayName": "Sample Quest - Expansion", "CatalogNamespace": "samplens", "CatalogItemId": "0000000000000000000000000000cccc",
+  "AppCategories": [ "public", "addons", "applications" ], "MainGameAppName": "SampleQuestApp", "InstallLocation": "D:\\Epic Games\\SampleQuest" }

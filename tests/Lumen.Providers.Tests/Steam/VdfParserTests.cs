@@ -39,6 +39,12 @@ public sealed class VdfParserTests
         root.GetObject("libraryfolders")!.GetObject("1")!.GetString("path").ShouldBe(@"D:\SteamLibrary");
     }
 
+    [Fact]
+    public void UnknownEscape_IsKeptVerbatim()
+    {
+        VdfParser.Parse("\"a\" \"C:\\Games\"").GetString("a").ShouldBe(@"C:\Games");
+    }
+
     [Theory]
     [InlineData("\"a\" { \"b\" \"c\"")]
     [InlineData("\"a\" \"unterminated")]
