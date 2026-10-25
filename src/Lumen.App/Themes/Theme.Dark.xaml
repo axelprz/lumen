@@ -1,0 +1,44 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- Copyright (C) 2026 Axel Ismael Perez (AxelPRZ) -->
+<!-- Palette tokens. Always reference brushes with DynamicResource: the accent is replaced at runtime (AccentService, M3). -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Color x:Key="Lumen.Color.Background">#FF0F1115</Color>
+  <Color x:Key="Lumen.Color.Sidebar">#FF15181E</Color>
+  <Color x:Key="Lumen.Color.Surface">#FF1C2028</Color>
+  <Color x:Key="Lumen.Color.SurfaceHover">#FF242936</Color>
+  <Color x:Key="Lumen.Color.Divider">#FF262B35</Color>
+  <Color x:Key="Lumen.Color.Text">#FFE8EAED</Color>
+  <Color x:Key="Lumen.Color.TextMuted">#FF8B93A1</Color>
+  <Color x:Key="Lumen.Color.Accent">#FF4C8DFF</Color>
+
+  <SolidColorBrush x:Key="Lumen.Brush.Background" Color="{StaticResource Lumen.Color.Background}" />
+  <SolidColorBrush x:Key="Lumen.Brush.Sidebar" Color="{StaticResource Lumen.Color.Sidebar}" />
+  <SolidColorBrush x:Key="Lumen.Brush.Surface" Color="{StaticResource Lumen.Color.Surface}" />
+  <SolidColorBrush x:Key="Lumen.Brush.SurfaceHover" Color="{StaticResource Lumen.Color.SurfaceHover}" />
+  <SolidColorBrush x:Key="Lumen.Brush.Divider" Color="{StaticResource Lumen.Color.Divider}" />
+  <SolidColorBrush x:Key="Lumen.Brush.Text" Color="{StaticResource Lumen.Color.Text}" />
+  <SolidColorBrush x:Key="Lumen.Brush.TextMuted" Color="{StaticResource Lumen.Color.TextMuted}" />
+  <SolidColorBrush x:Key="Lumen.Brush.Accent" Color="{StaticResource Lumen.Color.Accent}" />
+
+  <FontFamily x:Key="Lumen.Font.Icons">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+
+  <Style x:Key="Lumen.Text.Brand" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="22" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Margin" Value="24,28,24,24" />
+    <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
+  </Style>
+
+  <Style x:Key="Lumen.Text.PageTitle" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="32" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
+  </Style>
+
+  <Style x:Key="Lumen.Text.Icon" TargetType="TextBlock">
+    <Setter Property="FontFamily" Value="{StaticResource Lumen.Font.Icons}" />
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
+</ResourceDictionary>

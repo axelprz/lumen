@@ -21,7 +21,15 @@ dotnet test             # Core/Providers/Data tests run on any OS
 dotnet run --project src/Lumen.App   # Windows only
 ```
 
-The WPF app only runs on Windows. When working from a non-Windows environment, keep logic in the OS-agnostic projects (`Lumen.Core`, `Lumen.Data`, `Lumen.Providers`) and cover it with tests; keep `Lumen.Platform.Windows` and `Lumen.App` thin.
+No local SDK? Use Docker (same results as CI's Docker job):
+
+```bash
+docker build --target test .                    # restore + build everything + run all tests
+docker compose run --rm dev                     # SDK shell with the repo mounted at /src
+docker compose run --rm dev dotnet test         # one-off command in that shell
+```
+
+The WPF app only runs on Windows (never inside the container). When working from a non-Windows environment, keep logic in the OS-agnostic projects (`Lumen.Core`, `Lumen.Data`, `Lumen.Providers`) and cover it with tests; keep `Lumen.Platform.Windows` and `Lumen.App` thin.
 
 ## Conventions
 

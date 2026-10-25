@@ -1,0 +1,58 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- Copyright (C) 2026 Axel Ismael Perez (AxelPRZ) -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style x:Key="Lumen.Sidebar.List" TargetType="ListBox">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="12,0" />
+    <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.TextMuted}" />
+    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="KeyboardNavigation.DirectionalNavigation" Value="Cycle" />
+  </Style>
+
+  <Style x:Key="Lumen.Sidebar.Item" TargetType="ListBoxItem">
+    <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.TextMuted}" />
+    <Setter Property="Margin" Value="0,2" />
+    <Setter Property="Padding" Value="14,10" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ListBoxItem">
+          <Grid>
+            <Border x:Name="Bg"
+                    Background="Transparent"
+                    CornerRadius="6"
+                    BorderThickness="1"
+                    BorderBrush="Transparent"
+                    Padding="{TemplateBinding Padding}">
+              <ContentPresenter VerticalAlignment="Center" />
+            </Border>
+            <Border x:Name="Indicator"
+                    Width="3"
+                    Height="18"
+                    CornerRadius="1.5"
+                    HorizontalAlignment="Left"
+                    Background="{DynamicResource Lumen.Brush.Accent}"
+                    Visibility="Collapsed" />
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Lumen.Brush.SurfaceHover}" />
+              <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+              <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Lumen.Brush.Surface}" />
+              <Setter TargetName="Indicator" Property="Visibility" Value="Visible" />
+              <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+              <Setter TargetName="Bg" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+</ResourceDictionary>

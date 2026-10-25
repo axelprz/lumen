@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Domain, interfaces and services. No Windows/WPF references, ever. -->
+  <PropertyGroup>
+    <RootNamespace>Lumen.Core</RootNamespace>
+  </PropertyGroup>
+</Project>
