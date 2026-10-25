@@ -36,7 +36,7 @@ Audience: the author and his team first; published openly on GitHub for anyone.
 
 | Store | Installed (local, no login) | Owned but not installed | Launch | Install action |
 |---|---|---|---|---|
-| Steam | Yes | Yes — Steam Web API key + SteamID64 | `steam://rungameid/{id}` | `steam://install/{id}` |
+| Steam | Yes | Yes — Steam Web API key + SteamID64. Family-shared games (M5): optional Steam sign-in | `steam://rungameid/{id}` | `steam://install/{id}` |
 | Epic Games | Yes | Yes — optional login | Epic launcher URI | Opens Epic launcher |
 | GOG | Yes | Yes — optional login | GOG Galaxy / exe | Opens GOG Galaxy |
 | Xbox / MS Store | Yes | No (v2) | `shell:AppsFolder\{AUMID}` | — |
@@ -44,7 +44,7 @@ Audience: the author and his team first; published openly on GitHub for anyone.
 | EA app | Yes | No (v2) | EA app URI / exe | — |
 | Battle.net | Yes | No (v2) | `Battle.net.exe --exec="launch {code}"` | — |
 
-Every URI and file location must be verified on a real machine when implemented (see ARCHITECTURE.md §4 for the starting points). Epic and GOG logins use unofficial but widely used flows (the same ones Heroic/Legendary use); they must be isolated so that a breakage never affects local detection.
+Every URI and file location must be verified on a real machine when implemented (see ARCHITECTURE.md §4 for the starting points). Epic and GOG logins use unofficial but widely used flows (the same ones Heroic/Legendary use), and so does the Steam sign-in for Family Sharing (Steam's own `IAuthenticationService` / `IFamilyGroupsService`, which are not officially documented). They must be isolated so that a breakage never affects local detection or the rest of the library. All of them follow §4.8.
 
 ## 4. Features in v1
 
@@ -113,12 +113,25 @@ Each milestone ends with a working, tested build on `main`. Order matters; later
 | M2 | **Other stores (local)** — Epic, GOG, Xbox/MS Store, Ubisoft, EA, Battle.net installed detection + launch; title normalization and merging | All installed games from all stores appear once each and launch |
 | M3 | **Artwork + UI** — artwork service (Steam CDN, SteamGridDB, cache, overrides), Home, Library filters/search, Detail view, dynamic background/accent, first-run wizard | UI matches §4.3 for mouse/keyboard |
 | M4 | **Apps** — Start menu + AppsFolder providers, junk filter, Discover screen, collections & favorites | User can curate apps and organize mixed collections |
-| M5 | **Accounts** — Epic and GOG optional login, owned-not-installed games for both (the DPAPI secret store itself landed in M1, needed for the Steam key) | Connected Epic/GOG libraries show non-installed games |
+| M5 | **Accounts** — Epic and GOG optional login, owned-not-installed games for both; optional Steam sign-in (QR) for Steam Family shared games; all per §4.8 (the DPAPI secret store itself landed in M1, needed for the Steam key) | Connected Epic/GOG libraries show non-installed games; with Steam signed in, family-shared games appear (not-installed ones greyed out) |
 | M6 | **Playtime** — session tracker, Steam playtime import, UI integration | Hours and last played are correct after playing |
 | M7 | **Tray, hotkey, gamepad** — tray icon/menu, global hotkey quick search, gamepad navigation | All three work as in §4.3 |
 | M8 | **Routines** — schema loader/validator, action executor, trust model, import preview, sync folder watcher, UI | §4.5 complete |
 | M9 | **Updates & release** — Velopack integration, release workflow, portable zip, update UI, channels | Tagging `v1.0.0` publishes an installable, self-updating release |
 | — | **1.0 hardening** — bug bash on real machines with every store installed, docs, screenshots | Release |
+
+### 4.8 Account security (Steam, Epic, GOG sign-ins)
+
+Owner requirement: nobody outside the person using Lumen may be able to get at their credentials, and Lumen must be transparent about what it stores. Every sign-in follows these rules:
+
+- **Lumen never sees passwords** when the store offers an alternative. Steam: sign in by scanning a QR code with the Steam mobile app (approval happens on the phone). Epic/GOG: the store's own login page in the system browser; Lumen only receives the authorization code.
+- **Only what is needed is stored:** the long-lived refresh token, encrypted with DPAPI (CurrentUser + app entropy) in the local database. Short-lived access tokens live only in memory.
+- **Never logged, never synced, never in the repo, never sent anywhere except the store that issued it.** Requests that carry a token use a plain `HttpClient` (no URL logging); errors carry status codes only.
+- **Read-only:** Lumen only reads library data (owned/shared games). It never buys, changes account settings or touches anything else.
+- **Disconnect** revokes the token at the store when the store supports it, then deletes it locally.
+- **Transparency in Settings:** per account, show whether it is connected, which account, since when, and what Lumen can do with it.
+- **Honest limits (documented in the README):** DPAPI protects against other Windows users and against a copied database or disk; it cannot protect against malware already running as the same Windows user. Signing out of Lumen or Windows does not revoke the token; Disconnect does.
+- Any change to these flows is reviewed by the owner before merging.
 
 ## 6. Non-functional requirements
 
