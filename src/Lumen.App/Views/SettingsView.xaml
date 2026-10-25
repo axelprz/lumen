@@ -47,6 +47,11 @@
             <TextBlock Text="{l:Loc Settings_Steam_KeyLabel}" Style="{StaticResource Lumen.Text.Label}" Margin="0" />
           </DockPanel>
           <PasswordBox x:Name="ApiKeyBox" />
+          <TextBlock Text="{l:Loc Settings_Steam_KeyHint}"
+                     Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                     TextWrapping="Wrap"
+                     FontSize="12"
+                     Margin="0,6,0,0" />
           <TextBlock Text="{l:Loc Settings_Steam_KeySavedHint}"
                      Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                      FontSize="12"
