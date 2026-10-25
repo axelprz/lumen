@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/axelprz/lumen/docs/schemas/config.schema.json",
+  "title": "Lumen portable config",
+  "description": "Preferences that travel between machines via the sync folder. Never contains secrets, tokens or machine-specific absolute paths.",
+  "type": "object",
+  "required": ["schema"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": 1 },
+    "language": { "enum": ["system", "en", "es"], "default": "system" },
+    "ui": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dynamicAccent": { "type": "boolean", "default": true },
+        "dynamicBackground": { "type": "boolean", "default": true },
+        "defaultLibraryFilter": { "enum": ["all", "games", "apps"], "default": "all" },
+        "showNotInstalled": { "type": "boolean", "default": true },
+        "minimizeToTray": { "type": "boolean", "default": true }
+      }
+    },
+    "quickSearch": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean", "default": true },
+        "hotkey": { "type": "string", "pattern": "^((Ctrl|Alt|Shift|Win)\\+){1,3}[A-Za-z0-9]+$", "default": "Alt+Shift+Space" }
+      }
+    },
+    "stores": {
+      "type": "object",
+      "description": "Per-store enable flags. Keys are provider sources.",
+      "propertyNames": { "enum": ["steam", "epic", "gog", "xbox", "ubisoft", "ea", "battlenet", "startmenu", "appsfolder"] },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": { "enabled": { "type": "boolean", "default": true } }
+      }
+    },
+    "manualItems": {
+      "type": "array",
+      "description": "Definitions of manually added items. Paths may use %ENV% variables; a path missing on a machine shows the item as unavailable there.",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "title"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^manual:[0-9a-f-]{36}$" },
+          "kind": { "enum": ["game", "app"] },
+          "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "path": { "type": "string" },
+          "url": { "type": "string", "pattern": "^[a-z][a-z0-9+.-]*:" },
+          "args": { "type": "string", "maxLength": 2000 }
+        },
+        "oneOf": [ { "required": ["path"] }, { "required": ["url"] } ]
+      }
+    },
+    "overrides": {
+      "type": "object",
+      "description": "Per-item overrides keyed by ItemRef.",
+      "propertyNames": { "pattern": "^[a-z]+:.+$" },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "title": { "type": "string", "maxLength": 120 },
+          "hidden": { "type": "boolean" },
+          "args": { "type": "string", "maxLength": 2000 },
+          "artwork": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "Artwork choices as URLs or SteamGridDB asset ids (sgdb:{id}); never local image files.",
+            "properties": {
+              "cover": { "type": "string" },
+              "hero": { "type": "string" },
+              "logo": { "type": "string" },
+              "icon": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "ignoredApps": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^(startmenu|appsfolder):.+$" }
+    },
+    "updates": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "channel": { "enum": ["stable", "beta"], "default": "stable" },
+        "checkAutomatically": { "type": "boolean", "default": true }
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "id": "favorites",
+  "name": { "en": "Favorites", "es": "Favoritos" },
+  "sort": "manual",
+  "items": ["steam:570", "epic:Fortnite", "startmenu:Visual Studio Code"]
+}

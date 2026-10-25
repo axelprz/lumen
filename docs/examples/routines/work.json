@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "work",
+  "name": { "en": "Work", "es": "Trabajar" },
+  "description": "Opens the dev tools and closes game launchers.",
+  "icon": "briefcase",
+  "pinned": true,
+  "variables": { "project": "%USERPROFILE%\\Projects\\lumen" },
+  "actions": [
+    { "type": "close", "processes": ["steam.exe", "EpicGamesLauncher.exe"], "graceMs": 5000 },
+    { "type": "launch", "ref": "startmenu:Visual Studio Code", "args": "\"{project}\"" },
+    { "type": "launch", "ref": "startmenu:Slack" },
+    { "type": "url", "url": "https://github.com/axelprz/lumen" },
+    { "type": "wait", "ms": 1500 },
+    { "type": "folder", "path": "{project}" }
+  ]
+}

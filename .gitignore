@@ -1,0 +1,39 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+artifacts/
+publish/
+Releases/
+*.nupkg
+
+# IDEs
+.vs/
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.user
+*.suo
+*.userprefs
+*.DotSettings.user
+
+# Test results / coverage
+TestResults/
+coverage*/
+*.coverage
+*.trx
+
+# Local data, never commit
+*.db
+*.db-shm
+*.db-wal
+*.log
+logs/
+secrets*.json
+appsettings.Development.json
+.env
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store

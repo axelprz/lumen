@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/axelprz/lumen/docs/schemas/routine.schema.json",
+  "title": "Lumen routine",
+  "description": "An ordered list of actions that Lumen runs with one click. v1 never runs scripts or elevated processes.",
+  "type": "object",
+  "required": ["schema", "id", "name", "actions"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": 1 },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "description": "Stable slug, unique within the sync folder. Also the file name: routines/{id}.json."
+    },
+    "name": {
+      "description": "Display name. Either a string or a map of culture -> string.",
+      "oneOf": [
+        { "type": "string", "minLength": 1, "maxLength": 80 },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "pattern": "^[a-z]{2}(-[A-Z]{2})?$" },
+          "additionalProperties": { "type": "string", "minLength": 1, "maxLength": 80 }
+        }
+      ]
+    },
+    "description": { "type": "string", "maxLength": 500 },
+    "icon": { "type": "string", "maxLength": 40, "description": "Icon name from Lumen's built-in icon set." },
+    "pinned": { "type": "boolean", "default": false, "description": "Show as a card on Home." },
+    "stopOnError": { "type": "boolean", "default": false },
+    "variables": {
+      "type": "object",
+      "description": "User variables usable as {name} inside string parameters.",
+      "propertyNames": { "pattern": "^[a-zA-Z][a-zA-Z0-9_]{0,31}$" },
+      "additionalProperties": { "type": "string" }
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": { "$ref": "#/$defs/action" }
+    }
+  },
+  "$defs": {
+    "itemRef": {
+      "type": "string",
+      "pattern": "^[a-z]+:.+$",
+      "description": "Library item reference, e.g. steam:570, startmenu:Visual Studio Code, manual:3f2c..."
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "description": "May contain %ENV% variables and {routine variables}."
+    },
+    "action": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["launch", "url", "folder", "wait", "close"] },
+        "label": { "type": "string", "maxLength": 80 },
+        "timeoutMs": { "type": "integer", "minimum": 100, "maximum": 600000 }
+      },
+      "oneOf": [
+        { "$ref": "#/$defs/launchAction" },
+        { "$ref": "#/$defs/urlAction" },
+        { "$ref": "#/$defs/folderAction" },
+        { "$ref": "#/$defs/waitAction" },
+        { "$ref": "#/$defs/closeAction" }
+      ]
+    },
+    "launchAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "launch" },
+        "label": true,
+        "timeoutMs": true,
+        "ref": { "$ref": "#/$defs/itemRef" },
+        "path": { "$ref": "#/$defs/path", "description": "Executable path. Only when the target is not a library item; highlighted in the trust preview." },
+        "args": { "type": "string", "maxLength": 2000 },
+        "workingDirectory": { "$ref": "#/$defs/path" },
+        "skipIfRunning": { "type": "boolean", "default": true }
+      },
+      "oneOf": [
+        { "required": ["type", "ref"], "not": { "required": ["path"] } },
+        { "required": ["type", "path"], "not": { "required": ["ref"] } }
+      ]
+    },
+    "urlAction": {
+      "type": "object",
+      "required": ["type", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "url" },
+        "label": true,
+        "timeoutMs": true,
+        "url": { "type": "string", "pattern": "^https?://", "maxLength": 2000 }
+      }
+    },
+    "folderAction": {
+      "type": "object",
+      "required": ["type", "path"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "folder" },
+        "label": true,
+        "timeoutMs": true,
+        "path": { "$ref": "#/$defs/path" }
+      }
+    },
+    "waitAction": {
+      "type": "object",
+      "required": ["type", "ms"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "wait" },
+        "label": true,
+        "timeoutMs": true,
+        "ms": { "type": "integer", "minimum": 0, "maximum": 300000 }
+      }
+    },
+    "closeAction": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "close" },
+        "label": true,
+        "timeoutMs": true,
+        "refs": { "type": "array", "items": { "$ref": "#/$defs/itemRef" }, "minItems": 1 },
+        "processes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "pattern": "^[^\\\\/:*?\"<>|]+\\.exe$" },
+          "description": "Process image names, e.g. steam.exe"
+        },
+        "graceMs": { "type": "integer", "minimum": 0, "maximum": 60000, "default": 5000 },
+        "force": { "type": "boolean", "default": false, "description": "Kill if still running after graceMs." }
+      },
+      "anyOf": [ { "required": ["refs"] }, { "required": ["processes"] } ]
+    }
+  }
+}

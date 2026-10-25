@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "language": "es",
+  "ui": { "dynamicAccent": true, "showNotInstalled": true },
+  "quickSearch": { "enabled": true, "hotkey": "Alt+Shift+Space" },
+  "stores": { "battlenet": { "enabled": false } },
+  "manualItems": [
+    {
+      "id": "manual:6f1c2a7e-0d4b-4c8e-9b1a-2e5f3c7d9a10",
+      "kind": "app",
+      "title": "n8n",
+      "url": "https://n8n.example.com"
+    }
+  ],
+  "overrides": { "steam:570": { "title": "Dota 2", "artwork": { "cover": "sgdb:12345" } } },
+  "ignoredApps": ["startmenu:Uninstall Something"],
+  "updates": { "channel": "stable" }
+}
