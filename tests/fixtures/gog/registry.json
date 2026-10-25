@@ -16,6 +16,11 @@
     "SOFTWARE\\WOW6432Node\\GOG.com\\Games\\1000000004": {
       "gameID": "1000000004", "path": "C:\\GOG Games\\No Name"
     },
+    "SOFTWARE\\WOW6432Node\\GOG.com\\Games\\1000000006": {
+      "gameID": "1000000006", "gameName": "Empty Values Sample", "path": "C:\\Program Files\\GOG Galaxy\\Games\\Empty Values Sample",
+      "exe": "C:\\Program Files\\GOG Galaxy\\Games\\Empty Values Sample\\redist\\Launcher.exe", "launchParam": "", "dependsOn": "",
+      "workingDir": "C:\\Program Files\\GOG Galaxy\\Games\\Empty Values Sample\\redist"
+    },
     "SOFTWARE\\WOW6432Node\\GOG.com\\Games\\1000000005": {
       "gameID": "1000000005", "gameName": "Adventure Sample", "path": "D:/Games/GOG/Adventure Sample/",
       "exe": "D:/Games/GOG/Adventure Sample/adventure.exe"

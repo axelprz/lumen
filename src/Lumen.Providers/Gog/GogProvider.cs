@@ -14,7 +14,8 @@ public sealed class GogProvider(IRegistryReader registry, IFileSystem fileSystem
 {
     public const string SourceId = "gog";
 
-    // VERIFY: starting points from ARCHITECTURE §4, not yet checked on a machine with GOG games installed.
+    // Verified on Windows 11 (2026-10) with Galaxy installed: these keys exist; dependsOn/launchParam are
+    // present but empty for a base game; Galaxy lives in "Program Files" (read from the registry, not assumed).
     internal const string GamesKey = @"SOFTWARE\WOW6432Node\GOG.com\Games";
     internal const string GalaxyPathsKey = @"SOFTWARE\WOW6432Node\GOG.com\GalaxyClient\paths";
     internal const string GalaxyKey = @"SOFTWARE\WOW6432Node\GOG.com\GalaxyClient";
@@ -131,7 +132,7 @@ public sealed class GogProvider(IRegistryReader registry, IFileSystem fileSystem
     {
         if (galaxy is not null)
         {
-            // VERIFY: Galaxy command line from ARCHITECTURE §4.
+            // Verified (2026-10): works with Galaxy open or closed; when closed, Galaxy starts first, then the game.
             return new LaunchSpec(LaunchKind.ProcessWithArgs, galaxy, $"/command=runGame /gameId={id} /path=\"{path}\"", WindowsPath.Directory(galaxy));
         }
 
