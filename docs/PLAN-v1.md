@@ -113,7 +113,7 @@ Each milestone ends with a working, tested build on `main`. Order matters; later
 | M2 | **Other stores (local)** — Epic, GOG, Xbox/MS Store, Ubisoft, EA, Battle.net installed detection + launch; title normalization and merging | All installed games from all stores appear once each and launch |
 | M3 | **Artwork + UI** — artwork service (Steam CDN, SteamGridDB, cache, overrides), Home, Library filters/search, Detail view, dynamic background/accent, first-run wizard | UI matches §4.3 for mouse/keyboard |
 | M4 | **Apps** — Start menu + AppsFolder providers, junk filter, Discover screen, collections & favorites | User can curate apps and organize mixed collections |
-| M5 | **Accounts** — Epic and GOG optional login, owned-not-installed games for both, DPAPI secret store | Connected Epic/GOG libraries show non-installed games |
+| M5 | **Accounts** — Epic and GOG optional login, owned-not-installed games for both (the DPAPI secret store itself landed in M1, needed for the Steam key) | Connected Epic/GOG libraries show non-installed games |
 | M6 | **Playtime** — session tracker, Steam playtime import, UI integration | Hours and last played are correct after playing |
 | M7 | **Tray, hotkey, gamepad** — tray icon/menu, global hotkey quick search, gamepad navigation | All three work as in §4.3 |
 | M8 | **Routines** — schema loader/validator, action executor, trust model, import preview, sync folder watcher, UI | §4.5 complete |

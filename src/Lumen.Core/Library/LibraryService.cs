@@ -90,7 +90,7 @@ public sealed partial class LibraryService
     /// Installed entries win; owned entries fill in what is not installed. A scan that failed falls back to
     /// the matching part of the previous cache. Returns null when nothing new is known (keep the cache).
     /// </summary>
-    internal static IReadOnlyList<LibraryEntry>? Combine(ProviderScanReport report, IReadOnlyList<LibraryEntry> previous)
+    public static IReadOnlyList<LibraryEntry>? Combine(ProviderScanReport report, IReadOnlyList<LibraryEntry> previous)
     {
         // "Store not installed" and "no key configured" are real answers (nothing there), unlike Failed.
         var installedUsable = report.Installed.IsUsable || report.Installed.Status == ProviderStatus.NotAvailable;

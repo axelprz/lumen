@@ -1,0 +1,12 @@
+{
+  "response": {
+    "game_count": 5,
+    "games": [
+      { "appid": 1000010, "name": "Sample Quest", "playtime_forever": 754, "img_icon_url": "0000000000000000000000000000000000000000", "rtime_last_played": 1790001000 },
+      { "appid": 1000030, "name": "Never Installed Saga", "playtime_forever": 0, "img_icon_url": "", "rtime_last_played": 0 },
+      { "appid": 1000031, "name": "  Spaced Title  ", "playtime_forever": 12, "rtime_last_played": 1780000000 },
+      { "appid": 228980, "name": "Steamworks Common Redistributables", "playtime_forever": 0 },
+      { "appid": 1000032, "playtime_forever": 1 }
+    ]
+  }
+}

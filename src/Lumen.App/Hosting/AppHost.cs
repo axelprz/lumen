@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)
 
+using System.Net.Http;
 using Lumen.App.Localization;
 using Lumen.App.ViewModels;
 using Lumen.App.Views;
@@ -10,7 +11,9 @@ using Lumen.Core.Localization;
 using Lumen.Core.Platform;
 using Lumen.Data;
 using Lumen.Data.Migrations;
+using Lumen.Core.Settings;
 using Lumen.Platform.Windows;
+using Lumen.Platform.Windows.Security;
 using Lumen.Providers.Steam;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -50,8 +53,23 @@ public static class AppHost
         builder.Services.AddSingleton<IFileSystem, PhysicalFileSystem>();
         builder.Services.AddSingleton<ILauncher, ShellLauncher>();
 
+        // Settings and secrets (DPAPI, CurrentUser). Secrets are never logged or synced.
+        builder.Services.AddSingleton<ISecretProtector, DpapiProtector>();
+        builder.Services.AddSingleton<ISecretStore, SqliteSecretStore>();
+        builder.Services.AddSingleton<ILocalSettings, SqliteLocalSettings>();
+
+        // Steam Web API: a plain HttpClient on purpose. IHttpClientFactory's logging handler would log
+        // request URLs, and Steam only accepts the key as a query parameter (security rule 1).
+        builder.Services.AddSingleton(_ =>
+        {
+            var http = new HttpClient { BaseAddress = new Uri(SteamWebApi.BaseAddress), Timeout = TimeSpan.FromSeconds(20) };
+            http.DefaultRequestHeaders.UserAgent.ParseAdd("Lumen/" + (typeof(AppHost).Assembly.GetName().Version?.ToString(3) ?? "0.0.0"));
+            return new SteamWebApi(http);
+        });
+
         // Library
-        builder.Services.AddSingleton<ILibraryProvider, SteamProvider>();
+        builder.Services.AddSingleton<SteamProvider>();
+        builder.Services.AddSingleton<ILibraryProvider>(sp => sp.GetRequiredService<SteamProvider>());
         builder.Services.AddSingleton<ILibraryCache, SqliteLibraryCache>();
         builder.Services.AddSingleton(sp => new LibraryService(
             sp.GetServices<ILibraryProvider>(),
@@ -60,6 +78,8 @@ public static class AppHost
         builder.Services.AddSingleton<LaunchService>();
 
         builder.Services.AddSingleton<LibraryViewModel>();
+        builder.Services.AddSingleton<SteamSettingsViewModel>();
+        builder.Services.AddSingleton<SettingsViewModel>();
         builder.Services.AddSingleton<ShellViewModel>();
         builder.Services.AddSingleton<MainWindow>();
 

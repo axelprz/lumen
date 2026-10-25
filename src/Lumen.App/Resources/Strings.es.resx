@@ -73,4 +73,58 @@
   <data name="Library_CountOne" xml:space="preserve">
     <value>1 elemento</value>
   </data>
+  <data name="Settings_Steam_Title" xml:space="preserve">
+    <value>Steam</value>
+  </data>
+  <data name="Settings_Steam_Description" xml:space="preserve">
+    <value>Agregá tu API key de Steam y tu SteamID64 para ver también los juegos que tenés comprados pero no instalados. La key se guarda cifrada en esta PC y solo se envía a Steam.</value>
+  </data>
+  <data name="Settings_Steam_SteamIdLabel" xml:space="preserve">
+    <value>SteamID64 o URL del perfil</value>
+  </data>
+  <data name="Settings_Steam_SteamIdHint" xml:space="preserve">
+    <value>Es el número de 17 dígitos de steamcommunity.com/profiles/…. Si tu perfil tiene una URL personalizada, el número está en Steam → Detalles de la cuenta.</value>
+  </data>
+  <data name="Settings_Steam_KeyLabel" xml:space="preserve">
+    <value>API key de Steam</value>
+  </data>
+  <data name="Settings_Steam_GetKey" xml:space="preserve">
+    <value>Conseguir una key</value>
+  </data>
+  <data name="Settings_Steam_KeySavedHint" xml:space="preserve">
+    <value>Ya hay una key guardada. Dejá esto vacío para conservarla.</value>
+  </data>
+  <data name="Settings_Steam_SaveTest" xml:space="preserve">
+    <value>Guardar y probar</value>
+  </data>
+  <data name="Settings_Steam_Remove" xml:space="preserve">
+    <value>Quitar</value>
+  </data>
+  <data name="Settings_Steam_Testing" xml:space="preserve">
+    <value>Consultando a Steam…</value>
+  </data>
+  <data name="Settings_Steam_Connected" xml:space="preserve">
+    <value>Conectado. Juegos en tu cuenta: {0}.</value>
+  </data>
+  <data name="Settings_Steam_Private" xml:space="preserve">
+    <value>Conectado, pero los detalles de tus juegos son privados, así que Steam no lista ninguno. En Steam, abrí tu perfil → Editar perfil → Configuración de privacidad y poné Detalles de juegos en Público.</value>
+  </data>
+  <data name="Settings_Steam_InvalidKey" xml:space="preserve">
+    <value>Steam rechazó esta key. Revisala en la página de API keys de Steam.</value>
+  </data>
+  <data name="Settings_Steam_Unreachable" xml:space="preserve">
+    <value>No se pudo conectar con Steam. Revisá tu conexión y probá de nuevo.</value>
+  </data>
+  <data name="Settings_Steam_InvalidSteamId" xml:space="preserve">
+    <value>Ingresá un SteamID64 (17 dígitos que empiezan con 7656119) o una URL steamcommunity.com/profiles/….</value>
+  </data>
+  <data name="Settings_Steam_MissingKey" xml:space="preserve">
+    <value>Ingresá tu API key de Steam.</value>
+  </data>
+  <data name="Settings_Steam_InvalidKeyFormat" xml:space="preserve">
+    <value>Eso no parece una API key de Steam (32 letras y números).</value>
+  </data>
+  <data name="Settings_Steam_Removed" xml:space="preserve">
+    <value>Se quitaron los datos de tu cuenta de Steam de esta PC.</value>
+  </data>
 </root>

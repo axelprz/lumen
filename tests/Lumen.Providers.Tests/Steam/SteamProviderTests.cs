@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)
 
+using System.Net;
 using Lumen.Core.Library;
 using Lumen.Core.Platform;
+using Lumen.Core.Settings;
 using Lumen.Providers.Steam;
 using Lumen.Providers.Tests.Fakes;
 
@@ -14,7 +16,12 @@ public sealed class SteamProviderTests
     private const string ExtraLibrary = @"D:\SteamLibrary";
 
     private readonly FakeRegistry _registry = new();
+    private const string TestKey = "TESTKEY0000000000000000000000000";
+
     private readonly InMemoryFileSystem _fs = new();
+    private readonly FakeSecretStore _secrets = new();
+    private readonly FakeLocalSettings _settings = new();
+    private readonly StubHttpHandler _http = new();
 
     [Fact]
     public async Task SteamMissing_IsNotAvailable()
@@ -137,17 +144,94 @@ public sealed class SteamProviderTests
     [Fact]
     public async Task NeverThrows_EvenIfTheRegistryDoes()
     {
-        var provider = new SteamProvider(new ThrowingRegistry(), _fs);
+        var provider = new SteamProvider(new ThrowingRegistry(), _fs, _secrets, _settings, new SteamWebApi(new HttpClient(_http)));
 
         var result = await provider.ScanInstalledAsync(CancellationToken.None);
 
         result.Status.ShouldBe(ProviderStatus.Failed);
     }
 
-    [Fact]
-    public async Task OwnedScan_IsNotConfiguredYet()
+    [Theory]
+    [InlineData(null, null)]
+    [InlineData("KEY", null)]
+    [InlineData(null, "76561190000000001")]
+    [InlineData("KEY", "not-an-id")]
+    public async Task OwnedScan_WithoutKeyOrId_IsNotConfigured_AndMakesNoRequest(string? key, string? steamId)
     {
+        if (key is not null)
+        {
+            _secrets.Values[SecretNames.SteamWebApiKey] = key;
+        }
+
+        if (steamId is not null)
+        {
+            _settings.Values[LocalSettingKeys.SteamId64] = steamId;
+        }
+
         (await Provider().ScanOwnedAsync(CancellationToken.None)).Status.ShouldBe(ProviderStatus.NotConfigured);
+        _http.Requests.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task OwnedScan_ReturnsNotInstalledEntriesWithPlaytime()
+    {
+        ConfigureAccount();
+        _http.RespondWith(HttpStatusCode.OK, Fixtures.Read("steam/owned_games.json"));
+
+        var result = await Provider().ScanOwnedAsync(CancellationToken.None);
+
+        result.Status.ShouldBe(ProviderStatus.Ok);
+        result.Entries.Select(e => e.Ref.ExternalId).ShouldBe(["1000010", "1000030", "1000031", "1000032"]);
+        result.Entries.ShouldAllBe(e => e.State == InstallState.NotInstalled && e.InstallDirectory == null);
+        var quest = result.Entries[0];
+        quest.Install.ShouldBe(new LaunchSpec(LaunchKind.Uri, "steam://install/1000010"));
+        quest.Extra["playtimeMinutes"].ShouldBe("754");
+        quest.Extra["lastPlayed"].ShouldBe("1790001000");
+        result.Entries[1].Extra.ContainsKey("lastPlayed").ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task OwnedScan_PrivateProfile_IsPartialWithWarning()
+    {
+        ConfigureAccount();
+        _http.RespondWith(HttpStatusCode.OK, Fixtures.Read("steam/owned_games_private.json"));
+
+        var result = await Provider().ScanOwnedAsync(CancellationToken.None);
+
+        result.Status.ShouldBe(ProviderStatus.Partial);
+        result.Diagnostics.ShouldContain(d => d.Message.Contains("private"));
+    }
+
+    [Fact]
+    public async Task OwnedScan_BadKey_Fails_WithoutLeakingIt()
+    {
+        ConfigureAccount();
+        _http.RespondWith(HttpStatusCode.Forbidden);
+
+        var result = await Provider().ScanOwnedAsync(CancellationToken.None);
+
+        result.Status.ShouldBe(ProviderStatus.Failed);
+        result.Diagnostics.ShouldAllBe(d => !d.Message.Contains(TestKey) && (d.Detail == null || !d.Detail.Contains(TestKey)));
+    }
+
+    [Fact]
+    public async Task InstalledAndOwned_CombineIntoOneEntryPerGame()
+    {
+        ArrangeFullLibrary();
+        ConfigureAccount();
+        _http.RespondWith(HttpStatusCode.OK, Fixtures.Read("steam/owned_games.json"));
+        var provider = Provider();
+
+        var report = new ProviderScanReport(
+            "steam",
+            "Steam",
+            await provider.ScanInstalledAsync(CancellationToken.None),
+            await provider.ScanOwnedAsync(CancellationToken.None));
+        var combined = LibraryService.Combine(report, [])!;
+
+        combined.Count(e => e.Ref.ExternalId == "1000010").ShouldBe(1);
+        combined.Single(e => e.Ref.ExternalId == "1000010").State.ShouldBe(InstallState.Installed);
+        combined.Single(e => e.Ref.ExternalId == "1000030").State.ShouldBe(InstallState.NotInstalled);
     }
 
     [Fact]
@@ -156,7 +240,13 @@ public sealed class SteamProviderTests
         SteamExclusions.Embedded.ShouldContain("228980");
     }
 
-    private SteamProvider Provider() => new(_registry, _fs);
+    private SteamProvider Provider() => new(_registry, _fs, _secrets, _settings, new SteamWebApi(new HttpClient(_http)));
+
+    private void ConfigureAccount()
+    {
+        _secrets.Values[SecretNames.SteamWebApiKey] = TestKey;
+        _settings.Values[LocalSettingKeys.SteamId64] = "76561190000000001";
+    }
 
     private void ArrangeMainLibraryOnly()
     {
