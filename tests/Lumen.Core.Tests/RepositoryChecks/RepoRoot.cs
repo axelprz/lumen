@@ -10,8 +10,8 @@ internal static class RepoRoot
     private const string SolutionFile = "Lumen.slnx";
 
     /// <summary>
-    /// The directory containing Lumen.slnx: taken from build metadata (works when output is redirected,
-    /// e.g. the Docker artifacts volume), falling back to walking up from the test output folder.
+    /// The directory containing Lumen.slnx: taken from build metadata (works when build output lives outside
+    /// the repo), falling back to walking up from the test output folder.
     /// </summary>
     public static string Find()
     {

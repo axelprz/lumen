@@ -9,9 +9,6 @@ Lumen.slnx
 Directory.Build.props          # shared settings: net10.0, nullable, warnings as errors, EnableWindowsTargeting
 Directory.Packages.props       # central package versions
 global.json                    # .NET 10 SDK (latest feature band allowed)
-Dockerfile                     # reproducible Linux build + test environment (see §9)
-docker-compose.yml             # `dev` service: interactive SDK shell with the repo mounted
-.devcontainer/                 # same image for VS Code "Reopen in Container"
 src/
   Lumen.Core/                  # net10.0 — domain, interfaces, services. NO Windows/WPF references.
   Lumen.Data/                  # net10.0 — SQLite repositories + migrations
@@ -45,7 +42,6 @@ Dependency direction: `App → Platform.Windows → Providers → Data → Core`
 | Updates | Velopack |
 | Steam VDF | small in-house parser (KeyValues text format is simple; keep it dependency-free and tested) |
 | Tests | xUnit (v2) + Shouldly |
-| Dev environment | Docker (`mcr.microsoft.com/dotnet/sdk:10.0`) — tooling only, nothing ships in it |
 
 Versions are pinned in `Directory.Packages.props`. Prefer few dependencies; every new one must be MIT/BSD/Apache/LGPL/GPL-compatible.
 NuGet audit runs on restore and, with warnings as errors, a package with a known vulnerability (including transitive ones) fails the build — upgrade it, don't suppress the warning.
@@ -192,8 +188,8 @@ Every portable file has `"schema": <int>`; loaders migrate older versions and re
 ## 9. Build, CI and release
 
 - `Directory.Build.props`: `TargetFramework` defaults, `Nullable=enable`, `TreatWarningsAsErrors=true`, `EnableWindowsTargeting=true` (lets the full solution build on non-Windows agents; WPF still only runs on Windows).
-- CI (`.github/workflows/ci.yml`): on push/PR — `windows-latest`: restore, build, test; plus `ubuntu-latest`: `docker build --target test .` so the Docker environment never rots.
-- Docker (development): the `Dockerfile` builds the full solution and runs every test on Linux (`docker build --target test .`). `docker compose run --rm dev` (or the devcontainer) gives an SDK shell with the repo mounted; it sets `LUMEN_ARTIFACTS_PATH`, which `Directory.Build.props` turns into `UseArtifactsOutput` so container output lives in a volume and never mixes with Windows `bin/obj`. The WPF app cannot run in a container: launching it still needs Windows (`dotnet run --project src/Lumen.App`).
+- CI (`.github/workflows/ci.yml`): on push/PR — `windows-latest`: restore, build, test.
+- Development needs Windows with the .NET 10 SDK (`global.json`); the user-level install from Microsoft's `dotnet-install` script needs no admin. Logic in Core/Data/Providers also builds and tests on Linux/macOS thanks to `EnableWindowsTargeting`, but the WPF app only runs on Windows.
 - Localization: `Lumen.App/Resources/Strings.resx` (en) + `Strings.es.resx` (es), read through `LocalizationService`; XAML uses `{l:Loc Key}`, which follows runtime language changes. `LanguageResolver` (Core) maps the `language` preference to a culture. A repository test fails if the two resx files have different keys or a XAML `{l:Loc}` key is missing.
 - Release (`.github/workflows/release.yml`): on tag `v*` — `dotnet publish` self-contained `win-x64`, `vpk pack`, `vpk upload github` (pre-release tags like `v1.1.0-beta.1` go to the `beta` channel). Produces `Setup.exe`, portable zip, delta packages.
 - Versioning: SemVer; `MinVer` or tag-based versioning.

@@ -11,6 +11,4 @@
 *.png     binary
 *.jpg     binary
 *.ico     binary
-Dockerfile text eol=lf
-.dockerignore text eol=lf
 *.yml     text eol=lf

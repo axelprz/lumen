@@ -15,7 +15,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <!-- Lets repository checks find the source tree even when output lives elsewhere (Docker artifacts volume). -->
+    <!-- Lets repository checks find the source tree even when build output lives outside the repo. -->
     <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
       <_Parameter1>LumenRepoRoot</_Parameter1>
       <_Parameter2>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..'))</_Parameter2>
