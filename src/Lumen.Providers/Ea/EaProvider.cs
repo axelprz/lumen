@@ -16,7 +16,8 @@ public sealed class EaProvider(IRegistryReader registry, IFileSystem fileSystem,
 {
     public const string SourceId = "ea";
 
-    // VERIFY: community-documented (Lutris, open-source launchers), not yet checked on a machine with the EA app.
+    // Verified on Windows 11 (2026-10): games register Common Files\EAInstaller\{game}\Cleanup.exe and keep a DiP 4.0
+    // installerdata.xml (the content id list may contain empty entries). The EA app's own entries have no InstallLocation.
     internal const string InstallerDataRelativePath = @"__Installer\installerdata.xml";
     internal const string EaAppRelativePath = @"Electronic Arts\EA Desktop\EA Desktop\EADesktop.exe";
 
@@ -26,7 +27,7 @@ public sealed class EaProvider(IRegistryReader registry, IFileSystem fileSystem,
 
     public ProviderCapabilities Capabilities => ProviderCapabilities.InstalledScan;
 
-    /// <summary>VERIFY: the EA app still handles origin2:// links with the installer content id.</summary>
+    /// <summary>Launch link; verified (2026-10): the EA app handles origin2:// with the installer content id.</summary>
     public static LaunchSpec LaunchFor(string contentId) =>
         new(LaunchKind.Uri, $"origin2://game/launch?offerIds={Uri.EscapeDataString(contentId)}");
 

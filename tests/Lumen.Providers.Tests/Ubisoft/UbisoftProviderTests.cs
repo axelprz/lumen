@@ -7,7 +7,7 @@ using Lumen.Providers.Ubisoft;
 
 namespace Lumen.Providers.Tests.Ubisoft;
 
-// VERIFY: synthetic registry snapshot following the documented layout; not yet compared with a real install.
+// Synthetic registry snapshot following the real layout (compared with a real install, 2026-10).
 public sealed class UbisoftProviderTests
 {
     private readonly FakeRegistry _registry = new();

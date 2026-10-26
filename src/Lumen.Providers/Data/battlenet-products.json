@@ -1,6 +1,7 @@
 {
   "schema": 1,
-  "description": "Battle.net product uid (from the uninstall entry's --uid=) to launch code for Battle.net.exe --exec=\"launch CODE\". Data, not code: extend freely. VERIFY: community-documented codes, not all checked on a real install.",
+  "description": "Battle.net product uid (from the uninstall entry's --uid=) to launch code for Battle.net.exe --exec=\"launch CODE\". Data, not code: extend freely. VERIFY: community-documented codes; verified on a real install so far: s1 -> S1 (StarCraft).",
+  "excludedUids": [ "battle.net" ],
   "products": {
     "prometheus": "Pro",
     "wow": "WoW",
@@ -23,6 +24,7 @@
     "auks": "AUKS"
   },
   "notes": {
+    "battle.net": "The Battle.net app itself: uses the same Blizzard Uninstaller with --uid=battle.net (verified 2026-10)",
     "prometheus": "Overwatch 2",
     "wow": "World of Warcraft (Classic versions are picked inside Battle.net)",
     "fenris": "Diablo IV",

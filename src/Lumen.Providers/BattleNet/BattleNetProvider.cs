@@ -16,12 +16,13 @@ public sealed partial class BattleNetProvider(IRegistryReader registry, IFileSys
 {
     public const string SourceId = "battlenet";
 
-    // VERIFY: uninstall-entry layout and paths are community-documented, not yet checked on a machine with Battle.net.
+    // Verified on Windows 11 (2026-10): games and the app itself use Agent\Blizzard Uninstaller.exe --uid=...;
+    // the launcher is in Program Files (x86). Launch codes other than S1 are still community-documented (VERIFY).
     internal const string UninstallerName = "Blizzard Uninstaller.exe";
     internal const string LauncherRelativePath = @"Battle.net\Battle.net.exe";
 
     private const string ResourceName = "Lumen.Providers.Data.battlenet-products.json";
-    private static readonly Lazy<IReadOnlyDictionary<string, string>> _launchCodes = new(LoadLaunchCodes);
+    private static readonly Lazy<ProductData> _data = new(LoadProductData);
 
     public string Source => SourceId;
 
@@ -29,7 +30,12 @@ public sealed partial class BattleNetProvider(IRegistryReader registry, IFileSys
 
     public ProviderCapabilities Capabilities => ProviderCapabilities.InstalledScan;
 
-    public static IReadOnlyDictionary<string, string> LaunchCodes => _launchCodes.Value;
+    public static IReadOnlyDictionary<string, string> LaunchCodes => _data.Value.LaunchCodes;
+
+    /// <summary>Uids that are not games, e.g. the Battle.net app itself (it uses the same uninstaller).</summary>
+    public static IReadOnlySet<string> ExcludedUids => _data.Value.ExcludedUids;
+
+    internal sealed record ProductData(IReadOnlyDictionary<string, string> LaunchCodes, IReadOnlySet<string> ExcludedUids);
 
     public Task<ProviderResult> ScanInstalledAsync(CancellationToken ct)
     {
@@ -38,7 +44,7 @@ public sealed partial class BattleNetProvider(IRegistryReader registry, IFileSys
             var launcher = FindLauncher();
             var games = UninstallEntries.ReadAll(registry)
                 .Select(e => (Entry: e, Uid: ProductUid(e.UninstallString)))
-                .Where(x => x.Uid is not null)
+                .Where(x => x.Uid is not null && !ExcludedUids.Contains(x.Uid))
                 .ToList();
             if (games.Count == 0 && launcher is null)
             {
@@ -126,11 +132,15 @@ public sealed partial class BattleNetProvider(IRegistryReader registry, IFileSys
                 ? new LaunchSpec(LaunchKind.Executable, launcher)
                 : new LaunchSpec(LaunchKind.ProcessWithArgs, launcher, $"--exec=\"launch {code}\"", WindowsPath.Directory(launcher));
 
-    internal static IReadOnlyDictionary<string, string> ParseLaunchCodes(string json)
+    internal static ProductData ParseProductData(string json)
     {
         using var doc = JsonDocument.Parse(json);
-        return doc.RootElement.GetProperty("products").EnumerateObject()
+        var codes = doc.RootElement.GetProperty("products").EnumerateObject()
             .ToDictionary(p => p.Name.ToLowerInvariant(), p => p.Value.GetString()!, StringComparer.Ordinal);
+        var excluded = doc.RootElement.TryGetProperty("excludedUids", out var list)
+            ? list.EnumerateArray().Select(e => e.GetString()!.ToLowerInvariant()).ToHashSet(StringComparer.Ordinal)
+            : [];
+        return new ProductData(codes, excluded);
     }
 
     private string? FindLauncher()
@@ -147,14 +157,15 @@ public sealed partial class BattleNetProvider(IRegistryReader registry, IFileSys
         return null;
     }
 
-    private static IReadOnlyDictionary<string, string> LoadLaunchCodes()
+    private static ProductData LoadProductData()
     {
         using var stream = typeof(BattleNetProvider).Assembly.GetManifestResourceStream(ResourceName)
             ?? throw new InvalidOperationException($"Embedded resource '{ResourceName}' not found.");
         using var reader = new StreamReader(stream);
-        return ParseLaunchCodes(reader.ReadToEnd());
+        return ParseProductData(reader.ReadToEnd());
     }
 
-    [GeneratedRegex(@"--uid=""?(?<uid>[A-Za-z0-9_\-]+)", RegexOptions.CultureInvariant)]
+    // Uids may contain dots (the app itself is "battle.net").
+    [GeneratedRegex(@"--uid=""?(?<uid>[A-Za-z0-9_.\-]+)", RegexOptions.CultureInvariant)]
     private static partial Regex UidPattern();
 }

@@ -7,7 +7,7 @@ using Lumen.Providers.Tests.Fakes;
 
 namespace Lumen.Providers.Tests.BattleNet;
 
-// VERIFY: synthetic uninstall entries following community documentation; not yet compared with a real install.
+// Synthetic uninstall entries following the real format (compared with a real install, 2026-10).
 public sealed class BattleNetProviderTests
 {
     private const string Launcher = @"C:\Program Files (x86)\Battle.net\Battle.net.exe";
@@ -28,8 +28,30 @@ public sealed class BattleNetProviderTests
 
         var result = await Provider().ScanInstalledAsync(CancellationToken.None);
 
-        result.Entries.Select(e => e.Ref.ToString()).Order().ShouldBe(["battlenet:newthing", "battlenet:prometheus", "battlenet:wow_classic"]);
+        result.Entries.Select(e => e.Ref.ToString()).Order().ShouldBe(["battlenet:newthing", "battlenet:prometheus", "battlenet:s1", "battlenet:wow_classic"]);
         result.Diagnostics.ShouldContain(d => d.Message.Contains("Diablo IV"));
+    }
+
+    [Fact]
+    public async Task TheBattleNetAppItself_IsNotAGame()
+    {
+        // Real install (2026-10): the app registers with the same Blizzard Uninstaller and --uid=battle.net.
+        Arrange();
+
+        var titles = (await Provider().ScanInstalledAsync(CancellationToken.None)).Entries.Select(e => e.Title).ToList();
+
+        titles.ShouldNotContain("Battle.net");
+        BattleNetProvider.ExcludedUids.ShouldContain("battle.net");
+    }
+
+    [Fact]
+    public async Task StarCraft_LaunchesWithS1()
+    {
+        Arrange();
+
+        var starcraft = (await Provider().ScanInstalledAsync(CancellationToken.None)).Entries.Single(e => e.Ref.ExternalId == "s1");
+
+        starcraft.Launch!.Arguments.ShouldBe("--exec=\"launch S1\"");
     }
 
     [Fact]
@@ -71,6 +93,7 @@ public sealed class BattleNetProviderTests
     [InlineData("\"C:\\ProgramData\\Battle.net\\Agent\\Blizzard Uninstaller.exe\" --lang=enUS --uid=Prometheus", "prometheus")]
     [InlineData("\"C:\\ProgramData\\Battle.net\\Agent\\Blizzard Uninstaller.exe\" --uid=\"hs_beta\" --lang=esMX", "hs_beta")]
     [InlineData("\"C:\\Program Files\\Other\\uninstall.exe\" --uid=prometheus", null)]
+    [InlineData("\"C:\\ProgramData\\Battle.net\\Agent\\Blizzard Uninstaller.exe\" --lang=esMX --uid=battle.net --displayname=\"Battle.net\"", "battle.net")]
     [InlineData("\"C:\\ProgramData\\Battle.net\\Agent\\Blizzard Uninstaller.exe\" --lang=enUS", null)]
     [InlineData(null, null)]
     public void ProductUid(string? uninstallString, string? expected)
@@ -95,5 +118,7 @@ public sealed class BattleNetProviderTests
         _fs.AddDirectory(@"C:\Program Files (x86)\Overwatch");
         _fs.AddDirectory(@"D:\Games\World of Warcraft");
         _fs.AddDirectory(@"D:\Games\Future");
+        _fs.AddDirectory(@"C:\Program Files (x86)\StarCraft");
+        _fs.AddDirectory(@"C:\Program Files (x86)\Battle.net");
     }
 }
