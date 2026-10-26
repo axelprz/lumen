@@ -6,6 +6,7 @@ using Lumen.App.Localization;
 using Lumen.App.ViewModels;
 using Lumen.App.Views;
 using Lumen.Core;
+using Lumen.Core.Artwork;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
 using Lumen.Core.Platform;
@@ -101,6 +102,19 @@ public static class AppHost
             merger: sp.GetRequiredService<LibraryMerger>(),
             ruleStore: sp.GetRequiredService<IMergeRuleStore>()));
         builder.Services.AddSingleton<LaunchService>();
+
+        // Artwork: Steam CDN in this milestone step (allowed host); cached under %LOCALAPPDATA%\Lumen\cache\artwork.
+        builder.Services.AddSingleton<IArtworkSource, SteamArtworkSource>();
+        builder.Services.AddSingleton(sp =>
+        {
+            var http = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
+            http.DefaultRequestHeaders.UserAgent.ParseAdd("Lumen/" + (typeof(AppHost).Assembly.GetName().Version?.ToString(3) ?? "0.0.0"));
+            return new ArtworkService(
+                http,
+                sp.GetServices<IArtworkSource>(),
+                paths.ArtworkCacheDirectory,
+                sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<ArtworkService>>());
+        });
 
         builder.Services.AddSingleton<LibraryViewModel>();
         builder.Services.AddSingleton<SteamSettingsViewModel>();

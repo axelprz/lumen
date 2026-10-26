@@ -14,6 +14,27 @@ public partial class LibraryView : UserControl
         InitializeComponent();
     }
 
+    // Tile width (168) + right margin (20).
+    private const double TileSlot = 188;
+
+    // View concern: how many tiles fit in a row at the current width (scrollbar space reserved).
+    private void OnGridSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (DataContext is LibraryViewModel library && e.WidthChanged)
+        {
+            library.ColumnCount = (int)Math.Floor((e.NewSize.Width - SystemParameters.VerticalScrollBarWidth) / TileSlot);
+        }
+    }
+
+    // View concern: a tile became visible (or was recycled into view), so its cover is wanted now.
+    private async void OnTileLoaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: LibraryTileViewModel tile })
+        {
+            await tile.EnsureCoverAsync();
+        }
+    }
+
     // View concern: translate a drag & drop into file paths / URL text for the view model.
     private void OnDragOver(object sender, DragEventArgs e)
     {
