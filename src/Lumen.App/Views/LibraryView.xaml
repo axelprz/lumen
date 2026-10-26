@@ -10,10 +10,26 @@
              Drop="OnDrop">
   <UserControl.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
-    <!-- Edit/remove menu, only attached to manual items' tiles. -->
-    <ContextMenu x:Key="ManualTileMenu" x:Shared="False">
-      <MenuItem Header="{l:Loc Tile_Edit}" Command="{Binding EditCommand}" />
-      <MenuItem Header="{l:Loc Tile_Remove}" Command="{Binding RemoveCommand}" />
+    <!-- Per-tile menu built by the view model (store choice, separate, edit/remove). Separators have no command. -->
+    <ContextMenu x:Key="TileMenu" x:Shared="False" ItemsSource="{Binding MenuItems}">
+      <ContextMenu.ItemContainerStyle>
+        <Style TargetType="MenuItem">
+          <Setter Property="Header" Value="{Binding Header}" />
+          <Setter Property="Command" Value="{Binding Command}" />
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding IsSeparator}" Value="True">
+              <Setter Property="Template">
+                <Setter.Value>
+                  <ControlTemplate TargetType="MenuItem">
+                    <Separator Margin="0,2" />
+                  </ControlTemplate>
+                </Setter.Value>
+              </Setter>
+              <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </ContextMenu.ItemContainerStyle>
     </ContextMenu>
   </UserControl.Resources>
 
@@ -101,8 +117,8 @@
               <Border.Style>
                 <Style TargetType="Border">
                   <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsManual}" Value="True">
-                      <Setter Property="ContextMenu" Value="{StaticResource ManualTileMenu}" />
+                    <DataTrigger Binding="{Binding HasMenu}" Value="True">
+                      <Setter Property="ContextMenu" Value="{StaticResource TileMenu}" />
                     </DataTrigger>
                   </Style.Triggers>
                 </Style>

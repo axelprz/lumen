@@ -50,6 +50,19 @@ internal sealed class FakeProvider(string source) : ILibraryProvider
     }
 }
 
+internal sealed class InMemoryRules : IMergeRuleStore
+{
+    public MergeRules Rules { get; set; } = MergeRules.None;
+
+    public Task<MergeRules> LoadAsync(CancellationToken ct) => Task.FromResult(Rules);
+
+    public Task SeparateAsync(IEnumerable<ItemRef> refs, CancellationToken ct) => Task.CompletedTask;
+
+    public Task SetPreferredAsync(ItemRef preferred, IEnumerable<ItemRef> others, CancellationToken ct) => Task.CompletedTask;
+
+    public Task ResetAsync(CancellationToken ct) => Task.CompletedTask;
+}
+
 internal sealed class InMemoryCache : ILibraryCache
 {
     public Dictionary<string, IReadOnlyList<LibraryEntry>> BySource { get; } = [];

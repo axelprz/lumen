@@ -152,6 +152,24 @@ public sealed class LibraryServiceTests
     }
 
     [Fact]
+    public async Task Items_MergeAcrossStores_AndFollowRuleChanges()
+    {
+        var steam = new FakeProvider("steam").WithInstalled(Game("steam", "1", "Sample"));
+        var epic = new FakeProvider("epic").WithInstalled(Game("epic", "x", "Sample"));
+        var rules = new InMemoryRules();
+        var service = new LibraryService([steam, epic], _cache, NullLogger<LibraryService>.Instance, ruleStore: rules);
+        await service.ScanAsync(CancellationToken.None);
+
+        service.Items.ShouldHaveSingleItem().IsMerged.ShouldBeTrue();
+        service.Entries.Count.ShouldBe(2);
+
+        rules.Rules = new MergeRules(new HashSet<ItemRef> { new("steam", "1"), new("epic", "x") }, new HashSet<ItemRef>());
+        await service.ReloadMergeRulesAsync(CancellationToken.None);
+
+        service.Items.Count.ShouldBe(2);
+    }
+
+    [Fact]
     public async Task LoadCached_PublishesCacheContent()
     {
         _cache.BySource["steam"] = [Game("steam", "1", "From cache")];

@@ -214,4 +214,28 @@
   <data name="Manual_Error_ArgumentsNotAllowed" xml:space="preserve">
     <value>Launch arguments only work with .exe files.</value>
   </data>
+  <data name="Tile_PlayWith" xml:space="preserve">
+    <value>Play with {0}</value>
+  </data>
+  <data name="Tile_InstallWith" xml:space="preserve">
+    <value>Install with {0}</value>
+  </data>
+  <data name="Tile_AlwaysUse" xml:space="preserve">
+    <value>Always use {0}</value>
+  </data>
+  <data name="Tile_Separate" xml:space="preserve">
+    <value>Show stores separately</value>
+  </data>
+  <data name="Settings_Library_Title" xml:space="preserve">
+    <value>Library</value>
+  </data>
+  <data name="Settings_Library_MergeDescription" xml:space="preserve">
+    <value>A game you own on several stores shows up once, and Play uses the store where it's installed. If you showed stores separately or picked a store for a game, you can go back to automatic grouping here.</value>
+  </data>
+  <data name="Settings_Library_ResetMerges" xml:space="preserve">
+    <value>Reset grouping</value>
+  </data>
+  <data name="Settings_Library_ResetDone" xml:space="preserve">
+    <value>Grouping was reset: games are grouped automatically again.</value>
+  </data>
 </root>
