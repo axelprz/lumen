@@ -6,6 +6,7 @@ using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lumen.App.Services;
+using Lumen.Core.Artwork;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,9 @@ public sealed partial class LibraryViewModel : ObservableObject
     private readonly LaunchService _launcher;
     private readonly IManualItemStore _manualItems;
     private readonly IMergeRuleStore _mergeRules;
+    private readonly ArtworkService _artwork;
     private readonly IDialogService _dialogs;
+    private int _columnCount = 1;
     private readonly ILocalizer _localizer;
     private readonly ILogger<LibraryViewModel> _logger;
     private readonly IReadOnlyDictionary<string, string> _storeNames;
@@ -42,6 +45,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         IEnumerable<ILibraryProvider> providers,
         IManualItemStore manualItems,
         IMergeRuleStore mergeRules,
+        ArtworkService artwork,
         IDialogService dialogs,
         ILocalizer localizer,
         ILogger<LibraryViewModel> logger)
@@ -50,6 +54,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         _launcher = launcher;
         _manualItems = manualItems;
         _mergeRules = mergeRules;
+        _artwork = artwork;
         _dialogs = dialogs;
         _localizer = localizer;
         _logger = logger;
@@ -61,6 +66,23 @@ public sealed partial class LibraryViewModel : ObservableObject
     }
 
     public ObservableCollection<LibraryTileViewModel> Items { get; } = [];
+
+    /// <summary>Items laid out in rows of <see cref="ColumnCount"/> for the virtualized grid.</summary>
+    public ObservableCollection<TileRow> Rows { get; } = [];
+
+    /// <summary>Tiles per row; set by the view from its width.</summary>
+    public int ColumnCount
+    {
+        get => _columnCount;
+        set
+        {
+            var columns = Math.Max(1, value);
+            if (SetProperty(ref _columnCount, columns))
+            {
+                RebuildRows();
+            }
+        }
+    }
 
     public string CountText => Items.Count == 1
         ? _localizer["Library_CountOne"]
@@ -245,12 +267,38 @@ public sealed partial class LibraryViewModel : ObservableObject
             var primary = item.Primary;
             var stores = string.Join(" · ", item.Entries.Select(StoreNameOf).Distinct());
             var play = new AsyncRelayCommand(() => RunPrimaryActionAsync(primary), () => LaunchService.PrimaryAction(primary) is not null);
-            Items.Add(new LibraryTileViewModel(item, stores, _localizer, play, BuildMenu(item)));
+            Items.Add(new LibraryTileViewModel(item, stores, _localizer, play, BuildMenu(item), LoadCoverAsync));
         }
 
+        RebuildRows();
         OnPropertyChanged(nameof(CountText));
         OnPropertyChanged(nameof(IsEmpty));
     }
+
+    private void RebuildRows()
+    {
+        Rows.Clear();
+        foreach (var chunk in Items.Chunk(_columnCount))
+        {
+            Rows.Add(new TileRow(chunk));
+        }
+    }
+
+    private async Task<string?> LoadCoverAsync(LibraryItem item)
+    {
+        try
+        {
+            return await _artwork.GetForItemAsync(item, ArtworkKind.Cover, CancellationToken.None);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            LogCoverFailed(ex, item.Key.ToString());
+            return null;
+        }
+    }
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Could not load the cover for {Ref}")]
+    private partial void LogCoverFailed(Exception exception, string @ref);
 
     [LoggerMessage(Level = LogLevel.Error, Message = "Could not save a manual item")]
     private partial void LogManualSaveFailed(Exception exception);

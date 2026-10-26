@@ -3,6 +3,7 @@
 
 using System.Globalization;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
 
@@ -15,13 +16,27 @@ public sealed record TileMenuItem(string Header, ICommand? Command)
 }
 
 /// <summary>
-/// One cover in the library grid: a game or app, possibly owned on several stores (merged). Artwork arrives in
-/// M3; until then the tile shows the title's initial.
+/// One cover in the library grid: a game or app, possibly owned on several stores (merged). Shows the cover art
+/// once it is loaded (lazily, when the tile first appears), the title's initial until then or when there is none.
 /// </summary>
-public sealed class LibraryTileViewModel
+public sealed partial class LibraryTileViewModel : ObservableObject
 {
-    public LibraryTileViewModel(LibraryItem item, string storeNames, ILocalizer localizer, ICommand primaryCommand, IReadOnlyList<TileMenuItem> menu)
+    private readonly Func<LibraryItem, Task<string?>> _coverLoader;
+    private bool _coverRequested;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasCover))]
+    private string? _coverPath;
+
+    public LibraryTileViewModel(
+        LibraryItem item,
+        string storeNames,
+        ILocalizer localizer,
+        ICommand primaryCommand,
+        IReadOnlyList<TileMenuItem> menu,
+        Func<LibraryItem, Task<string?>> coverLoader)
     {
+        _coverLoader = coverLoader;
         Item = item;
         StoreName = storeNames;
         PrimaryCommand = primaryCommand;
@@ -39,6 +54,20 @@ public sealed class LibraryTileViewModel
 
     /// <summary>The entry Play/Install uses.</summary>
     public LibraryEntry Entry => Item.Primary;
+
+    public bool HasCover => CoverPath is not null;
+
+    /// <summary>Called when the tile becomes visible; loads (or downloads once) the cover. Safe to call repeatedly.</summary>
+    public async Task EnsureCoverAsync()
+    {
+        if (_coverRequested)
+        {
+            return;
+        }
+
+        _coverRequested = true;
+        CoverPath = await _coverLoader(Item);
+    }
 
     public string Title => Item.Title;
 

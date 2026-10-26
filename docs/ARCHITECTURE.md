@@ -153,7 +153,14 @@ Rules: providers only **read** store files; never write into a store's folder or
 | `SyncFolderService` | Watches the sync folder (`FileSystemWatcher` + debounce + periodic rescan fallback), loads routines/collections/config, writes changes back atomically (write temp → rename) |
 | `UpdateService` | Velopack: check, download, apply on restart; channel selection |
 
-Steam CDN artwork (starting point, verify): `https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/library_600x900.jpg`, `library_hero.jpg`, `logo.png`, `header.jpg`.
+Steam CDN artwork (**verified 2026-10**): `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{appid}/…` (current) and `https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/…` (fallback) both serve `library_600x900.jpg`, `library_hero.jpg`, `logo.png`, `header.jpg`. Cover falls back to `header.jpg` for old games.
+
+`ArtworkService` as implemented (M3):
+- **Sources:** pluggable `IArtworkSource`s, each returning candidate URLs on allowed hosts only. For a merged item, the primary entry is tried first, then the item's other stores.
+- **Cache:** `%LOCALAPPDATA%\Lumen\cache\artwork\{source}\{sha256(ref)[..16]}\{kind}.{jpg|png|webp}`, written atomically (temp → move).
+- **Safety:** downloads are limited to 4 at a time and deduplicated per key. Images are capped at 10 MB, and the bytes must be JPEG/PNG/WebP by their magic numbers. Anything else is discarded, never written as an image.
+- **Misses:** a definitive "not found" (every candidate answered 404/403/410 or a non-image) is remembered for 7 days in a `.miss` file. Network errors and 5xx are retried on the next request.
+- **UI:** covers load lazily when a tile is realized and are decoded at display size (`DecodePixelWidth`). The grid is a virtualized list of rows (WPF has no virtualizing wrap panel), so memory stays flat as the library grows.
 SteamGridDB API v2: `https://www.steamgriddb.com/api/v2` with `Authorization: Bearer {key}` — `/search/autocomplete/{term}`, `/grids/game/{id}?dimensions=600x900`, `/heroes/game/{id}`, `/logos/game/{id}`, `/icons/game/{id}`.
 
 ## 6. Data

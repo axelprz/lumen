@@ -5,11 +5,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:l="clr-namespace:Lumen.App.Localization"
              xmlns:vm="clr-namespace:Lumen.App.ViewModels"
+             xmlns:conv="clr-namespace:Lumen.App.Converters"
              AllowDrop="True"
              DragOver="OnDragOver"
              Drop="OnDrop">
   <UserControl.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    <conv:ImagePathConverter x:Key="ImagePath" />
     <!-- Per-tile menu built by the view model (store choice, separate, edit/remove). Separators have no command. -->
     <ContextMenu x:Key="TileMenu" x:Shared="False" ItemsSource="{Binding MenuItems}">
       <ContextMenu.ItemContainerStyle>
@@ -31,6 +33,82 @@
         </Style>
       </ContextMenu.ItemContainerStyle>
     </ContextMenu>
+    <DataTemplate x:Key="TileTemplate" DataType="{x:Type vm:LibraryTileViewModel}">
+      <Border x:Name="Tile" Width="168" Margin="0,0,20,24" Background="Transparent" ToolTip="{Binding Title}" Loaded="OnTileLoaded">
+        <Border.Style>
+          <Style TargetType="Border">
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding HasMenu}" Value="True">
+                <Setter Property="ContextMenu" Value="{StaticResource TileMenu}" />
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </Border.Style>
+        <Border.InputBindings>
+          <MouseBinding Gesture="LeftDoubleClick" Command="{Binding PrimaryCommand}" />
+        </Border.InputBindings>
+        <StackPanel>
+          <Border x:Name="Cover" Height="252" CornerRadius="8" ClipToBounds="True">
+            <Border.Background>
+              <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FF232836" Offset="0" />
+                <GradientStop Color="#FF171A22" Offset="1" />
+              </LinearGradientBrush>
+            </Border.Background>
+            <Grid>
+              <!-- Cover art (rounded through the border); the initial shows until it loads or when there is none. -->
+          <Border CornerRadius="8">
+            <Border.Background>
+              <ImageBrush ImageSource="{Binding CoverPath, Converter={StaticResource ImagePath}, ConverterParameter=336}" Stretch="UniformToFill" />
+            </Border.Background>
+          </Border>
+          <TextBlock x:Name="Initial"
+                     Text="{Binding Initial}"
+                         FontSize="72"
+                         FontWeight="Light"
+                         Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                         Opacity="0.6"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Margin="0,0,0,40" />
+              <Border HorizontalAlignment="Left"
+                      VerticalAlignment="Top"
+                      Margin="8"
+                      Padding="8,3"
+                      CornerRadius="4"
+                      Background="#B30F1115">
+                <TextBlock Text="{Binding StoreName}" FontSize="11" Foreground="{DynamicResource Lumen.Brush.Text}" />
+              </Border>
+              <Button VerticalAlignment="Bottom"
+                      Margin="10"
+                      Command="{Binding PrimaryCommand}"
+                      Content="{Binding ActionText}"
+                      Style="{StaticResource Lumen.Button.Tile}" />
+            </Grid>
+          </Border>
+          <TextBlock Text="{Binding Title}"
+                     Margin="2,10,2,0"
+                     FontSize="14"
+                     TextTrimming="CharacterEllipsis"
+                     TextWrapping="Wrap"
+                     Height="40" />
+          <!-- Fixed heights keep every row the same size, which keeps virtualized scrolling smooth. -->
+          <TextBlock Text="{Binding StateText}"
+                     Margin="2,2,2,0"
+                     Height="16"
+                     FontSize="12"
+                     Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+        </StackPanel>
+      </Border>
+      <DataTemplate.Triggers>
+        <DataTrigger Binding="{Binding IsInstalled}" Value="False">
+          <Setter TargetName="Cover" Property="Opacity" Value="0.5" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding HasCover}" Value="True">
+          <Setter TargetName="Initial" Property="Visibility" Value="Collapsed" />
+        </DataTrigger>
+      </DataTemplate.Triggers>
+    </DataTemplate>
   </UserControl.Resources>
 
   <Grid Margin="40,32,16,0">
@@ -103,81 +181,40 @@
                HorizontalAlignment="Left"
                Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}" />
 
-    <!-- Grid of covers. Virtualization arrives with the full Library view in M3. -->
-    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
-      <ItemsControl ItemsSource="{Binding Items}" Focusable="False" Margin="0,0,0,24">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <WrapPanel Orientation="Horizontal" />
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-        <ItemsControl.ItemTemplate>
-          <DataTemplate DataType="{x:Type vm:LibraryTileViewModel}">
-            <Border x:Name="Tile" Width="168" Margin="0,0,20,24" Background="Transparent" ToolTip="{Binding Title}">
-              <Border.Style>
-                <Style TargetType="Border">
-                  <Style.Triggers>
-                    <DataTrigger Binding="{Binding HasMenu}" Value="True">
-                      <Setter Property="ContextMenu" Value="{StaticResource TileMenu}" />
-                    </DataTrigger>
-                  </Style.Triggers>
-                </Style>
-              </Border.Style>
-              <Border.InputBindings>
-                <MouseBinding Gesture="LeftDoubleClick" Command="{Binding PrimaryCommand}" />
-              </Border.InputBindings>
-              <StackPanel>
-                <Border x:Name="Cover" Height="252" CornerRadius="8" ClipToBounds="True">
-                  <Border.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                      <GradientStop Color="#FF232836" Offset="0" />
-                      <GradientStop Color="#FF171A22" Offset="1" />
-                    </LinearGradientBrush>
-                  </Border.Background>
-                  <Grid>
-                    <TextBlock Text="{Binding Initial}"
-                               FontSize="72"
-                               FontWeight="Light"
-                               Foreground="{DynamicResource Lumen.Brush.TextMuted}"
-                               Opacity="0.6"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               Margin="0,0,0,40" />
-                    <Border HorizontalAlignment="Left"
-                            VerticalAlignment="Top"
-                            Margin="8"
-                            Padding="8,3"
-                            CornerRadius="4"
-                            Background="#B30F1115">
-                      <TextBlock Text="{Binding StoreName}" FontSize="11" Foreground="{DynamicResource Lumen.Brush.Text}" />
-                    </Border>
-                    <Button VerticalAlignment="Bottom"
-                            Margin="10"
-                            Command="{Binding PrimaryCommand}"
-                            Content="{Binding ActionText}"
-                            Style="{StaticResource Lumen.Button.Tile}" />
-                  </Grid>
-                </Border>
-                <TextBlock Text="{Binding Title}"
-                           Margin="2,10,2,0"
-                           FontSize="14"
-                           TextTrimming="CharacterEllipsis"
-                           TextWrapping="Wrap"
-                           MaxHeight="40" />
-                <TextBlock Text="{Binding StateText}"
-                           Margin="2,2,2,0"
-                           FontSize="12"
-                           Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
-              </StackPanel>
-            </Border>
-            <DataTemplate.Triggers>
-              <DataTrigger Binding="{Binding IsInstalled}" Value="False">
-                <Setter TargetName="Cover" Property="Opacity" Value="0.5" />
-              </DataTrigger>
-            </DataTemplate.Triggers>
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
-    </ScrollViewer>
+    <!-- Grid of covers: a virtualized list of rows (WPF has no virtualizing wrap panel), so only rows on
+         screen and their images exist in memory. The view sets ColumnCount from its width. -->
+    <ItemsControl x:Name="RowsHost"
+                  Grid.Row="2"
+                  ItemsSource="{Binding Rows}"
+                  SizeChanged="OnGridSizeChanged"
+                  Focusable="False"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
+                  VirtualizingPanel.ScrollUnit="Pixel"
+                  ScrollViewer.CanContentScroll="True">
+      <ItemsControl.Template>
+        <ControlTemplate TargetType="ItemsControl">
+          <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+            <ItemsPresenter Margin="0,0,0,24" />
+          </ScrollViewer>
+        </ControlTemplate>
+      </ItemsControl.Template>
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <VirtualizingStackPanel />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate DataType="{x:Type vm:TileRow}">
+          <ItemsControl ItemsSource="{Binding Tiles}" ItemTemplate="{StaticResource TileTemplate}" Focusable="False">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+          </ItemsControl>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
   </Grid>
 </UserControl>
