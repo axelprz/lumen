@@ -56,7 +56,7 @@
     <value>{0} items</value>
   </data>
   <data name="Library_Empty" xml:space="preserve">
-    <value>No games yet. Lumen finds the games installed with your stores (Steam, Epic, GOG, Ubisoft, EA, Battle.net) by itself; you can also add any game or app with Add, or by dragging an .exe, a shortcut or a link here.</value>
+    <value>No games yet. Lumen finds the games installed with your stores (Steam, Epic, GOG, Ubisoft, EA, Battle.net, Xbox) by itself; you can also add any game or app with Add, or by dragging an .exe, a shortcut or a link here.</value>
   </data>
   <data name="Library_NotInstalled" xml:space="preserve">
     <value>Not installed</value>
