@@ -16,9 +16,13 @@
       "DisplayName": "Diablo IV", "Publisher": "Blizzard Entertainment", "InstallLocation": "D:\\Games\\Diablo IV (removed)",
       "UninstallString": "\"C:\\ProgramData\\Battle.net\\Agent\\Blizzard Uninstaller.exe\" --lang=enUS --uid=fenris --displayname=\"Diablo IV\""
     },
+    "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\StarCraft": {
+      "DisplayName": "StarCraft", "Publisher": "Blizzard Entertainment", "InstallLocation": "C:\\Program Files (x86)\\StarCraft",
+      "UninstallString": "\"C:\\ProgramData\\Battle.net\\Agent\\Blizzard Uninstaller.exe\" --lang=esMX --uid=s1 --displayname=\"StarCraft\""
+    },
     "SOFTWARE\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Battle.net": {
       "DisplayName": "Battle.net", "Publisher": "Blizzard Entertainment", "InstallLocation": "C:\\Program Files (x86)\\Battle.net",
-      "UninstallString": "\"C:\\Program Files (x86)\\Battle.net\\Battle.net Uninstaller.exe\" --lang=enUS"
+      "UninstallString": "\"C:\\ProgramData\\Battle.net\\Agent\\Blizzard Uninstaller.exe\" --lang=esMX --uid=battle.net --displayname=\"Battle.net\""
     }
   }
 }

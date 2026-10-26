@@ -14,7 +14,8 @@ public sealed class UbisoftProvider(IRegistryReader registry, IFileSystem fileSy
 {
     public const string SourceId = "ubisoft";
 
-    // VERIFY: starting points from ARCHITECTURE §4, not yet checked on a machine with Ubisoft Connect.
+    // Verified on Windows 11 (2026-10): Installs\{id}\InstallDir uses forward slashes and a trailing slash;
+    // "Uplay Install {id}" carries the title. The launcher's own entry is "Uplay" (not matched).
     internal const string LauncherKey = @"SOFTWARE\WOW6432Node\Ubisoft\Launcher";
     internal const string InstallsKey = @"SOFTWARE\WOW6432Node\Ubisoft\Launcher\Installs";
     internal const string UninstallPrefix = "Uplay Install ";
@@ -25,7 +26,7 @@ public sealed class UbisoftProvider(IRegistryReader registry, IFileSystem fileSy
 
     public ProviderCapabilities Capabilities => ProviderCapabilities.InstalledScan;
 
-    /// <summary>VERIFY: URI documented in ARCHITECTURE §4.</summary>
+    /// <summary>Launch URI; verified (2026-10): starts the game through Ubisoft Connect.</summary>
     public static LaunchSpec LaunchFor(string id) => new(LaunchKind.Uri, $"uplay://launch/{id}/0");
 
     public Task<ProviderResult> ScanInstalledAsync(CancellationToken ct)

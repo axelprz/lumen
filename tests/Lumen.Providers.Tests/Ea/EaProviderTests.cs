@@ -8,8 +8,7 @@ using Lumen.Providers.Tests.Fakes;
 
 namespace Lumen.Providers.Tests.Ea;
 
-// VERIFY: synthetic uninstall entries and installerdata.xml following community documentation; not yet
-// compared with a real EA app install.
+// Synthetic uninstall entries and installerdata.xml following the real format (compared with a real install, 2026-10).
 public sealed class EaProviderTests
 {
     private const string EaApp = @"C:\Program Files\Electronic Arts\EA Desktop\EA Desktop\EADesktop.exe";
