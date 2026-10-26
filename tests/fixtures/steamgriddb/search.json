@@ -1,0 +1,8 @@
+{
+  "success": true,
+  "data": [
+    { "id": 900010, "name": "Sample Quest 2: Return", "types": [ "steam" ], "verified": true },
+    { "id": 900002, "name": "Old Game™", "types": [ "egs" ], "verified": true },
+    { "id": 900011, "name": "Old Games Collection", "types": [], "verified": false }
+  ]
+}

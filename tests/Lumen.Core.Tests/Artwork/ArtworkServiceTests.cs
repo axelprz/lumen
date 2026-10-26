@@ -21,9 +21,12 @@ public sealed class ArtworkServiceTests : IDisposable
 
     public void Dispose()
     {
-        if (Directory.Exists(_cache))
+        foreach (var dir in new[] { _cache, _overrides })
         {
-            Directory.Delete(_cache, recursive: true);
+            if (Directory.Exists(dir))
+            {
+                Directory.Delete(dir, recursive: true);
+            }
         }
     }
 
@@ -162,7 +165,102 @@ public sealed class ArtworkServiceTests : IDisposable
         ArtworkService.DetectImageExtension(header).ShouldBe(expected);
     }
 
-    private ArtworkService Service() => new(new HttpClient(_http), [new TestSource()], _cache, NullLogger<ArtworkService>.Instance, _time);
+    [Fact]
+    public async Task SecondSource_IsTried_WhenTheFirstHasNothing()
+    {
+        _http.Routes["https://second.test/1"] = () => Ok(_png);
+
+        var path = await Service(new TestSource(), new SecondSource(ArtworkCandidates.None, "https://second.test/1")).GetAsync(_game, ArtworkKind.Cover, CancellationToken.None);
+
+        path!.ShouldEndWith(".png");
+    }
+
+    [Fact]
+    public async Task UnavailableSource_IsNotRememberedAsAMiss()
+    {
+        var second = new SecondSource(ArtworkCandidates.Unavailable);
+        var service = Service(new TestSource(), second);
+
+        (await service.GetAsync(_game, ArtworkKind.Cover, CancellationToken.None)).ShouldBeNull();
+        Directory.Exists(_cache).ShouldBeFalse(); // no .miss written
+
+        second.Answer = new ArtworkCandidates([new Uri("https://second.test/1")], true);
+        _http.Routes["https://second.test/1"] = () => Ok(_jpeg);
+        (await service.GetAsync(_game, ArtworkKind.Cover, CancellationToken.None)).ShouldNotBeNull();
+    }
+
+    [Fact]
+    public async Task ThrowingSource_IsContained()
+    {
+        _http.Routes["https://cdn.test/1/cover"] = () => Ok(_jpeg);
+
+        var path = await Service(new SecondSource(null), new TestSource()).GetAsync(_game, ArtworkKind.Cover, CancellationToken.None);
+
+        path.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public async Task Override_WinsOverDownloads_AndSurvivesClearCache()
+    {
+        _http.Routes["https://cdn.test/1/cover"] = () => Ok(_jpeg);
+        var service = Service();
+        var picked = Path.Combine(Path.GetTempPath(), "lumen-tests", Guid.NewGuid().ToString("N") + ".png");
+        Directory.CreateDirectory(Path.GetDirectoryName(picked)!);
+        await File.WriteAllBytesAsync(picked, _png);
+
+        (await service.SetOverrideAsync(_game.Ref, ArtworkKind.Cover, picked, CancellationToken.None)).ShouldBeTrue();
+        File.Delete(picked); // the override is a copy
+        service.ClearCache();
+
+        var path = await service.GetAsync(_game, ArtworkKind.Cover, CancellationToken.None);
+        path!.ShouldStartWith(_overrides);
+        path.ShouldEndWith(".png");
+        service.HasOverride(_game.Ref, ArtworkKind.Cover).ShouldBeTrue();
+        _http.Calls.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task Override_RejectsFilesThatAreNotImages()
+    {
+        var fake = Path.Combine(Path.GetTempPath(), "lumen-tests", Guid.NewGuid().ToString("N") + ".png");
+        Directory.CreateDirectory(Path.GetDirectoryName(fake)!);
+        await File.WriteAllBytesAsync(fake, [0x4D, 0x5A, 0x90, 0x00]); // an .exe renamed to .png
+
+        (await Service().SetOverrideAsync(_game.Ref, ArtworkKind.Cover, fake, CancellationToken.None)).ShouldBeFalse();
+        Service().HasOverride(_game.Ref, ArtworkKind.Cover).ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task RemoveOverride_FallsBackToDownloads()
+    {
+        _http.Routes["https://cdn.test/1/cover"] = () => Ok(_jpeg);
+        var service = Service();
+        var picked = Path.Combine(Path.GetTempPath(), "lumen-tests", Guid.NewGuid().ToString("N") + ".png");
+        Directory.CreateDirectory(Path.GetDirectoryName(picked)!);
+        await File.WriteAllBytesAsync(picked, _png);
+        await service.SetOverrideAsync(_game.Ref, ArtworkKind.Cover, picked, CancellationToken.None);
+
+        service.RemoveOverride(_game.Ref, ArtworkKind.Cover);
+
+        (await service.GetAsync(_game, ArtworkKind.Cover, CancellationToken.None))!.ShouldEndWith(".jpg");
+    }
+
+    [Fact]
+    public async Task ClearMisses_LetsSourcesBeAskedAgain()
+    {
+        var service = Service();
+        await service.GetAsync(_game, ArtworkKind.Cover, CancellationToken.None); // both 404 → miss
+        _http.Routes["https://cdn.test/1/cover"] = () => Ok(_jpeg);
+
+        service.ClearMisses();
+
+        (await service.GetAsync(_game, ArtworkKind.Cover, CancellationToken.None)).ShouldNotBeNull();
+    }
+
+    private string _overrides => _cache + "-overrides";
+
+    private ArtworkService Service(params IArtworkSource[] sources) =>
+        new(new HttpClient(_http), sources.Length == 0 ? [new TestSource()] : sources, _cache, _overrides, NullLogger<ArtworkService>.Instance, _time);
 
     private static HttpResponseMessage Ok(byte[] body) => new(HttpStatusCode.OK) { Content = new ByteArrayContent(body) };
 
@@ -170,8 +268,21 @@ public sealed class ArtworkServiceTests : IDisposable
     {
         public bool CanHandle(LibraryEntry entry) => entry.Ref.Source == "test";
 
-        public IReadOnlyList<Uri> Candidates(LibraryEntry entry, ArtworkKind kind) =>
-            [new($"https://cdn.test/{entry.Ref.ExternalId}/{kind.ToString().ToLowerInvariant()}"), new($"https://cdn.test/{entry.Ref.ExternalId}/{kind.ToString().ToLowerInvariant()}-alt")];
+        public Task<ArtworkCandidates> GetCandidatesAsync(LibraryEntry entry, ArtworkKind kind, CancellationToken ct) =>
+            Task.FromResult(new ArtworkCandidates(
+                [new($"https://cdn.test/{entry.Ref.ExternalId}/{kind.ToString().ToLowerInvariant()}"), new($"https://cdn.test/{entry.Ref.ExternalId}/{kind.ToString().ToLowerInvariant()}-alt")],
+                true));
+    }
+
+    /// <summary>Answers with a fixed result; a null answer throws.</summary>
+    private sealed class SecondSource(ArtworkCandidates? answer, params string[] urls) : IArtworkSource
+    {
+        public ArtworkCandidates? Answer { get; set; } = answer is null ? null : urls.Length > 0 ? new ArtworkCandidates(urls.Select(u => new Uri(u)).ToList(), answer.Definitive) : answer;
+
+        public bool CanHandle(LibraryEntry entry) => true;
+
+        public Task<ArtworkCandidates> GetCandidatesAsync(LibraryEntry entry, ArtworkKind kind, CancellationToken ct) =>
+            Answer is null ? throw new InvalidOperationException("source bug") : Task.FromResult(Answer);
     }
 
     private sealed class RoutingHandler : HttpMessageHandler

@@ -238,4 +238,55 @@
   <data name="Settings_Library_ResetDone" xml:space="preserve">
     <value>Grouping was reset: games are grouped automatically again.</value>
   </data>
+  <data name="Tile_ChangeCover" xml:space="preserve">
+    <value>Change cover…</value>
+  </data>
+  <data name="Tile_RestoreCover" xml:space="preserve">
+    <value>Restore original cover</value>
+  </data>
+  <data name="Artwork_ImageFilter" xml:space="preserve">
+    <value>Images (*.jpg;*.jpeg;*.png;*.webp)|*.jpg;*.jpeg;*.png;*.webp</value>
+  </data>
+  <data name="Artwork_InvalidImage" xml:space="preserve">
+    <value>That file isn't a JPG, PNG or WebP image (or it's larger than 10 MB).</value>
+  </data>
+  <data name="Settings_Artwork_Title" xml:space="preserve">
+    <value>Artwork</value>
+  </data>
+  <data name="Settings_Artwork_Description" xml:space="preserve">
+    <value>Steam games get their covers from Steam automatically. Add a free SteamGridDB API key to also get covers for games from other stores and manual items. The key is encrypted on this PC and only sent to SteamGridDB.</value>
+  </data>
+  <data name="Settings_Sgdb_KeyLabel" xml:space="preserve">
+    <value>SteamGridDB API key</value>
+  </data>
+  <data name="Settings_Sgdb_GetKey" xml:space="preserve">
+    <value>Get a free key</value>
+  </data>
+  <data name="Settings_Sgdb_KeySaved" xml:space="preserve">
+    <value>A key is saved. Paste a new one to replace it.</value>
+  </data>
+  <data name="Settings_Sgdb_Testing" xml:space="preserve">
+    <value>Checking with SteamGridDB…</value>
+  </data>
+  <data name="Settings_Sgdb_Connected" xml:space="preserve">
+    <value>Connected. Covers for your other games will load as you browse the library.</value>
+  </data>
+  <data name="Settings_Sgdb_InvalidKey" xml:space="preserve">
+    <value>SteamGridDB rejected this key. Check it on your SteamGridDB profile.</value>
+  </data>
+  <data name="Settings_Sgdb_InvalidKeyFormat" xml:space="preserve">
+    <value>Paste the key from your SteamGridDB profile (letters and numbers only).</value>
+  </data>
+  <data name="Settings_Sgdb_Unreachable" xml:space="preserve">
+    <value>Couldn't reach SteamGridDB. Check your connection and try again.</value>
+  </data>
+  <data name="Settings_Sgdb_Removed" xml:space="preserve">
+    <value>SteamGridDB key removed from this PC. Covers already downloaded stay.</value>
+  </data>
+  <data name="Settings_Artwork_ClearCache" xml:space="preserve">
+    <value>Clear artwork cache</value>
+  </data>
+  <data name="Settings_Artwork_CacheCleared" xml:space="preserve">
+    <value>Artwork cache cleared. Covers will download again as you browse; custom covers were kept.</value>
+  </data>
 </root>

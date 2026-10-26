@@ -27,4 +27,17 @@ public partial class SettingsView : UserControl
         ApiKeyBox.Clear();
         await steam.SaveAndTestCommand.ExecuteAsync(key);
     }
+
+    // Same view concern for the SteamGridDB key.
+    private async void OnSgdbSaveClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not SettingsViewModel { Artwork: var artwork })
+        {
+            return;
+        }
+
+        var key = SgdbKeyBox.Password;
+        SgdbKeyBox.Clear();
+        await artwork.SaveAndTestCommand.ExecuteAsync(key);
+    }
 }

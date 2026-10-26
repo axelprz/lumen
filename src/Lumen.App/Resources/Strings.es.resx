@@ -238,4 +238,55 @@
   <data name="Settings_Library_ResetDone" xml:space="preserve">
     <value>Se restableció la agrupación: los juegos se agrupan solos otra vez.</value>
   </data>
+  <data name="Tile_ChangeCover" xml:space="preserve">
+    <value>Cambiar portada…</value>
+  </data>
+  <data name="Tile_RestoreCover" xml:space="preserve">
+    <value>Restaurar portada original</value>
+  </data>
+  <data name="Artwork_ImageFilter" xml:space="preserve">
+    <value>Imágenes (*.jpg;*.jpeg;*.png;*.webp)|*.jpg;*.jpeg;*.png;*.webp</value>
+  </data>
+  <data name="Artwork_InvalidImage" xml:space="preserve">
+    <value>Ese archivo no es una imagen JPG, PNG o WebP (o pesa más de 10 MB).</value>
+  </data>
+  <data name="Settings_Artwork_Title" xml:space="preserve">
+    <value>Artwork</value>
+  </data>
+  <data name="Settings_Artwork_Description" xml:space="preserve">
+    <value>Los juegos de Steam traen su portada de Steam automáticamente. Agregá una API key gratuita de SteamGridDB para tener también portadas de los juegos de otras tiendas y de los elementos manuales. La key se guarda cifrada en esta PC y solo se envía a SteamGridDB.</value>
+  </data>
+  <data name="Settings_Sgdb_KeyLabel" xml:space="preserve">
+    <value>API key de SteamGridDB</value>
+  </data>
+  <data name="Settings_Sgdb_GetKey" xml:space="preserve">
+    <value>Conseguir una key gratis</value>
+  </data>
+  <data name="Settings_Sgdb_KeySaved" xml:space="preserve">
+    <value>Ya hay una key guardada. Pegá una nueva para reemplazarla.</value>
+  </data>
+  <data name="Settings_Sgdb_Testing" xml:space="preserve">
+    <value>Consultando a SteamGridDB…</value>
+  </data>
+  <data name="Settings_Sgdb_Connected" xml:space="preserve">
+    <value>Conectado. Las portadas de tus otros juegos se van a cargar a medida que recorras la biblioteca.</value>
+  </data>
+  <data name="Settings_Sgdb_InvalidKey" xml:space="preserve">
+    <value>SteamGridDB rechazó esta key. Revisala en tu perfil de SteamGridDB.</value>
+  </data>
+  <data name="Settings_Sgdb_InvalidKeyFormat" xml:space="preserve">
+    <value>Pegá la key de tu perfil de SteamGridDB (solo letras y números).</value>
+  </data>
+  <data name="Settings_Sgdb_Unreachable" xml:space="preserve">
+    <value>No se pudo conectar con SteamGridDB. Revisá tu conexión y probá de nuevo.</value>
+  </data>
+  <data name="Settings_Sgdb_Removed" xml:space="preserve">
+    <value>Se quitó la key de SteamGridDB de esta PC. Las portadas ya descargadas se mantienen.</value>
+  </data>
+  <data name="Settings_Artwork_ClearCache" xml:space="preserve">
+    <value>Limpiar caché de artwork</value>
+  </data>
+  <data name="Settings_Artwork_CacheCleared" xml:space="preserve">
+    <value>Se limpió la caché. Las portadas se vuelven a descargar a medida que recorrés la biblioteca; las portadas personalizadas se mantuvieron.</value>
+  </data>
 </root>
