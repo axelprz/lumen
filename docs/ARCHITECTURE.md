@@ -179,6 +179,10 @@ Tables (initial; M2 note: `items`/`item_entries` were not needed. Items are comp
 
 Migrations are hand-written SQL files embedded in `Lumen.Data` as `Migrations/NNNN_lower_snake_name.sql` (versions contiguous from 1). `MigrationRunner` creates `schema_version` itself, applies each pending migration in its own transaction on startup (before the main window opens), and refuses a database whose version is newer than the app knows. `0001_initial` only creates `settings_local`; every other table is added by the milestone that first uses it, so its columns are designed with real code in hand. Connections use WAL, `foreign_keys=ON` and a 5 s busy timeout.
 
+`entry_first_seen` (migration 0007): when each `ItemRef` first appeared, written with `INSERT OR IGNORE` on every cache replace (never overwritten, kept after uninstalls); drives "Recently added". Existing rows were backfilled with their `updated_at`.
+
+Library search/filters/sort (M3, `LibraryQuery` + `LibraryFilter` in Core, pure): search is case-, accent- and symbol-insensitive and also matches on normalized titles ("witcher iii" finds "The Witcher® 3"); filters are type, store (matches any store of a merged item) and installed state; sorts are name, last played (store data for now, Lumen's own in M6), playtime (store data, summed), recently added. The chosen sort is remembered in `settings_local` (`library.sort`); filters reset each start. Tiles are reused across filter changes, so covers stay loaded.
+
 `entries` (migration 0002): one row per provider entry, primary key `(source, external_id)`; enums stored as text (`Game`, `Installed`, ...), launch/install specs and `Extra` as JSON. Rows a newer Lumen wrote with unknown values are skipped on read. A source is always replaced as a whole, in one transaction.
 
 ### Portable — JSON (sync folder, or `%APPDATA%\Lumen\portable` when no sync folder is set)

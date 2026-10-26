@@ -8,6 +8,9 @@ public interface ILibraryCache
 {
     Task<IReadOnlyList<LibraryEntry>> LoadAllAsync(CancellationToken ct);
 
-    /// <summary>Atomically replaces every cached entry of <paramref name="source"/>.</summary>
+    /// <summary>Atomically replaces every cached entry of <paramref name="source"/>; records when new entries first appeared.</summary>
     Task ReplaceSourceAsync(string source, IReadOnlyList<LibraryEntry> entries, CancellationToken ct);
+
+    /// <summary>When each entry first appeared in Lumen (survives rescans and uninstalls).</summary>
+    Task<IReadOnlyDictionary<ItemRef, DateTimeOffset>> LoadFirstSeenAsync(CancellationToken ct);
 }

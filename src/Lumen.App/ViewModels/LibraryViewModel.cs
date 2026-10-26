@@ -9,6 +9,7 @@ using Lumen.App.Services;
 using Lumen.Core.Artwork;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
+using Lumen.Core.Settings;
 using Microsoft.Extensions.Logging;
 
 namespace Lumen.App.ViewModels;
@@ -25,6 +26,8 @@ public sealed partial class LibraryViewModel : ObservableObject
     private readonly IMergeRuleStore _mergeRules;
     private readonly ArtworkService _artwork;
     private readonly IDialogService _dialogs;
+    private readonly LibraryFilter _filter;
+    private readonly ILocalSettings _settings;
     private int _columnCount = 1;
     private readonly ILocalizer _localizer;
     private readonly ILogger<LibraryViewModel> _logger;
@@ -47,9 +50,13 @@ public sealed partial class LibraryViewModel : ObservableObject
         IMergeRuleStore mergeRules,
         ArtworkService artwork,
         IDialogService dialogs,
+        LibraryFilter filter,
+        ILocalSettings settings,
         ILocalizer localizer,
         ILogger<LibraryViewModel> logger)
     {
+        _filter = filter;
+        _settings = settings;
         _library = library;
         _launcher = launcher;
         _manualItems = manualItems;
@@ -63,8 +70,10 @@ public sealed partial class LibraryViewModel : ObservableObject
 
         _library.Changed += (_, _) => _ui.Post(_ => Rebuild(), null);
         _localizer.CultureChanged += (_, _) => Rebuild();
+        BuildFilterOptions();
     }
 
+    /// <summary>The tiles currently shown (after search, filters and sort).</summary>
     public ObservableCollection<LibraryTileViewModel> Items { get; } = [];
 
     /// <summary>Items laid out in rows of <see cref="ColumnCount"/> for the virtualized grid.</summary>
@@ -84,17 +93,18 @@ public sealed partial class LibraryViewModel : ObservableObject
         }
     }
 
-    public string CountText => Items.Count == 1
-        ? _localizer["Library_CountOne"]
-        : string.Format(_localizer.Culture, _localizer["Library_Count"], Items.Count);
+    /// <summary>"79 items", or "12 of 79" while filtering.</summary>
+    public string CountText => FormatCount();
 
-    public bool IsEmpty => !IsScanning && Items.Count == 0;
+    /// <summary>The library itself is empty (not just filtered to nothing).</summary>
+    public bool IsEmpty => !IsScanning && _allTiles.Count == 0;
 
     public bool HasNotice => !string.IsNullOrEmpty(Notice);
 
     /// <summary>Called once after the main window is shown.</summary>
     public async Task InitializeAsync(CancellationToken ct)
     {
+        await RestoreSortAsync();
         try
         {
             await _library.LoadCachedAsync(ct);
@@ -308,11 +318,22 @@ public sealed partial class LibraryViewModel : ObservableObject
     /// </summary>
     private void RefreshTiles(Func<LibraryTileViewModel, bool> match)
     {
+        for (var i = 0; i < _allTiles.Count; i++)
+        {
+            if (match(_allTiles[i]))
+            {
+                _allTiles[i] = CreateTile(_allTiles[i].Item);
+            }
+        }
+
+        // Swap the visible ones in place too (same item, new tile).
+        var current = TilesByItem();
         for (var i = 0; i < Items.Count; i++)
         {
-            if (match(Items[i]))
+            var fresh = current[Items[i].Item];
+            if (!ReferenceEquals(fresh, Items[i]))
             {
-                Items[i] = CreateTile(Items[i].Item);
+                Items[i] = fresh;
             }
         }
 
@@ -337,15 +358,10 @@ public sealed partial class LibraryViewModel : ObservableObject
 
     private void Rebuild()
     {
-        Items.Clear();
-        foreach (var item in _library.Items)
-        {
-            Items.Add(CreateTile(item));
-        }
-
-        RebuildRows();
-        OnPropertyChanged(nameof(CountText));
-        OnPropertyChanged(nameof(IsEmpty));
+        _allTiles.Clear();
+        _allTiles.AddRange(_library.Items.Select(CreateTile));
+        BuildFilterOptions(); // stores present may have changed; selections are kept
+        ApplyFilter();
     }
 
     private void RebuildRows()

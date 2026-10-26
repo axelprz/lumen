@@ -1,0 +1,201 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)
+
+using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Lumen.Core.Library;
+using Lumen.Core.Settings;
+
+namespace Lumen.App.ViewModels;
+
+/// <summary>One choice in a filter dropdown.</summary>
+public sealed record FilterOption<T>(string Label, T Value)
+{
+    // What screen readers (UI Automation) and the closed ComboBox announce: the visible label only.
+    public override string ToString() => Label;
+}
+
+/// <summary>Search, filters and sort for the library page.</summary>
+public sealed partial class LibraryViewModel
+{
+    private const string SortSettingKey = "library.sort";
+
+    private readonly List<LibraryTileViewModel> _allTiles = [];
+
+    [ObservableProperty]
+    private string _searchText = string.Empty;
+
+    [ObservableProperty]
+    private FilterOption<KindFilter>? _selectedKind;
+
+    [ObservableProperty]
+    private FilterOption<string?>? _selectedStore;
+
+    [ObservableProperty]
+    private FilterOption<InstallFilter>? _selectedInstall;
+
+    [ObservableProperty]
+    private FilterOption<LibrarySort>? _selectedSort;
+
+    public IReadOnlyList<FilterOption<KindFilter>> KindOptions { get; private set; } = [];
+
+    public IReadOnlyList<FilterOption<InstallFilter>> InstallOptions { get; private set; } = [];
+
+    public IReadOnlyList<FilterOption<LibrarySort>> SortOptions { get; private set; } = [];
+
+    /// <summary>"All stores" plus every store present in the library.</summary>
+    public IReadOnlyList<FilterOption<string?>> StoreOptions { get; private set; } = [];
+
+    public bool IsFiltering => CurrentQuery().IsFiltering;
+
+    /// <summary>The library has items but none match the current search/filters.</summary>
+    public bool HasNoMatches => IsFiltering && _allTiles.Count > 0 && Items.Count == 0;
+
+    partial void OnSearchTextChanged(string value) => ApplyFilter();
+
+    partial void OnSelectedKindChanged(FilterOption<KindFilter>? value) => ApplyFilter();
+
+    partial void OnSelectedStoreChanged(FilterOption<string?>? value) => ApplyFilter();
+
+    partial void OnSelectedInstallChanged(FilterOption<InstallFilter>? value) => ApplyFilter();
+
+    partial void OnSelectedSortChanged(FilterOption<LibrarySort>? value)
+    {
+        ApplyFilter();
+
+        // Remember only the user's choices: while the options are being (re)built the default selection must
+        // not overwrite what was saved. A convenience, so failures are ignored.
+        if (value is not null && !_suspendFilter)
+        {
+            _ = _settings.SetAsync(SortSettingKey, value.Value.ToString(), CancellationToken.None);
+        }
+    }
+
+    [RelayCommand]
+    private void ClearFilters()
+    {
+        _suspendFilter = true;
+        SearchText = string.Empty;
+        SelectedKind = KindOptions[0];
+        SelectedStore = StoreOptions[0];
+        SelectedInstall = InstallOptions[0];
+        _suspendFilter = false;
+        ApplyFilter();
+    }
+
+    private bool _suspendFilter;
+
+    private void BuildFilterOptions()
+    {
+        var kind = SelectedKind?.Value ?? KindFilter.All;
+        var install = SelectedInstall?.Value ?? InstallFilter.All;
+        var sort = SelectedSort?.Value ?? LibrarySort.Name;
+        var store = SelectedStore?.Value;
+
+        _suspendFilter = true;
+        KindOptions =
+        [
+            new(_localizer["Filter_AllTypes"], KindFilter.All),
+            new(_localizer["Filter_Games"], KindFilter.Games),
+            new(_localizer["Filter_Apps"], KindFilter.Apps),
+        ];
+        InstallOptions =
+        [
+            new(_localizer["Filter_AnyState"], InstallFilter.All),
+            new(_localizer["Filter_Installed"], InstallFilter.Installed),
+            new(_localizer["Filter_NotInstalled"], InstallFilter.NotInstalled),
+        ];
+        SortOptions =
+        [
+            new(_localizer["Sort_Name"], LibrarySort.Name),
+            new(_localizer["Sort_LastPlayed"], LibrarySort.LastPlayed),
+            new(_localizer["Sort_Playtime"], LibrarySort.Playtime),
+            new(_localizer["Sort_RecentlyAdded"], LibrarySort.RecentlyAdded),
+        ];
+        StoreOptions = [new FilterOption<string?>(_localizer["Filter_AllStores"], null),
+            .. _library.Entries.Select(e => e.Ref.Source).Distinct()
+                .Select(source => new FilterOption<string?>(source == ManualItem.Source ? _localizer["Store_Manual"] : _storeNames.GetValueOrDefault(source, source), source))
+                .OrderBy(o => o.Label, StringComparer.CurrentCultureIgnoreCase)];
+
+        OnPropertyChanged(nameof(KindOptions));
+        OnPropertyChanged(nameof(InstallOptions));
+        OnPropertyChanged(nameof(SortOptions));
+        OnPropertyChanged(nameof(StoreOptions));
+        SelectedKind = KindOptions.First(o => o.Value == kind);
+        SelectedInstall = InstallOptions.First(o => o.Value == install);
+        SelectedSort = SortOptions.First(o => o.Value == sort);
+        SelectedStore = StoreOptions.FirstOrDefault(o => o.Value == store) ?? StoreOptions[0];
+        _suspendFilter = false;
+    }
+
+    private async Task RestoreSortAsync()
+    {
+        try
+        {
+            var saved = await _settings.GetAsync(SortSettingKey, CancellationToken.None);
+            if (Enum.TryParse<LibrarySort>(saved, out var sort))
+            {
+                SelectedSort = SortOptions.FirstOrDefault(o => o.Value == sort) ?? SelectedSort;
+            }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            LogCacheFailed(ex);
+        }
+    }
+
+    private LibraryQuery CurrentQuery() => new(
+        SearchText,
+        SelectedKind?.Value ?? KindFilter.All,
+        SelectedStore?.Value,
+        SelectedInstall?.Value ?? InstallFilter.All,
+        SelectedSort?.Value ?? LibrarySort.Name);
+
+    /// <summary>Shows the tiles that match the current query, in its order. Tiles are reused, so covers stay loaded.</summary>
+    private void ApplyFilter()
+    {
+        if (_suspendFilter)
+        {
+            return;
+        }
+
+        var byItem = TilesByItem();
+        var visible = _filter.Apply(_allTiles.Select(t => t.Item).ToList(), CurrentQuery(), _library.FirstSeen);
+        Items.Clear();
+        foreach (var item in visible)
+        {
+            Items.Add(byItem[item]);
+        }
+
+        RebuildRows();
+        OnPropertyChanged(nameof(CountText));
+        OnPropertyChanged(nameof(IsEmpty));
+        OnPropertyChanged(nameof(IsFiltering));
+        OnPropertyChanged(nameof(HasNoMatches));
+    }
+
+    // Items are matched by reference: two different items can never be "equal" here.
+    private Dictionary<LibraryItem, LibraryTileViewModel> TilesByItem()
+    {
+        var map = new Dictionary<LibraryItem, LibraryTileViewModel>(ReferenceEqualityComparer.Instance);
+        foreach (var tile in _allTiles)
+        {
+            map[tile.Item] = tile;
+        }
+
+        return map;
+    }
+
+    private string FormatCount()
+    {
+        if (IsFiltering)
+        {
+            return string.Format(CultureInfo.CurrentCulture, _localizer["Library_CountFiltered"], Items.Count, _allTiles.Count);
+        }
+
+        return _allTiles.Count == 1
+            ? _localizer["Library_CountOne"]
+            : string.Format(_localizer.Culture, _localizer["Library_Count"], _allTiles.Count);
+    }
+}

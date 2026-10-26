@@ -7,6 +7,7 @@
              xmlns:vm="clr-namespace:Lumen.App.ViewModels"
              xmlns:conv="clr-namespace:Lumen.App.Converters"
              AllowDrop="True"
+             PreviewKeyDown="OnPreviewKeyDown"
              DragOver="OnDragOver"
              Drop="OnDrop">
   <UserControl.Resources>
@@ -115,6 +116,7 @@
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
@@ -156,8 +158,53 @@
       </StackPanel>
     </DockPanel>
 
+    <!-- Search, filters and sort. Ctrl+F focuses the search box; Esc clears it. -->
+    <WrapPanel Grid.Row="1" Margin="0,0,24,16">
+      <Grid Width="240" Height="36" Margin="0,0,12,8">
+        <TextBox x:Name="SearchBox"
+                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                 Padding="30,0,8,0"
+                 VerticalContentAlignment="Center"
+                 AutomationProperties.Name="{l:Loc Library_Search}" />
+        <TextBlock Text="&#xE721;"
+                   Style="{StaticResource Lumen.Text.Icon}"
+                   FontSize="14"
+                   Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                   HorizontalAlignment="Left"
+                   Margin="12,0,0,0"
+                   IsHitTestVisible="False" />
+        <TextBlock Text="{l:Loc Library_Search}"
+                   Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                   FontSize="14"
+                   VerticalAlignment="Center"
+                   Margin="34,0,0,0"
+                   IsHitTestVisible="False">
+          <TextBlock.Style>
+            <Style TargetType="TextBlock">
+              <Setter Property="Visibility" Value="Collapsed" />
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                  <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </TextBlock.Style>
+        </TextBlock>
+      </Grid>
+      <ComboBox ItemsSource="{Binding KindOptions}" SelectedItem="{Binding SelectedKind}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_TypeLabel}" />
+      <ComboBox ItemsSource="{Binding StoreOptions}" SelectedItem="{Binding SelectedStore}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_StoreLabel}" />
+      <ComboBox ItemsSource="{Binding InstallOptions}" SelectedItem="{Binding SelectedInstall}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_StateLabel}" />
+      <ComboBox ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SelectedSort}" DisplayMemberPath="Label" MinWidth="180" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Sort_Label}" />
+      <Button Command="{Binding ClearFiltersCommand}"
+              Content="{l:Loc Filter_Clear}"
+              Style="{StaticResource Lumen.Button}"
+              Height="36"
+              Margin="0,0,12,8"
+              Visibility="{Binding IsFiltering, Converter={StaticResource BoolToVisibility}}" />
+    </WrapPanel>
+
     <!-- Non-blocking notice (scan problems, launch failures) -->
-    <Border Grid.Row="1"
+    <Border Grid.Row="2"
             Margin="0,0,24,16"
             Padding="14,10"
             CornerRadius="6"
@@ -171,8 +218,8 @@
       </DockPanel>
     </Border>
 
-    <!-- Empty state -->
-    <TextBlock Grid.Row="2"
+    <!-- Empty states: nothing in the library at all, or nothing matching the filters -->
+    <TextBlock Grid.Row="3"
                Text="{l:Loc Library_Empty}"
                Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                FontSize="15"
@@ -180,11 +227,21 @@
                MaxWidth="520"
                HorizontalAlignment="Left"
                Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}" />
+    <StackPanel Grid.Row="3"
+                HorizontalAlignment="Left"
+                Visibility="{Binding HasNoMatches, Converter={StaticResource BoolToVisibility}}">
+      <TextBlock Text="{l:Loc Library_NoMatches}" Foreground="{DynamicResource Lumen.Brush.TextMuted}" FontSize="15" />
+      <Button Command="{Binding ClearFiltersCommand}"
+              Content="{l:Loc Filter_Clear}"
+              Style="{StaticResource Lumen.Button}"
+              HorizontalAlignment="Left"
+              Margin="0,12,0,0" />
+    </StackPanel>
 
     <!-- Grid of covers: a virtualized list of rows (WPF has no virtualizing wrap panel), so only rows on
          screen and their images exist in memory. The view sets ColumnCount from its width. -->
     <ItemsControl x:Name="RowsHost"
-                  Grid.Row="2"
+                  Grid.Row="3"
                   ItemsSource="{Binding Rows}"
                   SizeChanged="OnGridSizeChanged"
                   Focusable="False"

@@ -72,10 +72,20 @@ internal sealed class InMemoryCache : ILibraryCache
     public Task<IReadOnlyList<LibraryEntry>> LoadAllAsync(CancellationToken ct) =>
         Task.FromResult<IReadOnlyList<LibraryEntry>>(BySource.Values.SelectMany(v => v).ToList());
 
+    public Dictionary<ItemRef, DateTimeOffset> FirstSeen { get; } = [];
+
     public Task ReplaceSourceAsync(string source, IReadOnlyList<LibraryEntry> entries, CancellationToken ct)
     {
         BySource[source] = entries;
+        foreach (var entry in entries)
+        {
+            FirstSeen.TryAdd(entry.Ref, DateTimeOffset.UtcNow);
+        }
+
         Writes++;
         return Task.CompletedTask;
     }
+
+    public Task<IReadOnlyDictionary<ItemRef, DateTimeOffset>> LoadFirstSeenAsync(CancellationToken ct) =>
+        Task.FromResult<IReadOnlyDictionary<ItemRef, DateTimeOffset>>(new Dictionary<ItemRef, DateTimeOffset>(FirstSeen));
 }

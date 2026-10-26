@@ -12,6 +12,7 @@
         <ResourceDictionary Source="Themes/Controls/Sidebar.xaml" />
         <ResourceDictionary Source="Themes/Controls/Buttons.xaml" />
         <ResourceDictionary Source="Themes/Controls/Inputs.xaml" />
+        <ResourceDictionary Source="Themes/Controls/ComboBox.xaml" />
       </ResourceDictionary.MergedDictionaries>
       <conv:InverseBooleanConverter x:Key="InverseBool" />
     </ResourceDictionary>

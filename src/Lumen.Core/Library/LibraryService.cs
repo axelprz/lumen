@@ -30,6 +30,7 @@ public sealed partial class LibraryService
     private readonly LibraryMerger _merger;
     private readonly IMergeRuleStore? _ruleStore;
     private Snapshot _snapshot = new([], [], MergeRules.None);
+    private IReadOnlyDictionary<ItemRef, DateTimeOffset> _firstSeen = new Dictionary<ItemRef, DateTimeOffset>();
 
     public LibraryService(
         IEnumerable<ILibraryProvider> providers,
@@ -57,10 +58,14 @@ public sealed partial class LibraryService
     /// <summary>Entries merged into items (one per game across stores), sorted by title.</summary>
     public IReadOnlyList<LibraryItem> Items => Volatile.Read(ref _snapshot).Items;
 
+    /// <summary>When each entry first appeared in Lumen ("Recently added").</summary>
+    public IReadOnlyDictionary<ItemRef, DateTimeOffset> FirstSeen => Volatile.Read(ref _firstSeen);
+
     public async Task LoadCachedAsync(CancellationToken ct)
     {
         var rules = _ruleStore is null ? MergeRules.None : await _ruleStore.LoadAsync(ct).ConfigureAwait(false);
         var cached = await _cache.LoadAllAsync(ct).ConfigureAwait(false);
+        Volatile.Write(ref _firstSeen, await _cache.LoadFirstSeenAsync(ct).ConfigureAwait(false));
         Publish(cached, rules);
     }
 
@@ -101,6 +106,7 @@ public sealed partial class LibraryService
                 LogScanned(report.Source, combined.Count, report.Installed.Status, report.Owned.Status);
             }
 
+            Volatile.Write(ref _firstSeen, await _cache.LoadFirstSeenAsync(ct).ConfigureAwait(false));
             Publish(bySource.Values.SelectMany(v => v).ToList());
             return reports;
         }
