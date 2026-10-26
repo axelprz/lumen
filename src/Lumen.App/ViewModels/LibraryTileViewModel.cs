@@ -8,38 +8,47 @@ using Lumen.Core.Localization;
 
 namespace Lumen.App.ViewModels;
 
-/// <summary>Commands a tile can run; created by <see cref="LibraryViewModel"/>.</summary>
-public sealed record TileCommands(ICommand Primary, ICommand? Edit, ICommand? Remove);
+/// <summary>One entry of a tile's context menu. A null command draws a separator.</summary>
+public sealed record TileMenuItem(string Header, ICommand? Command)
+{
+    public bool IsSeparator => Command is null;
+}
 
-/// <summary>One cover in the library grid. Artwork arrives in M3; until then the tile shows the title's initial.</summary>
+/// <summary>
+/// One cover in the library grid: a game or app, possibly owned on several stores (merged). Artwork arrives in
+/// M3; until then the tile shows the title's initial.
+/// </summary>
 public sealed class LibraryTileViewModel
 {
-    public LibraryTileViewModel(LibraryEntry entry, string storeName, ILocalizer localizer, TileCommands commands)
+    public LibraryTileViewModel(LibraryItem item, string storeNames, ILocalizer localizer, ICommand primaryCommand, IReadOnlyList<TileMenuItem> menu)
     {
-        Entry = entry;
-        StoreName = storeName;
-        PrimaryCommand = commands.Primary;
-        EditCommand = commands.Edit;
-        RemoveCommand = commands.Remove;
-        CanRunPrimary = LaunchService.PrimaryAction(entry) is not null;
-        ActionText = localizer[!CanRunPrimary ? "Action_Unavailable" : entry.IsInstalled ? "Action_Play" : "Action_Install"];
-        StateText = entry.IsInstalled ? string.Empty : localizer[CanRunPrimary ? "Library_NotInstalled" : "Library_NotAvailable"];
-        Initial = entry.Title.Length == 0
+        Item = item;
+        StoreName = storeNames;
+        PrimaryCommand = primaryCommand;
+        MenuItems = menu;
+        CanRunPrimary = LaunchService.PrimaryAction(item.Primary) is not null;
+        var playable = item.Primary.IsInstalled;
+        ActionText = localizer[!CanRunPrimary ? "Action_Unavailable" : playable ? "Action_Play" : "Action_Install"];
+        StateText = playable ? string.Empty : localizer[CanRunPrimary ? "Library_NotInstalled" : "Library_NotAvailable"];
+        Initial = item.Title.Length == 0
             ? "?"
-            : StringInfo.GetNextTextElement(entry.Title).ToUpper(CultureInfo.CurrentCulture);
+            : StringInfo.GetNextTextElement(item.Title).ToUpper(CultureInfo.CurrentCulture);
     }
 
-    public LibraryEntry Entry { get; }
+    public LibraryItem Item { get; }
 
-    public string Title => Entry.Title;
+    /// <summary>The entry Play/Install uses.</summary>
+    public LibraryEntry Entry => Item.Primary;
 
-    public bool IsInstalled => Entry.IsInstalled;
+    public string Title => Item.Title;
+
+    /// <summary>True when the entry Play uses is installed (drives the greyed-out look).</summary>
+    public bool IsInstalled => Item.Primary.IsInstalled;
 
     /// <summary>False when there is nothing to run (e.g. a manual item whose file is not on this PC).</summary>
     public bool CanRunPrimary { get; }
 
-    public bool IsManual => Entry.Ref.Source == ManualItem.Source;
-
+    /// <summary>Store badge text: one store, or several joined with " · " for a merged game.</summary>
     public string StoreName { get; }
 
     public string Initial { get; }
@@ -51,9 +60,7 @@ public sealed class LibraryTileViewModel
 
     public ICommand PrimaryCommand { get; }
 
-    /// <summary>Manual items only.</summary>
-    public ICommand? EditCommand { get; }
+    public IReadOnlyList<TileMenuItem> MenuItems { get; }
 
-    /// <summary>Manual items only.</summary>
-    public ICommand? RemoveCommand { get; }
+    public bool HasMenu => MenuItems.Count > 0;
 }

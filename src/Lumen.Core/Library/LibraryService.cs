@@ -27,31 +27,48 @@ public sealed partial class LibraryService
     private readonly ILogger<LibraryService> _logger;
     private readonly TimeSpan _providerTimeout;
     private readonly SemaphoreSlim _scanLock = new(1, 1);
-    private IReadOnlyList<LibraryEntry> _entries = [];
+    private readonly LibraryMerger _merger;
+    private readonly IMergeRuleStore? _ruleStore;
+    private Snapshot _snapshot = new([], [], MergeRules.None);
 
     public LibraryService(
         IEnumerable<ILibraryProvider> providers,
         ILibraryCache cache,
         ILogger<LibraryService> logger,
-        TimeSpan? providerTimeout = null)
+        TimeSpan? providerTimeout = null,
+        LibraryMerger? merger = null,
+        IMergeRuleStore? ruleStore = null)
     {
         ArgumentNullException.ThrowIfNull(providers);
         _providers = providers.ToList();
         _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _providerTimeout = providerTimeout ?? DefaultProviderTimeout;
+        _merger = merger ?? new LibraryMerger(new TitleNormalizer());
+        _ruleStore = ruleStore;
     }
 
-    /// <summary>Raised (on any thread) after <see cref="Entries"/> changes.</summary>
+    /// <summary>Raised (on any thread) after <see cref="Entries"/> or <see cref="Items"/> change.</summary>
     public event EventHandler? Changed;
 
     /// <summary>Current entries, sorted by title. Replaced as a whole, so it is safe to read from any thread.</summary>
-    public IReadOnlyList<LibraryEntry> Entries => Volatile.Read(ref _entries);
+    public IReadOnlyList<LibraryEntry> Entries => Volatile.Read(ref _snapshot).Entries;
+
+    /// <summary>Entries merged into items (one per game across stores), sorted by title.</summary>
+    public IReadOnlyList<LibraryItem> Items => Volatile.Read(ref _snapshot).Items;
 
     public async Task LoadCachedAsync(CancellationToken ct)
     {
+        var rules = _ruleStore is null ? MergeRules.None : await _ruleStore.LoadAsync(ct).ConfigureAwait(false);
         var cached = await _cache.LoadAllAsync(ct).ConfigureAwait(false);
-        Publish(cached);
+        Publish(cached, rules);
+    }
+
+    /// <summary>Re-applies merge decisions after the user separated items, picked a store or reset them.</summary>
+    public async Task ReloadMergeRulesAsync(CancellationToken ct)
+    {
+        var rules = _ruleStore is null ? MergeRules.None : await _ruleStore.LoadAsync(ct).ConfigureAwait(false);
+        Publish(Entries, rules);
     }
 
     /// <summary>Scans every provider.</summary>
@@ -169,15 +186,23 @@ public sealed partial class LibraryService
         }
     }
 
-    private void Publish(IReadOnlyList<LibraryEntry> entries)
+    private void Publish(IReadOnlyList<LibraryEntry> entries, MergeRules? rules = null)
     {
+        rules ??= Volatile.Read(ref _snapshot).Rules;
         var sorted = entries
             .OrderBy(e => e.Title, StringComparer.CurrentCultureIgnoreCase)
             .ThenBy(e => e.Ref.ToString(), StringComparer.Ordinal)
             .ToList();
-        Volatile.Write(ref _entries, sorted);
+        var items = _merger.Merge(sorted, rules)
+            .OrderBy(i => i.Title, StringComparer.CurrentCultureIgnoreCase)
+            .ThenBy(i => i.Key.ToString(), StringComparer.Ordinal)
+            .ToList();
+        Volatile.Write(ref _snapshot, new Snapshot(sorted, items, rules));
         Changed?.Invoke(this, EventArgs.Empty);
     }
+
+    // Entries, items and the rules they were built with are swapped together so readers never see a mix.
+    private sealed record Snapshot(IReadOnlyList<LibraryEntry> Entries, IReadOnlyList<LibraryItem> Items, MergeRules Rules);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Scanned {Source}: {Count} entries (installed: {Installed}, owned: {Owned})")]
     private partial void LogScanned(string source, int count, ProviderStatus installed, ProviderStatus owned);

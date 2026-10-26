@@ -214,4 +214,28 @@
   <data name="Manual_Error_ArgumentsNotAllowed" xml:space="preserve">
     <value>Los argumentos de inicio solo funcionan con archivos .exe.</value>
   </data>
+  <data name="Tile_PlayWith" xml:space="preserve">
+    <value>Jugar con {0}</value>
+  </data>
+  <data name="Tile_InstallWith" xml:space="preserve">
+    <value>Instalar con {0}</value>
+  </data>
+  <data name="Tile_AlwaysUse" xml:space="preserve">
+    <value>Usar siempre {0}</value>
+  </data>
+  <data name="Tile_Separate" xml:space="preserve">
+    <value>Mostrar tiendas por separado</value>
+  </data>
+  <data name="Settings_Library_Title" xml:space="preserve">
+    <value>Biblioteca</value>
+  </data>
+  <data name="Settings_Library_MergeDescription" xml:space="preserve">
+    <value>Un juego que tenés en varias tiendas aparece una sola vez, y Jugar usa la tienda donde está instalado. Si mostraste tiendas por separado o elegiste una tienda para algún juego, acá podés volver a la agrupación automática.</value>
+  </data>
+  <data name="Settings_Library_ResetMerges" xml:space="preserve">
+    <value>Restablecer agrupación</value>
+  </data>
+  <data name="Settings_Library_ResetDone" xml:space="preserve">
+    <value>Se restableció la agrupación: los juegos se agrupan solos otra vez.</value>
+  </data>
 </root>

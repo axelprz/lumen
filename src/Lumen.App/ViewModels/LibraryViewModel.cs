@@ -21,6 +21,7 @@ public sealed partial class LibraryViewModel : ObservableObject
     private readonly LibraryService _library;
     private readonly LaunchService _launcher;
     private readonly IManualItemStore _manualItems;
+    private readonly IMergeRuleStore _mergeRules;
     private readonly IDialogService _dialogs;
     private readonly ILocalizer _localizer;
     private readonly ILogger<LibraryViewModel> _logger;
@@ -40,6 +41,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         LaunchService launcher,
         IEnumerable<ILibraryProvider> providers,
         IManualItemStore manualItems,
+        IMergeRuleStore mergeRules,
         IDialogService dialogs,
         ILocalizer localizer,
         ILogger<LibraryViewModel> logger)
@@ -47,6 +49,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         _library = library;
         _launcher = launcher;
         _manualItems = manualItems;
+        _mergeRules = mergeRules;
         _dialogs = dialogs;
         _localizer = localizer;
         _logger = logger;
@@ -178,20 +181,71 @@ public sealed partial class LibraryViewModel : ObservableObject
         }
     }
 
+    private async Task UseStoreAlwaysAsync(LibraryItem item, LibraryEntry preferred)
+    {
+        await _mergeRules.SetPreferredAsync(preferred.Ref, item.Entries.Select(e => e.Ref), CancellationToken.None);
+        await _library.ReloadMergeRulesAsync(CancellationToken.None);
+    }
+
+    private async Task SeparateAsync(LibraryItem item)
+    {
+        await _mergeRules.SeparateAsync(item.Entries.Select(e => e.Ref), CancellationToken.None);
+        await _library.ReloadMergeRulesAsync(CancellationToken.None);
+    }
+
+    private string StoreNameOf(LibraryEntry entry) =>
+        entry.Ref.Source == ManualItem.Source
+            ? _localizer["Store_Manual"]
+            : _storeNames.GetValueOrDefault(entry.Ref.Source, entry.Ref.Source);
+
+    private string Format(string key, string arg) => string.Format(CultureInfo.CurrentCulture, _localizer[key], arg);
+
+    /// <summary>Context menu: per-store play/install and preference for merged games; edit/remove for manual items.</summary>
+    private List<TileMenuItem> BuildMenu(LibraryItem item)
+    {
+        var menu = new List<TileMenuItem>();
+        if (item.IsMerged)
+        {
+            foreach (var entry in item.Entries.Where(e => LaunchService.PrimaryAction(e) is not null))
+            {
+                var key = entry.IsInstalled ? "Tile_PlayWith" : "Tile_InstallWith";
+                menu.Add(new(Format(key, StoreNameOf(entry)), new AsyncRelayCommand(() => RunPrimaryActionAsync(entry))));
+            }
+
+            menu.Add(new(string.Empty, null));
+            foreach (var entry in item.Entries.Where(e => e != item.Primary && LaunchService.PrimaryAction(e) is not null))
+            {
+                menu.Add(new(Format("Tile_AlwaysUse", StoreNameOf(entry)), new AsyncRelayCommand(() => UseStoreAlwaysAsync(item, entry))));
+            }
+
+            menu.Add(new(_localizer["Tile_Separate"], new AsyncRelayCommand(() => SeparateAsync(item))));
+        }
+
+        // A manual item can be merged with a store's copy; edit/remove always target the manual entry.
+        var manual = item.Entries.FirstOrDefault(e => e.Ref.Source == ManualItem.Source);
+        if (manual is not null)
+        {
+            if (menu.Count > 0)
+            {
+                menu.Add(new(string.Empty, null));
+            }
+
+            menu.Add(new(_localizer["Tile_Edit"], new AsyncRelayCommand(() => EditManualItemAsync(manual))));
+            menu.Add(new(_localizer["Tile_Remove"], new AsyncRelayCommand(() => RemoveManualItemAsync(manual))));
+        }
+
+        return menu;
+    }
+
     private void Rebuild()
     {
         Items.Clear();
-        foreach (var entry in _library.Entries)
+        foreach (var item in _library.Items)
         {
-            var isManual = entry.Ref.Source == ManualItem.Source;
-            var store = isManual
-                ? _localizer["Store_Manual"]
-                : _storeNames.GetValueOrDefault(entry.Ref.Source, entry.Ref.Source);
-            var commands = new TileCommands(
-                new AsyncRelayCommand(() => RunPrimaryActionAsync(entry), () => LaunchService.PrimaryAction(entry) is not null),
-                isManual ? new AsyncRelayCommand(() => EditManualItemAsync(entry)) : null,
-                isManual ? new AsyncRelayCommand(() => RemoveManualItemAsync(entry)) : null);
-            Items.Add(new LibraryTileViewModel(entry, store, _localizer, commands));
+            var primary = item.Primary;
+            var stores = string.Join(" · ", item.Entries.Select(StoreNameOf).Distinct());
+            var play = new AsyncRelayCommand(() => RunPrimaryActionAsync(primary), () => LaunchService.PrimaryAction(primary) is not null);
+            Items.Add(new LibraryTileViewModel(item, stores, _localizer, play, BuildMenu(item)));
         }
 
         OnPropertyChanged(nameof(CountText));

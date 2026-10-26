@@ -88,6 +88,14 @@ public sealed class LibraryItem
 - Merge entries of `Kind.Game` with identical normalized title across different sources.
 - User merge/split decisions are stored (SQLite) and always win over automatic merging.
 
+Implemented in M2 (`TitleNormalizer`, `LibraryMerger`, `LibraryItem`):
+- Normalizer also strips accents and apostrophes, turns `&` into "and", converts roman numerals II–XX (a lone "I" is left alone), and never strips the whole title. Edition suffixes live in `src/Lumen.Providers/Data/title-cleanup.json`. The list is deliberately conservative: "Remastered"/"Remake"/"Director's Cut" are often different products and are not stripped.
+- A merged item holds at most one entry per store: two entries with the same title in one store are different products.
+- Apps are never merged automatically.
+- `LibraryItem.Primary` (what Play/Install uses) is the user's preferred entry if it can run, else the first installed entry by store priority (Steam, Epic, GOG, Xbox, Ubisoft, EA, Battle.net, Manual), else the first that can be installed.
+- `LibraryService` publishes `Entries` and `Items` together (one snapshot), and `ReloadMergeRulesAsync` re-applies decisions without rescanning.
+- User decisions (`merge_rules`, migration 0005): **separate** (an entry never auto-merges) and **preferred** (store used for Play in its item), plus reset-all in Settings → Library. A tile's context menu offers "Play/Install with {store}", "Always use {store}" and "Show stores separately". **Manual "merge these two"** (for titles the normalizer doesn't match) is left for the Detail view in M3, where the user can pick another item.
+
 ## 4. Providers
 
 ```csharp
@@ -151,7 +159,7 @@ SteamGridDB API v2: `https://www.steamgriddb.com/api/v2` with `Authorization: Be
 ## 6. Data
 
 ### Local — SQLite at `%LOCALAPPDATA%\Lumen\lumen.db`
-Tables (initial): `entries` (provider output cache), `items`, `item_entries`, `merge_rules`, `overrides`, `playtime_sessions`, `steam_playtime`, `ignored_apps`, `secrets`, `routine_trust` (routine id → sha256 + approved_at), `settings_local`, `schema_version`.
+Tables (initial; M2 note: `items`/`item_entries` were not needed. Items are computed in memory from `entries` + `merge_rules` on every change, which keeps one source of truth and is fast for thousands of entries): `entries` (provider output cache), `items`, `item_entries`, `merge_rules`, `overrides`, `playtime_sessions`, `steam_playtime`, `ignored_apps`, `secrets`, `routine_trust` (routine id → sha256 + approved_at), `settings_local`, `schema_version`.
 
 Migrations are hand-written SQL files embedded in `Lumen.Data` as `Migrations/NNNN_lower_snake_name.sql` (versions contiguous from 1). `MigrationRunner` creates `schema_version` itself, applies each pending migration in its own transaction on startup (before the main window opens), and refuses a database whose version is newer than the app knows. `0001_initial` only creates `settings_local`; every other table is added by the milestone that first uses it, so its columns are designed with real code in hand. Connections use WAL, `foreign_keys=ON` and a 5 s busy timeout.
 

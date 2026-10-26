@@ -14,6 +14,7 @@ using Lumen.Data.Migrations;
 using Lumen.Core.Settings;
 using Lumen.Platform.Windows;
 using Lumen.Platform.Windows.Security;
+using Lumen.Providers;
 using Lumen.Providers.BattleNet;
 using Lumen.Providers.Ea;
 using Lumen.Providers.Epic;
@@ -90,10 +91,15 @@ public static class AppHost
         builder.Services.AddSingleton<ILibraryProvider, ManualItemsProvider>();
         builder.Services.AddSingleton<IDialogService, DialogService>();
         builder.Services.AddSingleton<ILibraryCache, SqliteLibraryCache>();
+        builder.Services.AddSingleton<IMergeRuleStore, SqliteMergeRuleStore>();
+        builder.Services.AddSingleton(_ => new LibraryMerger(TitleCleanup.CreateNormalizer()));
         builder.Services.AddSingleton(sp => new LibraryService(
             sp.GetServices<ILibraryProvider>(),
             sp.GetRequiredService<ILibraryCache>(),
-            sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<LibraryService>>()));
+            sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<LibraryService>>(),
+            providerTimeout: null,
+            merger: sp.GetRequiredService<LibraryMerger>(),
+            ruleStore: sp.GetRequiredService<IMergeRuleStore>()));
         builder.Services.AddSingleton<LaunchService>();
 
         builder.Services.AddSingleton<LibraryViewModel>();

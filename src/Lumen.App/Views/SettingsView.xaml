@@ -99,6 +99,27 @@
           </TextBlock>
         </StackPanel>
       </Border>
+
+      <!-- Library -->
+      <Border Style="{StaticResource Lumen.Card}" Margin="0,20,0,0">
+        <StackPanel>
+          <TextBlock Text="{l:Loc Settings_Library_Title}" FontSize="18" FontWeight="SemiBold" />
+          <TextBlock Text="{l:Loc Settings_Library_MergeDescription}"
+                     Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                     TextWrapping="Wrap"
+                     FontSize="14"
+                     Margin="0,6,0,16" />
+          <Button Content="{l:Loc Settings_Library_ResetMerges}"
+                  Command="{Binding ResetMergesCommand}"
+                  Style="{StaticResource Lumen.Button}"
+                  HorizontalAlignment="Left" />
+          <TextBlock Text="{Binding LibraryStatus}"
+                     Foreground="{DynamicResource Lumen.Brush.Success}"
+                     FontSize="14"
+                     Margin="0,12,0,0"
+                     Visibility="{Binding HasLibraryStatus, Converter={StaticResource BoolToVisibility}}" />
+        </StackPanel>
+      </Border>
     </StackPanel>
   </ScrollViewer>
 </UserControl>
