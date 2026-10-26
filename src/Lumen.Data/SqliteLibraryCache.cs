@@ -76,7 +76,30 @@ public sealed class SqliteLibraryCache(ISqliteConnectionFactory connectionFactor
             }),
             transaction,
             cancellationToken: ct)).ConfigureAwait(false);
+        await connection.ExecuteAsync(new CommandDefinition(
+            "INSERT OR IGNORE INTO entry_first_seen (ref, first_seen) VALUES (@Ref, @Now);",
+            entries.Select(e => new { Ref = e.Ref.ToString(), Now = now }),
+            transaction,
+            cancellationToken: ct)).ConfigureAwait(false);
         await transaction.CommitAsync(ct).ConfigureAwait(false);
+    }
+
+    public async Task<IReadOnlyDictionary<ItemRef, DateTimeOffset>> LoadFirstSeenAsync(CancellationToken ct)
+    {
+        await using var connection = await connectionFactory.OpenAsync(ct).ConfigureAwait(false);
+        var rows = await connection.QueryAsync<(string Ref, string FirstSeen)>(new CommandDefinition(
+            "SELECT ref, first_seen FROM entry_first_seen;", cancellationToken: ct)).ConfigureAwait(false);
+        var result = new Dictionary<ItemRef, DateTimeOffset>();
+        foreach (var (refText, firstSeen) in rows)
+        {
+            if (ItemRef.TryParse(refText, out var itemRef)
+                && DateTimeOffset.TryParse(firstSeen, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var when))
+            {
+                result[itemRef] = when;
+            }
+        }
+
+        return result;
     }
 
     private static LibraryEntry? ToEntry(Row row)

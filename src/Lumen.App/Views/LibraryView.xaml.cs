@@ -3,6 +3,7 @@
 
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Lumen.App.ViewModels;
 
 namespace Lumen.App.Views;
@@ -12,6 +13,22 @@ public partial class LibraryView : UserControl
     public LibraryView()
     {
         InitializeComponent();
+    }
+
+    // View concern: Ctrl+F jumps to the search box; Esc in the search box clears it.
+    private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control)
+        {
+            SearchBox.Focus();
+            SearchBox.SelectAll();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape && SearchBox.IsKeyboardFocusWithin && SearchBox.Text.Length > 0)
+        {
+            SearchBox.Clear();
+            e.Handled = true;
+        }
     }
 
     // Tile width (168) + right margin (20).

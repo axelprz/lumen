@@ -77,6 +77,22 @@ public sealed class SqliteLibraryCacheTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task FirstSeen_IsRecordedOnce_AndSurvivesRemoval()
+    {
+        var cache = new SqliteLibraryCache(_db.Factory);
+        await cache.ReplaceSourceAsync("steam", [Entry("steam", "1")], CancellationToken.None);
+        var first = (await cache.LoadFirstSeenAsync(CancellationToken.None))[new ItemRef("steam", "1")];
+
+        await Task.Delay(20);
+        await cache.ReplaceSourceAsync("steam", [Entry("steam", "1"), Entry("steam", "2")], CancellationToken.None);
+        await cache.ReplaceSourceAsync("steam", [Entry("steam", "2")], CancellationToken.None); // "1" uninstalled/removed
+
+        var seen = await cache.LoadFirstSeenAsync(CancellationToken.None);
+        seen[new ItemRef("steam", "1")].ShouldBe(first);
+        seen[new ItemRef("steam", "2")].ShouldBeGreaterThan(first);
+    }
+
+    [Fact]
     public async Task Replace_RejectsEntriesFromAnotherSource()
     {
         var cache = new SqliteLibraryCache(_db.Factory);

@@ -289,4 +289,61 @@
   <data name="Settings_Artwork_CacheCleared" xml:space="preserve">
     <value>Se limpió la caché. Las portadas se vuelven a descargar a medida que recorrés la biblioteca; las portadas personalizadas se mantuvieron.</value>
   </data>
+  <data name="Library_Search" xml:space="preserve">
+    <value>Buscar en tu biblioteca</value>
+  </data>
+  <data name="Library_NoMatches" xml:space="preserve">
+    <value>No hay nada que coincida con tu búsqueda y filtros.</value>
+  </data>
+  <data name="Library_CountFiltered" xml:space="preserve">
+    <value>{0} de {1}</value>
+  </data>
+  <data name="Filter_TypeLabel" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="Filter_StoreLabel" xml:space="preserve">
+    <value>Tienda</value>
+  </data>
+  <data name="Filter_StateLabel" xml:space="preserve">
+    <value>Estado</value>
+  </data>
+  <data name="Sort_Label" xml:space="preserve">
+    <value>Ordenar por</value>
+  </data>
+  <data name="Filter_AllTypes" xml:space="preserve">
+    <value>Juegos y apps</value>
+  </data>
+  <data name="Filter_Games" xml:space="preserve">
+    <value>Juegos</value>
+  </data>
+  <data name="Filter_Apps" xml:space="preserve">
+    <value>Apps</value>
+  </data>
+  <data name="Filter_AllStores" xml:space="preserve">
+    <value>Todas las tiendas</value>
+  </data>
+  <data name="Filter_AnyState" xml:space="preserve">
+    <value>Instalados o no</value>
+  </data>
+  <data name="Filter_Installed" xml:space="preserve">
+    <value>Instalados</value>
+  </data>
+  <data name="Filter_NotInstalled" xml:space="preserve">
+    <value>No instalados</value>
+  </data>
+  <data name="Sort_Name" xml:space="preserve">
+    <value>Nombre (A–Z)</value>
+  </data>
+  <data name="Sort_LastPlayed" xml:space="preserve">
+    <value>Jugados recientemente</value>
+  </data>
+  <data name="Sort_Playtime" xml:space="preserve">
+    <value>Más jugados</value>
+  </data>
+  <data name="Sort_RecentlyAdded" xml:space="preserve">
+    <value>Agregados recientemente</value>
+  </data>
+  <data name="Filter_Clear" xml:space="preserve">
+    <value>Limpiar filtros</value>
+  </data>
 </root>
