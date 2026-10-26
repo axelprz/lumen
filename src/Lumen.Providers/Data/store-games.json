@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "description": "Microsoft Store packages that are games but predate the GDK, so they have no MicrosoftGame.config. Package family names. Data, not code: extend freely.",
+  "familyNames": [
+    "Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe",
+    "Microsoft.MicrosoftMahjong_8wekyb3d8bbwe",
+    "Microsoft.MicrosoftJigsaw_8wekyb3d8bbwe",
+    "Microsoft.MicrosoftSudoku_8wekyb3d8bbwe",
+    "Microsoft.MicrosoftUltimateWordGames_8wekyb3d8bbwe",
+    "Microsoft.MicrosoftTreasureHunt_8wekyb3d8bbwe",
+    "Microsoft.MicrosoftMinesweeper_8wekyb3d8bbwe",
+    "Microsoft.MinecraftUWP_8wekyb3d8bbwe"
+  ]
+}

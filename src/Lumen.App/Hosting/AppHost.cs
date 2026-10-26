@@ -18,6 +18,7 @@ using Lumen.Providers.BattleNet;
 using Lumen.Providers.Ea;
 using Lumen.Providers.Epic;
 using Lumen.Providers.Ubisoft;
+using Lumen.Providers.Xbox;
 using Lumen.Providers.Gog;
 using Lumen.Providers.Manual;
 using Lumen.Providers.Steam;
@@ -59,6 +60,7 @@ public static class AppHost
         builder.Services.AddSingleton<IRegistryReader, WindowsRegistryReader>();
         builder.Services.AddSingleton<IFileSystem, PhysicalFileSystem>();
         builder.Services.AddSingleton<IKnownFolders, WindowsKnownFolders>();
+        builder.Services.AddSingleton<IPackageCatalog, WindowsPackageCatalog>();
         builder.Services.AddSingleton<ILauncher, ShellLauncher>();
 
         // Settings and secrets (DPAPI, CurrentUser). Secrets are never logged or synced.
@@ -83,6 +85,7 @@ public static class AppHost
         builder.Services.AddSingleton<ILibraryProvider, UbisoftProvider>();
         builder.Services.AddSingleton<ILibraryProvider, EaProvider>();
         builder.Services.AddSingleton<ILibraryProvider, BattleNetProvider>();
+        builder.Services.AddSingleton<ILibraryProvider, XboxProvider>();
         builder.Services.AddSingleton<IManualItemStore, SqliteManualItemStore>();
         builder.Services.AddSingleton<ILibraryProvider, ManualItemsProvider>();
         builder.Services.AddSingleton<IDialogService, DialogService>();
