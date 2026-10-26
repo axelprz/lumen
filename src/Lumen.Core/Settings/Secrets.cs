@@ -29,6 +29,8 @@ public interface ISecretStore
 public static class SecretNames
 {
     public const string SteamWebApiKey = "steam.webApiKey";
+
+    public const string SteamGridDbApiKey = "steamgriddb.apiKey";
 }
 
 /// <summary>Machine-local preferences that never sync (SQLite <c>settings_local</c>).</summary>

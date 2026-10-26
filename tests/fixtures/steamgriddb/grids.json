@@ -1,0 +1,12 @@
+{
+  "success": true,
+  "data": [
+    { "id": 1, "score": 10, "style": "alternate", "width": 600, "height": 900, "nsfw": false, "humor": false, "mime": "image/png", "language": "en", "url": "https://cdn2.steamgriddb.com/grid/0000000000000000000000000000aaaa.png", "thumb": "https://cdn2.steamgriddb.com/thumb/0000000000000000000000000000aaaa.png" },
+    { "id": 2, "score": 9, "style": "alternate", "width": 600, "height": 900, "nsfw": true, "humor": false, "mime": "image/png", "language": "en", "url": "https://cdn2.steamgriddb.com/grid/0000000000000000000000000000bbbb.png" },
+    { "id": 3, "score": 8, "style": "blurred", "width": 600, "height": 900, "nsfw": false, "humor": false, "mime": "image/jpeg", "language": "en", "url": "https://evil.example.com/grid/cccc.jpg" },
+    { "id": 4, "score": 7, "style": "material", "width": 600, "height": 900, "nsfw": false, "humor": false, "mime": "image/jpeg", "language": "en", "url": "http://cdn2.steamgriddb.com/grid/0000000000000000000000000000dddd.jpg" },
+    { "id": 5, "score": 6, "style": "alternate", "width": 600, "height": 900, "nsfw": false, "humor": false, "mime": "image/webp", "language": "en", "url": "https://cdn2.steamgriddb.com/grid/0000000000000000000000000000eeee.webp" },
+    { "id": 6, "score": 5, "style": "alternate", "width": 600, "height": 900, "nsfw": false, "humor": false, "mime": "image/png", "language": "en", "url": "https://cdn2.steamgriddb.com/grid/0000000000000000000000000000ffff.png" },
+    { "id": 7, "score": 4, "style": "alternate", "width": 600, "height": 900, "nsfw": false, "humor": false, "mime": "image/png", "language": "en", "url": "https://cdn2.steamgriddb.com/grid/00000000000000000000000000001111.png" }
+  ]
+}

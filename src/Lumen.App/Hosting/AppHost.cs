@@ -24,6 +24,7 @@ using Lumen.Providers.Xbox;
 using Lumen.Providers.Gog;
 using Lumen.Providers.Manual;
 using Lumen.Providers.Steam;
+using Lumen.Providers.SteamGridDb;
 using Lumen.App.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -75,7 +76,7 @@ public static class AppHost
         builder.Services.AddSingleton(_ =>
         {
             var http = new HttpClient { BaseAddress = new Uri(SteamWebApi.BaseAddress), Timeout = TimeSpan.FromSeconds(20) };
-            http.DefaultRequestHeaders.UserAgent.ParseAdd("Lumen/" + (typeof(AppHost).Assembly.GetName().Version?.ToString(3) ?? "0.0.0"));
+            http.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent());
             return new SteamWebApi(http);
         });
 
@@ -103,25 +104,43 @@ public static class AppHost
             ruleStore: sp.GetRequiredService<IMergeRuleStore>()));
         builder.Services.AddSingleton<LaunchService>();
 
-        // Artwork: Steam CDN in this milestone step (allowed host); cached under %LOCALAPPDATA%\Lumen\cache\artwork.
+        // Artwork (allowed hosts only): Steam CDN first, then SteamGridDB when the user saved a key. Downloads are
+        // cached under %LOCALAPPDATA%\Lumen\cache\artwork; user-picked covers live in artwork-overrides.
+        builder.Services.AddSingleton<IArtworkLookupCache, SqliteArtworkLookupCache>();
+        builder.Services.AddSingleton(_ =>
+        {
+            // Plain HttpClient on purpose: the API key is in a header, and no handler logs requests.
+            var http = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
+            http.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent());
+            return new SteamGridDbClient(http);
+        });
         builder.Services.AddSingleton<IArtworkSource, SteamArtworkSource>();
+        builder.Services.AddSingleton<IArtworkSource>(sp => new SteamGridDbArtworkSource(
+            sp.GetRequiredService<ISecretStore>(),
+            sp.GetRequiredService<SteamGridDbClient>(),
+            sp.GetRequiredService<IArtworkLookupCache>(),
+            TitleCleanup.CreateNormalizer()));
         builder.Services.AddSingleton(sp =>
         {
             var http = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
-            http.DefaultRequestHeaders.UserAgent.ParseAdd("Lumen/" + (typeof(AppHost).Assembly.GetName().Version?.ToString(3) ?? "0.0.0"));
+            http.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent());
             return new ArtworkService(
                 http,
                 sp.GetServices<IArtworkSource>(),
                 paths.ArtworkCacheDirectory,
+                paths.ArtworkOverridesDirectory,
                 sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<ArtworkService>>());
         });
 
         builder.Services.AddSingleton<LibraryViewModel>();
         builder.Services.AddSingleton<SteamSettingsViewModel>();
+        builder.Services.AddSingleton<ArtworkSettingsViewModel>();
         builder.Services.AddSingleton<SettingsViewModel>();
         builder.Services.AddSingleton<ShellViewModel>();
         builder.Services.AddSingleton<MainWindow>();
 
         return builder.Build();
     }
+
+    private static string UserAgent() => "Lumen/" + (typeof(AppHost).Assembly.GetName().Version?.ToString(3) ?? "0.0.0");
 }

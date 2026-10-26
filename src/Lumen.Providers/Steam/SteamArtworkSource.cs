@@ -17,7 +17,10 @@ public sealed class SteamArtworkSource : IArtworkSource
 
     public bool CanHandle(LibraryEntry entry) => entry.Ref.Source == SteamProvider.SourceId && entry.Ref.ExternalId.All(char.IsAsciiDigit);
 
-    public IReadOnlyList<Uri> Candidates(LibraryEntry entry, ArtworkKind kind)
+    public Task<ArtworkCandidates> GetCandidatesAsync(LibraryEntry entry, ArtworkKind kind, CancellationToken ct) =>
+        Task.FromResult(new ArtworkCandidates(Candidates(entry, kind), Definitive: true));
+
+    internal IReadOnlyList<Uri> Candidates(LibraryEntry entry, ArtworkKind kind)
     {
         var id = entry.Ref.ExternalId;
         IEnumerable<string> files = kind switch

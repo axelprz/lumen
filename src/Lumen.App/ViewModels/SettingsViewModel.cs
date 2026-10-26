@@ -11,6 +11,7 @@ namespace Lumen.App.ViewModels;
 /// <summary>Settings page. Grows section by section (language, stores, artwork, sync...) in later milestones.</summary>
 public sealed partial class SettingsViewModel(
     SteamSettingsViewModel steam,
+    ArtworkSettingsViewModel artwork,
     IMergeRuleStore mergeRules,
     LibraryService library,
     ILocalizer localizer) : ObservableObject
@@ -21,9 +22,15 @@ public sealed partial class SettingsViewModel(
 
     public SteamSettingsViewModel Steam { get; } = steam;
 
+    public ArtworkSettingsViewModel Artwork { get; } = artwork;
+
     public bool HasLibraryStatus => !string.IsNullOrEmpty(LibraryStatus);
 
-    public Task InitializeAsync(CancellationToken ct) => Steam.InitializeAsync(ct);
+    public async Task InitializeAsync(CancellationToken ct)
+    {
+        await Steam.InitializeAsync(ct);
+        await Artwork.InitializeAsync(ct);
+    }
 
     /// <summary>Forgets "separate"/"always use" decisions so games are grouped automatically again.</summary>
     [RelayCommand]

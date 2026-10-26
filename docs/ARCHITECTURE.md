@@ -156,12 +156,21 @@ Rules: providers only **read** store files; never write into a store's folder or
 Steam CDN artwork (**verified 2026-10**): `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{appid}/…` (current) and `https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/…` (fallback) both serve `library_600x900.jpg`, `library_hero.jpg`, `logo.png`, `header.jpg`. Cover falls back to `header.jpg` for old games.
 
 `ArtworkService` as implemented (M3):
-- **Sources:** pluggable `IArtworkSource`s, each returning candidate URLs on allowed hosts only. For a merged item, the primary entry is tried first, then the item's other stores.
+- **Order:** user override → disk cache → sources in registration order (Steam CDN, then SteamGridDB). For a merged item, the primary entry is tried first, then the item's other stores.
+- **Sources:** pluggable async `IArtworkSource`s returning `ArtworkCandidates` (URLs on allowed hosts only, plus `Definitive`). "Unavailable" (not configured, offline, rate-limited, rejected key) never records a miss. A source that throws is contained.
+- **Overrides:** "Change cover…" copies a user-picked image (validated JPEG/PNG/WebP, ≤ 10 MB) to `%LOCALAPPDATA%\Lumen\artwork-overrides\…`, outside the cache, so "Clear artwork cache" keeps it. "Restore original cover" deletes it. Only the edited tile is refreshed (scroll position kept).
 - **Cache:** `%LOCALAPPDATA%\Lumen\cache\artwork\{source}\{sha256(ref)[..16]}\{kind}.{jpg|png|webp}`, written atomically (temp → move).
 - **Safety:** downloads are limited to 4 at a time and deduplicated per key. Images are capped at 10 MB, and the bytes must be JPEG/PNG/WebP by their magic numbers. Anything else is discarded, never written as an image.
 - **Misses:** a definitive "not found" (every candidate answered 404/403/410 or a non-image) is remembered for 7 days in a `.miss` file. Network errors and 5xx are retried on the next request.
 - **UI:** covers load lazily when a tile is realized and are decoded at display size (`DecodePixelWidth`). The grid is a virtualized list of rows (WPF has no virtualizing wrap panel), so memory stays flat as the library grows.
 SteamGridDB API v2: `https://www.steamgriddb.com/api/v2` with `Authorization: Bearer {key}` — `/search/autocomplete/{term}`, `/grids/game/{id}?dimensions=600x900`, `/heroes/game/{id}`, `/logos/game/{id}`, `/icons/game/{id}`.
+
+As implemented (M3, `SteamGridDbClient` / `SteamGridDbArtworkSource`):
+- **Key handling:** the key only travels in the Authorization header (never in a URL), through a plain `HttpClient` with no logging handler. It is tested with a search before it's saved, stored with DPAPI, never shown back.
+- **Finding the game:** Steam entries use `/games/steam/{appid}`; others search by title and only accept a result whose normalized title matches exactly, so a game never gets the wrong art. The SteamGridDB id (or "not found", retried after 30 days) is cached in `artwork_lookups` (migration 0006).
+- **Images:** requests add `types=static&nsfw=false&humor=false&epilepsy=false`. Only `https` URLs on `steamgriddb.com` / `*.steamgriddb.com` are accepted (images come from `cdn2.steamgriddb.com`), top 3 per kind.
+- **Live API checked (2026-10):** without a key every endpoint answers `401 {"success":false,"errors":["Authentication Required"]}`; a wrong key is rejected the same way, and Settings shows "rejected".
+- Saving a key clears remembered misses and lookups so items without art are retried immediately.
 
 ## 6. Data
 

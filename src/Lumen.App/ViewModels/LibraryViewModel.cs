@@ -256,7 +256,83 @@ public sealed partial class LibraryViewModel : ObservableObject
             menu.Add(new(_localizer["Tile_Remove"], new AsyncRelayCommand(() => RemoveManualItemAsync(manual))));
         }
 
+        // Every item: pick a custom cover; restore it if one is set.
+        if (menu.Count > 0)
+        {
+            menu.Add(new(string.Empty, null));
+        }
+
+        menu.Add(new(_localizer["Tile_ChangeCover"], new AsyncRelayCommand(() => ChangeCoverAsync(item))));
+        if (item.Entries.Any(e => _artwork.HasOverride(e.Ref, ArtworkKind.Cover)))
+        {
+            menu.Add(new(_localizer["Tile_RestoreCover"], new RelayCommand(() => RestoreCover(item))));
+        }
+
         return menu;
+    }
+
+    private async Task ChangeCoverAsync(LibraryItem item)
+    {
+        var file = _dialogs.PickFile(_localizer["Artwork_ImageFilter"]);
+        if (file is null)
+        {
+            return;
+        }
+
+        Notice = null;
+        if (!await _artwork.SetOverrideAsync(item.Key, ArtworkKind.Cover, file, CancellationToken.None))
+        {
+            Notice = _localizer["Artwork_InvalidImage"];
+            return;
+        }
+
+        RefreshTiles(t => t.Item == item);
+    }
+
+    private void RestoreCover(LibraryItem item)
+    {
+        foreach (var entry in item.Entries)
+        {
+            _artwork.RemoveOverride(entry.Ref, ArtworkKind.Cover);
+        }
+
+        RefreshTiles(t => t.Item == item);
+    }
+
+    /// <summary>Reloads every cover (after the cache was cleared or a new artwork source was configured).</summary>
+    public void ReloadArtwork() => RefreshTiles(_ => true);
+
+    /// <summary>
+    /// Replaces matching tiles in place (new cover request, new menu) without rebuilding the grid, so the
+    /// scroll position and the rest of the tiles stay as they are.
+    /// </summary>
+    private void RefreshTiles(Func<LibraryTileViewModel, bool> match)
+    {
+        for (var i = 0; i < Items.Count; i++)
+        {
+            if (match(Items[i]))
+            {
+                Items[i] = CreateTile(Items[i].Item);
+            }
+        }
+
+        for (var r = 0; r < Rows.Count; r++)
+        {
+            var start = r * _columnCount;
+            var updated = Items.Skip(start).Take(_columnCount).ToList();
+            if (!updated.SequenceEqual(Rows[r].Tiles))
+            {
+                Rows[r] = new TileRow(updated);
+            }
+        }
+    }
+
+    private LibraryTileViewModel CreateTile(LibraryItem item)
+    {
+        var primary = item.Primary;
+        var stores = string.Join(" · ", item.Entries.Select(StoreNameOf).Distinct());
+        var play = new AsyncRelayCommand(() => RunPrimaryActionAsync(primary), () => LaunchService.PrimaryAction(primary) is not null);
+        return new LibraryTileViewModel(item, stores, _localizer, play, BuildMenu(item), LoadCoverAsync);
     }
 
     private void Rebuild()
@@ -264,10 +340,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         Items.Clear();
         foreach (var item in _library.Items)
         {
-            var primary = item.Primary;
-            var stores = string.Join(" · ", item.Entries.Select(StoreNameOf).Distinct());
-            var play = new AsyncRelayCommand(() => RunPrimaryActionAsync(primary), () => LaunchService.PrimaryAction(primary) is not null);
-            Items.Add(new LibraryTileViewModel(item, stores, _localizer, play, BuildMenu(item), LoadCoverAsync));
+            Items.Add(CreateTile(item));
         }
 
         RebuildRows();

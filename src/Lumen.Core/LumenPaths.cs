@@ -29,6 +29,9 @@ public sealed record LumenPaths
 
     public string ArtworkCacheDirectory => Path.Combine(LocalDataDirectory, "cache", "artwork");
 
+    /// <summary>Images the user picked for an item; outside the cache so clearing it never removes them.</summary>
+    public string ArtworkOverridesDirectory => Path.Combine(LocalDataDirectory, "artwork-overrides");
+
     /// <summary>Where portable JSON lives when the user has not chosen a sync folder.</summary>
     public string DefaultPortableDirectory => Path.Combine(RoamingDataDirectory, "portable");
 
