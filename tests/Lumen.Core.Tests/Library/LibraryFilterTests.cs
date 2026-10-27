@@ -101,4 +101,24 @@ public sealed class LibraryFilterTests
 
     private static IReadOnlyDictionary<string, string> Extra(long lastPlayed, long minutes) =>
         new Dictionary<string, string> { ["lastPlayed"] = lastPlayed.ToString(System.Globalization.CultureInfo.InvariantCulture), ["playtimeMinutes"] = minutes.ToString(System.Globalization.CultureInfo.InvariantCulture) };
+
+    [Fact]
+    public void HiddenItems_OnlyShowInTheHiddenView()
+    {
+        var hidden = _alpha with { IsHidden = true };
+        IReadOnlyList<LibraryItem> items = [_witcher, hidden];
+
+        _filter.Apply(items, LibraryQuery.Default, _noDates).ShouldBe([_witcher]);
+        _filter.Apply(items, new LibraryQuery(Hidden: true), _noDates).ShouldBe([hidden]);
+        new LibraryQuery(Hidden: true).IsFiltering.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Search_UsesTheCustomTitle()
+    {
+        var renamed = _alpha with { CustomTitle = "Zeta Renamed" };
+
+        _filter.Apply([_witcher, renamed], new LibraryQuery(Search: "zeta"), _noDates).ShouldBe([renamed]);
+        _filter.Apply([renamed, _witcher], LibraryQuery.Default, _noDates).Select(i => i.Title).ShouldBe(["The Witcher® 3: Wild Hunt", "Zeta Renamed"]);
+    }
 }

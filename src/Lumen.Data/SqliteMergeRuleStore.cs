@@ -12,11 +12,12 @@ public sealed class SqliteMergeRuleStore(ISqliteConnectionFactory connectionFact
     public async Task<MergeRules> LoadAsync(CancellationToken ct)
     {
         await using var connection = await connectionFactory.OpenAsync(ct).ConfigureAwait(false);
-        var rows = await connection.QueryAsync<(string Ref, long Separated, long Preferred)>(new CommandDefinition(
-            "SELECT ref, separated, preferred FROM merge_rules;", cancellationToken: ct)).ConfigureAwait(false);
+        var rows = await connection.QueryAsync<(string Ref, long Separated, long Preferred, string? MergedWith)>(new CommandDefinition(
+            "SELECT ref, separated, preferred, merged_with FROM merge_rules;", cancellationToken: ct)).ConfigureAwait(false);
 
         var separated = new HashSet<ItemRef>();
         var preferred = new HashSet<ItemRef>();
+        var links = new Dictionary<ItemRef, ItemRef>();
         foreach (var row in rows)
         {
             if (!ItemRef.TryParse(row.Ref, out var itemRef))
@@ -33,9 +34,14 @@ public sealed class SqliteMergeRuleStore(ISqliteConnectionFactory connectionFact
             {
                 preferred.Add(itemRef);
             }
+
+            if (row.MergedWith is not null && ItemRef.TryParse(row.MergedWith, out var target) && target != itemRef)
+            {
+                links[itemRef] = target;
+            }
         }
 
-        return new MergeRules(separated, preferred);
+        return new MergeRules(separated, preferred, links);
     }
 
     public async Task SeparateAsync(IEnumerable<ItemRef> refs, CancellationToken ct)
@@ -44,12 +50,33 @@ public sealed class SqliteMergeRuleStore(ISqliteConnectionFactory connectionFact
         await using var transaction = await connection.BeginTransactionAsync(ct).ConfigureAwait(false);
         foreach (var itemRef in refs)
         {
+            // Separating also undoes manual merges in both directions (from this entry and to it).
             await connection.ExecuteAsync(new CommandDefinition(
                 """
-                INSERT INTO merge_rules (ref, separated, preferred, updated_at) VALUES (@Ref, 1, 0, @Now)
-                ON CONFLICT(ref) DO UPDATE SET separated = 1, preferred = 0, updated_at = excluded.updated_at;
+                INSERT INTO merge_rules (ref, separated, preferred, merged_with, updated_at) VALUES (@Ref, 1, 0, NULL, @Now)
+                ON CONFLICT(ref) DO UPDATE SET separated = 1, preferred = 0, merged_with = NULL, updated_at = excluded.updated_at;
+                UPDATE merge_rules SET merged_with = NULL, updated_at = @Now WHERE merged_with = @Ref;
                 """,
                 new { Ref = itemRef.ToString(), Now = Now() },
+                transaction,
+                cancellationToken: ct)).ConfigureAwait(false);
+        }
+
+        await transaction.CommitAsync(ct).ConfigureAwait(false);
+    }
+
+    public async Task LinkAsync(IEnumerable<ItemRef> refs, ItemRef target, CancellationToken ct)
+    {
+        await using var connection = await connectionFactory.OpenAsync(ct).ConfigureAwait(false);
+        await using var transaction = await connection.BeginTransactionAsync(ct).ConfigureAwait(false);
+        foreach (var itemRef in refs.Where(r => r != target))
+        {
+            await connection.ExecuteAsync(new CommandDefinition(
+                """
+                INSERT INTO merge_rules (ref, separated, preferred, merged_with, updated_at) VALUES (@Ref, 0, 0, @Target, @Now)
+                ON CONFLICT(ref) DO UPDATE SET merged_with = excluded.merged_with, updated_at = excluded.updated_at;
+                """,
+                new { Ref = itemRef.ToString(), Target = target.ToString(), Now = Now() },
                 transaction,
                 cancellationToken: ct)).ConfigureAwait(false);
         }

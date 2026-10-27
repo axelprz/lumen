@@ -230,7 +230,7 @@
     <value>Biblioteca</value>
   </data>
   <data name="Settings_Library_MergeDescription" xml:space="preserve">
-    <value>Un juego que tenés en varias tiendas aparece una sola vez, y Jugar usa la tienda donde está instalado. Si mostraste tiendas por separado o elegiste una tienda para algún juego, acá podés volver a la agrupación automática.</value>
+    <value>Un juego que tenés en varias tiendas aparece una sola vez, y Jugar usa la tienda donde está instalado. Si mostraste tiendas por separado, uniste elementos a mano o elegiste una tienda para algún juego, acá podés volver a la agrupación automática. Los nombres personalizados y los elementos ocultos se mantienen.</value>
   </data>
   <data name="Settings_Library_ResetMerges" xml:space="preserve">
     <value>Restablecer agrupación</value>
@@ -399,5 +399,59 @@
   </data>
   <data name="Library_Installed" xml:space="preserve">
     <value>instalado</value>
+  </data>
+  <data name="Library_CountHidden" xml:space="preserve">
+    <value>{0} ocultos</value>
+  </data>
+  <data name="Library_ShowHidden" xml:space="preserve">
+    <value>Ocultos ({0})</value>
+  </data>
+  <data name="Library_BackFromHidden" xml:space="preserve">
+    <value>Volver a la biblioteca</value>
+  </data>
+  <data name="Tile_Hide" xml:space="preserve">
+    <value>Ocultar de la biblioteca</value>
+  </data>
+  <data name="Tile_Unhide" xml:space="preserve">
+    <value>Volver a mostrar en la biblioteca</value>
+  </data>
+  <data name="Detail_Rename" xml:space="preserve">
+    <value>Renombrar…</value>
+  </data>
+  <data name="Detail_RenameLabel" xml:space="preserve">
+    <value>Nombre en Lumen</value>
+  </data>
+  <data name="Detail_RenameHint" xml:space="preserve">
+    <value>Este nombre lo usa solo Lumen; la tienda conserva el suyo. Dejalo vacío para usar el nombre de la tienda ({0}).</value>
+  </data>
+  <data name="Detail_Save" xml:space="preserve">
+    <value>Guardar</value>
+  </data>
+  <data name="Detail_Cancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="Detail_RestoreTitle" xml:space="preserve">
+    <value>Restaurar nombre original</value>
+  </data>
+  <data name="Detail_HiddenBanner" xml:space="preserve">
+    <value>Este elemento está oculto: solo aparece con el botón “Ocultos” de la biblioteca.</value>
+  </data>
+  <data name="Detail_MergeWith" xml:space="preserve">
+    <value>Unir con otro elemento…</value>
+  </data>
+  <data name="Detail_MergeTitle" xml:space="preserve">
+    <value>Unir con otro elemento</value>
+  </data>
+  <data name="Detail_MergeHint" xml:space="preserve">
+    <value>Para el mismo juego en dos tiendas que Lumen no reconoció como iguales. Buscá el otro y elegilo: va a aparecer una sola vez, con las dos tiendas. Se deshace con “Mostrar tiendas por separado”.</value>
+  </data>
+  <data name="Detail_MergeSearch" xml:space="preserve">
+    <value>Buscar en tu biblioteca</value>
+  </data>
+  <data name="Detail_MergeNoResults" xml:space="preserve">
+    <value>No hay nada en tu biblioteca que coincida.</value>
+  </data>
+  <data name="Detail_MergeTypeToSearch" xml:space="preserve">
+    <value>Escribí parte del nombre para buscar.</value>
   </data>
 </root>

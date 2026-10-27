@@ -25,4 +25,17 @@ public partial class GameDetailView : UserControl
             menu.IsOpen = true;
         }
     }
+
+    // View concern: when the rename or merge box appears, put the cursor in it (rename text selected).
+    private void OnEditorVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (sender is TextBox box && box.IsVisible)
+        {
+            box.Dispatcher.BeginInvoke(() =>
+            {
+                box.Focus();
+                box.SelectAll();
+            });
+        }
+    }
 }

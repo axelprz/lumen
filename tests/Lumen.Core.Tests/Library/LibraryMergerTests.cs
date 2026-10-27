@@ -117,4 +117,50 @@ public sealed class LibraryMergerTests
         items.SelectMany(i => i.Entries).Select(e => e.Ref.ToString()).Order().ShouldBe(entries.Select(e => e.Ref.ToString()).Order());
         items.Count.ShouldBe(3);
     }
+
+    [Fact]
+    public void ManualLink_JoinsDifferentTitles()
+    {
+        var steam = Game("steam", "1", "Sample Quest");
+        var epic = Game("epic", "x", "SQ: Remastered Collection");
+        var rules = MergeRules.None with { Links = new Dictionary<ItemRef, ItemRef> { [epic.Ref] = steam.Ref } };
+
+        var item = _merger.Merge([steam, epic], rules).ShouldHaveSingleItem();
+
+        item.Entries.Select(e => e.Ref).ShouldBe([steam.Ref, epic.Ref]);
+    }
+
+    [Fact]
+    public void ManualLink_WinsOverSeparated_AndIsTransitive()
+    {
+        var steam = Game("steam", "1", "Alpha");
+        var epic = Game("epic", "x", "Beta");
+        var gog = Game("gog", "9", "Gamma");
+        var rules = new MergeRules(
+            new HashSet<ItemRef> { steam.Ref, epic.Ref, gog.Ref },
+            new HashSet<ItemRef>(),
+            new Dictionary<ItemRef, ItemRef> { [epic.Ref] = steam.Ref, [gog.Ref] = epic.Ref });
+
+        _merger.Merge([steam, epic, gog], rules).ShouldHaveSingleItem().Entries.Count.ShouldBe(3);
+    }
+
+    [Fact]
+    public void ManualLink_ToAnEntryThatIsGone_IsIgnored()
+    {
+        var epic = Game("epic", "x", "Beta");
+        var rules = MergeRules.None with { Links = new Dictionary<ItemRef, ItemRef> { [epic.Ref] = new ItemRef("steam", "404") } };
+
+        _merger.Merge([epic, Game("gog", "9", "Gamma")], rules).Count.ShouldBe(2);
+    }
+
+    [Fact]
+    public void ManualLink_JoinsWholeAutoMergedGroups()
+    {
+        var steam = Game("steam", "1", "Sample");
+        var epic = Game("epic", "x", "Sample");
+        var gog = Game("gog", "9", "Sample Deluxe Edition Plus");
+        var rules = MergeRules.None with { Links = new Dictionary<ItemRef, ItemRef> { [gog.Ref] = epic.Ref } };
+
+        _merger.Merge([steam, epic, gog], rules).ShouldHaveSingleItem().Entries.Count.ShouldBe(3);
+    }
 }

@@ -18,6 +18,7 @@ public sealed record DetailServices(
     ILauncher Shell,
     ArtworkService Artwork,
     IMergeRuleStore MergeRules,
+    IItemOverrideStore Overrides,
     LibraryService Library,
     IDialogService Dialogs,
     IFileSystem FileSystem,
@@ -30,9 +31,16 @@ public sealed record StoreChoice(LibraryEntry Entry, string Label)
     public override string ToString() => Label;
 }
 
+/// <summary>Another library item the user can merge this one with.</summary>
+public sealed record MergeCandidate(LibraryItem Item, string Label)
+{
+    public override string ToString() => Label;
+}
+
 /// <summary>
 /// Detail view of one game or app: hero art and logo, Play/Install, which store to use (merged games), what Lumen
-/// knows (stores, playtime, last played, folder) and actions (folder, store page, artwork, separate stores).
+/// knows (stores, playtime, last played, folder) and actions (folder, store page, artwork, rename, hide, merge with
+/// another item, separate stores).
 /// </summary>
 public sealed partial class GameDetailViewModel : ObservableObject
 {
@@ -57,6 +65,23 @@ public sealed partial class GameDetailViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasNotice))]
     private string? _notice;
+
+    [ObservableProperty]
+    private bool _isRenaming;
+
+    [ObservableProperty]
+    private string _renameText = string.Empty;
+
+    [ObservableProperty]
+    private bool _isMerging;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(MergeStatus))]
+    private string _mergeSearch = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(MergeStatus))]
+    private IReadOnlyList<MergeCandidate> _mergeCandidates = [];
 
     public GameDetailViewModel(LibraryItem item, DetailServices services, Action close)
     {
@@ -118,6 +143,23 @@ public sealed partial class GameDetailViewModel : ObservableObject
     public bool CanOpenStorePage => EntryActions.StorePage(Selected) is not null || Item.Entries.Any(e => EntryActions.StorePage(e) is not null);
 
     public bool IsMerged => Item.IsMerged;
+
+    public bool IsHidden => Item.IsHidden;
+
+    public bool HasCustomTitle => Item.CustomTitle is not null;
+
+    public string HideText => _s.Localizer[Item.IsHidden ? "Tile_Unhide" : "Tile_Hide"];
+
+    public string RenameHint => string.Format(CultureInfo.CurrentCulture, _s.Localizer["Detail_RenameHint"], Item.OriginalTitle);
+
+    /// <summary>Shown under the merge search box when there is no list to pick from.</summary>
+    public string? MergeStatus =>
+        MergeCandidates.Count > 0 ? null
+        : string.IsNullOrWhiteSpace(MergeSearch) ? _s.Localizer["Detail_MergeTypeToSearch"]
+        : _s.Localizer["Detail_MergeNoResults"];
+
+    /// <summary>Most candidates listed at once; typing more narrows it down.</summary>
+    public const int MaxMergeCandidates = 30;
 
     /// <summary>Loads hero, logo and cover (each from cache, or downloaded once).</summary>
     public async Task LoadArtworkAsync()
@@ -197,7 +239,111 @@ public sealed partial class GameDetailViewModel : ObservableObject
     private async Task SeparateAsync()
     {
         await _s.MergeRules.SeparateAsync(Item.Entries.Select(e => e.Ref), CancellationToken.None);
-        await _s.Library.ReloadMergeRulesAsync(CancellationToken.None);
+        await _s.Library.ReloadUserChoicesAsync(CancellationToken.None);
+    }
+
+    [RelayCommand]
+    private void StartRename()
+    {
+        IsMerging = false;
+        RenameText = Item.Title;
+        IsRenaming = true;
+    }
+
+    [RelayCommand]
+    private void CancelRename() => IsRenaming = false;
+
+    /// <summary>Saves the name on every entry of the item; the store's own name (or empty) clears it.</summary>
+    [RelayCommand]
+    private async Task SaveRenameAsync()
+    {
+        var title = ItemOverride.CleanTitle(RenameText);
+        if (string.Equals(title, Item.OriginalTitle, StringComparison.Ordinal))
+        {
+            title = null;
+        }
+
+        IsRenaming = false;
+        await SetTitleAsync(title);
+    }
+
+    [RelayCommand]
+    private Task RestoreTitleAsync()
+    {
+        IsRenaming = false;
+        return SetTitleAsync(null);
+    }
+
+    [RelayCommand]
+    private async Task ToggleHiddenAsync()
+    {
+        await _s.Overrides.SetHiddenAsync(Item.Entries.Select(e => e.Ref), !Item.IsHidden, CancellationToken.None);
+        await _s.Library.ReloadUserChoicesAsync(CancellationToken.None);
+    }
+
+    [RelayCommand]
+    private void StartMerge()
+    {
+        IsRenaming = false;
+        MergeSearch = string.Empty;
+        MergeCandidates = [];
+        IsMerging = true;
+    }
+
+    [RelayCommand]
+    private void CancelMerge() => IsMerging = false;
+
+    partial void OnMergeSearchChanged(string value) => MergeCandidates = FindCandidates(value);
+
+    /// <summary>
+    /// Items of the same kind whose name (or original name) contains the search, ignoring case and accents.
+    /// Hidden items are included: merging is also how a hidden duplicate gets folded into the visible one.
+    /// </summary>
+    public IReadOnlyList<MergeCandidate> FindCandidates(string search)
+    {
+        var text = search.Trim();
+        if (text.Length == 0)
+        {
+            return [];
+        }
+
+        var compare = CultureInfo.CurrentCulture.CompareInfo;
+        const CompareOptions options = CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace;
+        var mine = Item.Entries.Select(e => e.Ref).ToHashSet();
+        return _s.Library.Items
+            .Where(i => i.Kind == Item.Kind && !i.Entries.Any(e => mine.Contains(e.Ref)))
+            .Where(i => compare.IndexOf(i.Title, text, options) >= 0 || compare.IndexOf(i.OriginalTitle, text, options) >= 0)
+            .OrderBy(i => compare.IsPrefix(i.Title, text, options) ? 0 : 1)
+            .ThenBy(i => i.Title, StringComparer.CurrentCultureIgnoreCase)
+            .Take(MaxMergeCandidates)
+            .Select(i => new MergeCandidate(i, $"{i.Title} · {string.Join(", ", i.Entries.Select(_s.StoreName).Distinct())}"))
+            .ToList();
+    }
+
+    /// <summary>
+    /// Every entry of <paramref name="candidate"/> joins this item. The result keeps this item's name and visibility,
+    /// so merging never hides or renames what the user is looking at.
+    /// </summary>
+    [RelayCommand]
+    private async Task MergeWithAsync(MergeCandidate? candidate)
+    {
+        if (candidate is null)
+        {
+            return;
+        }
+
+        IsMerging = false;
+        var theirs = candidate.Item.Entries.Select(e => e.Ref).ToList();
+        await _s.MergeRules.LinkAsync(theirs, Item.Primary.Ref, CancellationToken.None);
+        await _s.Overrides.SetHiddenAsync(theirs, Item.IsHidden, CancellationToken.None);
+        await _s.Overrides.SetTitleAsync(theirs, Item.CustomTitle, CancellationToken.None);
+        await _s.Library.ReloadUserChoicesAsync(CancellationToken.None);
+    }
+
+    private async Task SetTitleAsync(string? title)
+    {
+        await _s.Overrides.SetTitleAsync(Item.Entries.Select(e => e.Ref), title, CancellationToken.None);
+        await _s.Library.ReloadUserChoicesAsync(CancellationToken.None);
     }
 
     /// <summary>Raised after a custom image was set or removed, so the grid can refresh this game's tile.</summary>
@@ -206,7 +352,7 @@ public sealed partial class GameDetailViewModel : ObservableObject
     private async Task PreferAsync(LibraryEntry preferred)
     {
         await _s.MergeRules.SetPreferredAsync(preferred.Ref, Item.Entries.Select(e => e.Ref), CancellationToken.None);
-        await _s.Library.ReloadMergeRulesAsync(CancellationToken.None);
+        await _s.Library.ReloadUserChoicesAsync(CancellationToken.None);
     }
 
     private async Task ChangeArtworkAsync(ArtworkKind kind)

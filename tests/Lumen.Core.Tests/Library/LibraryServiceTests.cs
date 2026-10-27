@@ -164,7 +164,7 @@ public sealed class LibraryServiceTests
         service.Entries.Count.ShouldBe(2);
 
         rules.Rules = new MergeRules(new HashSet<ItemRef> { new("steam", "1"), new("epic", "x") }, new HashSet<ItemRef>());
-        await service.ReloadMergeRulesAsync(CancellationToken.None);
+        await service.ReloadUserChoicesAsync(CancellationToken.None);
 
         service.Items.Count.ShouldBe(2);
     }
@@ -206,4 +206,59 @@ public sealed class LibraryServiceTests
 
     private LibraryService Service(ILibraryProvider[] providers, TimeSpan? timeout) =>
         new(providers, _cache, NullLogger<LibraryService>.Instance, timeout);
+
+    [Fact]
+    public async Task Overrides_RenameAndHide_AndFollowChanges()
+    {
+        var steam = new FakeProvider("steam").WithInstalled(Game("steam", "1", "Alpha"), Game("steam", "2", "Beta"));
+        var overrides = new InMemoryOverrides();
+        var service = new LibraryService([steam], _cache, NullLogger<LibraryService>.Instance, overrideStore: overrides);
+        await service.ScanAsync(CancellationToken.None);
+
+        await overrides.SetTitleAsync([new ItemRef("steam", "1")], "  Zulu  ", CancellationToken.None);
+        await overrides.SetHiddenAsync([new ItemRef("steam", "2")], true, CancellationToken.None);
+        await service.ReloadUserChoicesAsync(CancellationToken.None);
+
+        service.Items.Select(i => (i.Title, i.IsHidden)).ShouldBe([("Beta", true), ("Zulu", false)]);
+        service.Items[1].OriginalTitle.ShouldBe("Alpha");
+
+        await overrides.SetTitleAsync([new ItemRef("steam", "1")], null, CancellationToken.None);
+        await service.ReloadUserChoicesAsync(CancellationToken.None);
+
+        service.Items.Select(i => i.Title).ShouldBe(["Alpha", "Beta"]);
+    }
+
+    [Fact]
+    public void ApplyOverrides_PrimaryTitleWins_AndAnyHiddenEntryHidesTheItem()
+    {
+        var steam = Game("steam", "1", "Sample");
+        var epic = Game("epic", "x", "Sample");
+        var item = new LibraryItem([steam, epic], steam);
+        var overrides = new Dictionary<ItemRef, ItemOverride>
+        {
+            [epic.Ref] = new("From Epic", Hidden: true),
+            [steam.Ref] = new("From Steam", Hidden: false),
+        };
+
+        var result = LibraryService.ApplyOverrides(item, overrides);
+
+        result.Title.ShouldBe("From Steam");
+        result.IsHidden.ShouldBeTrue();
+        LibraryService.ApplyOverrides(item, new Dictionary<ItemRef, ItemOverride>()).ShouldBeSameAs(item);
+    }
+
+    [Theory]
+    [InlineData(null, null)]
+    [InlineData("   ", null)]
+    [InlineData("  Name ", "Name")]
+    public void CleanTitle_TrimsAndTreatsEmptyAsNone(string? input, string? expected)
+    {
+        ItemOverride.CleanTitle(input).ShouldBe(expected);
+    }
+
+    [Fact]
+    public void CleanTitle_CapsTheLength()
+    {
+        ItemOverride.CleanTitle(new string('a', 300))!.Length.ShouldBe(ItemOverride.MaxTitleLength);
+    }
 }

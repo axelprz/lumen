@@ -230,7 +230,7 @@
     <value>Library</value>
   </data>
   <data name="Settings_Library_MergeDescription" xml:space="preserve">
-    <value>A game you own on several stores shows up once, and Play uses the store where it's installed. If you showed stores separately or picked a store for a game, you can go back to automatic grouping here.</value>
+    <value>A game you own on several stores shows up once, and Play uses the store where it's installed. If you showed stores separately, merged items by hand or picked a store for a game, you can go back to automatic grouping here. Custom names and hidden items are kept.</value>
   </data>
   <data name="Settings_Library_ResetMerges" xml:space="preserve">
     <value>Reset grouping</value>
@@ -399,5 +399,59 @@
   </data>
   <data name="Library_Installed" xml:space="preserve">
     <value>installed</value>
+  </data>
+  <data name="Library_CountHidden" xml:space="preserve">
+    <value>{0} hidden</value>
+  </data>
+  <data name="Library_ShowHidden" xml:space="preserve">
+    <value>Hidden ({0})</value>
+  </data>
+  <data name="Library_BackFromHidden" xml:space="preserve">
+    <value>Back to library</value>
+  </data>
+  <data name="Tile_Hide" xml:space="preserve">
+    <value>Hide from library</value>
+  </data>
+  <data name="Tile_Unhide" xml:space="preserve">
+    <value>Show in library again</value>
+  </data>
+  <data name="Detail_Rename" xml:space="preserve">
+    <value>Rename…</value>
+  </data>
+  <data name="Detail_RenameLabel" xml:space="preserve">
+    <value>Name in Lumen</value>
+  </data>
+  <data name="Detail_RenameHint" xml:space="preserve">
+    <value>Only Lumen uses this name; the store keeps its own. Leave it empty to use the store's name ({0}).</value>
+  </data>
+  <data name="Detail_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Detail_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Detail_RestoreTitle" xml:space="preserve">
+    <value>Restore original name</value>
+  </data>
+  <data name="Detail_HiddenBanner" xml:space="preserve">
+    <value>This item is hidden: it only shows with the “Hidden” button in the library.</value>
+  </data>
+  <data name="Detail_MergeWith" xml:space="preserve">
+    <value>Merge with another item…</value>
+  </data>
+  <data name="Detail_MergeTitle" xml:space="preserve">
+    <value>Merge with another item</value>
+  </data>
+  <data name="Detail_MergeHint" xml:space="preserve">
+    <value>For the same game on two stores that Lumen didn't match. Search for the other one and pick it; it will show up once, with both stores. You can undo it with “Show stores separately”.</value>
+  </data>
+  <data name="Detail_MergeSearch" xml:space="preserve">
+    <value>Search your library</value>
+  </data>
+  <data name="Detail_MergeNoResults" xml:space="preserve">
+    <value>Nothing in your library matches.</value>
+  </data>
+  <data name="Detail_MergeTypeToSearch" xml:space="preserve">
+    <value>Type part of the name to search.</value>
   </data>
 </root>
