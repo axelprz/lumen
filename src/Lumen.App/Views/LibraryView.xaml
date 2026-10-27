@@ -6,6 +6,7 @@
              xmlns:l="clr-namespace:Lumen.App.Localization"
              xmlns:vm="clr-namespace:Lumen.App.ViewModels"
              xmlns:conv="clr-namespace:Lumen.App.Converters"
+             xmlns:views="clr-namespace:Lumen.App.Views"
              AllowDrop="True"
              PreviewKeyDown="OnPreviewKeyDown"
              DragOver="OnDragOver"
@@ -45,9 +46,6 @@
             </Style.Triggers>
           </Style>
         </Border.Style>
-        <Border.InputBindings>
-          <MouseBinding Gesture="LeftDoubleClick" Command="{Binding PrimaryCommand}" />
-        </Border.InputBindings>
         <StackPanel>
           <Border x:Name="Cover" Height="252" CornerRadius="8" ClipToBounds="True">
             <Border.Background>
@@ -57,27 +55,48 @@
               </LinearGradientBrush>
             </Border.Background>
             <Grid>
-              <!-- Cover art (rounded through the border); the initial shows until it loads or when there is none. -->
-          <Border CornerRadius="8">
-            <Border.Background>
-              <ImageBrush ImageSource="{Binding CoverPath, Converter={StaticResource ImagePath}, ConverterParameter=336}" Stretch="UniformToFill" />
-            </Border.Background>
-          </Border>
-          <TextBlock x:Name="Initial"
-                     Text="{Binding Initial}"
-                         FontSize="72"
-                         FontWeight="Light"
-                         Foreground="{DynamicResource Lumen.Brush.TextMuted}"
-                         Opacity="0.6"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"
-                         Margin="0,0,0,40" />
+              <!-- The cover is a button: click or Enter opens the detail view. Play stays a separate button on top. -->
+              <Button x:Name="CoverButton"
+                      Command="{Binding OpenDetailCommand}"
+                      Cursor="Hand"
+                      AutomationProperties.Name="{Binding Title}">
+                <Button.Template>
+                  <ControlTemplate TargetType="Button">
+                    <Border x:Name="Focus" Background="Transparent" CornerRadius="8" BorderThickness="2" BorderBrush="Transparent">
+                      <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                      <Trigger Property="IsKeyboardFocused" Value="True">
+                        <Setter TargetName="Focus" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
+                      </Trigger>
+                    </ControlTemplate.Triggers>
+                  </ControlTemplate>
+                </Button.Template>
+                <Grid>
+                  <!-- Cover art (rounded through the border); the initial shows until it loads or when there is none. -->
+                  <Border CornerRadius="8">
+                    <Border.Background>
+                      <ImageBrush ImageSource="{Binding CoverPath, Converter={StaticResource ImagePath}, ConverterParameter=336}" Stretch="UniformToFill" />
+                    </Border.Background>
+                  </Border>
+                  <TextBlock x:Name="Initial"
+                             Text="{Binding Initial}"
+                             FontSize="72"
+                             FontWeight="Light"
+                             Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                             Opacity="0.6"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             Margin="0,0,0,40" />
+                </Grid>
+              </Button>
               <Border HorizontalAlignment="Left"
                       VerticalAlignment="Top"
                       Margin="8"
                       Padding="8,3"
                       CornerRadius="4"
-                      Background="#B30F1115">
+                      Background="#B30F1115"
+                      IsHitTestVisible="False">
                 <TextBlock Text="{Binding StoreName}" FontSize="11" Foreground="{DynamicResource Lumen.Brush.Text}" />
               </Border>
               <Button VerticalAlignment="Bottom"
@@ -112,6 +131,19 @@
     </DataTemplate>
   </UserControl.Resources>
 
+  <Grid>
+  <!-- The open game's detail view covers the whole page; the library keeps its scroll and filters underneath. -->
+  <ContentControl Panel.ZIndex="5"
+                  Content="{Binding Detail}"
+                  Focusable="False"
+                  Visibility="{Binding HasDetail, Converter={StaticResource BoolToVisibility}}">
+    <ContentControl.ContentTemplate>
+      <DataTemplate DataType="{x:Type vm:GameDetailViewModel}">
+        <views:GameDetailView />
+      </DataTemplate>
+    </ContentControl.ContentTemplate>
+  </ContentControl>
+
   <Grid Margin="40,32,16,0">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
@@ -126,6 +158,7 @@
               VerticalAlignment="Center"
               Margin="12,0,0,0"
               Command="{Binding AddManualItemCommand}"
+              AutomationProperties.Name="{l:Loc Library_Add}"
               Style="{StaticResource Lumen.Button}">
         <StackPanel Orientation="Horizontal">
           <TextBlock Text="&#xE710;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
@@ -135,6 +168,7 @@
       <Button DockPanel.Dock="Right"
               VerticalAlignment="Center"
               Command="{Binding RescanCommand}"
+              AutomationProperties.Name="{l:Loc Library_Rescan}"
               Style="{StaticResource Lumen.Button}">
         <StackPanel Orientation="Horizontal">
           <TextBlock Text="&#xE72C;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
@@ -273,5 +307,6 @@
         </DataTemplate>
       </ItemsControl.ItemTemplate>
     </ItemsControl>
+  </Grid>
   </Grid>
 </UserControl>

@@ -346,4 +346,58 @@
   <data name="Filter_Clear" xml:space="preserve">
     <value>Limpiar filtros</value>
   </data>
+  <data name="Detail_Back" xml:space="preserve">
+    <value>Volver</value>
+  </data>
+  <data name="Detail_OpenFolder" xml:space="preserve">
+    <value>Abrir carpeta</value>
+  </data>
+  <data name="Detail_StorePage" xml:space="preserve">
+    <value>Página en la tienda</value>
+  </data>
+  <data name="Detail_More" xml:space="preserve">
+    <value>Más</value>
+  </data>
+  <data name="Detail_ChangeBackground" xml:space="preserve">
+    <value>Cambiar fondo…</value>
+  </data>
+  <data name="Detail_ChangeLogo" xml:space="preserve">
+    <value>Cambiar logo…</value>
+  </data>
+  <data name="Detail_RestoreArtwork" xml:space="preserve">
+    <value>Restaurar imágenes originales</value>
+  </data>
+  <data name="Detail_Stores" xml:space="preserve">
+    <value>Tiendas</value>
+  </data>
+  <data name="Detail_Playtime" xml:space="preserve">
+    <value>Tiempo de juego</value>
+  </data>
+  <data name="Detail_LastPlayed" xml:space="preserve">
+    <value>Última vez</value>
+  </data>
+  <data name="Detail_Location" xml:space="preserve">
+    <value>Ubicación</value>
+  </data>
+  <data name="Detail_NoPlaytime" xml:space="preserve">
+    <value>Sin datos todavía</value>
+  </data>
+  <data name="Detail_PlaytimeMinutes" xml:space="preserve">
+    <value>{0} min</value>
+  </data>
+  <data name="Detail_PlaytimeHours" xml:space="preserve">
+    <value>{0:0.#} h</value>
+  </data>
+  <data name="Detail_NeverPlayed" xml:space="preserve">
+    <value>Nunca</value>
+  </data>
+  <data name="Detail_NotInstalledPath" xml:space="preserve">
+    <value>No instalado</value>
+  </data>
+  <data name="Detail_PlayWithLabel" xml:space="preserve">
+    <value>Jugar con</value>
+  </data>
+  <data name="Library_Installed" xml:space="preserve">
+    <value>instalado</value>
+  </data>
 </root>

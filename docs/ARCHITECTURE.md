@@ -216,6 +216,11 @@ Every portable file has `"schema": <int>`; loaders migrate older versions and re
 - Virtualized grid (`VirtualizingWrapPanel` or equivalent) for large libraries; images decoded at display size and cached.
 - All user-visible text in `Resources/Strings.resx` / `Strings.es.resx`. No hard-coded strings in XAML or view models.
 - Gamepad input is translated into `FocusNavigationDirection` moves and routed commands so every screen that works with the keyboard works with a gamepad.
+- **Detail view (M3):** the cover is a button (click/Enter) that opens `GameDetailViewModel` over the library page; the library keeps its scroll, search and filters underneath. Esc/Back closes it.
+  - Shows: hero (fading into the page), logo (falls back to the title), Play/Install, "Play with" store selector for merged games (choosing a store saves it as the preferred one), stores, playtime, last played and location.
+  - Actions: open the install folder (`explorer.exe "<folder>"`, only when it exists) and the store page inside the store's own app (`steam://store/{id}`, `ms-windows-store://pdp/?PFN=…`; other stores have no reliable link and hide the button). Under "More": change cover/background/logo (overrides), restore originals, show stores separately.
+  - Manual merge, rename and hide come in the next M3 PR.
+- **Accessibility:** buttons whose content is icon + text set `AutomationProperties.Name`; dropdown options override `ToString()` with their label. Clickable things that share a grid cell must be checked for hit-testing (UI Automation `Invoke` bypasses it).
 - Global hotkey via `RegisterHotKey` on a hidden message window.
 
 ## 9. Build, CI and release
