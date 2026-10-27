@@ -131,7 +131,8 @@ public sealed partial class LibraryViewModel : ObservableObject
         Notice = null;
         try
         {
-            var reports = await _library.ScanAsync(CancellationToken.None);
+            // Manual rescan: also refresh cached remote data (Steam's owned list).
+            var reports = await _library.RefreshAsync(CancellationToken.None);
             var withProblems = reports.Where(r => r.Problems.Any()).Select(r => r.DisplayName).ToList();
             if (withProblems.Count > 0)
             {
@@ -404,19 +405,53 @@ public sealed partial class LibraryViewModel : ObservableObject
 
     private void Rebuild()
     {
+        // Keep the tile of every item that didn't change (cover stays loaded, nothing flickers); only new or
+        // changed items get a new tile. Matters for automatic rescans, e.g. a game finishing its install.
+        var previous = new Dictionary<ItemRef, LibraryTileViewModel>();
+        foreach (var tile in _allTiles)
+        {
+            previous.TryAdd(tile.Item.Key, tile);
+        }
+
         _allTiles.Clear();
-        _allTiles.AddRange(_library.Items.Select(CreateTile));
+        foreach (var item in _library.Items)
+        {
+            _allTiles.Add(previous.TryGetValue(item.Key, out var old) && SameItem(old.Item, item) ? old : CreateTile(item));
+        }
+
         BuildFilterOptions(); // stores present may have changed; selections are kept
         ApplyFilter();
         SyncDetail();
     }
 
+    private static bool SameItem(LibraryItem a, LibraryItem b) =>
+        a.Primary.Ref == b.Primary.Ref && EntryContentComparer.SameList(a.Entries, b.Entries);
+
+    /// <summary>
+    /// Lays the visible tiles out in rows, replacing only rows whose tiles changed and adding/removing rows at the
+    /// end, so the virtualized list keeps its scroll position.
+    /// </summary>
     private void RebuildRows()
     {
-        Rows.Clear();
-        foreach (var chunk in Items.Chunk(_columnCount))
+        var chunks = Items.Chunk(_columnCount).ToList();
+        for (var i = 0; i < chunks.Count; i++)
         {
-            Rows.Add(new TileRow(chunk));
+            if (i < Rows.Count)
+            {
+                if (!Rows[i].Tiles.SequenceEqual(chunks[i]))
+                {
+                    Rows[i] = new TileRow(chunks[i]);
+                }
+            }
+            else
+            {
+                Rows.Add(new TileRow(chunks[i]));
+            }
+        }
+
+        while (Rows.Count > chunks.Count)
+        {
+            Rows.RemoveAt(Rows.Count - 1);
         }
     }
 

@@ -79,6 +79,37 @@ public sealed partial class LibraryService
     /// <summary>Scans every provider.</summary>
     public Task<IReadOnlyList<ProviderScanReport>> ScanAsync(CancellationToken ct) => ScanCoreAsync(_providers, ct);
 
+    /// <summary>A manual "Rescan": like <see cref="ScanAsync"/>, but providers first drop cached remote results.</summary>
+    public Task<IReadOnlyList<ProviderScanReport>> RefreshAsync(CancellationToken ct)
+    {
+        foreach (var caching in _providers.OfType<ICachingProvider>())
+        {
+            caching.InvalidateCache();
+        }
+
+        return ScanCoreAsync(_providers, ct);
+    }
+
+    /// <summary>Folders to watch for installs/uninstalls, from every provider that knows them.</summary>
+    public async Task<IReadOnlyList<WatchTarget>> GetWatchTargetsAsync(CancellationToken ct)
+    {
+        var targets = new List<WatchTarget>();
+        foreach (var provider in _providers.OfType<IWatchableProvider>())
+        {
+            try
+            {
+                targets.AddRange(await provider.GetWatchTargetsAsync(ct).ConfigureAwait(false));
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                // Watching is a convenience; the next manual or focus-triggered rescan still works.
+                LogProviderThrew(ex, ((ILibraryProvider)provider).Source, "watch");
+            }
+        }
+
+        return targets;
+    }
+
     /// <summary>Scans only the provider for <paramref name="source"/> (e.g. after editing manual items), leaving the rest as they are.</summary>
     public Task<IReadOnlyList<ProviderScanReport>> ScanSourceAsync(string source, CancellationToken ct) =>
         ScanCoreAsync(_providers.Where(p => p.Source == source).ToList(), ct);
@@ -199,6 +230,14 @@ public sealed partial class LibraryService
             .OrderBy(e => e.Title, StringComparer.CurrentCultureIgnoreCase)
             .ThenBy(e => e.Ref.ToString(), StringComparer.Ordinal)
             .ToList();
+        // Automatic rescans run often (store folder changes, window focus): when nothing changed, don't make
+        // the UI rebuild anything.
+        var previous = Volatile.Read(ref _snapshot);
+        if (ReferenceEquals(rules, previous.Rules) && previous.Items.Count > 0 && EntryContentComparer.SameList(sorted, previous.Entries))
+        {
+            return;
+        }
+
         var items = _merger.Merge(sorted, rules)
             .OrderBy(i => i.Title, StringComparer.CurrentCultureIgnoreCase)
             .ThenBy(i => i.Key.ToString(), StringComparer.Ordinal)

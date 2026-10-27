@@ -119,6 +119,13 @@ public interface IAccountConnector                 // Epic, GOG, Steam (Family S
 
 `ProviderResult` carries entries **plus** non-fatal diagnostics and a status: `Ok`, `Partial` (some items unreadable), `NotAvailable` (store not installed), `NotConfigured` (needs key/login), `Failed`. A provider must never throw out of a scan: catch, log, return what it could read.
 
+**Keeping the library current (M3, `LibraryAutoRefresh`):**
+- **Watches** the folders providers report via `IWatchableProvider`: Steam: each library's `steamapps\appmanifest_*.acf`; Epic: `Manifests\*.item`. Read-only `FileSystemWatcher`s; nothing is ever written there.
+- **Rescans when the main window is activated**, which covers stores without files to watch (GOG, Ubisoft, EA, Battle.net, Xbox) and installs finished while Lumen was in the background.
+- **Debounce and spacing:** events are debounced (3 s; a download rewrites manifests many times) and automatic scans are at least 10 s apart; a change during a scan schedules one more.
+- **No extra network:** automatic scans don't hit the network for cached data. `ICachingProvider`: Steam keeps its owned list for 10 min. The manual **Rescan** calls `RefreshAsync`, which invalidates those caches first.
+- **Quiet UI:** `LibraryService` doesn't raise `Changed` when a scan finds the same entries (`EntryContentComparer` compares `Extra` by content). When something did change, the library reuses the tiles of unchanged items and updates grid rows in place, so covers don't reload and the scroll position stays.
+
 `LibraryService.ScanSourceAsync(source)` rescans a single provider (used after editing manual items, so Steam isn't queried again). `LibraryService` runs every provider in parallel with a 30 s timeout per scan (and still contains a provider that throws). Per source it combines the installed scan with the owned scan: installed entries win, owned ones fill in as `NotInstalled`. A `Failed` scan falls back to the matching part of the previous cache, so a broken provider never wipes the library; `NotAvailable`/`NotConfigured` are real answers and do clear stale entries. Results are persisted per source and published sorted by title.
 
 ### Starting points per store (verify on a real machine before relying on them)

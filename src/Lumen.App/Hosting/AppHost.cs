@@ -92,6 +92,7 @@ public static class AppHost
         builder.Services.AddSingleton<IManualItemStore, SqliteManualItemStore>();
         builder.Services.AddSingleton<ILibraryProvider, ManualItemsProvider>();
         builder.Services.AddSingleton<IDialogService, DialogService>();
+        builder.Services.AddSingleton<LibraryAutoRefresh>();
         builder.Services.AddSingleton<ILibraryCache, SqliteLibraryCache>();
         builder.Services.AddSingleton<IMergeRuleStore, SqliteMergeRuleStore>();
         builder.Services.AddSingleton(_ => new LibraryMerger(TitleCleanup.CreateNormalizer()));

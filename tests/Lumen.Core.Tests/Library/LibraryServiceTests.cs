@@ -170,6 +170,28 @@ public sealed class LibraryServiceTests
     }
 
     [Fact]
+    public async Task RescanWithNoChanges_DoesNotRaiseChanged()
+    {
+        var steam = new FakeProvider("steam").WithInstalled(Game("steam", "1", "Sample") with
+        {
+            Extra = new Dictionary<string, string> { ["appid"] = "1" },
+        });
+        var service = Service(steam);
+        await service.ScanAsync(CancellationToken.None);
+        var changed = 0;
+        service.Changed += (_, _) => changed++;
+
+        // A fresh scan builds new objects (new Extra dictionary) with the same content.
+        steam.WithInstalled(Game("steam", "1", "Sample") with { Extra = new Dictionary<string, string> { ["appid"] = "1" } });
+        await service.ScanAsync(CancellationToken.None);
+        changed.ShouldBe(0);
+
+        steam.WithInstalled(Game("steam", "1", "Sample", installed: false));
+        await service.ScanAsync(CancellationToken.None);
+        changed.ShouldBe(1);
+    }
+
+    [Fact]
     public async Task LoadCached_PublishesCacheContent()
     {
         _cache.BySource["steam"] = [Game("steam", "1", "From cache")];
