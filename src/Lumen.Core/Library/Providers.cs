@@ -68,6 +68,24 @@ public sealed record ProviderResult(
 }
 
 /// <summary>
+/// A provider that keeps remote results for a while (e.g. Steam's owned list) so frequent automatic rescans
+/// stay local. A manual "Rescan" asks it to forget them.
+/// </summary>
+public interface ICachingProvider
+{
+    void InvalidateCache();
+}
+
+/// <summary>Folders whose changes mean "this store's installed games may have changed" (install finished, uninstall).</summary>
+public sealed record WatchTarget(string Directory, string Filter);
+
+/// <summary>A provider that can tell which folders to watch so Lumen notices installs/uninstalls by itself.</summary>
+public interface IWatchableProvider
+{
+    Task<IReadOnlyList<WatchTarget>> GetWatchTargetsAsync(CancellationToken ct);
+}
+
+/// <summary>
 /// A store or app source. Implementations must never throw out of a scan: catch, record a diagnostic
 /// and return whatever could be read.
 /// </summary>

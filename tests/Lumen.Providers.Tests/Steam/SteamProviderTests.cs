@@ -215,6 +215,56 @@ public sealed class SteamProviderTests
     }
 
     [Fact]
+    public async Task OwnedList_IsReusedForAWhile_UntilInvalidated()
+    {
+        ConfigureAccount();
+        _http.RespondWith(HttpStatusCode.OK, Fixtures.Read("steam/owned_games.json"));
+        var provider = Provider();
+
+        await provider.ScanOwnedAsync(CancellationToken.None);
+        await provider.ScanOwnedAsync(CancellationToken.None);
+        _http.Requests.Count.ShouldBe(1);
+
+        provider.InvalidateCache();
+        await provider.ScanOwnedAsync(CancellationToken.None);
+        _http.Requests.Count.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task FailedOwnedScan_IsNotCached()
+    {
+        ConfigureAccount();
+        _http.RespondWith(HttpStatusCode.ServiceUnavailable);
+        var provider = Provider();
+
+        await provider.ScanOwnedAsync(CancellationToken.None);
+        await provider.ScanOwnedAsync(CancellationToken.None);
+
+        _http.Requests.Count.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task WatchTargets_AreEachLibrarysSteamappsFolder()
+    {
+        ArrangeFullLibrary();
+        _fs.AddDirectory(ExtraLibrary + @"\steamapps");
+
+        var targets = await Provider().GetWatchTargetsAsync(CancellationToken.None);
+
+        targets.ShouldBe(
+        [
+            new WatchTarget(@"C:\Program Files (x86)\Steam\steamapps", "appmanifest_*.acf"),
+            new WatchTarget(@"D:\SteamLibrary\steamapps", "appmanifest_*.acf"),
+        ]);
+    }
+
+    [Fact]
+    public async Task WatchTargets_EmptyWithoutSteam()
+    {
+        (await Provider().GetWatchTargetsAsync(CancellationToken.None)).ShouldBeEmpty();
+    }
+
+    [Fact]
     public async Task InstalledAndOwned_CombineIntoOneEntryPerGame()
     {
         ArrangeFullLibrary();

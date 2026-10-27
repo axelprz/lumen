@@ -94,6 +94,14 @@ public sealed class EpicProviderTests
     }
 
     [Fact]
+    public async Task WatchTarget_IsTheManifestsFolder()
+    {
+        ArrangeAll(DefaultManifests);
+
+        (await Provider().GetWatchTargetsAsync(CancellationToken.None)).ShouldBe([new WatchTarget(DefaultManifests, "*.item")]);
+    }
+
+    [Fact]
     public async Task OwnedScan_NeedsSignIn()
     {
         (await Provider().ScanOwnedAsync(CancellationToken.None)).Status.ShouldBe(ProviderStatus.NotConfigured);

@@ -8,6 +8,7 @@ using Lumen.App.Hosting;
 using Lumen.App.Localization;
 using Lumen.App.ViewModels;
 using Lumen.App.Views;
+using Lumen.Core.Library;
 using Lumen.Core.Localization;
 using Lumen.Platform.Windows;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,6 +59,11 @@ public partial class App : Application
         // The window is already visible: load settings, show the cached library, then rescan in the background.
         await _host.Services.GetRequiredService<SettingsViewModel>().InitializeAsync(CancellationToken.None).ConfigureAwait(true);
         await _host.Services.GetRequiredService<LibraryViewModel>().InitializeAsync(CancellationToken.None).ConfigureAwait(true);
+
+        // From now on, notice installs/uninstalls by themselves (store folders + coming back to the window).
+        var autoRefresh = _host.Services.GetRequiredService<LibraryAutoRefresh>();
+        await autoRefresh.StartAsync(CancellationToken.None).ConfigureAwait(true);
+        MainWindow.Activated += (_, _) => autoRefresh.OnWindowActivated();
     }
 
     protected override void OnExit(ExitEventArgs e)

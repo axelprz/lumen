@@ -11,8 +11,16 @@ namespace Lumen.Providers.Epic;
 /// Epic Games Store: installed games from the launcher's manifests (<c>*.item</c> JSON files), no login.
 /// Owned-not-installed games need the optional Epic sign-in (M5). Only reads Epic's files and registry.
 /// </summary>
-public sealed class EpicProvider(IRegistryReader registry, IFileSystem fileSystem, IKnownFolders folders) : ILibraryProvider
+public sealed class EpicProvider(IRegistryReader registry, IFileSystem fileSystem, IKnownFolders folders) : ILibraryProvider, IWatchableProvider
 {
+    /// <summary>The launcher writes/removes a .item manifest when an install finishes or a game is uninstalled.</summary>
+    public Task<IReadOnlyList<WatchTarget>> GetWatchTargetsAsync(CancellationToken ct)
+    {
+        var manifests = ManifestsDirectory();
+        IReadOnlyList<WatchTarget> targets = fileSystem.DirectoryExists(manifests) ? [new WatchTarget(manifests, "*.item")] : [];
+        return Task.FromResult(targets);
+    }
+
     public const string SourceId = "epic";
 
     // Verified on Windows 11 (2026-10): manifests live in %ProgramData%\Epic\EpicGamesLauncher\Data\Manifests;

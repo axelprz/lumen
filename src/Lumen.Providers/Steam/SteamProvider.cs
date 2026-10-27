@@ -17,9 +17,35 @@ public sealed class SteamProvider(
     IFileSystem fileSystem,
     ISecretStore secrets,
     ILocalSettings settings,
-    SteamWebApi webApi) : ILibraryProvider
+    SteamWebApi webApi,
+    TimeProvider? time = null) : ILibraryProvider, ICachingProvider, IWatchableProvider
 {
     public const string SourceId = "steam";
+
+    /// <summary>The owned list barely changes; automatic rescans reuse it for this long (manual Rescan refreshes).</summary>
+    public static readonly TimeSpan OwnedCacheLifetime = TimeSpan.FromMinutes(10);
+
+    private readonly TimeProvider _time = time ?? TimeProvider.System;
+    private (ProviderResult Result, DateTimeOffset At)? _ownedCache;
+
+    public void InvalidateCache() => _ownedCache = null;
+
+    /// <summary>Each library's steamapps folder: Steam rewrites appmanifest_*.acf when an install finishes or a game is removed.</summary>
+    public async Task<IReadOnlyList<WatchTarget>> GetWatchTargetsAsync(CancellationToken ct)
+    {
+        var steamPath = FindSteamPath();
+        if (steamPath is null)
+        {
+            return [];
+        }
+
+        var libraries = await FindLibrariesAsync(steamPath, [], ct).ConfigureAwait(false);
+        return libraries
+            .Select(lib => Join(lib, "steamapps"))
+            .Where(fileSystem.DirectoryExists)
+            .Select(dir => new WatchTarget(dir, "appmanifest_*.acf"))
+            .ToList();
+    }
 
     // VERIFY: confirmed on one Windows 11 machine (2026-10): SteamPath is lowercase with forward slashes.
     internal const string RegistryKey = @"Software\Valve\Steam";
@@ -82,8 +108,13 @@ public sealed class SteamProvider(
                 return ProviderResult.NotConfigured("Steam Web API key or SteamID64 not set.");
             }
 
+            if (_ownedCache is { } cached && _time.GetUtcNow() - cached.At < OwnedCacheLifetime)
+            {
+                return cached.Result;
+            }
+
             var result = await webApi.GetOwnedGamesAsync(apiKey, steamId, ct).ConfigureAwait(false);
-            return result.Error switch
+            var scan = result.Error switch
             {
                 SteamApiError.None => ProviderResult.FromScan(ToEntries(result.Games), []),
                 SteamApiError.PrivateProfile => new ProviderResult(
@@ -93,6 +124,10 @@ public sealed class SteamProvider(
                 SteamApiError.InvalidKey => ProviderResult.Failed($"Steam rejected the Web API key (HTTP {result.Detail})."),
                 _ => ProviderResult.Failed($"Steam Web API unavailable ({result.Error}: {result.Detail})."),
             };
+
+            // Only good answers are reused; failures are retried on the next scan.
+            _ownedCache = scan.Status == ProviderStatus.Ok ? (scan, _time.GetUtcNow()) : null;
+            return scan;
         }
         catch (OperationCanceledException)
         {
