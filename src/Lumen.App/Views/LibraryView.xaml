@@ -218,8 +218,10 @@
       </DockPanel>
     </Border>
 
-    <!-- Empty states: nothing in the library at all, or nothing matching the filters -->
+    <!-- Empty states: nothing in the library at all, or nothing matching the filters. ZIndex keeps them above
+         the (empty, but hit-testable) grid that shares this row, so anything clickable here gets the mouse. -->
     <TextBlock Grid.Row="3"
+               Panel.ZIndex="1"
                Text="{l:Loc Library_Empty}"
                Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                FontSize="15"
@@ -227,16 +229,14 @@
                MaxWidth="520"
                HorizontalAlignment="Left"
                Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}" />
-    <StackPanel Grid.Row="3"
-                HorizontalAlignment="Left"
-                Visibility="{Binding HasNoMatches, Converter={StaticResource BoolToVisibility}}">
-      <TextBlock Text="{l:Loc Library_NoMatches}" Foreground="{DynamicResource Lumen.Brush.TextMuted}" FontSize="15" />
-      <Button Command="{Binding ClearFiltersCommand}"
-              Content="{l:Loc Filter_Clear}"
-              Style="{StaticResource Lumen.Button}"
-              HorizontalAlignment="Left"
-              Margin="0,12,0,0" />
-    </StackPanel>
+    <!-- "Clear filters" lives in the filter bar only; a second copy here was redundant. -->
+    <TextBlock Grid.Row="3"
+               Panel.ZIndex="1"
+               Text="{l:Loc Library_NoMatches}"
+               Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+               FontSize="15"
+               HorizontalAlignment="Left"
+               Visibility="{Binding HasNoMatches, Converter={StaticResource BoolToVisibility}}" />
 
     <!-- Grid of covers: a virtualized list of rows (WPF has no virtualizing wrap panel), so only rows on
          screen and their images exist in memory. The view sets ColumnCount from its width. -->
