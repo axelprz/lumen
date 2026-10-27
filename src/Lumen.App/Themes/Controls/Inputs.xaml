@@ -8,7 +8,9 @@
             BorderBrush="{TemplateBinding BorderBrush}"
             BorderThickness="{TemplateBinding BorderThickness}"
             CornerRadius="6">
-      <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" Focusable="False" />
+      <!-- No Margin here: TextBox/PasswordBox already apply their Padding to the text inside the content host.
+           Binding it again doubled the inset (typed text started far from where the placeholder is). -->
+      <ScrollViewer x:Name="PART_ContentHost" Focusable="False" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
     </Border>
     <ControlTemplate.Triggers>
       <Trigger Property="IsKeyboardFocusWithin" Value="True">
