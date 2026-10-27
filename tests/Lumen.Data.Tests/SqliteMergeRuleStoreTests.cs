@@ -79,4 +79,40 @@ public sealed class SqliteMergeRuleStoreTests : IAsyncLifetime
         rules.Separated.ShouldBeEmpty();
         rules.Preferred.ShouldBeEmpty();
     }
+
+    [Fact]
+    public async Task Link_IsStored_AndSkipsTheTargetItself()
+    {
+        var store = new SqliteMergeRuleStore(_db.Factory);
+
+        await store.LinkAsync([_epic, _gog, _steam], _steam, CancellationToken.None);
+
+        var links = (await store.LoadAsync(CancellationToken.None)).Links;
+        links.Count.ShouldBe(2);
+        links[_epic].ShouldBe(_steam);
+        links[_gog].ShouldBe(_steam);
+    }
+
+    [Fact]
+    public async Task Separating_UndoesLinksInBothDirections()
+    {
+        var store = new SqliteMergeRuleStore(_db.Factory);
+        await store.LinkAsync([_epic], _steam, CancellationToken.None);
+        await store.LinkAsync([_gog], _epic, CancellationToken.None);
+
+        await store.SeparateAsync([_epic], CancellationToken.None);
+
+        (await store.LoadAsync(CancellationToken.None)).Links.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Reset_ForgetsLinks()
+    {
+        var store = new SqliteMergeRuleStore(_db.Factory);
+        await store.LinkAsync([_epic], _steam, CancellationToken.None);
+
+        await store.ResetAsync(CancellationToken.None);
+
+        (await store.LoadAsync(CancellationToken.None)).Links.ShouldBeEmpty();
+    }
 }

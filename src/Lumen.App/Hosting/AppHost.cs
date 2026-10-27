@@ -95,6 +95,7 @@ public static class AppHost
         builder.Services.AddSingleton<LibraryAutoRefresh>();
         builder.Services.AddSingleton<ILibraryCache, SqliteLibraryCache>();
         builder.Services.AddSingleton<IMergeRuleStore, SqliteMergeRuleStore>();
+        builder.Services.AddSingleton<IItemOverrideStore, SqliteItemOverrideStore>();
         builder.Services.AddSingleton(_ => new LibraryMerger(TitleCleanup.CreateNormalizer()));
         builder.Services.AddSingleton(_ => new LibraryFilter(TitleCleanup.CreateNormalizer()));
         builder.Services.AddSingleton(sp => new LibraryService(
@@ -103,7 +104,8 @@ public static class AppHost
             sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<LibraryService>>(),
             providerTimeout: null,
             merger: sp.GetRequiredService<LibraryMerger>(),
-            ruleStore: sp.GetRequiredService<IMergeRuleStore>()));
+            ruleStore: sp.GetRequiredService<IMergeRuleStore>(),
+            overrideStore: sp.GetRequiredService<IItemOverrideStore>()));
         builder.Services.AddSingleton<LaunchService>();
 
         // Artwork (allowed hosts only): Steam CDN first, then SteamGridDB when the user saved a key. Downloads are

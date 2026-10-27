@@ -25,6 +25,7 @@ public sealed partial class LibraryViewModel : ObservableObject
     private readonly LaunchService _launcher;
     private readonly IManualItemStore _manualItems;
     private readonly IMergeRuleStore _mergeRules;
+    private readonly IItemOverrideStore _overrides;
     private readonly ArtworkService _artwork;
     private readonly IDialogService _dialogs;
     private readonly LibraryFilter _filter;
@@ -51,6 +52,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         IEnumerable<ILibraryProvider> providers,
         IManualItemStore manualItems,
         IMergeRuleStore mergeRules,
+        IItemOverrideStore overrides,
         ArtworkService artwork,
         IDialogService dialogs,
         LibraryFilter filter,
@@ -68,6 +70,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         _launcher = launcher;
         _manualItems = manualItems;
         _mergeRules = mergeRules;
+        _overrides = overrides;
         _artwork = artwork;
         _dialogs = dialogs;
         _localizer = localizer;
@@ -224,13 +227,19 @@ public sealed partial class LibraryViewModel : ObservableObject
     private async Task UseStoreAlwaysAsync(LibraryItem item, LibraryEntry preferred)
     {
         await _mergeRules.SetPreferredAsync(preferred.Ref, item.Entries.Select(e => e.Ref), CancellationToken.None);
-        await _library.ReloadMergeRulesAsync(CancellationToken.None);
+        await _library.ReloadUserChoicesAsync(CancellationToken.None);
     }
 
     private async Task SeparateAsync(LibraryItem item)
     {
         await _mergeRules.SeparateAsync(item.Entries.Select(e => e.Ref), CancellationToken.None);
-        await _library.ReloadMergeRulesAsync(CancellationToken.None);
+        await _library.ReloadUserChoicesAsync(CancellationToken.None);
+    }
+
+    private async Task SetHiddenAsync(LibraryItem item, bool hidden)
+    {
+        await _overrides.SetHiddenAsync(item.Entries.Select(e => e.Ref), hidden, CancellationToken.None);
+        await _library.ReloadUserChoicesAsync(CancellationToken.None);
     }
 
     private string StoreNameOf(LibraryEntry entry) =>
@@ -286,6 +295,10 @@ public sealed partial class LibraryViewModel : ObservableObject
             menu.Add(new(_localizer["Tile_RestoreCover"], new RelayCommand(() => RestoreCover(item))));
         }
 
+        menu.Add(new(string.Empty, null));
+        menu.Add(item.IsHidden
+            ? new(_localizer["Tile_Unhide"], new AsyncRelayCommand(() => SetHiddenAsync(item, hidden: false)))
+            : new(_localizer["Tile_Hide"], new AsyncRelayCommand(() => SetHiddenAsync(item, hidden: true))));
         return menu;
     }
 
@@ -375,7 +388,7 @@ public sealed partial class LibraryViewModel : ObservableObject
     {
         var detail = new GameDetailViewModel(
             item,
-            new DetailServices(_launcher, _shell, _artwork, _mergeRules, _library, _dialogs, _fileSystem, _localizer, StoreNameOf),
+            new DetailServices(_launcher, _shell, _artwork, _mergeRules, _overrides, _library, _dialogs, _fileSystem, _localizer, StoreNameOf),
             () => Detail = null);
         detail.ArtworkChanged += (_, _) => RefreshTiles(t => t.Item.Entries.Any(e => detail.Item.Entries.Contains(e)));
         Detail = detail;
@@ -420,12 +433,23 @@ public sealed partial class LibraryViewModel : ObservableObject
         }
 
         BuildFilterOptions(); // stores present may have changed; selections are kept
-        ApplyFilter();
+        if (ShowHidden && HiddenCount == 0)
+        {
+            ShowHidden = false; // the last hidden item was shown again: back to the library (applies the filter)
+        }
+        else
+        {
+            ApplyFilter();
+        }
+
         SyncDetail();
     }
 
     private static bool SameItem(LibraryItem a, LibraryItem b) =>
-        a.Primary.Ref == b.Primary.Ref && EntryContentComparer.SameList(a.Entries, b.Entries);
+        a.Primary.Ref == b.Primary.Ref
+        && a.Title == b.Title
+        && a.IsHidden == b.IsHidden
+        && EntryContentComparer.SameList(a.Entries, b.Entries);
 
     /// <summary>
     /// Lays the visible tiles out in rows, replacing only rows whose tiles changed and adding/removing rows at the

@@ -235,6 +235,18 @@
               Height="36"
               Margin="0,0,12,8"
               Visibility="{Binding IsFiltering, Converter={StaticResource BoolToVisibility}}" />
+      <!-- Switches between the library and the items the user hid; only there once something is hidden. -->
+      <Button Command="{Binding ToggleHiddenCommand}"
+              Style="{StaticResource Lumen.Button}"
+              Height="36"
+              Margin="0,0,12,8"
+              AutomationProperties.Name="{Binding HiddenToggleText}"
+              Visibility="{Binding HasHiddenToggle, Converter={StaticResource BoolToVisibility}}">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="&#xED1A;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+          <TextBlock Text="{Binding HiddenToggleText}" />
+        </StackPanel>
+      </Button>
     </WrapPanel>
 
     <!-- Non-blocking notice (scan problems, launch failures) -->

@@ -35,16 +35,21 @@ public enum LibrarySort
 
 /// <summary>What the library page shows: free-text search plus filters and an order.</summary>
 /// <param name="Store">A source id ("steam", "epic", …) or null for every store.</param>
+/// <param name="Hidden">False: the library without hidden items. True: only the hidden ones (to find and unhide them).</param>
 public sealed record LibraryQuery(
     string Search = "",
     KindFilter Kind = KindFilter.All,
     string? Store = null,
     InstallFilter Install = InstallFilter.All,
-    LibrarySort Sort = LibrarySort.Name)
+    LibrarySort Sort = LibrarySort.Name,
+    bool Hidden = false)
 {
     public static LibraryQuery Default { get; } = new();
 
-    /// <summary>True when anything but the sort narrows the list (the UI shows "x of y" and "clear filters").</summary>
+    /// <summary>
+    /// True when anything but the sort narrows the list (the UI shows "x of y" and "clear filters"). Switching to the
+    /// hidden items is a different view, not a filter.
+    /// </summary>
     public bool IsFiltering => !string.IsNullOrWhiteSpace(Search) || Kind != KindFilter.All || Store is not null || Install != InstallFilter.All;
 }
 
@@ -64,7 +69,8 @@ public sealed class LibraryFilter(TitleNormalizer normalizer)
         var normalizedSearch = search.Length == 0 ? string.Empty : normalizer.Normalize(search);
 
         var filtered = items.Where(item =>
-            MatchesKind(item, query.Kind)
+            item.IsHidden == query.Hidden
+            && MatchesKind(item, query.Kind)
             && (query.Store is null || item.Entries.Any(e => e.Ref.Source == query.Store))
             && MatchesInstall(item, query.Install)
             && (search.Length == 0 || MatchesSearch(item.Title, search, normalizedSearch)));

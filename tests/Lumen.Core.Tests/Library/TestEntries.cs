@@ -58,9 +58,39 @@ internal sealed class InMemoryRules : IMergeRuleStore
 
     public Task SeparateAsync(IEnumerable<ItemRef> refs, CancellationToken ct) => Task.CompletedTask;
 
+    public Task LinkAsync(IEnumerable<ItemRef> refs, ItemRef target, CancellationToken ct) => Task.CompletedTask;
+
     public Task SetPreferredAsync(ItemRef preferred, IEnumerable<ItemRef> others, CancellationToken ct) => Task.CompletedTask;
 
     public Task ResetAsync(CancellationToken ct) => Task.CompletedTask;
+}
+
+internal sealed class InMemoryOverrides : IItemOverrideStore
+{
+    public Dictionary<ItemRef, ItemOverride> Overrides { get; } = [];
+
+    public Task<IReadOnlyDictionary<ItemRef, ItemOverride>> LoadAsync(CancellationToken ct) =>
+        Task.FromResult<IReadOnlyDictionary<ItemRef, ItemOverride>>(new Dictionary<ItemRef, ItemOverride>(Overrides));
+
+    public Task SetTitleAsync(IEnumerable<ItemRef> refs, string? title, CancellationToken ct)
+    {
+        foreach (var itemRef in refs)
+        {
+            Overrides[itemRef] = (Overrides.GetValueOrDefault(itemRef) ?? new ItemOverride(null, false)) with { Title = ItemOverride.CleanTitle(title) };
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task SetHiddenAsync(IEnumerable<ItemRef> refs, bool hidden, CancellationToken ct)
+    {
+        foreach (var itemRef in refs)
+        {
+            Overrides[itemRef] = (Overrides.GetValueOrDefault(itemRef) ?? new ItemOverride(null, false)) with { Hidden = hidden };
+        }
+
+        return Task.CompletedTask;
+    }
 }
 
 internal sealed class InMemoryCache : ILibraryCache

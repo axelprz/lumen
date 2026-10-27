@@ -37,7 +37,7 @@ public sealed partial class SettingsViewModel(
     private async Task ResetMergesAsync()
     {
         await mergeRules.ResetAsync(CancellationToken.None);
-        await library.ReloadMergeRulesAsync(CancellationToken.None);
+        await library.ReloadUserChoicesAsync(CancellationToken.None);
         LibraryStatus = localizer["Settings_Library_ResetDone"];
     }
 }

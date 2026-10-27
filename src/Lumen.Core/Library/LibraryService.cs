@@ -29,7 +29,8 @@ public sealed partial class LibraryService
     private readonly SemaphoreSlim _scanLock = new(1, 1);
     private readonly LibraryMerger _merger;
     private readonly IMergeRuleStore? _ruleStore;
-    private Snapshot _snapshot = new([], [], MergeRules.None);
+    private readonly IItemOverrideStore? _overrideStore;
+    private Snapshot _snapshot = new([], [], new UserChoices(MergeRules.None, NoOverrides));
     private IReadOnlyDictionary<ItemRef, DateTimeOffset> _firstSeen = new Dictionary<ItemRef, DateTimeOffset>();
 
     public LibraryService(
@@ -38,7 +39,8 @@ public sealed partial class LibraryService
         ILogger<LibraryService> logger,
         TimeSpan? providerTimeout = null,
         LibraryMerger? merger = null,
-        IMergeRuleStore? ruleStore = null)
+        IMergeRuleStore? ruleStore = null,
+        IItemOverrideStore? overrideStore = null)
     {
         ArgumentNullException.ThrowIfNull(providers);
         _providers = providers.ToList();
@@ -47,7 +49,10 @@ public sealed partial class LibraryService
         _providerTimeout = providerTimeout ?? DefaultProviderTimeout;
         _merger = merger ?? new LibraryMerger(new TitleNormalizer());
         _ruleStore = ruleStore;
+        _overrideStore = overrideStore;
     }
+
+    private static readonly IReadOnlyDictionary<ItemRef, ItemOverride> NoOverrides = new Dictionary<ItemRef, ItemOverride>();
 
     /// <summary>Raised (on any thread) after <see cref="Entries"/> or <see cref="Items"/> change.</summary>
     public event EventHandler? Changed;
@@ -63,18 +68,22 @@ public sealed partial class LibraryService
 
     public async Task LoadCachedAsync(CancellationToken ct)
     {
-        var rules = _ruleStore is null ? MergeRules.None : await _ruleStore.LoadAsync(ct).ConfigureAwait(false);
+        var choices = await LoadChoicesAsync(ct).ConfigureAwait(false);
         var cached = await _cache.LoadAllAsync(ct).ConfigureAwait(false);
         Volatile.Write(ref _firstSeen, await _cache.LoadFirstSeenAsync(ct).ConfigureAwait(false));
-        Publish(cached, rules);
+        Publish(cached, choices);
     }
 
-    /// <summary>Re-applies merge decisions after the user separated items, picked a store or reset them.</summary>
-    public async Task ReloadMergeRulesAsync(CancellationToken ct)
-    {
-        var rules = _ruleStore is null ? MergeRules.None : await _ruleStore.LoadAsync(ct).ConfigureAwait(false);
-        Publish(Entries, rules);
-    }
+    /// <summary>
+    /// Re-applies the user's choices without rescanning: after merging, separating, picking a store, renaming,
+    /// hiding, or resetting them.
+    /// </summary>
+    public async Task ReloadUserChoicesAsync(CancellationToken ct) =>
+        Publish(Entries, await LoadChoicesAsync(ct).ConfigureAwait(false));
+
+    private async Task<UserChoices> LoadChoicesAsync(CancellationToken ct) => new(
+        _ruleStore is null ? MergeRules.None : await _ruleStore.LoadAsync(ct).ConfigureAwait(false),
+        _overrideStore is null ? NoOverrides : await _overrideStore.LoadAsync(ct).ConfigureAwait(false));
 
     /// <summary>Scans every provider.</summary>
     public Task<IReadOnlyList<ProviderScanReport>> ScanAsync(CancellationToken ct) => ScanCoreAsync(_providers, ct);
@@ -223,9 +232,9 @@ public sealed partial class LibraryService
         }
     }
 
-    private void Publish(IReadOnlyList<LibraryEntry> entries, MergeRules? rules = null)
+    private void Publish(IReadOnlyList<LibraryEntry> entries, UserChoices? choices = null)
     {
-        rules ??= Volatile.Read(ref _snapshot).Rules;
+        choices ??= Volatile.Read(ref _snapshot).Choices;
         var sorted = entries
             .OrderBy(e => e.Title, StringComparer.CurrentCultureIgnoreCase)
             .ThenBy(e => e.Ref.ToString(), StringComparer.Ordinal)
@@ -233,21 +242,54 @@ public sealed partial class LibraryService
         // Automatic rescans run often (store folder changes, window focus): when nothing changed, don't make
         // the UI rebuild anything.
         var previous = Volatile.Read(ref _snapshot);
-        if (ReferenceEquals(rules, previous.Rules) && previous.Items.Count > 0 && EntryContentComparer.SameList(sorted, previous.Entries))
+        if (ReferenceEquals(choices, previous.Choices) && previous.Items.Count > 0 && EntryContentComparer.SameList(sorted, previous.Entries))
         {
             return;
         }
 
-        var items = _merger.Merge(sorted, rules)
+        var items = _merger.Merge(sorted, choices.Rules)
+            .Select(i => ApplyOverrides(i, choices.Overrides))
             .OrderBy(i => i.Title, StringComparer.CurrentCultureIgnoreCase)
             .ThenBy(i => i.Key.ToString(), StringComparer.Ordinal)
             .ToList();
-        Volatile.Write(ref _snapshot, new Snapshot(sorted, items, rules));
+        Volatile.Write(ref _snapshot, new Snapshot(sorted, items, choices));
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
-    // Entries, items and the rules they were built with are swapped together so readers never see a mix.
-    private sealed record Snapshot(IReadOnlyList<LibraryEntry> Entries, IReadOnlyList<LibraryItem> Items, MergeRules Rules);
+    /// <summary>
+    /// A custom title is saved on every entry of the item it was given to; the primary's wins, then any other's.
+    /// An item is hidden when any of its entries is (hiding a merged item hides all of them).
+    /// </summary>
+    public static LibraryItem ApplyOverrides(LibraryItem item, IReadOnlyDictionary<ItemRef, ItemOverride> overrides)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        ArgumentNullException.ThrowIfNull(overrides);
+        if (overrides.Count == 0)
+        {
+            return item;
+        }
+
+        var found = item.Entries
+            .OrderBy(e => e == item.Primary ? 0 : 1)
+            .Select(e => overrides.GetValueOrDefault(e.Ref))
+            .Where(o => o is not null)
+            .ToList();
+        if (found.Count == 0)
+        {
+            return item;
+        }
+
+        return item with
+        {
+            CustomTitle = found.Select(o => o!.Title).FirstOrDefault(t => t is not null),
+            IsHidden = found.Any(o => o!.Hidden),
+        };
+    }
+
+    private sealed record UserChoices(MergeRules Rules, IReadOnlyDictionary<ItemRef, ItemOverride> Overrides);
+
+    // Entries, items and the choices they were built with are swapped together so readers never see a mix.
+    private sealed record Snapshot(IReadOnlyList<LibraryEntry> Entries, IReadOnlyList<LibraryItem> Items, UserChoices Choices);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Scanned {Source}: {Count} entries (installed: {Installed}, owned: {Owned})")]
     private partial void LogScanned(string source, int count, ProviderStatus installed, ProviderStatus owned);

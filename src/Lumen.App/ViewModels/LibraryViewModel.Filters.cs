@@ -38,6 +38,21 @@ public sealed partial class LibraryViewModel
     [ObservableProperty]
     private FilterOption<LibrarySort>? _selectedSort;
 
+    /// <summary>Showing only the hidden items (to find and unhide them) instead of the library.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HiddenToggleText))]
+    private bool _showHidden;
+
+    /// <summary>How many items the user hid.</summary>
+    public int HiddenCount => _allTiles.Count(t => t.Item.IsHidden);
+
+    /// <summary>The "Hidden (n)" button only appears once something is hidden (or while viewing them).</summary>
+    public bool HasHiddenToggle => ShowHidden || HiddenCount > 0;
+
+    public string HiddenToggleText => ShowHidden
+        ? _localizer["Library_BackFromHidden"]
+        : string.Format(CultureInfo.CurrentCulture, _localizer["Library_ShowHidden"], HiddenCount);
+
     public IReadOnlyList<FilterOption<KindFilter>> KindOptions { get; private set; } = [];
 
     public IReadOnlyList<FilterOption<InstallFilter>> InstallOptions { get; private set; } = [];
@@ -49,8 +64,11 @@ public sealed partial class LibraryViewModel
 
     public bool IsFiltering => CurrentQuery().IsFiltering;
 
-    /// <summary>The library has items but none match the current search/filters.</summary>
-    public bool HasNoMatches => IsFiltering && _allTiles.Count > 0 && Items.Count == 0;
+    /// <summary>The library (or the hidden list) has items but none match the current search/filters.</summary>
+    public bool HasNoMatches => IsFiltering && ViewTotal > 0 && Items.Count == 0;
+
+    /// <summary>Items in the current view before search/filters: the library without hidden ones, or only the hidden.</summary>
+    private int ViewTotal => _allTiles.Count(t => t.Item.IsHidden == ShowHidden);
 
     partial void OnSearchTextChanged(string value) => ApplyFilter();
 
@@ -59,6 +77,11 @@ public sealed partial class LibraryViewModel
     partial void OnSelectedStoreChanged(FilterOption<string?>? value) => ApplyFilter();
 
     partial void OnSelectedInstallChanged(FilterOption<InstallFilter>? value) => ApplyFilter();
+
+    partial void OnShowHiddenChanged(bool value) => ApplyFilter();
+
+    [RelayCommand]
+    private void ToggleHidden() => ShowHidden = !ShowHidden;
 
     partial void OnSelectedSortChanged(FilterOption<LibrarySort>? value)
     {
@@ -150,7 +173,8 @@ public sealed partial class LibraryViewModel
         SelectedKind?.Value ?? KindFilter.All,
         SelectedStore?.Value,
         SelectedInstall?.Value ?? InstallFilter.All,
-        SelectedSort?.Value ?? LibrarySort.Name);
+        SelectedSort?.Value ?? LibrarySort.Name,
+        ShowHidden);
 
     /// <summary>Shows the tiles that match the current query, in its order. Tiles are reused, so covers stay loaded.</summary>
     private void ApplyFilter()
@@ -173,6 +197,8 @@ public sealed partial class LibraryViewModel
         OnPropertyChanged(nameof(IsEmpty));
         OnPropertyChanged(nameof(IsFiltering));
         OnPropertyChanged(nameof(HasNoMatches));
+        OnPropertyChanged(nameof(HasHiddenToggle));
+        OnPropertyChanged(nameof(HiddenToggleText));
     }
 
     // Items are matched by reference: two different items can never be "equal" here.
@@ -189,13 +215,19 @@ public sealed partial class LibraryViewModel
 
     private string FormatCount()
     {
+        var total = ViewTotal;
         if (IsFiltering)
         {
-            return string.Format(CultureInfo.CurrentCulture, _localizer["Library_CountFiltered"], Items.Count, _allTiles.Count);
+            return string.Format(CultureInfo.CurrentCulture, _localizer["Library_CountFiltered"], Items.Count, total);
         }
 
-        return _allTiles.Count == 1
+        if (ShowHidden)
+        {
+            return string.Format(CultureInfo.CurrentCulture, _localizer["Library_CountHidden"], total);
+        }
+
+        return total == 1
             ? _localizer["Library_CountOne"]
-            : string.Format(_localizer.Culture, _localizer["Library_Count"], _allTiles.Count);
+            : string.Format(_localizer.Culture, _localizer["Library_Count"], total);
     }
 }

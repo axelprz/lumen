@@ -128,11 +128,17 @@
               </StackPanel>
               <Button.ContextMenu>
                 <ContextMenu>
+                  <MenuItem Header="{l:Loc Detail_Rename}" Command="{Binding StartRenameCommand}" />
+                  <MenuItem Header="{l:Loc Detail_RestoreTitle}" Command="{Binding RestoreTitleCommand}"
+                            Visibility="{Binding HasCustomTitle, Converter={StaticResource BoolToVisibility}}" />
+                  <MenuItem Header="{Binding HideText}" Command="{Binding ToggleHiddenCommand}" />
+                  <Separator />
                   <MenuItem Header="{l:Loc Tile_ChangeCover}" Command="{Binding ChangeCoverCommand}" />
                   <MenuItem Header="{l:Loc Detail_ChangeBackground}" Command="{Binding ChangeBackgroundCommand}" />
                   <MenuItem Header="{l:Loc Detail_ChangeLogo}" Command="{Binding ChangeLogoCommand}" />
                   <MenuItem Header="{l:Loc Detail_RestoreArtwork}" Command="{Binding RestoreArtworkCommand}" />
-                  <Separator Visibility="{Binding IsMerged, Converter={StaticResource BoolToVisibility}}" />
+                  <Separator />
+                  <MenuItem Header="{l:Loc Detail_MergeWith}" Command="{Binding StartMergeCommand}" />
                   <MenuItem Header="{l:Loc Tile_Separate}" Command="{Binding SeparateCommand}"
                             Visibility="{Binding IsMerged, Converter={StaticResource BoolToVisibility}}" />
                 </ContextMenu>
@@ -145,6 +151,90 @@
                   HorizontalAlignment="Left"
                   Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}">
             <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="14" />
+          </Border>
+
+          <!-- Hidden: say so, with a one-click way back -->
+          <Border Margin="0,4,0,12" Padding="14,10" CornerRadius="6"
+                  Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
+                  HorizontalAlignment="Left"
+                  Visibility="{Binding IsHidden, Converter={StaticResource BoolToVisibility}}">
+            <DockPanel>
+              <TextBlock DockPanel.Dock="Left" Text="&#xED1A;" Style="{StaticResource Lumen.Text.Icon}" VerticalAlignment="Center" Margin="0,0,10,0" />
+              <Button DockPanel.Dock="Right" Command="{Binding ToggleHiddenCommand}" Content="{Binding HideText}"
+                      Style="{StaticResource Lumen.Button}" Margin="16,0,0,0" />
+              <TextBlock Text="{l:Loc Detail_HiddenBanner}" TextWrapping="Wrap" FontSize="14" VerticalAlignment="Center" />
+            </DockPanel>
+          </Border>
+
+          <!-- Rename -->
+          <Border Margin="0,4,0,12" Padding="16" CornerRadius="6" MaxWidth="640" HorizontalAlignment="Left"
+                  Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
+                  Visibility="{Binding IsRenaming, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel>
+              <TextBlock Text="{l:Loc Detail_RenameLabel}" Style="{StaticResource InfoLabel}" />
+              <TextBox Text="{Binding RenameText, UpdateSourceTrigger=PropertyChanged}"
+                       MaxLength="120" Height="36" VerticalContentAlignment="Center" Padding="8,0"
+                       IsVisibleChanged="OnEditorVisibleChanged"
+                       AutomationProperties.Name="{l:Loc Detail_RenameLabel}">
+                <TextBox.InputBindings>
+                  <KeyBinding Key="Return" Command="{Binding SaveRenameCommand}" />
+                  <KeyBinding Key="Escape" Command="{Binding CancelRenameCommand}" />
+                </TextBox.InputBindings>
+              </TextBox>
+              <TextBlock Text="{Binding RenameHint}" TextWrapping="Wrap" FontSize="12" Margin="0,8,0,12"
+                         Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+              <StackPanel Orientation="Horizontal">
+                <Button Command="{Binding SaveRenameCommand}" Content="{l:Loc Detail_Save}" Style="{StaticResource Lumen.Button}"
+                        Background="{DynamicResource Lumen.Brush.Accent}" BorderBrush="{DynamicResource Lumen.Brush.Accent}" Foreground="White"
+                        Margin="0,0,8,0" />
+                <Button Command="{Binding CancelRenameCommand}" Content="{l:Loc Detail_Cancel}" Style="{StaticResource Lumen.Button}" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <!-- Merge with another item: search, then pick -->
+          <Border Margin="0,4,0,12" Padding="16" CornerRadius="6" MaxWidth="640" HorizontalAlignment="Left"
+                  Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
+                  Visibility="{Binding IsMerging, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel>
+              <TextBlock Text="{l:Loc Detail_MergeTitle}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,6" />
+              <TextBlock Text="{l:Loc Detail_MergeHint}" TextWrapping="Wrap" FontSize="12" Margin="0,0,0,12"
+                         Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+              <TextBox Text="{Binding MergeSearch, UpdateSourceTrigger=PropertyChanged}"
+                       Height="36" VerticalContentAlignment="Center" Padding="8,0"
+                       IsVisibleChanged="OnEditorVisibleChanged"
+                       AutomationProperties.Name="{l:Loc Detail_MergeSearch}">
+                <TextBox.InputBindings>
+                  <KeyBinding Key="Escape" Command="{Binding CancelMergeCommand}" />
+                </TextBox.InputBindings>
+              </TextBox>
+              <TextBlock Text="{Binding MergeStatus}" FontSize="13" Margin="0,8,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
+                <TextBlock.Style>
+                  <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding MergeStatus}" Value="{x:Null}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </TextBlock.Style>
+              </TextBlock>
+              <ItemsControl ItemsSource="{Binding MergeCandidates}" Margin="0,8,0,0" Focusable="False">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Button Content="{Binding Label}"
+                            Command="{Binding DataContext.MergeWithCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                            CommandParameter="{Binding}"
+                            Style="{StaticResource Lumen.Button}"
+                            HorizontalContentAlignment="Left"
+                            Margin="0,0,0,6"
+                            AutomationProperties.Name="{Binding Label}" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <Button Command="{Binding CancelMergeCommand}" Content="{l:Loc Detail_Cancel}" Style="{StaticResource Lumen.Button}"
+                      HorizontalAlignment="Left" Margin="0,6,0,0" />
+            </StackPanel>
           </Border>
 
           <!-- What Lumen knows -->
