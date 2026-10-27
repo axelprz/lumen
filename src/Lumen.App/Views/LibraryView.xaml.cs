@@ -18,6 +18,15 @@ public partial class LibraryView : UserControl
     // View concern: Ctrl+F jumps to the search box; Esc in the search box clears it.
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
+        // Esc (or Backspace outside a text box) closes the detail view.
+        if (DataContext is LibraryViewModel { Detail: { } detail }
+            && (e.Key == Key.Escape || (e.Key == Key.Back && e.OriginalSource is not TextBox)))
+        {
+            detail.CloseCommand.Execute(null);
+            e.Handled = true;
+            return;
+        }
+
         if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control)
         {
             SearchBox.Focus();

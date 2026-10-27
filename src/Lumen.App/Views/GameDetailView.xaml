@@ -1,0 +1,173 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- Copyright (C) 2026 Axel Ismael Perez (AxelPRZ) -->
+<UserControl x:Class="Lumen.App.Views.GameDetailView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:l="clr-namespace:Lumen.App.Localization"
+             xmlns:conv="clr-namespace:Lumen.App.Converters">
+  <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    <conv:ImagePathConverter x:Key="ImagePath" />
+    <Style x:Key="InfoLabel" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.TextMuted}" />
+      <Setter Property="Margin" Value="0,0,0,6" />
+    </Style>
+    <Style x:Key="InfoValue" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
+    </Style>
+  </UserControl.Resources>
+
+  <Grid Background="{DynamicResource Lumen.Brush.Background}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
+      <StackPanel>
+        <!-- Hero: background art fading into the page, with the logo (or the title) over it -->
+        <Grid Height="380" ClipToBounds="True">
+          <Border>
+            <Border.Background>
+              <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#FF232836" Offset="0" />
+                <GradientStop Color="#FF0F1115" Offset="1" />
+              </LinearGradientBrush>
+            </Border.Background>
+          </Border>
+          <Border>
+            <Border.Background>
+              <ImageBrush ImageSource="{Binding HeroPath, Converter={StaticResource ImagePath}, ConverterParameter=1920}" Stretch="UniformToFill" AlignmentY="Top" />
+            </Border.Background>
+          </Border>
+          <Border>
+            <Border.Background>
+              <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#330F1115" Offset="0" />
+                <GradientStop Color="#660F1115" Offset="0.55" />
+                <GradientStop Color="#FF0F1115" Offset="1" />
+              </LinearGradientBrush>
+            </Border.Background>
+          </Border>
+
+          <Button Command="{Binding CloseCommand}"
+                  Style="{StaticResource Lumen.Button}"
+                  Background="#990F1115"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Top"
+                  Margin="32,28,0,0"
+                  AutomationProperties.Name="{l:Loc Detail_Back}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xE72B;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+              <TextBlock Text="{l:Loc Detail_Back}" />
+            </StackPanel>
+          </Button>
+
+          <Grid VerticalAlignment="Bottom" Margin="48,0,48,20">
+            <Image Source="{Binding LogoPath, Converter={StaticResource ImagePath}, ConverterParameter=920}"
+                   MaxHeight="130"
+                   MaxWidth="460"
+                   HorizontalAlignment="Left"
+                   Stretch="Uniform"
+                   Visibility="{Binding HasLogo, Converter={StaticResource BoolToVisibility}}"
+                   AutomationProperties.Name="{Binding Title}" />
+            <TextBlock Text="{Binding Title}" FontSize="40" FontWeight="SemiBold" TextWrapping="Wrap">
+              <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                  <Setter Property="Visibility" Value="Visible" />
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding HasLogo}" Value="True">
+                      <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </TextBlock.Style>
+            </TextBlock>
+          </Grid>
+        </Grid>
+
+        <StackPanel Margin="48,8,48,48">
+          <!-- Actions -->
+          <WrapPanel>
+            <Button Command="{Binding PlayCommand}"
+                    Content="{Binding ActionText}"
+                    IsEnabled="{Binding CanRun}"
+                    Style="{StaticResource Lumen.Button}"
+                    Background="{DynamicResource Lumen.Brush.Accent}"
+                    BorderBrush="{DynamicResource Lumen.Brush.Accent}"
+                    Foreground="White"
+                    FontSize="16"
+                    FontWeight="SemiBold"
+                    Padding="36,10"
+                    Margin="0,0,12,12" />
+            <StackPanel Orientation="Horizontal" Margin="0,0,12,12" VerticalAlignment="Center"
+                        Visibility="{Binding HasStoreChoice, Converter={StaticResource BoolToVisibility}}">
+              <TextBlock Text="{l:Loc Detail_PlayWithLabel}" VerticalAlignment="Center" Foreground="{DynamicResource Lumen.Brush.TextMuted}" Margin="0,0,8,0" />
+              <ComboBox ItemsSource="{Binding StoreChoices}" SelectedItem="{Binding SelectedStore}" DisplayMemberPath="Label" MinWidth="200"
+                        AutomationProperties.Name="{l:Loc Detail_PlayWithLabel}" />
+            </StackPanel>
+            <Button Command="{Binding OpenFolderCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
+                    AutomationProperties.Name="{l:Loc Detail_OpenFolder}"
+                    Visibility="{Binding CanOpenFolder, Converter={StaticResource BoolToVisibility}}">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="&#xE838;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+                <TextBlock Text="{l:Loc Detail_OpenFolder}" />
+              </StackPanel>
+            </Button>
+            <Button Command="{Binding OpenStorePageCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
+                    AutomationProperties.Name="{l:Loc Detail_StorePage}"
+                    Visibility="{Binding CanOpenStorePage, Converter={StaticResource BoolToVisibility}}">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="&#xE719;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+                <TextBlock Text="{l:Loc Detail_StorePage}" />
+              </StackPanel>
+            </Button>
+            <Button x:Name="MoreButton" Click="OnMoreClick" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
+                    AutomationProperties.Name="{l:Loc Detail_More}">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="&#xE712;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+                <TextBlock Text="{l:Loc Detail_More}" />
+              </StackPanel>
+              <Button.ContextMenu>
+                <ContextMenu>
+                  <MenuItem Header="{l:Loc Tile_ChangeCover}" Command="{Binding ChangeCoverCommand}" />
+                  <MenuItem Header="{l:Loc Detail_ChangeBackground}" Command="{Binding ChangeBackgroundCommand}" />
+                  <MenuItem Header="{l:Loc Detail_ChangeLogo}" Command="{Binding ChangeLogoCommand}" />
+                  <MenuItem Header="{l:Loc Detail_RestoreArtwork}" Command="{Binding RestoreArtworkCommand}" />
+                  <Separator Visibility="{Binding IsMerged, Converter={StaticResource BoolToVisibility}}" />
+                  <MenuItem Header="{l:Loc Tile_Separate}" Command="{Binding SeparateCommand}"
+                            Visibility="{Binding IsMerged, Converter={StaticResource BoolToVisibility}}" />
+                </ContextMenu>
+              </Button.ContextMenu>
+            </Button>
+          </WrapPanel>
+
+          <Border Margin="0,4,0,12" Padding="14,10" CornerRadius="6"
+                  Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
+                  HorizontalAlignment="Left"
+                  Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}">
+            <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="14" />
+          </Border>
+
+          <!-- What Lumen knows -->
+          <UniformGrid Columns="4" Margin="0,16,0,0">
+            <StackPanel Margin="0,0,24,16">
+              <TextBlock Text="{l:Loc Detail_Stores}" Style="{StaticResource InfoLabel}" />
+              <TextBlock Text="{Binding StoresText}" Style="{StaticResource InfoValue}" />
+            </StackPanel>
+            <StackPanel Margin="0,0,24,16">
+              <TextBlock Text="{l:Loc Detail_Playtime}" Style="{StaticResource InfoLabel}" />
+              <TextBlock Text="{Binding PlaytimeText}" Style="{StaticResource InfoValue}" />
+            </StackPanel>
+            <StackPanel Margin="0,0,24,16">
+              <TextBlock Text="{l:Loc Detail_LastPlayed}" Style="{StaticResource InfoLabel}" />
+              <TextBlock Text="{Binding LastPlayedText}" Style="{StaticResource InfoValue}" />
+            </StackPanel>
+            <StackPanel Margin="0,0,24,16">
+              <TextBlock Text="{l:Loc Detail_Location}" Style="{StaticResource InfoLabel}" />
+              <TextBlock Text="{Binding InstallPath}" Style="{StaticResource InfoValue}" FontSize="13" />
+            </StackPanel>
+          </UniformGrid>
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

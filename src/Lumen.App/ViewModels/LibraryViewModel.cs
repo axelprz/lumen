@@ -9,6 +9,7 @@ using Lumen.App.Services;
 using Lumen.Core.Artwork;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
+using Lumen.Core.Platform;
 using Lumen.Core.Settings;
 using Microsoft.Extensions.Logging;
 
@@ -28,6 +29,8 @@ public sealed partial class LibraryViewModel : ObservableObject
     private readonly IDialogService _dialogs;
     private readonly LibraryFilter _filter;
     private readonly ILocalSettings _settings;
+    private readonly ILauncher _shell;
+    private readonly IFileSystem _fileSystem;
     private int _columnCount = 1;
     private readonly ILocalizer _localizer;
     private readonly ILogger<LibraryViewModel> _logger;
@@ -52,11 +55,15 @@ public sealed partial class LibraryViewModel : ObservableObject
         IDialogService dialogs,
         LibraryFilter filter,
         ILocalSettings settings,
+        ILauncher shell,
+        IFileSystem fileSystem,
         ILocalizer localizer,
         ILogger<LibraryViewModel> logger)
     {
         _filter = filter;
         _settings = settings;
+        _shell = shell;
+        _fileSystem = fileSystem;
         _library = library;
         _launcher = launcher;
         _manualItems = manualItems;
@@ -353,7 +360,46 @@ public sealed partial class LibraryViewModel : ObservableObject
         var primary = item.Primary;
         var stores = string.Join(" · ", item.Entries.Select(StoreNameOf).Distinct());
         var play = new AsyncRelayCommand(() => RunPrimaryActionAsync(primary), () => LaunchService.PrimaryAction(primary) is not null);
-        return new LibraryTileViewModel(item, stores, _localizer, play, BuildMenu(item), LoadCoverAsync);
+        return new LibraryTileViewModel(item, stores, _localizer, play, BuildMenu(item), LoadCoverAsync, new AsyncRelayCommand(() => OpenDetailAsync(item)));
+    }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasDetail))]
+    private GameDetailViewModel? _detail;
+
+    /// <summary>True while a game's detail view covers the grid.</summary>
+    public bool HasDetail => Detail is not null;
+
+    private async Task OpenDetailAsync(LibraryItem item)
+    {
+        var detail = new GameDetailViewModel(
+            item,
+            new DetailServices(_launcher, _shell, _artwork, _mergeRules, _library, _dialogs, _fileSystem, _localizer, StoreNameOf),
+            () => Detail = null);
+        detail.ArtworkChanged += (_, _) => RefreshTiles(t => t.Item.Entries.Any(e => detail.Item.Entries.Contains(e)));
+        Detail = detail;
+        await detail.LoadArtworkAsync();
+    }
+
+    /// <summary>After the library changes, keep the open detail on the same game (it may now be merged/split).</summary>
+    private void SyncDetail()
+    {
+        if (Detail is null)
+        {
+            return;
+        }
+
+        var refs = Detail.Item.Entries.Select(e => e.Ref).ToHashSet();
+        var match = _library.Items.FirstOrDefault(i => i.Primary.Ref == Detail.Item.Primary.Ref)
+            ?? _library.Items.FirstOrDefault(i => i.Entries.Any(e => refs.Contains(e.Ref)));
+        if (match is null)
+        {
+            Detail = null;
+        }
+        else if (!ReferenceEquals(match, Detail.Item))
+        {
+            _ = OpenDetailAsync(match);
+        }
     }
 
     private void Rebuild()
@@ -362,6 +408,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         _allTiles.AddRange(_library.Items.Select(CreateTile));
         BuildFilterOptions(); // stores present may have changed; selections are kept
         ApplyFilter();
+        SyncDetail();
     }
 
     private void RebuildRows()

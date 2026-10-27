@@ -34,9 +34,11 @@ public sealed partial class LibraryTileViewModel : ObservableObject
         ILocalizer localizer,
         ICommand primaryCommand,
         IReadOnlyList<TileMenuItem> menu,
-        Func<LibraryItem, Task<string?>> coverLoader)
+        Func<LibraryItem, Task<string?>> coverLoader,
+        ICommand openDetailCommand)
     {
         _coverLoader = coverLoader;
+        OpenDetailCommand = openDetailCommand;
         Item = item;
         StoreName = storeNames;
         PrimaryCommand = primaryCommand;
@@ -88,6 +90,9 @@ public sealed partial class LibraryTileViewModel : ObservableObject
     public string StateText { get; }
 
     public ICommand PrimaryCommand { get; }
+
+    /// <summary>Opens this game's detail view (click or Enter on the cover).</summary>
+    public ICommand OpenDetailCommand { get; }
 
     public IReadOnlyList<TileMenuItem> MenuItems { get; }
 
