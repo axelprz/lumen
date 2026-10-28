@@ -69,6 +69,14 @@ public partial class HomeView : UserControl
         }
     }
 
+    private void OnQuickAppLoaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: QuickAppViewModel app })
+        {
+            _ = app.EnsureIconAsync();
+        }
+    }
+
     private void OnTilePointed(object sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement { DataContext: HomeTileViewModel tile } && _vm is not null)

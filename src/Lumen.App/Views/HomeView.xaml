@@ -10,6 +10,62 @@
   <UserControl.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     <conv:ImagePathConverter x:Key="ImagePath" />
+    <!-- A game in a Home row (Continue playing, Favorites): cover (or icon); pointing at it features it, click opens it -->
+    <DataTemplate x:Key="HomeTile" DataType="{x:Type vm:HomeTileViewModel}">
+      <StackPanel Width="150" Margin="0,0,18,12" ToolTip="{Binding Title}" Loaded="OnTileLoaded">
+        <Button x:Name="Cover"
+                Command="{Binding DataContext.OpenDetailCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                CommandParameter="{Binding Item}"
+                Cursor="Hand"
+                MouseEnter="OnTilePointed"
+                GotKeyboardFocus="OnTilePointed"
+                AutomationProperties.Name="{Binding Title}">
+          <Button.Template>
+            <ControlTemplate TargetType="Button">
+              <Border x:Name="Frame" Height="225" CornerRadius="8" BorderThickness="2" BorderBrush="Transparent" ClipToBounds="True">
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#FF232836" Offset="0" />
+                    <GradientStop Color="#FF171A22" Offset="1" />
+                  </LinearGradientBrush>
+                </Border.Background>
+                <ContentPresenter />
+              </Border>
+              <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                  <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
+                </Trigger>
+                <Trigger Property="IsKeyboardFocused" Value="True">
+                  <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
+                </Trigger>
+              </ControlTemplate.Triggers>
+            </ControlTemplate>
+          </Button.Template>
+          <Grid>
+            <Border CornerRadius="6">
+              <Border.Background>
+                <ImageBrush ImageSource="{Binding CoverPath, Converter={StaticResource ImagePath}, ConverterParameter=300}" Stretch="UniformToFill" />
+              </Border.Background>
+            </Border>
+            <Image Source="{Binding IconPath, Converter={StaticResource ImagePath}, ConverterParameter=192}"
+                   Width="96" Height="96" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   RenderOptions.BitmapScalingMode="HighQuality"
+                   Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibility}}" />
+            <TextBlock x:Name="Initial" Text="{Binding Initial}" FontSize="60" FontWeight="Light" Opacity="0.6"
+                       Foreground="{DynamicResource Lumen.Brush.TextMuted}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Grid>
+        </Button>
+        <TextBlock Text="{Binding Title}" Margin="2,8,2,0" FontSize="13" TextTrimming="CharacterEllipsis" />
+      </StackPanel>
+      <DataTemplate.Triggers>
+        <DataTrigger Binding="{Binding HasCover}" Value="True">
+          <Setter TargetName="Initial" Property="Visibility" Value="Collapsed" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding HasIcon}" Value="True">
+          <Setter TargetName="Initial" Property="Visibility" Value="Collapsed" />
+        </DataTrigger>
+      </DataTemplate.Triggers>
+    </DataTemplate>
   </UserControl.Resources>
 
   <Grid Background="{DynamicResource Lumen.Brush.Background}" ClipToBounds="True">
@@ -124,71 +180,86 @@
           </TextBlock>
           <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" Focusable="False"
                         PreviewMouseWheel="OnRowMouseWheel">
-            <ItemsControl ItemsSource="{Binding ContinuePlaying}" Focusable="False">
+            <ItemsControl ItemsSource="{Binding ContinuePlaying}" ItemTemplate="{StaticResource HomeTile}" Focusable="False">
               <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                   <StackPanel Orientation="Horizontal" />
                 </ItemsPanelTemplate>
               </ItemsControl.ItemsPanel>
-              <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type vm:HomeTileViewModel}">
-                  <StackPanel Width="150" Margin="0,0,18,12" ToolTip="{Binding Title}" Loaded="OnTileLoaded">
-                    <Button x:Name="Cover"
-                            Command="{Binding DataContext.OpenDetailCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                            CommandParameter="{Binding Item}"
-                            Cursor="Hand"
-                            MouseEnter="OnTilePointed"
-                            GotKeyboardFocus="OnTilePointed"
-                            AutomationProperties.Name="{Binding Title}">
-                      <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                          <Border x:Name="Frame" Height="225" CornerRadius="8" BorderThickness="2" BorderBrush="Transparent" ClipToBounds="True">
-                            <Border.Background>
-                              <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#FF232836" Offset="0" />
-                                <GradientStop Color="#FF171A22" Offset="1" />
-                              </LinearGradientBrush>
-                            </Border.Background>
-                            <ContentPresenter />
-                          </Border>
-                          <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                              <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
-                            </Trigger>
-                            <Trigger Property="IsKeyboardFocused" Value="True">
-                              <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
-                            </Trigger>
-                          </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                      </Button.Template>
-                      <Grid>
-                        <Border CornerRadius="6">
-                          <Border.Background>
-                            <ImageBrush ImageSource="{Binding CoverPath, Converter={StaticResource ImagePath}, ConverterParameter=300}" Stretch="UniformToFill" />
-                          </Border.Background>
-                        </Border>
-                        <Image Source="{Binding IconPath, Converter={StaticResource ImagePath}, ConverterParameter=192}"
-                               Width="96" Height="96" HorizontalAlignment="Center" VerticalAlignment="Center"
-                               RenderOptions.BitmapScalingMode="HighQuality"
-                               Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibility}}" />
-                        <TextBlock x:Name="Initial" Text="{Binding Initial}" FontSize="60" FontWeight="Light" Opacity="0.6"
-                                   Foreground="{DynamicResource Lumen.Brush.TextMuted}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                      </Grid>
-                    </Button>
-                    <TextBlock Text="{Binding Title}" Margin="2,8,2,0" FontSize="13" TextTrimming="CharacterEllipsis" />
-                  </StackPanel>
-                  <DataTemplate.Triggers>
-                    <DataTrigger Binding="{Binding HasCover}" Value="True">
-                      <Setter TargetName="Initial" Property="Visibility" Value="Collapsed" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding HasIcon}" Value="True">
-                      <Setter TargetName="Initial" Property="Visibility" Value="Collapsed" />
-                    </DataTrigger>
-                  </DataTemplate.Triggers>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
+
             </ItemsControl>
           </ScrollViewer>
+        </StackPanel>
+
+        <!-- Favorites -->
+        <StackPanel Margin="0,28,0,0" Visibility="{Binding HasFavorites, Converter={StaticResource BoolToVisibility}}">
+          <TextBlock Text="{l:Loc Collections_Favorites}" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,14" />
+          <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" Focusable="False"
+                        PreviewMouseWheel="OnRowMouseWheel">
+            <ItemsControl ItemsSource="{Binding Favorites}" ItemTemplate="{StaticResource HomeTile}" Focusable="False">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+            </ItemsControl>
+          </ScrollViewer>
+        </StackPanel>
+
+        <!-- Quick apps: a compact dock of icons; a click opens the app -->
+        <StackPanel Margin="0,24,0,0" Visibility="{Binding HasQuickApps, Converter={StaticResource BoolToVisibility}}">
+          <TextBlock Text="{l:Loc Home_QuickApps}" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,14" />
+          <ItemsControl ItemsSource="{Binding QuickApps}" Focusable="False">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="{x:Type vm:QuickAppViewModel}">
+                <Button Command="{Binding DataContext.OpenAppCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                        CommandParameter="{Binding}"
+                        ToolTip="{Binding Title}"
+                        Cursor="Hand"
+                        Margin="0,0,12,12"
+                        Loaded="OnQuickAppLoaded"
+                        AutomationProperties.Name="{Binding Title}">
+                  <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                      <Border x:Name="Frame" Width="88" Padding="8,12,8,8" CornerRadius="8" BorderThickness="2" BorderBrush="Transparent"
+                              Background="{DynamicResource Lumen.Brush.Surface}">
+                        <ContentPresenter />
+                      </Border>
+                      <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                          <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                          <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
+                        </Trigger>
+                      </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                  </Button.Template>
+                  <StackPanel>
+                    <Grid Width="44" Height="44">
+                      <Image Source="{Binding IconPath, Converter={StaticResource ImagePath}, ConverterParameter=96}"
+                             RenderOptions.BitmapScalingMode="HighQuality"
+                             Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibility}}" />
+                      <TextBlock x:Name="Initial" Text="{Binding Initial}" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                 Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+                    </Grid>
+                    <TextBlock Text="{Binding Title}" FontSize="12" Margin="0,8,0,0" TextAlignment="Center" TextTrimming="CharacterEllipsis"
+                               Foreground="{DynamicResource Lumen.Brush.Text}" />
+                  </StackPanel>
+                </Button>
+                <DataTemplate.Triggers>
+                  <DataTrigger Binding="{Binding HasIcon}" Value="True">
+                    <Setter TargetName="Initial" Property="Visibility" Value="Collapsed" />
+                  </DataTrigger>
+                </DataTemplate.Triggers>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
         </StackPanel>
       </StackPanel>
     </ScrollViewer>

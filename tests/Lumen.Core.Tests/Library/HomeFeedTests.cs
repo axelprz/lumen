@@ -73,10 +73,39 @@ public sealed class HomeFeedTests
         feed.ContinuePlaying.ShouldBeEmpty();
     }
 
+    [Fact]
+    public void Favorites_AreGamesInTheOrderMarked_HiddenOnesLeftOut()
+    {
+        var first = Item(Game("steam", "1", "Zeta"));
+        var second = Item(Game("epic", "x", "Alpha"));
+        var hidden = Item(Game("gog", "9", "Hidden")) with { IsHidden = true };
+        var app = App("startmenu", "Editor.lnk", "Editor");
+        var favorites = new Collection(Collection.FavoritesId, "Favorites", [first.Key, hidden.Key, app.Key, second.Key]);
+
+        var feed = HomeFeed.Build([second, first, hidden, app], _noDates, favorites);
+
+        feed.Favorites.ShouldBe([first, second]);
+        feed.QuickApps.ShouldBe([app]);
+    }
+
+    [Fact]
+    public void QuickApps_WithoutFavoriteApps_AreTheLibrarysApps_ByName_Capped()
+    {
+        var apps = Enumerable.Range(1, 20).Select(i => App("startmenu", $"{i}.lnk", $"App {i:00}")).ToList();
+
+        var feed = HomeFeed.Build(apps, _noDates);
+
+        feed.QuickApps.Count.ShouldBe(HomeFeed.MaxQuickApps);
+        feed.QuickApps[0].Title.ShouldBe("App 01");
+        feed.Favorites.ShouldBeEmpty();
+    }
+
     private static LibraryItem Played(string id, string title, long unix) => Item(Game("steam", id, title) with { Extra = Extra(unix) });
 
     private static LibraryItem Item(LibraryEntry entry) => new([entry], entry);
 
     private static IReadOnlyDictionary<string, string> Extra(long lastPlayed) =>
         new Dictionary<string, string> { ["lastPlayed"] = lastPlayed.ToString(CultureInfo.InvariantCulture) };
+
+    private static LibraryItem App(string source, string id, string title) => Item(Game(source, id, title) with { Kind = ItemKind.App });
 }
