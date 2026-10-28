@@ -27,6 +27,7 @@ public partial class App : Application
     private TrayService? _tray;
     private HotkeyService? _hotkeys;
     private QuickSearchWindow? _quickSearch;
+    private GamepadService? _gamepad;
     private bool _showRequested;
     private bool _shuttingDown;
 
@@ -87,6 +88,10 @@ public partial class App : Application
             _hotkeys.Pressed += (_, _) => _quickSearch.Open();
             _tray.OpenQuickSearch = _quickSearch.Open;
             await _hotkeys.StartAsync(CancellationToken.None).ConfigureAwait(true);
+
+            // Gamepad: works while a Lumen window is in front.
+            _gamepad = _host.Services.GetRequiredService<GamepadService>();
+            _gamepad.Attach(window, _quickSearch, _quickSearch.Open, window.FocusPage);
 
             // Started with Windows: stay in the tray until the user opens Lumen.
             if (!options.StartInTray || _showRequested)
@@ -149,6 +154,7 @@ public partial class App : Application
         _tray?.Dispose(); // removes the icon right away instead of on the next mouse-over
         _hotkeys?.Dispose();
         _quickSearch?.CloseForExit();
+        _gamepad?.Dispose();
         if (_host is not null)
         {
             try

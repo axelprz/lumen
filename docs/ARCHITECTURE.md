@@ -251,7 +251,17 @@ Every portable file has `"schema": <int>`; loaders migrate older versions and re
   - Tiles never hold bitmaps themselves.
   - The tile context menu is built when it opens, not per tile.
 - All user-visible text in `Resources/Strings.resx` / `Strings.es.resx`. No hard-coded strings in XAML or view models.
-- Gamepad input is translated into `FocusNavigationDirection` moves and routed commands so every screen that works with the keyboard works with a gamepad.
+- **Gamepad (M7):** every screen that works with the keyboard works with a gamepad. It only acts while a Lumen window (main or quick search) is the active window.
+  - **Reading:** `WindowsGamepadReader` (Windows.Gaming.Input; Xbox and compatible pads) only reads and never vibrates. Several pads merge. Connections come from the added/removed events, because the pad list starts empty.
+  - **Polling:** `GamepadService` polls about every 16 ms, only while a pad is connected and Lumen is active.
+  - **Commands:** `GamepadNavigator` (Core, tested) turns readings into commands like a keyboard would: buttons act on press; a held D-pad/left stick (threshold 0.5, main axis) repeats after 400 ms every 110 ms. Coming back to Lumen ignores what was already held.
+  - **Mapping:**
+    - Directions → arrow keys
+    - A → Enter (Space on checkboxes; opens a closed dropdown)
+    - B → Esc
+
+    These go through WPF's own input pipeline (`InputManager.ProcessInput`), not Windows' `SendInput`. They can only reach Lumen's focused element, and WPF treats them as keyboard input: focus moves spatially, the focus highlight shows, and Enter/Esc bindings run.
+  - **Lumen actions:** Y opens quick search. LB/RB move to the previous/next sidebar section (no wrap; not while the welcome wizard is open) and focus the new page. With nothing focused yet, the first input focuses the window's first control.
 - **Home (M3):** the start page. `HomeFeed` (Core, pure) picks "Continue playing" (visible games with a known last-played date, newest first, up to 12) and the featured game (the most recently played; with no history, the newest installed game). Hidden items and apps never appear. The featured game's hero (or cover) fills the page blurred (decoded at 640 px, two layers crossfading); logo (or title), playtime, last played, Play and Details over it. Pointing at or focusing a tile in the row features it after 180 ms. Details opens the game in the library's detail view and Back returns to Home. The row has no scrollbar: the wheel scrolls it sideways. Below it (M4):
   - **Favorites:** favorite games, in the order they were marked, up to 24.
   - **Quick apps:** a compact dock of app icons that open the app with one click. It shows favorite apps; with none marked, the library's apps by name (up to 12).
@@ -295,7 +305,7 @@ Every portable file has `"schema": <int>`; loaders migrate older versions and re
 
     Ties go to installed items, then the most recently played. Hidden items never appear, at most 8 results, and with no text it lists recently played items. Only items that can run are listed; not-installed games say so, and Enter installs.
   - **Window:** `QuickSearchWindow` is borderless, topmost and not in the taskbar. It opens centered in the upper part of the main screen with the text field focused. ↑/↓ choose, Enter or click runs, Esc or clicking elsewhere hides it. It is reused, never rebuilt.
-  - The tray menu has "Quick search (shortcut)". The gamepad's Y joins in the gamepad PR.
+  - The tray menu has "Quick search (shortcut)". The gamepad's Y opens it too.
 
 ## 9. Build, CI and release
 

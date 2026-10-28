@@ -56,7 +56,8 @@
     </Border>
 
     <!-- Content: the selected section's page, picked by view-model type -->
-    <ContentControl Grid.Column="1"
+    <ContentControl x:Name="PageHost"
+                    Grid.Column="1"
                     Content="{Binding SelectedSection.Page}"
                     Focusable="False">
       <ContentControl.Resources>

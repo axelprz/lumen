@@ -181,6 +181,7 @@ public static class AppHost
         // Playtime (M6): sessions of what Lumen launches, from the process list (no admin), stored per machine.
         builder.Services.AddSingleton<IProcessList, WindowsProcessList>();
         builder.Services.AddSingleton<IStartupRegistration, WindowsStartupRegistration>();
+        builder.Services.AddSingleton<Lumen.Core.Shell.IGamepadReader, WindowsGamepadReader>();
         builder.Services.AddSingleton<IPlaytimeStore, SqlitePlaytimeStore>();
         builder.Services.AddSingleton(sp => new PlaytimeTracker(
             sp.GetRequiredService<IProcessList>(),
@@ -238,6 +239,7 @@ public static class AppHost
         builder.Services.AddSingleton<WindowSettingsViewModel>();
         builder.Services.AddSingleton<TrayService>();
         builder.Services.AddSingleton<HotkeyService>();
+        builder.Services.AddSingleton<GamepadService>();
         builder.Services.AddSingleton(_ => new QuickSearch(TitleCleanup.CreateNormalizer()));
         builder.Services.AddSingleton<QuickSearchViewModel>();
         builder.Services.AddSingleton<QuickSearchWindow>();
