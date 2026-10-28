@@ -43,6 +43,7 @@ public partial class App : Application
             // so the window opens already in the right language and on the right screen.
             await _host.Services.GetRequiredService<LanguageSettingsViewModel>().InitializeAsync(CancellationToken.None).ConfigureAwait(true);
             await _host.Services.GetRequiredService<FirstRunViewModel>().OpenIfNeededAsync(CancellationToken.None).ConfigureAwait(true);
+            await _host.Services.GetRequiredService<CollectionService>().LoadAsync(CancellationToken.None).ConfigureAwait(true);
 
             var window = _host.Services.GetRequiredService<MainWindow>();
             window.Closed += OnMainWindowClosed;

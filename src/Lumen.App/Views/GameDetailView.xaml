@@ -104,6 +104,24 @@
               <ComboBox ItemsSource="{Binding StoreChoices}" SelectedItem="{Binding SelectedStore}" DisplayMemberPath="Label" MinWidth="200"
                         AutomationProperties.Name="{l:Loc Detail_PlayWithLabel}" />
             </StackPanel>
+            <Button Command="{Binding ToggleFavoriteCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
+                    AutomationProperties.Name="{Binding FavoriteText}">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="FavoriteStar" Text="&#xE734;" FontSize="13" Margin="0,0,8,0">
+                  <TextBlock.Style>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource Lumen.Text.Icon}">
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                          <Setter Property="Text" Value="&#xE735;" />
+                          <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Warning}" />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </TextBlock.Style>
+                </TextBlock>
+                <TextBlock Text="{Binding FavoriteText}" />
+              </StackPanel>
+            </Button>
             <Button Command="{Binding OpenFolderCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
                     AutomationProperties.Name="{l:Loc Detail_OpenFolder}"
                     Visibility="{Binding CanOpenFolder, Converter={StaticResource BoolToVisibility}}">
@@ -136,6 +154,8 @@
               </StackPanel>
               <Button.ContextMenu>
                 <ContextMenu>
+                  <MenuItem Header="{l:Loc Detail_Collections}" Command="{Binding StartCollectionsCommand}" />
+                  <Separator />
                   <MenuItem Header="{l:Loc Detail_Rename}" Command="{Binding StartRenameCommand}" />
                   <MenuItem Header="{l:Loc Detail_RestoreTitle}" Command="{Binding RestoreTitleCommand}"
                             Visibility="{Binding HasCustomTitle, Converter={StaticResource BoolToVisibility}}" />
@@ -172,6 +192,49 @@
                       Style="{StaticResource Lumen.Button}" Margin="16,0,0,0" />
               <TextBlock Text="{l:Loc Detail_HiddenBanner}" TextWrapping="Wrap" FontSize="14" VerticalAlignment="Center" />
             </DockPanel>
+          </Border>
+
+          <!-- Collections: one checkbox per collection, plus "new collection" -->
+          <Border Margin="0,4,0,12" Padding="16" CornerRadius="6" MaxWidth="640" HorizontalAlignment="Left"
+                  Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
+                  Visibility="{Binding IsChoosingCollections, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel>
+              <TextBlock Text="{l:Loc Detail_Collections}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
+              <TextBlock Text="{l:Loc Detail_NoCollections}" FontSize="13" Margin="0,0,0,10" TextWrapping="Wrap"
+                         Foreground="{DynamicResource Lumen.Brush.TextMuted}">
+                <TextBlock.Style>
+                  <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding HasCollections}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </TextBlock.Style>
+              </TextBlock>
+              <ItemsControl ItemsSource="{Binding CollectionChoices}" Focusable="False">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <CheckBox IsChecked="{Binding IsIn}" Content="{Binding Name}" Margin="0,0,0,8" FontSize="14"
+                              Foreground="{DynamicResource Lumen.Brush.Text}" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <DockPanel Margin="0,8,0,0">
+                <Button DockPanel.Dock="Right" Command="{Binding CreateCollectionCommand}" Content="{l:Loc Detail_CreateCollection}"
+                        Style="{StaticResource Lumen.Button}" Margin="8,0,0,0" />
+                <TextBox Text="{Binding NewCollectionName, UpdateSourceTrigger=PropertyChanged}"
+                         MaxLength="80" Height="36" Padding="8,0" VerticalContentAlignment="Center"
+                         AutomationProperties.Name="{l:Loc Collections_NewName}">
+                  <TextBox.InputBindings>
+                    <KeyBinding Key="Return" Command="{Binding CreateCollectionCommand}" />
+                    <KeyBinding Key="Escape" Command="{Binding CloseCollectionsCommand}" />
+                  </TextBox.InputBindings>
+                </TextBox>
+              </DockPanel>
+              <Button Command="{Binding CloseCollectionsCommand}" Content="{l:Loc Detail_Done}" Style="{StaticResource Lumen.Button}"
+                      HorizontalAlignment="Left" Margin="0,12,0,0" />
+            </StackPanel>
           </Border>
 
           <!-- Rename -->

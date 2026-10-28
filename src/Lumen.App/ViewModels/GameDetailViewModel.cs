@@ -19,6 +19,7 @@ public sealed record DetailServices(
     ArtworkService Artwork,
     IMergeRuleStore MergeRules,
     IItemOverrideStore Overrides,
+    CollectionService Collections,
     LibraryService Library,
     IDialogService Dialogs,
     IFileSystem FileSystem,
@@ -29,6 +30,21 @@ public sealed record DetailServices(
 public sealed record StoreChoice(LibraryEntry Entry, string Label)
 {
     public override string ToString() => Label;
+}
+
+/// <summary>One collection in the detail view's "Collections" panel: checked when this game is in it.</summary>
+public sealed partial class CollectionChoice(string id, string name, bool isIn, Func<string, bool, Task> set) : ObservableObject
+{
+    [ObservableProperty]
+    private bool _isIn = isIn;
+
+    public string Id { get; } = id;
+
+    public string Name { get; } = name;
+
+    public override string ToString() => Name;
+
+    partial void OnIsInChanged(bool value) => _ = set(Id, value);
 }
 
 /// <summary>Another library item the user can merge this one with.</summary>
@@ -74,6 +90,12 @@ public sealed partial class GameDetailViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isMerging;
+
+    [ObservableProperty]
+    private bool _isChoosingCollections;
+
+    [ObservableProperty]
+    private string _newCollectionName = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(MergeStatus))]
@@ -151,6 +173,15 @@ public sealed partial class GameDetailViewModel : ObservableObject
     public bool CanUninstall => UninstallTarget is not null;
 
     public bool IsHidden => Item.IsHidden;
+
+    public bool IsFavorite => _s.Collections.IsFavorite(Item);
+
+    public string FavoriteText => _s.Localizer[IsFavorite ? "Detail_Favorite" : "Detail_AddFavorite"];
+
+    /// <summary>Every collection except Favorites (that one has its own button), checked when the game is in it.</summary>
+    public IReadOnlyList<CollectionChoice> CollectionChoices { get; private set; } = [];
+
+    public bool HasCollections => CollectionChoices.Count > 0;
 
     public bool HasCustomTitle => Item.CustomTitle is not null;
 
@@ -283,9 +314,64 @@ public sealed partial class GameDetailViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private Task ToggleFavoriteAsync() => RunCollectionChangeAsync(() => _s.Collections.SetFavoriteAsync(Item, !IsFavorite, CancellationToken.None));
+
+    [RelayCommand]
+    private void StartCollections()
+    {
+        IsRenaming = false;
+        IsMerging = false;
+        NewCollectionName = string.Empty;
+        RefreshCollections();
+        IsChoosingCollections = true;
+    }
+
+    [RelayCommand]
+    private void CloseCollections() => IsChoosingCollections = false;
+
+    /// <summary>Creates a collection and puts this game in it.</summary>
+    [RelayCommand]
+    private Task CreateCollectionAsync() => RunCollectionChangeAsync(async () =>
+    {
+        if (await _s.Collections.CreateAsync(NewCollectionName, CancellationToken.None) is { } id)
+        {
+            NewCollectionName = string.Empty;
+            await _s.Collections.SetAsync(id, Item, true, CancellationToken.None);
+        }
+    });
+
+    /// <summary>Called when collections change anywhere (this view, the tile menu, the Collections page).</summary>
+    public void RefreshCollections()
+    {
+        OnPropertyChanged(nameof(IsFavorite));
+        OnPropertyChanged(nameof(FavoriteText));
+        CollectionChoices = _s.Collections.All
+            .Where(c => !c.IsFavorites)
+            .Select(c => new CollectionChoice(c.Id, c.Name, c.Contains(Item), (id, isIn) =>
+                RunCollectionChangeAsync(() => _s.Collections.SetAsync(id, Item, isIn, CancellationToken.None))))
+            .ToList();
+        OnPropertyChanged(nameof(CollectionChoices));
+        OnPropertyChanged(nameof(HasCollections));
+    }
+
+    private async Task RunCollectionChangeAsync(Func<Task> change)
+    {
+        Notice = null;
+        try
+        {
+            await change();
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            Notice = _s.Localizer["Collections_SaveFailed"];
+        }
+    }
+
+    [RelayCommand]
     private void StartRename()
     {
         IsMerging = false;
+        IsChoosingCollections = false;
         RenameText = Item.Title;
         IsRenaming = true;
     }
@@ -325,6 +411,7 @@ public sealed partial class GameDetailViewModel : ObservableObject
     private void StartMerge()
     {
         IsRenaming = false;
+        IsChoosingCollections = false;
         MergeSearch = string.Empty;
         MergeCandidates = [];
         IsMerging = true;

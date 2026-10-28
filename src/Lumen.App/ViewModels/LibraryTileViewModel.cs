@@ -63,6 +63,9 @@ public sealed partial class LibraryTileViewModel : ObservableObject
 
     public bool HasCover => CoverPath is not null;
 
+    /// <summary>In Favorites: the tile shows a small star.</summary>
+    public bool IsFavorite { get; init; }
+
     /// <summary>No cover, but an icon (apps, some Store games): shown centered.</summary>
     public bool HasIcon => IconPath is not null;
 
