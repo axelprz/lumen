@@ -317,6 +317,8 @@
             <StackPanel Margin="0,0,24,16">
               <TextBlock Text="{l:Loc Detail_Playtime}" Style="{StaticResource InfoLabel}" />
               <TextBlock Text="{Binding PlaytimeText}" Style="{StaticResource InfoValue}" />
+              <TextBlock Text="{Binding PlaytimeSourceText}" FontSize="12" Margin="0,2,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                         Visibility="{Binding HasPlaytimeSource, Converter={StaticResource BoolToVisibility}}" />
             </StackPanel>
             <StackPanel Margin="0,0,24,16">
               <TextBlock Text="{l:Loc Detail_LastPlayed}" Style="{StaticResource InfoLabel}" />

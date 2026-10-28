@@ -19,6 +19,21 @@ public enum InstallFilter
     NotInstalled,
 }
 
+/// <summary>Where an item's playtime figure comes from.</summary>
+public enum PlaytimeSource
+{
+    None,
+
+    /// <summary>The store reports it (Steam).</summary>
+    Store,
+
+    /// <summary>Lumen measured it from the sessions it launched.</summary>
+    Lumen,
+
+    /// <summary>A merged item: the store's figure for one copy plus Lumen's for another.</summary>
+    StoreAndLumen,
+}
+
 public enum LibrarySort
 {
     Name,
@@ -109,17 +124,40 @@ public sealed class LibraryFilter(TitleNormalizer normalizer)
         };
     }
 
-    /// <summary>Most recent "last played" across the item's stores (unix seconds in <c>Extra["lastPlayed"]</c>).</summary>
+    /// <summary>
+    /// Most recent "last played" across the item's stores: the store's (<c>Extra["lastPlayed"]</c>) or Lumen's own
+    /// (<c>Extra["lumenLastPlayed"]</c>), whichever is later. Unix seconds.
+    /// </summary>
     public static DateTimeOffset? LastPlayed(LibraryItem item) =>
         item.Entries
-            .Select(e => e.Extra.TryGetValue("lastPlayed", out var raw) && long.TryParse(raw, NumberStyles.Integer, CultureInfo.InvariantCulture, out var unix) && unix > 0
-                ? DateTimeOffset.FromUnixTimeSeconds(unix)
-                : (DateTimeOffset?)null)
+            .SelectMany(e => new[] { Number(e, "lastPlayed"), Number(e, "lumenLastPlayed") })
+            .Where(unix => unix > 0)
+            .Select(unix => (DateTimeOffset?)DateTimeOffset.FromUnixTimeSeconds(unix!.Value))
             .Max();
 
-    /// <summary>Playtime known from stores (<c>Extra["playtimeMinutes"]</c>, summed); Lumen's own tracking arrives in M6.</summary>
+    /// <summary>
+    /// Minutes played, summed over the item's stores. Per entry (PLAN-v1 §4.4): the store's own number when it has one
+    /// (Steam) — Lumen's sessions for it are informational, so nothing counts twice — otherwise Lumen's sessions.
+    /// </summary>
     public static long PlaytimeMinutes(LibraryItem item) =>
-        item.Entries.Sum(e => e.Extra.TryGetValue("playtimeMinutes", out var raw) && long.TryParse(raw, NumberStyles.Integer, CultureInfo.InvariantCulture, out var minutes) ? minutes : 0);
+        item.Entries.Sum(e => Number(e, "playtimeMinutes") ?? Number(e, "lumenMinutes") ?? 0);
+
+    /// <summary>Where <see cref="PlaytimeMinutes"/> comes from, so the UI can say so.</summary>
+    public static PlaytimeSource SourceOfPlaytime(LibraryItem item)
+    {
+        var fromStore = item.Entries.Any(e => Number(e, "playtimeMinutes") > 0);
+        var fromLumen = item.Entries.Any(e => Number(e, "playtimeMinutes") is null && Number(e, "lumenMinutes") > 0);
+        return (fromStore, fromLumen) switch
+        {
+            (true, true) => PlaytimeSource.StoreAndLumen,
+            (true, false) => PlaytimeSource.Store,
+            (false, true) => PlaytimeSource.Lumen,
+            _ => PlaytimeSource.None,
+        };
+    }
+
+    private static long? Number(LibraryEntry entry, string key) =>
+        entry.Extra.TryGetValue(key, out var raw) && long.TryParse(raw, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ? value : null;
 
     private static DateTimeOffset? Added(LibraryItem item, IReadOnlyDictionary<ItemRef, DateTimeOffset> firstSeen) =>
         item.Entries.Select(e => firstSeen.TryGetValue(e.Ref, out var when) ? when : (DateTimeOffset?)null).Min();

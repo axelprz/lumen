@@ -871,4 +871,13 @@
   <data name="GogAccount_Disconnected" xml:space="preserve">
     <value>Disconnected. The sign-in was deleted from this PC.</value>
   </data>
+  <data name="Detail_PlaytimeFromStore" xml:space="preserve">
+    <value>according to the store</value>
+  </data>
+  <data name="Detail_PlaytimeFromLumen" xml:space="preserve">
+    <value>measured by Lumen</value>
+  </data>
+  <data name="Detail_PlaytimeFromBoth" xml:space="preserve">
+    <value>store + Lumen</value>
+  </data>
 </root>

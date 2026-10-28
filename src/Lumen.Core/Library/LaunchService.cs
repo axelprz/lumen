@@ -15,8 +15,11 @@ public enum LaunchOutcome
     Failed,
 }
 
-/// <summary>Plays installed entries and hands not-installed ones to their store's installer.</summary>
-public sealed partial class LaunchService(ILauncher launcher, ILogger<LaunchService> logger)
+/// <summary>
+/// Plays installed entries and hands not-installed ones to their store's installer. Games it plays are handed to the
+/// <see cref="PlaytimeTracker"/> (PLAN-v1 §4.4: Lumen tracks what it launches).
+/// </summary>
+public sealed partial class LaunchService(ILauncher launcher, ILogger<LaunchService> logger, PlaytimeTracker? tracker = null)
 {
     /// <summary>The action the primary button performs: launch when installed, install otherwise.</summary>
     public static LaunchSpec? PrimaryAction(LibraryEntry entry)
@@ -37,6 +40,11 @@ public sealed partial class LaunchService(ILauncher launcher, ILogger<LaunchServ
         {
             var pid = await launcher.StartAsync(spec, ct).ConfigureAwait(false);
             LogStarted(entry.Ref.ToString(), entry.IsInstalled ? "launch" : "install", pid);
+            if (entry.IsInstalled)
+            {
+                tracker?.Track(entry);
+            }
+
             return LaunchOutcome.Started;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)

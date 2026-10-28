@@ -126,6 +126,13 @@ public sealed partial class GameDetailViewModel : ObservableObject
             : minutes < 60
                 ? string.Format(CultureInfo.CurrentCulture, loc["Detail_PlaytimeMinutes"], minutes)
                 : string.Format(CultureInfo.CurrentCulture, loc["Detail_PlaytimeHours"], minutes / 60.0);
+        PlaytimeSourceText = LibraryFilter.SourceOfPlaytime(item) switch
+        {
+            PlaytimeSource.Store => loc["Detail_PlaytimeFromStore"],
+            PlaytimeSource.Lumen => loc["Detail_PlaytimeFromLumen"],
+            PlaytimeSource.StoreAndLumen => loc["Detail_PlaytimeFromBoth"],
+            _ => null,
+        };
         var lastPlayed = LibraryFilter.LastPlayed(item);
         LastPlayedText = lastPlayed is null ? loc["Detail_NeverPlayed"] : lastPlayed.Value.LocalDateTime.ToString("D", CultureInfo.CurrentCulture);
         InstallPath = item.Entries.Select(e => e.InstallDirectory).FirstOrDefault(d => !string.IsNullOrWhiteSpace(d)) ?? loc["Detail_NotInstalledPath"];
@@ -155,6 +162,11 @@ public sealed partial class GameDetailViewModel : ObservableObject
     public string StoresText { get; }
 
     public string PlaytimeText { get; }
+
+    /// <summary>Where the hours come from: the store (Steam), Lumen's own sessions, or both (merged games).</summary>
+    public string? PlaytimeSourceText { get; }
+
+    public bool HasPlaytimeSource => PlaytimeSourceText is not null;
 
     public string LastPlayedText { get; }
 

@@ -176,8 +176,19 @@ public static class AppHost
             merger: sp.GetRequiredService<LibraryMerger>(),
             ruleStore: sp.GetRequiredService<IMergeRuleStore>(),
             overrideStore: sp.GetRequiredService<IItemOverrideStore>(),
-            appChoiceStore: sp.GetRequiredService<IAppChoiceStore>()));
-        builder.Services.AddSingleton<LaunchService>();
+            appChoiceStore: sp.GetRequiredService<IAppChoiceStore>(),
+            playtimeStore: sp.GetRequiredService<IPlaytimeStore>()));
+        // Playtime (M6): sessions of what Lumen launches, from the process list (no admin), stored per machine.
+        builder.Services.AddSingleton<IProcessList, WindowsProcessList>();
+        builder.Services.AddSingleton<IPlaytimeStore, SqlitePlaytimeStore>();
+        builder.Services.AddSingleton(sp => new PlaytimeTracker(
+            sp.GetRequiredService<IProcessList>(),
+            sp.GetRequiredService<IPlaytimeStore>(),
+            sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<PlaytimeTracker>>()));
+        builder.Services.AddSingleton(sp => new LaunchService(
+            sp.GetRequiredService<ILauncher>(),
+            sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<LaunchService>>(),
+            sp.GetRequiredService<PlaytimeTracker>()));
 
         // Artwork (allowed hosts only): Steam CDN first, then SteamGridDB when the user saved a key. Downloads are
         // cached under %LOCALAPPDATA%\Lumen\cache\artwork; user-picked covers live in artwork-overrides.
