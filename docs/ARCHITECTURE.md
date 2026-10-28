@@ -151,6 +151,7 @@ Rules: providers only **read** store files; never write into a store's folder or
 - **Curation:** detected apps are suggestions, not library items (`AppCuration`, Core). The user's choice is stored per ref in `app_choices` (migration 0009: `added` / `ignored`, no row = suggestion). It is machine-local until the sync folder (M8) moves ignored apps to `config.json` → `ignoredApps`.
 - **What the library shows:** `LibraryService.Entries` keeps everything scanned, while `Items` only include added apps.
 - **Never suggested:** shortcuts to games Lumen already shows through a store (same normalized title, or a target inside the game's install folder).
+- **Copies of one app** (same target and name, e.g. Discord's two Start menu shortcuts with different arguments) count once: they're never suggested when one copy is in the library, and listed once otherwise.
 
 ## 5. Services (Lumen.Core)
 
@@ -176,6 +177,8 @@ Steam CDN artwork (**verified 2026-10**): `https://shared.fastly.steamstatic.com
 - **Safety:** downloads are limited to 4 at a time and deduplicated per key. Images are capped at 10 MB, and the bytes must be JPEG/PNG/WebP by their magic numbers. Anything else is discarded, never written as an image.
 - **Misses:** a definitive "not found" (every candidate answered 404/403/410 or a non-image) is remembered for 7 days in a `.miss` file. Network errors and 5xx are retried on the next request.
 - **UI:** covers load lazily when a tile is realized and are decoded at display size (`DecodePixelWidth`). The grid is a virtualized list of rows (WPF has no virtualizing wrap panel), so memory stays flat as the library grows.
+SteamGridDB title search (non-Steam games) accepts only an exact normalized name match. When the full title has none, it retries with the part before the first subtitle separator (` - `, ` – `, ` — `, `: `), e.g. "Home - A Unique Horror Adventure" → "Home" (M4, reported by the owner). Settings → "Clear artwork cache" also clears remembered misses, so existing libraries pick this up.
+
 SteamGridDB API v2: `https://www.steamgriddb.com/api/v2` with `Authorization: Bearer {key}` — `/search/autocomplete/{term}`, `/grids/game/{id}?dimensions=600x900`, `/heroes/game/{id}`, `/logos/game/{id}`, `/icons/game/{id}`.
 
 As implemented (M3, `SteamGridDbClient` / `SteamGridDbArtworkSource`):

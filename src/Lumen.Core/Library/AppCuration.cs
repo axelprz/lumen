@@ -43,7 +43,9 @@ public static class AppCuration
     /// <summary>
     /// Detected apps with the given status: suggestions (<paramref name="choice"/> null: neither added nor ignored),
     /// or the ignored ones. Shortcuts to games Lumen already shows through their store are never suggested: same
-    /// normalized title, or a target inside the game's install folder.
+    /// normalized title, or a target inside the game's install folder. Copies of one app (same program and name, e.g.
+    /// "Discord" in two Start menu folders with different arguments) count once: never suggested when a copy is in
+    /// the library, and listed once otherwise (the one nearest the top of the Start menu).
     /// </summary>
     public static IReadOnlyList<LibraryEntry> Detected(
         IReadOnlyList<LibraryEntry> entries,
@@ -63,11 +65,19 @@ public static class AppCuration
             .Select(d => d!.TrimEnd('\\', '/') + "\\")
             .ToList();
 
-        return entries
-            .Where(e => IsCandidateSource(e.Ref.Source))
-            .Where(e => (choices.TryGetValue(e.Ref, out var c) ? c : (AppChoice?)null) == choice)
+        var detected = entries.Where(e => IsCandidateSource(e.Ref.Source)).ToList();
+        AppChoice? ChoiceOf(LibraryEntry e) => choices.TryGetValue(e.Ref, out var c) ? c : null;
+        string SameApp(LibraryEntry e) =>
+            (e.Extra.GetValueOrDefault("target") ?? e.Ref.ToString()).ToUpperInvariant() + "|" + normalizer.Normalize(e.Title);
+        var inLibrary = detected.Where(e => ChoiceOf(e) == AppChoice.Added).Select(SameApp).ToHashSet(StringComparer.Ordinal);
+
+        return detected
+            .Where(e => ChoiceOf(e) == choice)
+            .Where(e => choice == AppChoice.Added || !inLibrary.Contains(SameApp(e)))
             .Where(e => !gameTitles.Contains(normalizer.Normalize(e.Title)))
             .Where(e => !(e.Extra.TryGetValue("target", out var target) && gameFolders.Any(f => target.StartsWith(f, StringComparison.OrdinalIgnoreCase))))
+            .GroupBy(SameApp, StringComparer.Ordinal)
+            .Select(g => g.OrderBy(e => e.Ref.ExternalId.Count(c => c == '/')).ThenBy(e => e.Ref.ExternalId, StringComparer.OrdinalIgnoreCase).First())
             .OrderBy(e => e.Title, StringComparer.CurrentCultureIgnoreCase)
             .ToList();
     }

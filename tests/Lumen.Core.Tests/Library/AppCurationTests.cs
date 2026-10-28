@@ -33,6 +33,17 @@ public sealed class AppCurationTests
     }
 
     [Fact]
+    public void CopiesOfOneApp_AreSuggestedOnce_AndNotAtAllOnceOneIsAdded()
+    {
+        var root = App("startmenu", "Discord.lnk", "Discord", @"C:\Users\player\AppData\Local\Discord\Discord.exe");
+        var nested = App("startmenu", "Discord Inc/Discord.lnk", "Discord", @"C:\Users\player\AppData\Local\Discord\Discord.exe");
+        var none = new Dictionary<ItemRef, AppChoice>();
+
+        AppCuration.Detected([nested, root], none, Normalizer).ShouldBe([root]);
+        AppCuration.Detected([nested, root], new Dictionary<ItemRef, AppChoice> { [nested.Ref] = AppChoice.Added }, Normalizer).ShouldBeEmpty();
+    }
+
+    [Fact]
     public void OnlyAddedApps_AreShown_StoresAndManualItemsAlways()
     {
         var choices = new Dictionary<ItemRef, AppChoice> { [_editor.Ref] = AppChoice.Added, [_notes.Ref] = AppChoice.Ignored };

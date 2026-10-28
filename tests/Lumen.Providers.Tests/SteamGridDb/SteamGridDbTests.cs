@@ -106,6 +106,39 @@ public sealed class SteamGridDbTests
     }
 
     [Fact]
+    public async Task TitleWithSubtitle_FallsBackToTheMainTitle()
+    {
+        _secrets.Values[SecretNames.SteamGridDbApiKey] = Key;
+        Route(r => r.AbsolutePath.Contains("/search/autocomplete/"), "steamgriddb/search.json");
+        var searches = new List<string>();
+        var previous = _http.Respond; // record each search, then answer as routed above
+        _http.Respond = r =>
+        {
+            if (r.RequestUri!.AbsolutePath.Contains("/search/autocomplete/"))
+            {
+                searches.Add(Uri.UnescapeDataString(r.RequestUri.AbsolutePath.Split('/')[^1]));
+            }
+
+            return previous(r);
+        };
+
+        var (id, _) = await Source().FindGameIdAsync(Key, Entry("epic", "x", "Old Game - A Unique Adventure"), CancellationToken.None);
+
+        id.ShouldBe(900002);
+        searches.ShouldBe(["Old Game - A Unique Adventure", "Old Game"]);
+    }
+
+    [Theory]
+    [InlineData("Home - A Unique Horror Adventure", "Home")]
+    [InlineData("Sample: The Sequel", "Sample")]
+    [InlineData("Sample Quest", null)]
+    [InlineData("- Odd", null)]
+    public void MainTitle_IsThePartBeforeTheSubtitle(string title, string? expected)
+    {
+        SteamGridDbArtworkSource.MainTitle(title).ShouldBe(expected);
+    }
+
+    [Fact]
     public async Task NoMatchingTitle_IsADefinitiveNotFound_AndRemembered()
     {
         _secrets.Values[SecretNames.SteamGridDbApiKey] = Key;
