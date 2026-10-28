@@ -10,6 +10,8 @@ namespace Lumen.App.ViewModels;
 
 /// <summary>Settings page. Grows section by section (language, stores, artwork, sync...) in later milestones.</summary>
 public sealed partial class SettingsViewModel(
+    LanguageSettingsViewModel language,
+    FirstRunViewModel firstRun,
     SteamSettingsViewModel steam,
     ArtworkSettingsViewModel artwork,
     IMergeRuleStore mergeRules,
@@ -19,6 +21,10 @@ public sealed partial class SettingsViewModel(
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasLibraryStatus))]
     private string? _libraryStatus;
+
+    public LanguageSettingsViewModel Language { get; } = language;
+
+    public FirstRunViewModel FirstRun { get; } = firstRun;
 
     public SteamSettingsViewModel Steam { get; } = steam;
 
@@ -32,7 +38,7 @@ public sealed partial class SettingsViewModel(
         await Artwork.InitializeAsync(ct);
     }
 
-    /// <summary>Forgets "separate"/"always use" decisions so games are grouped automatically again.</summary>
+    /// <summary>Forgets "separate", "merge" and "always use" decisions so games are grouped automatically again.</summary>
     [RelayCommand]
     private async Task ResetMergesAsync()
     {

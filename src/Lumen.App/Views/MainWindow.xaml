@@ -16,6 +16,9 @@
         Foreground="{DynamicResource Lumen.Brush.Text}"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display">
+  <Window.Resources>
+    <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+  </Window.Resources>
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="232" />
@@ -77,5 +80,11 @@
         </DataTemplate>
       </ContentControl.Resources>
     </ContentControl>
+
+    <!-- First-run wizard: covers sidebar and page until finished or skipped -->
+    <views:FirstRunView Grid.ColumnSpan="2"
+                        Panel.ZIndex="10"
+                        DataContext="{Binding FirstRun}"
+                        Visibility="{Binding IsOpen, Converter={StaticResource BoolToVisibility}}" />
   </Grid>
 </Window>

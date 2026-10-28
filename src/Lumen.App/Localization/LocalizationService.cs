@@ -19,6 +19,12 @@ public sealed class LocalizationService : ObservableObject, ILocalizer
     private static readonly ResourceManager _resources =
         new("Lumen.App.Resources.Strings", typeof(LocalizationService).Assembly);
 
+    /// <summary>
+    /// Windows' display language, captured before Lumen changes the thread's UI culture, so "follow Windows" keeps
+    /// meaning Windows after the user tried another language.
+    /// </summary>
+    public static CultureInfo SystemUiCulture { get; } = CultureInfo.CurrentUICulture;
+
     private CultureInfo _culture = CultureInfo.GetCultureInfo(LanguageResolver.FallbackLanguage);
 
     private LocalizationService()

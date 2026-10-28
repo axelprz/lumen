@@ -31,13 +31,18 @@ public partial class App : Application
 
         // config.json is not loaded until the sync folder exists (M8); until then follow the OS language.
         var localizer = LocalizationService.Instance;
-        localizer.Culture = LanguageResolver.Resolve(LanguageResolver.SystemPreference, CultureInfo.CurrentUICulture);
+        localizer.Culture = LanguageResolver.Resolve(LanguageResolver.SystemPreference, LocalizationService.SystemUiCulture);
 
         try
         {
             Log.Information("Lumen starting (UI culture {Culture})", localizer.Culture.Name);
             _host = AppHost.Build(paths, localizer);
             await _host.StartAsync().ConfigureAwait(true);
+
+            // Saved language first (the database is ready once the host started), then decide on the wizard,
+            // so the window opens already in the right language and on the right screen.
+            await _host.Services.GetRequiredService<LanguageSettingsViewModel>().InitializeAsync(CancellationToken.None).ConfigureAwait(true);
+            await _host.Services.GetRequiredService<FirstRunViewModel>().OpenIfNeededAsync(CancellationToken.None).ConfigureAwait(true);
 
             var window = _host.Services.GetRequiredService<MainWindow>();
             window.Closed += OnMainWindowClosed;
