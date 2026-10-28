@@ -86,6 +86,22 @@ public sealed class SteamAccountTests
     }
 
     [Fact]
+    public async Task Renewal_SendsPlainFormFields_InTheBody()
+    {
+        string? body = null;
+        _http.Respond = r =>
+        {
+            body = r.Content!.ReadAsStringAsync().Result;
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(Fixtures.Read("steam/auth-access-token.json")) };
+        };
+
+        (await Api().RefreshAccessTokenAsync("refresh-value", SteamId, CancellationToken.None)).Error.ShouldBe(SteamAccountError.None);
+
+        body.ShouldBe($"refresh_token=refresh-value&steamid={SteamId}&renewal_type=0");
+        _http.Requests.ShouldHaveSingleItem().Query.ShouldBeEmpty(); // the token never goes in the URL
+    }
+
+    [Fact]
     public async Task ApprovedSignIn_StoresOnlyTheRefreshToken_AndTheAccountForSettings()
     {
         Route("PollAuthSessionStatus", "steam/auth-poll-approved.json");

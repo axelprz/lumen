@@ -36,6 +36,7 @@ public sealed class SteamAccount(SteamAccountApi api, ISecretStore secrets, ILoc
     private readonly TimeProvider _time = time ?? TimeProvider.System;
     private readonly SemaphoreSlim _tokenLock = new(1, 1);
     private (string Token, DateTimeOffset Expires)? _access;
+    private string? _lastRenewalDetail;
 
     /// <summary>Raised after connecting or disconnecting.</summary>
     public event EventHandler? Changed;
@@ -127,7 +128,7 @@ public sealed class SteamAccount(SteamAccountApi api, ISecretStore secrets, ILoc
         var (access, tokenError) = await GetAccessTokenAsync(ct).ConfigureAwait(false);
         if (access is null)
         {
-            return Failure(tokenError, "access token");
+            return Failure(tokenError, "renewing access: " + _lastRenewalDetail);
         }
 
         var group = await api.GetFamilyGroupAsync(access, steamId, ct).ConfigureAwait(false);
@@ -169,6 +170,7 @@ public sealed class SteamAccount(SteamAccountApi api, ISecretStore secrets, ILoc
             if (result.Error != SteamAccountError.None || result.Value is null)
             {
                 _access = null;
+                _lastRenewalDetail = $"{result.Error} {result.Detail}".Trim(); // status / eresult only
                 return (null, result.Error == SteamAccountError.None ? SteamAccountError.Unauthorized : result.Error);
             }
 
