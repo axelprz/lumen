@@ -12,4 +12,8 @@ internal sealed class FakeKnownFolders : IKnownFolders
     public string ProgramFiles { get; init; } = @"C:\Program Files";
 
     public string ProgramFilesX86 { get; init; } = @"C:\Program Files (x86)";
+
+    public string CommonStartMenuPrograms { get; init; } = @"C:\ProgramData\Microsoft\Windows\Start Menu\Programs";
+
+    public string UserStartMenuPrograms { get; init; } = @"C:\Users\player\AppData\Roaming\Microsoft\Windows\Start Menu\Programs";
 }

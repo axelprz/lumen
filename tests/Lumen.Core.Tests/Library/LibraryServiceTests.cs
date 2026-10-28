@@ -276,4 +276,26 @@ public sealed class LibraryServiceTests
         completed.ShouldBe(1);
         service.LastFullScan.ShouldNotBeNull().Select(r => r.Source).ShouldBe(["steam", "manual"]);
     }
+
+    [Fact]
+    public async Task DetectedApps_ReachItemsOnlyOnceAdded()
+    {
+        var app = Game("startmenu", "Sample.lnk", "Sample App") with { Kind = ItemKind.App };
+        var choices = new InMemoryAppChoices();
+        var service = new LibraryService(
+            [new FakeProvider("startmenu").WithInstalled(app), new FakeProvider("steam").WithInstalled(Game("steam", "1", "Game"))],
+            _cache,
+            NullLogger<LibraryService>.Instance,
+            appChoiceStore: choices);
+        await service.ScanAsync(CancellationToken.None);
+
+        service.Entries.Count.ShouldBe(2);
+        service.Items.Select(i => i.Title).ShouldBe(["Game"]);
+
+        await choices.SetAsync([app.Ref], AppChoice.Added, CancellationToken.None);
+        await service.ReloadUserChoicesAsync(CancellationToken.None);
+
+        service.Items.Select(i => i.Title).ShouldBe(["Game", "Sample App"]);
+        service.AppChoices[app.Ref].ShouldBe(AppChoice.Added);
+    }
 }

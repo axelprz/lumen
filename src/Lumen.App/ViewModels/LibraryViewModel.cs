@@ -28,6 +28,7 @@ public sealed partial class LibraryViewModel : ObservableObject
     private readonly IItemOverrideStore _overrides;
     private readonly ArtworkService _artwork;
     private readonly AccentService _accent;
+    private readonly DiscoverAppsViewModel _discover;
     private readonly IDialogService _dialogs;
     private readonly LibraryFilter _filter;
     private readonly ILocalSettings _settings;
@@ -56,6 +57,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         IItemOverrideStore overrides,
         ArtworkService artwork,
         AccentService accent,
+        DiscoverAppsViewModel discover,
         IDialogService dialogs,
         LibraryFilter filter,
         ILocalSettings settings,
@@ -75,6 +77,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         _overrides = overrides;
         _artwork = artwork;
         _accent = accent;
+        _discover = discover;
         _dialogs = dialogs;
         _localizer = localizer;
         _logger = logger;
@@ -85,6 +88,9 @@ public sealed partial class LibraryViewModel : ObservableObject
         _localizer.CultureChanged += (_, _) => Rebuild();
         BuildFilterOptions();
     }
+
+    /// <summary>"Discover apps": detected apps to add, shown over the library while open.</summary>
+    public DiscoverAppsViewModel Discover => _discover;
 
     /// <summary>The tiles currently shown (after search, filters and sort).</summary>
     public ObservableCollection<LibraryTileViewModel> Items { get; } = [];
@@ -245,10 +251,16 @@ public sealed partial class LibraryViewModel : ObservableObject
         await _library.ReloadUserChoicesAsync(CancellationToken.None);
     }
 
-    private string StoreNameOf(LibraryEntry entry) =>
-        entry.Ref.Source == ManualItem.Source
-            ? _localizer["Store_Manual"]
-            : _storeNames.GetValueOrDefault(entry.Ref.Source, entry.Ref.Source);
+    private string StoreNameOf(LibraryEntry entry) => SourceName(entry.Ref.Source);
+
+    // Manual items and detected apps aren't stores: their names are translated.
+    private string SourceName(string source) => source switch
+    {
+        ManualItem.Source => _localizer["Store_Manual"],
+        "startmenu" => _localizer["Store_Windows"],
+        "appsfolder" => _localizer["Store_MicrosoftStore"],
+        _ => _storeNames.GetValueOrDefault(source, source),
+    };
 
     private string Format(string key, string arg) => string.Format(CultureInfo.CurrentCulture, _localizer[key], arg);
 
@@ -284,6 +296,18 @@ public sealed partial class LibraryViewModel : ObservableObject
 
             menu.Add(new(_localizer["Tile_Edit"], new AsyncRelayCommand(() => EditManualItemAsync(manual))));
             menu.Add(new(_localizer["Tile_Remove"], new AsyncRelayCommand(() => RemoveManualItemAsync(manual))));
+        }
+
+        // A detected app the user added: take it back out (it returns to "Discover apps").
+        var detected = item.Entries.FirstOrDefault(e => AppCuration.IsCandidateSource(e.Ref.Source));
+        if (detected is not null)
+        {
+            if (menu.Count > 0)
+            {
+                menu.Add(new(string.Empty, null));
+            }
+
+            menu.Add(new(_localizer["Tile_RemoveApp"], new AsyncRelayCommand(() => _discover.RemoveFromLibraryAsync(detected))));
         }
 
         // Every item: pick a custom cover; restore it if one is set.

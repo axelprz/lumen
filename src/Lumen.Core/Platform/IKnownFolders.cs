@@ -14,4 +14,10 @@ public interface IKnownFolders
 
     /// <summary>%ProgramFiles(x86)%, e.g. C:\Program Files (x86).</summary>
     string ProgramFilesX86 { get; }
+
+    /// <summary>All users' Start menu programs, e.g. C:\ProgramData\Microsoft\Windows\Start Menu\Programs.</summary>
+    string CommonStartMenuPrograms { get; }
+
+    /// <summary>The current user's Start menu programs, e.g. %AppData%\Microsoft\Windows\Start Menu\Programs.</summary>
+    string UserStartMenuPrograms { get; }
 }

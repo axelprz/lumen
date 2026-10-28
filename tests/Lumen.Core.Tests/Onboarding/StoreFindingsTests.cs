@@ -46,9 +46,10 @@ public sealed class StoreFindingsTests
     }
 
     [Fact]
-    public void ManualItems_AreNotAStore()
+    public void ManualItemsAndDetectedApps_AreNotStores()
     {
         StoreFindings.From([Report("manual", ProviderResult.FromScan([Game("manual", "x", "Mine")], []))]).ShouldBeEmpty();
+        StoreFindings.From([Report("startmenu", ProviderResult.FromScan([], [])), Report("appsfolder", ProviderResult.FromScan([], []))]).ShouldBeEmpty();
     }
 
     private static ProviderScanReport Report(string source, ProviderResult installed, ProviderResult? owned = null) =>

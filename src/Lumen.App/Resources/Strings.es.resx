@@ -568,4 +568,64 @@
   <data name="Settings_ShowWelcome" xml:space="preserve">
     <value>Volver a ver la bienvenida</value>
   </data>
+  <data name="Action_Open" xml:space="preserve">
+    <value>Abrir</value>
+  </data>
+  <data name="Store_Windows" xml:space="preserve">
+    <value>Windows</value>
+  </data>
+  <data name="Store_MicrosoftStore" xml:space="preserve">
+    <value>Microsoft Store</value>
+  </data>
+  <data name="Store_StartMenu" xml:space="preserve">
+    <value>Menú Inicio</value>
+  </data>
+  <data name="Tile_RemoveApp" xml:space="preserve">
+    <value>Quitar de la biblioteca</value>
+  </data>
+  <data name="Discover_Title" xml:space="preserve">
+    <value>Descubrir apps</value>
+  </data>
+  <data name="Discover_ButtonCount" xml:space="preserve">
+    <value>Descubrir apps · {0}</value>
+  </data>
+  <data name="Discover_Body" xml:space="preserve">
+    <value>Apps instaladas en esta PC que todavía no están en tu biblioteca. Agregá las que quieras tener a mano; las que ignores no se vuelven a sugerir. Lumen solo lee el menú Inicio: no cambia nada.</value>
+  </data>
+  <data name="Discover_Search" xml:space="preserve">
+    <value>Buscar apps</value>
+  </data>
+  <data name="Discover_Add" xml:space="preserve">
+    <value>Agregar</value>
+  </data>
+  <data name="Discover_Ignore" xml:space="preserve">
+    <value>Ignorar</value>
+  </data>
+  <data name="Discover_Restore" xml:space="preserve">
+    <value>Volver a sugerir</value>
+  </data>
+  <data name="Discover_ShowIgnored" xml:space="preserve">
+    <value>Ignoradas ({0})</value>
+  </data>
+  <data name="Discover_BackToSuggestions" xml:space="preserve">
+    <value>Volver a las sugerencias</value>
+  </data>
+  <data name="Discover_Added" xml:space="preserve">
+    <value>“{0}” ya está en tu biblioteca.</value>
+  </data>
+  <data name="Discover_IgnoredNotice" xml:space="preserve">
+    <value>“{0}” no se va a volver a sugerir. Podés recuperarla desde “Ignoradas”.</value>
+  </data>
+  <data name="Discover_SaveFailed" xml:space="preserve">
+    <value>No se pudo guardar esa elección. Probá de nuevo.</value>
+  </data>
+  <data name="Discover_AllReviewed" xml:space="preserve">
+    <value>No hay apps nuevas para sugerir. Las que instales después van a aparecer acá.</value>
+  </data>
+  <data name="Discover_NoIgnored" xml:space="preserve">
+    <value>No ignoraste ninguna app.</value>
+  </data>
+  <data name="Discover_NoMatches" xml:space="preserve">
+    <value>Ninguna app coincide con tu búsqueda.</value>
+  </data>
 </root>

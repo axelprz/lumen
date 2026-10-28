@@ -90,6 +90,8 @@ public sealed class EntryActionsTests
 
         public IReadOnlyList<string> GetFiles(string directory, string pattern) => [];
 
+        public IReadOnlyList<string> GetDirectories(string directory) => [];
+
         public Task<string> ReadAllTextAsync(string path, CancellationToken ct) => throw new FileNotFoundException();
     }
 }

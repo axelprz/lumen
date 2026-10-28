@@ -93,6 +93,31 @@ internal sealed class InMemoryOverrides : IItemOverrideStore
     }
 }
 
+internal sealed class InMemoryAppChoices : IAppChoiceStore
+{
+    public Dictionary<ItemRef, AppChoice> Choices { get; } = [];
+
+    public Task<IReadOnlyDictionary<ItemRef, AppChoice>> LoadAsync(CancellationToken ct) =>
+        Task.FromResult<IReadOnlyDictionary<ItemRef, AppChoice>>(new Dictionary<ItemRef, AppChoice>(Choices));
+
+    public Task SetAsync(IEnumerable<ItemRef> refs, AppChoice? choice, CancellationToken ct)
+    {
+        foreach (var itemRef in refs)
+        {
+            if (choice is { } value)
+            {
+                Choices[itemRef] = value;
+            }
+            else
+            {
+                Choices.Remove(itemRef);
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+}
+
 internal sealed class InMemoryCache : ILibraryCache
 {
     public Dictionary<string, IReadOnlyList<LibraryEntry>> BySource { get; } = [];

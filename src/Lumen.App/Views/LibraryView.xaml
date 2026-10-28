@@ -132,6 +132,15 @@
   </UserControl.Resources>
 
   <Grid>
+  <!-- "Discover apps" covers the page while open -->
+  <Border Panel.ZIndex="6"
+          Background="{DynamicResource Lumen.Brush.Background}"
+          Padding="40,32,24,16"
+          DataContext="{Binding Discover}"
+          Visibility="{Binding IsOpen, Converter={StaticResource BoolToVisibility}}">
+    <views:DiscoverAppsView />
+  </Border>
+
   <!-- The open game's detail view covers the whole page; the library keeps its scroll and filters underneath. -->
   <ContentControl Panel.ZIndex="5"
                   Content="{Binding Detail}"
@@ -163,6 +172,17 @@
         <StackPanel Orientation="Horizontal">
           <TextBlock Text="&#xE710;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
           <TextBlock Text="{l:Loc Library_Add}" />
+        </StackPanel>
+      </Button>
+      <Button DockPanel.Dock="Right"
+              VerticalAlignment="Center"
+              Margin="12,0,0,0"
+              Command="{Binding Discover.OpenCommand}"
+              AutomationProperties.Name="{Binding Discover.ButtonText}"
+              Style="{StaticResource Lumen.Button}">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="&#xE71D;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+          <TextBlock Text="{Binding Discover.ButtonText}" />
         </StackPanel>
       </Button>
       <Button DockPanel.Dock="Right"

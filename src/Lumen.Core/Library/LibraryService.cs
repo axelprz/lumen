@@ -30,7 +30,8 @@ public sealed partial class LibraryService
     private readonly LibraryMerger _merger;
     private readonly IMergeRuleStore? _ruleStore;
     private readonly IItemOverrideStore? _overrideStore;
-    private Snapshot _snapshot = new([], [], new UserChoices(MergeRules.None, NoOverrides));
+    private readonly IAppChoiceStore? _appChoiceStore;
+    private Snapshot _snapshot = new([], [], new UserChoices(MergeRules.None, NoOverrides, NoAppChoices));
     private IReadOnlyDictionary<ItemRef, DateTimeOffset> _firstSeen = new Dictionary<ItemRef, DateTimeOffset>();
 
     public LibraryService(
@@ -40,7 +41,8 @@ public sealed partial class LibraryService
         TimeSpan? providerTimeout = null,
         LibraryMerger? merger = null,
         IMergeRuleStore? ruleStore = null,
-        IItemOverrideStore? overrideStore = null)
+        IItemOverrideStore? overrideStore = null,
+        IAppChoiceStore? appChoiceStore = null)
     {
         ArgumentNullException.ThrowIfNull(providers);
         _providers = providers.ToList();
@@ -50,17 +52,26 @@ public sealed partial class LibraryService
         _merger = merger ?? new LibraryMerger(new TitleNormalizer());
         _ruleStore = ruleStore;
         _overrideStore = overrideStore;
+        _appChoiceStore = appChoiceStore;
     }
 
     private static readonly IReadOnlyDictionary<ItemRef, ItemOverride> NoOverrides = new Dictionary<ItemRef, ItemOverride>();
 
+    private static readonly IReadOnlyDictionary<ItemRef, AppChoice> NoAppChoices = new Dictionary<ItemRef, AppChoice>();
+
     /// <summary>Raised (on any thread) after <see cref="Entries"/> or <see cref="Items"/> change.</summary>
     public event EventHandler? Changed;
 
-    /// <summary>Current entries, sorted by title. Replaced as a whole, so it is safe to read from any thread.</summary>
+    /// <summary>
+    /// Current entries, sorted by title, including detected apps the user hasn't added (see <see cref="AppCuration"/>).
+    /// Replaced as a whole, so it is safe to read from any thread.
+    /// </summary>
     public IReadOnlyList<LibraryEntry> Entries => Volatile.Read(ref _snapshot).Entries;
 
-    /// <summary>Entries merged into items (one per game across stores), sorted by title.</summary>
+    /// <summary>The user's choices about detected apps (added / ignored), as of the last publish.</summary>
+    public IReadOnlyDictionary<ItemRef, AppChoice> AppChoices => Volatile.Read(ref _snapshot).Choices.Apps;
+
+    /// <summary>Entries merged into items (one per game across stores), sorted by title. Only added apps.</summary>
     public IReadOnlyList<LibraryItem> Items => Volatile.Read(ref _snapshot).Items;
 
     /// <summary>What each provider reported in the last scan of every store (null until one finishes).</summary>
@@ -89,7 +100,8 @@ public sealed partial class LibraryService
 
     private async Task<UserChoices> LoadChoicesAsync(CancellationToken ct) => new(
         _ruleStore is null ? MergeRules.None : await _ruleStore.LoadAsync(ct).ConfigureAwait(false),
-        _overrideStore is null ? NoOverrides : await _overrideStore.LoadAsync(ct).ConfigureAwait(false));
+        _overrideStore is null ? NoOverrides : await _overrideStore.LoadAsync(ct).ConfigureAwait(false),
+        _appChoiceStore is null ? NoAppChoices : await _appChoiceStore.LoadAsync(ct).ConfigureAwait(false));
 
     /// <summary>Scans every provider.</summary>
     public Task<IReadOnlyList<ProviderScanReport>> ScanAsync(CancellationToken ct) => ScanCoreAsync(_providers, ct);
@@ -259,7 +271,8 @@ public sealed partial class LibraryService
             return;
         }
 
-        var items = _merger.Merge(sorted, choices.Rules)
+        var shown = sorted.Where(e => AppCuration.IsShown(e, choices.Apps)).ToList();
+        var items = _merger.Merge(shown, choices.Rules)
             .Select(i => ApplyOverrides(i, choices.Overrides))
             .OrderBy(i => i.Title, StringComparer.CurrentCultureIgnoreCase)
             .ThenBy(i => i.Key.ToString(), StringComparer.Ordinal)
@@ -298,7 +311,7 @@ public sealed partial class LibraryService
         };
     }
 
-    private sealed record UserChoices(MergeRules Rules, IReadOnlyDictionary<ItemRef, ItemOverride> Overrides);
+    private sealed record UserChoices(MergeRules Rules, IReadOnlyDictionary<ItemRef, ItemOverride> Overrides, IReadOnlyDictionary<ItemRef, AppChoice> Apps);
 
     // Entries, items and the choices they were built with are swapped together so readers never see a mix.
     private sealed record Snapshot(IReadOnlyList<LibraryEntry> Entries, IReadOnlyList<LibraryItem> Items, UserChoices Choices);

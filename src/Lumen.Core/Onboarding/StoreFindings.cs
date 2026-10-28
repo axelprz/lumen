@@ -27,7 +27,7 @@ public sealed record StoreFinding(string Source, string DisplayName, StoreState 
 
 public static class StoreFindings
 {
-    /// <summary>Manual items are the user's own, not a store.</summary>
+    /// <summary>Manual items are the user's own, not a store (nor are detected apps, see <see cref="AppCuration"/>).</summary>
     public const string ManualSource = "manual";
 
     /// <summary>
@@ -38,7 +38,7 @@ public static class StoreFindings
     {
         ArgumentNullException.ThrowIfNull(reports);
         return reports
-            .Where(r => r.Source != ManualSource)
+            .Where(r => r.Source != ManualSource && !AppCuration.IsCandidateSource(r.Source))
             .Select(Summarize)
             .OrderBy(f => f.State)
             .ThenByDescending(f => f.Installed)
