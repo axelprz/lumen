@@ -37,3 +37,6 @@ appsettings.Development.json
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Synthetic test fixture (Start menu translated names)
+!tests/fixtures/startmenu/desktop.ini
