@@ -1,0 +1,29 @@
+{
+  "responseMetadata": {
+    "nextCursor": "cursor-2",
+    "stateToken": "s1"
+  },
+  "records": [
+    {
+      "namespace": "sample-ns-1",
+      "catalogItemId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1",
+      "appName": "SampleQuest",
+      "productId": "p1",
+      "sandboxName": "Live",
+      "sandboxType": "PUBLIC",
+      "recordType": "APPLICATION"
+    },
+    {
+      "namespace": "ue",
+      "catalogItemId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa9",
+      "appName": "SomeMarketplaceAsset",
+      "recordType": "APPLICATION"
+    },
+    {
+      "namespace": "sample-ns-2",
+      "catalogItemId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2",
+      "appName": "SampleDlc",
+      "recordType": "APPLICATION"
+    }
+  ]
+}

@@ -96,6 +96,19 @@ public static class AppHost
             sp.GetRequiredService<ISecretStore>(),
             sp.GetRequiredService<ILocalSettings>()));
 
+        // Epic sign-in (M5): tokens only travel to Epic's account, library and catalog services, on a plain HttpClient.
+        builder.Services.AddSingleton(_ =>
+        {
+            var http = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
+            http.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent());
+            return new EpicAccountApi(http);
+        });
+        builder.Services.AddSingleton(sp => new EpicAccount(
+            sp.GetRequiredService<EpicAccountApi>(),
+            sp.GetRequiredService<ISecretStore>(),
+            sp.GetRequiredService<ILocalSettings>()));
+        builder.Services.AddSingleton<IMetadataCache, SqliteMetadataCache>();
+
         // Library
         builder.Services.AddSingleton(sp => new SteamProvider(
             sp.GetRequiredService<IRegistryReader>(),
@@ -105,7 +118,12 @@ public static class AppHost
             sp.GetRequiredService<SteamWebApi>(),
             account: sp.GetRequiredService<SteamAccount>()));
         builder.Services.AddSingleton<ILibraryProvider>(sp => sp.GetRequiredService<SteamProvider>());
-        builder.Services.AddSingleton<ILibraryProvider, EpicProvider>();
+        builder.Services.AddSingleton<ILibraryProvider>(sp => new EpicProvider(
+            sp.GetRequiredService<IRegistryReader>(),
+            sp.GetRequiredService<IFileSystem>(),
+            sp.GetRequiredService<IKnownFolders>(),
+            sp.GetRequiredService<EpicAccount>(),
+            sp.GetRequiredService<IMetadataCache>()));
         builder.Services.AddSingleton<ILibraryProvider, GogProvider>();
         builder.Services.AddSingleton<ILibraryProvider, UbisoftProvider>();
         builder.Services.AddSingleton<ILibraryProvider, EaProvider>();
@@ -185,6 +203,7 @@ public static class AppHost
         builder.Services.AddSingleton<LibraryViewModel>();
         builder.Services.AddSingleton<SteamSettingsViewModel>();
         builder.Services.AddSingleton<SteamFamilyViewModel>();
+        builder.Services.AddSingleton<EpicAccountViewModel>();
         builder.Services.AddSingleton<ArtworkSettingsViewModel>();
         builder.Services.AddSingleton<LanguageSettingsViewModel>();
         builder.Services.AddSingleton<FirstRunViewModel>();

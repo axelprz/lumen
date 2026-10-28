@@ -1,0 +1,5 @@
+{
+  "errorCode": "errors.com.epicgames.oauth.corrective_action_required",
+  "errorMessage": "Corrective action is required to continue.",
+  "correctiveAction": "PRIVACY_POLICY_ACCEPTANCE"
+}

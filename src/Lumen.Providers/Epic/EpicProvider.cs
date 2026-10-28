@@ -2,17 +2,34 @@
 // Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)
 
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Lumen.Core.Library;
 using Lumen.Core.Platform;
 
 namespace Lumen.Providers.Epic;
 
 /// <summary>
-/// Epic Games Store: installed games from the launcher's manifests (<c>*.item</c> JSON files), no login.
-/// Owned-not-installed games need the optional Epic sign-in (M5). Only reads Epic's files and registry.
+/// Epic Games Store: installed games from the launcher's manifests (<c>*.item</c> JSON files), no login; owned games
+/// from the optional Epic sign-in (<see cref="EpicAccount"/>), titled from Epic's catalog (cached in
+/// <see cref="IMetadataCache"/> so each item is looked up once). Only reads Epic's files and registry.
 /// </summary>
-public sealed class EpicProvider(IRegistryReader registry, IFileSystem fileSystem, IKnownFolders folders) : ILibraryProvider, IWatchableProvider
+public sealed class EpicProvider(
+    IRegistryReader registry,
+    IFileSystem fileSystem,
+    IKnownFolders folders,
+    EpicAccount? account = null,
+    IMetadataCache? metadata = null,
+    TimeProvider? time = null) : ILibraryProvider, IWatchableProvider, ICachingProvider
 {
+    /// <summary>The owned list barely changes; automatic rescans reuse it for this long (manual Rescan refreshes).</summary>
+    public static readonly TimeSpan OwnedCacheLifetime = TimeSpan.FromMinutes(10);
+
+    private const int ParallelLookups = 6;
+    private readonly TimeProvider _time = time ?? TimeProvider.System;
+    private (ProviderResult Result, DateTimeOffset At)? _ownedCache;
+
+    public void InvalidateCache() => _ownedCache = null;
+
     /// <summary>The launcher writes/removes a .item manifest when an install finishes or a game is uninstalled.</summary>
     public Task<IReadOnlyList<WatchTarget>> GetWatchTargetsAsync(CancellationToken ct)
     {
@@ -34,7 +51,7 @@ public sealed class EpicProvider(IRegistryReader registry, IFileSystem fileSyste
 
     public string DisplayName => "Epic Games";
 
-    public ProviderCapabilities Capabilities => ProviderCapabilities.InstalledScan;
+    public ProviderCapabilities Capabilities => ProviderCapabilities.InstalledScan | ProviderCapabilities.OwnedLibrary;
 
     /// <summary>Launcher URI; verified on Windows 11 (2026-10): starts the game through the Epic launcher.</summary>
     public static LaunchSpec LaunchFor(string appName, string? catalogNamespace, string? catalogItemId) =>
@@ -85,8 +102,122 @@ public sealed class EpicProvider(IRegistryReader registry, IFileSystem fileSyste
         }
     }
 
-    public Task<ProviderResult> ScanOwnedAsync(CancellationToken ct) =>
-        Task.FromResult(ProviderResult.NotConfigured("Epic owned library needs the Epic sign-in (M5)."));
+    public async Task<ProviderResult> ScanOwnedAsync(CancellationToken ct)
+    {
+        try
+        {
+            if (account is null)
+            {
+                return ProviderResult.NotConfigured("Epic sign-in not available.");
+            }
+
+            if (_ownedCache is { } cached && _time.GetUtcNow() - cached.At < OwnedCacheLifetime)
+            {
+                return cached.Result;
+            }
+
+            var owned = await account.GetOwnedAsync(ct).ConfigureAwait(false);
+            var scan = owned.Status switch
+            {
+                EpicOwnedStatus.NotConnected => ProviderResult.NotConfigured("Not signed in to Epic."),
+                EpicOwnedStatus.NeedsReconnect => ProviderResult.Failed("Epic: the sign-in was rejected; connect again in Settings."),
+                EpicOwnedStatus.Failed => ProviderResult.Failed($"Epic library unavailable ({owned.Detail})."),
+                _ => await ToOwnedResultAsync(owned.Records, ct).ConfigureAwait(false),
+            };
+
+            _ownedCache = scan.Status == ProviderStatus.Ok ? (scan, _time.GetUtcNow()) : null;
+            return scan;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            return ProviderResult.Failed("Epic: could not read the owned library.", ex);
+        }
+    }
+
+    /// <summary>Titles every record from the cache or the catalog; DLC, add-ons and engines are dropped.</summary>
+    internal async Task<ProviderResult> ToOwnedResultAsync(IReadOnlyList<EpicLibraryRecord> records, CancellationToken ct)
+    {
+        var unique = records.DistinctBy(r => r.AppName).ToList();
+        static string Key(EpicLibraryRecord r) => "epic:catalog:" + r.CatalogItemId;
+        var known = metadata is null
+            ? new Dictionary<string, string>()
+            : new Dictionary<string, string>(await metadata.GetManyAsync(unique.Select(Key), ct).ConfigureAwait(false));
+
+        var missing = unique.Where(r => !known.ContainsKey(Key(r))).ToList();
+        var fetched = new Dictionary<string, string>(StringComparer.Ordinal);
+        var failures = 0;
+        using (var gate = new SemaphoreSlim(ParallelLookups))
+        {
+            await Task.WhenAll(missing.Select(async record =>
+            {
+                await gate.WaitAsync(ct).ConfigureAwait(false);
+                try
+                {
+                    var info = await account!.LookupCatalogAsync(record.Namespace, record.CatalogItemId, ct).ConfigureAwait(false);
+                    lock (fetched)
+                    {
+                        if (info.Value is { } value)
+                        {
+                            fetched[Key(record)] = new JsonObject { ["t"] = value.Title, ["a"] = value.IsApp, ["s"] = value.Skip }.ToJsonString();
+                        }
+                        else
+                        {
+                            failures++;
+                        }
+                    }
+                }
+                finally
+                {
+                    gate.Release();
+                }
+            })).ConfigureAwait(false);
+        }
+
+        if (metadata is not null && fetched.Count > 0)
+        {
+            await metadata.SetManyAsync(fetched, ct).ConfigureAwait(false);
+        }
+
+        foreach (var (key, value) in fetched)
+        {
+            known[key] = value;
+        }
+
+        var entries = new List<LibraryEntry>();
+        foreach (var record in unique)
+        {
+            if (!known.TryGetValue(Key(record), out var json) || JsonNode.Parse(json) is not JsonObject info
+                || info["s"]?.GetValue<bool>() == true || info["t"]?.GetValue<string>() is not { Length: > 0 } title)
+            {
+                continue;
+            }
+
+            var extra = new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["appName"] = record.AppName,
+                ["namespace"] = record.Namespace,
+                ["catalogItemId"] = record.CatalogItemId,
+            };
+            entries.Add(new LibraryEntry(
+                new ItemRef(SourceId, record.AppName),
+                info["a"]?.GetValue<bool>() == true ? ItemKind.App : ItemKind.Game,
+                title.Trim(),
+                InstallState.NotInstalled,
+                null,
+                LaunchFor(record.AppName, record.Namespace, record.CatalogItemId),
+                InstallFor(record.AppName, record.Namespace, record.CatalogItemId),
+                extra));
+        }
+
+        IReadOnlyList<ProviderDiagnostic> diagnostics = failures == 0
+            ? []
+            : [new ProviderDiagnostic(DiagnosticSeverity.Warning, $"Epic: {failures} owned item(s) couldn't be looked up in the catalog; they'll be retried.")];
+        return ProviderResult.FromScan(entries, diagnostics);
+    }
 
     internal string ManifestsDirectory()
     {

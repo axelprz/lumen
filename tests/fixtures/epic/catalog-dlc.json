@@ -1,0 +1,17 @@
+{
+  "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2": {
+    "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2",
+    "title": "Sample Quest - Expansion",
+    "categories": [
+      {
+        "path": "addons"
+      },
+      {
+        "path": "applications"
+      }
+    ],
+    "mainGameItem": {
+      "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1"
+    }
+  }
+}

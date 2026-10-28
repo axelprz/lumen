@@ -1,0 +1,15 @@
+{
+  "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1": {
+    "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1",
+    "title": "Sample Quest",
+    "namespace": "sample-ns-1",
+    "categories": [
+      {
+        "path": "games"
+      },
+      {
+        "path": "applications"
+      }
+    ]
+  }
+}

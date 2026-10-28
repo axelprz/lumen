@@ -1,0 +1,19 @@
+{
+  "responseMetadata": {
+    "stateToken": "s2"
+  },
+  "records": [
+    {
+      "namespace": "sample-ns-3",
+      "catalogItemId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa3",
+      "appName": "SampleTool",
+      "recordType": "APPLICATION"
+    },
+    {
+      "namespace": "sample-ns-4",
+      "catalogItemId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa4",
+      "appName": "SampleBundle",
+      "recordType": "BUNDLE"
+    }
+  ]
+}
