@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)
 
 using System.Globalization;
+using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lumen.App.Services;
@@ -12,19 +13,28 @@ using Lumen.Core.Localization;
 namespace Lumen.App.ViewModels;
 
 /// <summary>A game in a Home row: its cover, and pointing at it features it in the hero.</summary>
-public sealed partial class HomeTileViewModel(LibraryItem item, Func<LibraryItem, Task<TileArt?>> coverLoader) : ObservableObject
+public sealed partial class HomeTileViewModel(LibraryItem item, Func<LibraryItem, Task<TileArt?>> coverLoader, ImageCache images) : ObservableObject
 {
+    public const double CoverWidth = 150;
+
+    public const double IconWidth = 96;
+
+    private readonly ImageCache _images = images;
     private bool _coverRequested;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasCover))]
+    [NotifyPropertyChangedFor(nameof(HasCover), nameof(CoverImage))]
     private string? _coverPath;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasIcon))]
+    [NotifyPropertyChangedFor(nameof(HasIcon), nameof(IconImage))]
     private string? _iconPath;
 
     public LibraryItem Item { get; } = item;
+
+    public ImageSource? CoverImage => Cached(CoverPath, CoverWidth, nameof(CoverImage));
+
+    public ImageSource? IconImage => Cached(IconPath, IconWidth, nameof(IconImage));
 
     public bool HasIcon => IconPath is not null;
 
@@ -36,6 +46,32 @@ public sealed partial class HomeTileViewModel(LibraryItem item, Func<LibraryItem
 
     // What screen readers announce for the row's items.
     public override string ToString() => Title;
+    // Images come from the shared in-memory cache: instant when already decoded, otherwise decoded off the UI
+    // thread and announced when ready. The tile never holds the bitmap itself, so memory stays bounded.
+    private ImageSource? Cached(string? path, double width, string property)
+    {
+        if (path is null)
+        {
+            return null;
+        }
+
+        if (_images.TryGet(path, width) is { } hit)
+        {
+            return hit;
+        }
+
+        _ = LoadThenNotifyAsync(path, width, property);
+        return null;
+    }
+
+    private async Task LoadThenNotifyAsync(string path, double width, string property)
+    {
+        if (await _images.LoadAsync(path, width) is not null)
+        {
+            OnPropertyChanged(property);
+        }
+    }
+
 
     public async Task EnsureCoverAsync()
     {
@@ -110,6 +146,7 @@ public sealed partial class HomeViewModel : ObservableObject
     private readonly ArtworkService _artwork;
     private readonly AccentService _accent;
     private readonly CollectionService _collections;
+    private readonly ImageCache _images;
     private readonly ILocalizer _localizer;
     private readonly SynchronizationContext _ui;
     private LibraryItem? _defaultFeatured;
@@ -131,8 +168,9 @@ public sealed partial class HomeViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(HasNotice))]
     private string? _notice;
 
-    public HomeViewModel(LibraryService library, LaunchService launcher, ArtworkService artwork, AccentService accent, CollectionService collections, ILocalizer localizer)
+    public HomeViewModel(LibraryService library, LaunchService launcher, ArtworkService artwork, AccentService accent, CollectionService collections, ImageCache images, ILocalizer localizer)
     {
+        _images = images;
         _library = library;
         _launcher = launcher;
         _artwork = artwork;
@@ -272,7 +310,7 @@ public sealed partial class HomeViewModel : ObservableObject
         }
 
         HomeTileViewModel Tile(LibraryItem item) =>
-            previous.TryGetValue(item.Key, out var tile) && ReferenceEquals(tile.Item, item) ? tile : new HomeTileViewModel(item, LoadCoverAsync);
+            previous.TryGetValue(item.Key, out var tile) && ReferenceEquals(tile.Item, item) ? tile : new HomeTileViewModel(item, LoadCoverAsync, _images);
 
         ContinuePlaying = feed.ContinuePlaying.Select(Tile).ToList();
         Favorites = feed.Favorites.Select(Tile).ToList();

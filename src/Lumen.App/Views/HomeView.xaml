@@ -44,10 +44,10 @@
           <Grid>
             <Border CornerRadius="6">
               <Border.Background>
-                <ImageBrush ImageSource="{Binding CoverPath, Converter={StaticResource ImagePath}, ConverterParameter=300}" Stretch="UniformToFill" />
+                <ImageBrush ImageSource="{Binding CoverImage}" Stretch="UniformToFill" />
               </Border.Background>
             </Border>
-            <Image Source="{Binding IconPath, Converter={StaticResource ImagePath}, ConverterParameter=192}"
+            <Image Source="{Binding IconImage}"
                    Width="96" Height="96" HorizontalAlignment="Center" VerticalAlignment="Center"
                    RenderOptions.BitmapScalingMode="HighQuality"
                    Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibility}}" />

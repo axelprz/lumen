@@ -239,7 +239,10 @@ Every portable file has `"schema": <int>`; loaders migrate older versions and re
 
 - Single main window with a custom dark chrome; navigation via a `NavigationService` and view-model-first `DataTemplate`s.
 - Themes as `ResourceDictionary`: `Theme.Dark.xaml` (palette tokens), `Controls/*.xaml` (styled controls). Accent is a dynamic resource updated by `AccentService`.
-- Virtualized grid (`VirtualizingWrapPanel` or equivalent) for large libraries; images decoded at display size and cached.
+- Virtualized grid for large libraries: rows of tiles in a recycling `VirtualizingStackPanel`.
+  - **`ImageCache`** (M5, after a stutter report with ~370 games) decodes tile covers and icons off the UI thread, at their on-screen pixel size (display scaling from the main window). It keeps the most recent ones, up to 96 MB, so scrolling back over them costs nothing. A cover decode measured ~5 ms on the owner's PC, so a row of 7 was ~35 ms per frame.
+  - Tiles never hold bitmaps themselves.
+  - The tile context menu is built when it opens, not per tile.
 - All user-visible text in `Resources/Strings.resx` / `Strings.es.resx`. No hard-coded strings in XAML or view models.
 - Gamepad input is translated into `FocusNavigationDirection` moves and routed commands so every screen that works with the keyboard works with a gamepad.
 - **Home (M3):** the start page. `HomeFeed` (Core, pure) picks "Continue playing" (visible games with a known last-played date, newest first, up to 12) and the featured game (the most recently played; with no history, the newest installed game). Hidden items and apps never appear. The featured game's hero (or cover) fills the page blurred (decoded at 640 px, two layers crossfading); logo (or title), playtime, last played, Play and Details over it. Pointing at or focusing a tile in the row features it after 180 ms. Details opens the game in the library's detail view and Back returns to Home. The row has no scrollbar: the wheel scrolls it sideways. Below it (M4):

@@ -178,6 +178,7 @@ public static class AppHost
         });
 
         builder.Services.AddSingleton<AccentService>();
+        builder.Services.AddSingleton<ImageCache>();
         builder.Services.AddSingleton<HomeViewModel>();
         builder.Services.AddSingleton<DiscoverAppsViewModel>();
         builder.Services.AddSingleton<CollectionsViewModel>();

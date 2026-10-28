@@ -3,6 +3,8 @@
 
 using System.Globalization;
 using System.Windows.Input;
+using System.Windows.Media;
+using Lumen.App.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
@@ -21,15 +23,21 @@ public sealed record TileMenuItem(string Header, ICommand? Command)
 /// </summary>
 public sealed partial class LibraryTileViewModel : ObservableObject
 {
+    /// <summary>On-screen sizes (device-independent pixels) the tile's images are decoded for.</summary>
+    public const double CoverWidth = 168;
+
+    public const double IconWidth = 112;
+
     private readonly Func<LibraryItem, Task<TileArt?>> _coverLoader;
+    private readonly ImageCache _images;
     private bool _coverRequested;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasCover))]
+    [NotifyPropertyChangedFor(nameof(HasCover), nameof(CoverImage))]
     private string? _coverPath;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasIcon))]
+    [NotifyPropertyChangedFor(nameof(HasIcon), nameof(IconImage))]
     private string? _iconPath;
 
     public LibraryTileViewModel(
@@ -39,8 +47,10 @@ public sealed partial class LibraryTileViewModel : ObservableObject
         ICommand primaryCommand,
         IReadOnlyList<TileMenuItem> menu,
         Func<LibraryItem, Task<TileArt?>> coverLoader,
-        ICommand openDetailCommand)
+        ICommand openDetailCommand,
+        ImageCache images)
     {
+        _images = images;
         _coverLoader = coverLoader;
         OpenDetailCommand = openDetailCommand;
         Item = item;
@@ -62,6 +72,10 @@ public sealed partial class LibraryTileViewModel : ObservableObject
     public LibraryEntry Entry => Item.Primary;
 
     public bool HasCover => CoverPath is not null;
+
+    public ImageSource? CoverImage => Cached(CoverPath, CoverWidth, nameof(CoverImage));
+
+    public ImageSource? IconImage => Cached(IconPath, IconWidth, nameof(IconImage));
 
     /// <summary>In Favorites: the tile shows a small star.</summary>
     public bool IsFavorite { get; init; }
@@ -115,4 +129,30 @@ public sealed partial class LibraryTileViewModel : ObservableObject
     public IReadOnlyList<TileMenuItem> MenuItems { get; }
 
     public bool HasMenu => MenuItems.Count > 0;
+
+    // Images come from the shared in-memory cache: instant when already decoded, otherwise decoded off the UI
+    // thread and announced when ready. The tile never holds the bitmap itself, so memory stays bounded.
+    private ImageSource? Cached(string? path, double width, string property)
+    {
+        if (path is null)
+        {
+            return null;
+        }
+
+        if (_images.TryGet(path, width) is { } hit)
+        {
+            return hit;
+        }
+
+        _ = LoadThenNotifyAsync(path, width, property);
+        return null;
+    }
+
+    private async Task LoadThenNotifyAsync(string path, double width, string property)
+    {
+        if (await _images.LoadAsync(path, width) is not null)
+        {
+            OnPropertyChanged(property);
+        }
+    }
 }
