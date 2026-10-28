@@ -117,8 +117,9 @@ Each milestone ends with a working, tested build on `main`. Order matters; later
 | M6 | **Playtime** — session tracker, Steam playtime import, UI integration | Hours and last played are correct after playing |
 | M7 | **Tray, hotkey, gamepad** — tray icon/menu, global hotkey quick search, gamepad navigation | All three work as in §4.3 |
 | M8 | **Routines** — schema loader/validator, action executor, trust model, import preview, sync folder watcher, UI | §4.5 complete |
-| M9 | **Updates & release** — Velopack integration, release workflow, portable zip, update UI, channels | Tagging `v1.0.0` publishes an installable, self-updating release |
-| — | **1.0 hardening** — bug bash on real machines with every store installed, docs, screenshots | Release |
+| M9 | **Updates & release** — Velopack integration, release workflow, portable zip, update UI, channels | Tagging a version (pre-release tags until 1.0) publishes an installable, self-updating release |
+| M10 | **UI rework** (owner request, 2026-10-28) — see §4.9 | The owner approves the new look on real use; every screen and the gamepad still work |
+| — | **1.0 hardening** — bug bash on real machines with every store installed, docs, screenshots (of the reworked UI) | Tagging `v1.0.0` releases |
 
 ### 4.8 Account security (Steam, Epic, GOG sign-ins)
 
@@ -133,6 +134,25 @@ Owner requirement: nobody outside the person using Lumen may be able to get at t
 - **Honest limits (documented in the README):** DPAPI protects against other Windows users and against a copied database or disk; it cannot protect against malware already running as the same Windows user. Signing out of Lumen or Windows does not revoke the token; Disconnect does.
 - Any change to these flows is reviewed by the owner before merging.
 
+### 4.9 UI rework (M10, before 1.0)
+
+Owner request (2026-10-28): before 1.0, a modern, futuristic look that makes people want to use Lumen. It should be friendly and striking, at home next to Steam and other launchers. Same screens and features; this is the look, motion and type.
+
+- **Type:** a new UI font in the spirit of game launchers. Steam's Motiva Sans is commercial, so it can't ship. Candidates with an open license (SIL OFL): Inter, Outfit, Exo 2, Rajdhani. The owner picks from a sample; the font file ships inside the app (it is not code, so security rule 6 is unaffected).
+- **Motion:**
+  - page transitions
+  - tile hover/focus (scale, glow)
+  - staggered entrance of rows
+  - smooth hero crossfades
+
+  Motion is short (≤ 250 ms for interactions) and respects Windows' "Animation effects" off setting.
+- **Surfaces:** Windows 11 Mica/acrylic backdrop where available (fallback: the current dark palette), depth and glow on art, refined spacing and hierarchy.
+- **Constraints:**
+  - keeps the scroll performance of the M5 fix (no per-tile effects that cost a frame)
+  - keeps contrast rules (§4.3 accent safeguard)
+  - keyboard and gamepad focus stay clearly visible
+  - all text stays in resx
+
 ## 6. Non-functional requirements
 
 - Cold start to interactive library < 2 s with a cached library of ~1,000 items; rescans run in the background.
@@ -140,6 +160,23 @@ Owner requirement: nobody outside the person using Lumen may be able to get at t
 - No admin rights required for anything.
 - Logs in `%LOCALAPPDATA%\Lumen\logs`, rolling, no secrets or tokens ever logged.
 - All parsing code (VDF, manifests, registry snapshots, schemas) has unit tests with fixture files.
+
+## v1.1 — Deals (owner request, 2026-10-28)
+
+A "Deals" section so players stay on top of offers and what's new. Planned for 1.1, after 1.0 is stable.
+
+- **Search a game → price comparison** across stores, with the historical low. Sources to evaluate: CheapShark (no key), IsThereAnyDeal (free app key).
+- **Best deals of the week** across all stores.
+- **Free games now:** Epic's weekly free games (its public promotions feed), plus giveaways on other stores (e.g. GamerPower).
+- **Trending:** Steam's most played and top sellers (public Steam endpoints). "Trending" means popular right now, never paid placement or ads.
+- **Local price with taxes (Argentina):** the idea behind the Steamcito browser extension (final price as charged to a local card). Tax rates change often, so they live in a data file updated with releases and shown with their date. Advice on which bank card or promotion to use is **out of scope**: there is no reliable source and it goes stale quickly.
+
+**Security and privacy (must be settled with the owner before starting):**
+- It adds new network hosts to CLAUDE.md security rule 4.
+- The section is **off until the user turns it on**. The prompt names the services it contacts.
+- A search sends only the game's name. No account, token, library or ID ever goes to these services.
+- Responses are cached. Requests carry no identifiers.
+- Each service's terms are respected (e.g. links back to the deal).
 
 ## Backlog (post-v1)
 

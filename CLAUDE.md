@@ -6,7 +6,7 @@ Lumen is a game-first launcher for Windows (C# + WPF, .NET 10) that unifies ever
 
 ## How to work
 
-- Work milestone by milestone (M0 → M9), in order. One milestone = one or more focused PRs; each PR leaves `main` building and green.
+- Work milestone by milestone (M0 → M10), in order. One milestone = one or more focused PRs; each PR leaves `main` building and green.
 - Before starting a milestone, write a short checklist in the PR description from the plan's "Done when" column.
 - If the implementation contradicts ARCHITECTURE.md or a schema, update the doc in the same PR and say why.
 - Store-specific paths/URIs in ARCHITECTURE.md §4 are **starting points to verify**, not facts. When you can't verify on a real machine, write fixture-based tests from documented formats and leave a `// VERIFY:` comment plus a note in the PR.
