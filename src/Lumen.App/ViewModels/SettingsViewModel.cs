@@ -15,6 +15,7 @@ public sealed partial class SettingsViewModel(
     SteamSettingsViewModel steam,
     SteamFamilyViewModel steamFamily,
     EpicAccountViewModel epic,
+    GogAccountViewModel gog,
     ArtworkSettingsViewModel artwork,
     IMergeRuleStore mergeRules,
     LibraryService library,
@@ -34,6 +35,8 @@ public sealed partial class SettingsViewModel(
 
     public EpicAccountViewModel Epic { get; } = epic;
 
+    public GogAccountViewModel Gog { get; } = gog;
+
     public ArtworkSettingsViewModel Artwork { get; } = artwork;
 
     public bool HasLibraryStatus => !string.IsNullOrEmpty(LibraryStatus);
@@ -43,6 +46,7 @@ public sealed partial class SettingsViewModel(
         await Steam.InitializeAsync(ct);
         await SteamFamily.InitializeAsync(ct);
         await Epic.InitializeAsync(ct);
+        await Gog.InitializeAsync(ct);
         await Artwork.InitializeAsync(ct);
     }
 

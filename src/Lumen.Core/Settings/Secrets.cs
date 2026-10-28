@@ -37,6 +37,9 @@ public static class SecretNames
 
     /// <summary>Epic sign-in: the refresh token (rotates on every use; the newest one is kept).</summary>
     public const string EpicRefreshToken = "epic.refreshToken";
+
+    /// <summary>GOG sign-in: the refresh token (rotates on every use; the newest one is kept).</summary>
+    public const string GogRefreshToken = "gog.refreshToken";
 }
 
 /// <summary>Machine-local preferences that never sync (SQLite <c>settings_local</c>).</summary>
@@ -66,6 +69,13 @@ public static class LocalSettingKeys
     public const string EpicAccountId = "epic.account.id";
 
     public const string EpicAccountSince = "epic.account.since";
+
+    /// <summary>Signed-in GOG account, shown in Settings: user name, user id, since when.</summary>
+    public const string GogAccountName = "gog.account.name";
+
+    public const string GogAccountId = "gog.account.id";
+
+    public const string GogAccountSince = "gog.account.since";
 
     /// <summary>
     /// UI language: "system", "en" or "es" (<see cref="Localization.LanguageResolver"/>). Machine-local until the sync

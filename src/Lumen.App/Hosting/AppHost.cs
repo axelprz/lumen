@@ -109,6 +109,19 @@ public static class AppHost
             sp.GetRequiredService<ILocalSettings>()));
         builder.Services.AddSingleton<IMetadataCache, SqliteMetadataCache>();
 
+        // GOG sign-in (M5): tokens only travel to auth.gog.com / embed.gog.com, on a plain HttpClient (GOG's token
+        // endpoint takes them in the query string, which must never be logged).
+        builder.Services.AddSingleton(_ =>
+        {
+            var http = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
+            http.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent());
+            return new GogAccountApi(http);
+        });
+        builder.Services.AddSingleton(sp => new GogAccount(
+            sp.GetRequiredService<GogAccountApi>(),
+            sp.GetRequiredService<ISecretStore>(),
+            sp.GetRequiredService<ILocalSettings>()));
+
         // Library
         builder.Services.AddSingleton(sp => new SteamProvider(
             sp.GetRequiredService<IRegistryReader>(),
@@ -124,7 +137,10 @@ public static class AppHost
             sp.GetRequiredService<IKnownFolders>(),
             sp.GetRequiredService<EpicAccount>(),
             sp.GetRequiredService<IMetadataCache>()));
-        builder.Services.AddSingleton<ILibraryProvider, GogProvider>();
+        builder.Services.AddSingleton<ILibraryProvider>(sp => new GogProvider(
+            sp.GetRequiredService<IRegistryReader>(),
+            sp.GetRequiredService<IFileSystem>(),
+            sp.GetRequiredService<GogAccount>()));
         builder.Services.AddSingleton<ILibraryProvider, UbisoftProvider>();
         builder.Services.AddSingleton<ILibraryProvider, EaProvider>();
         builder.Services.AddSingleton<ILibraryProvider, BattleNetProvider>();
@@ -204,6 +220,7 @@ public static class AppHost
         builder.Services.AddSingleton<SteamSettingsViewModel>();
         builder.Services.AddSingleton<SteamFamilyViewModel>();
         builder.Services.AddSingleton<EpicAccountViewModel>();
+        builder.Services.AddSingleton<GogAccountViewModel>();
         builder.Services.AddSingleton<ArtworkSettingsViewModel>();
         builder.Services.AddSingleton<LanguageSettingsViewModel>();
         builder.Services.AddSingleton<FirstRunViewModel>();
