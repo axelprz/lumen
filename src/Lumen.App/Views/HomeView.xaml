@@ -167,6 +167,10 @@
                             <ImageBrush ImageSource="{Binding CoverPath, Converter={StaticResource ImagePath}, ConverterParameter=300}" Stretch="UniformToFill" />
                           </Border.Background>
                         </Border>
+                        <Image Source="{Binding IconPath, Converter={StaticResource ImagePath}, ConverterParameter=192}"
+                               Width="96" Height="96" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               RenderOptions.BitmapScalingMode="HighQuality"
+                               Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibility}}" />
                         <TextBlock x:Name="Initial" Text="{Binding Initial}" FontSize="60" FontWeight="Light" Opacity="0.6"
                                    Foreground="{DynamicResource Lumen.Brush.TextMuted}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                       </Grid>
@@ -175,6 +179,9 @@
                   </StackPanel>
                   <DataTemplate.Triggers>
                     <DataTrigger Binding="{Binding HasCover}" Value="True">
+                      <Setter TargetName="Initial" Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding HasIcon}" Value="True">
                       <Setter TargetName="Initial" Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
                   </DataTemplate.Triggers>

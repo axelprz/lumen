@@ -151,6 +151,7 @@ public sealed class StartMenuProvider(
         if (target.IconPath is { } icon)
         {
             extra["icon"] = icon;
+            extra["iconIndex"] = target.IconIndex.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 
         if (target.Arguments is { } arguments)

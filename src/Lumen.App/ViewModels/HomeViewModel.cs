@@ -12,7 +12,7 @@ using Lumen.Core.Localization;
 namespace Lumen.App.ViewModels;
 
 /// <summary>A game in a Home row: its cover, and pointing at it features it in the hero.</summary>
-public sealed partial class HomeTileViewModel(LibraryItem item, Func<LibraryItem, Task<string?>> coverLoader) : ObservableObject
+public sealed partial class HomeTileViewModel(LibraryItem item, Func<LibraryItem, Task<TileArt?>> coverLoader) : ObservableObject
 {
     private bool _coverRequested;
 
@@ -20,7 +20,13 @@ public sealed partial class HomeTileViewModel(LibraryItem item, Func<LibraryItem
     [NotifyPropertyChangedFor(nameof(HasCover))]
     private string? _coverPath;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasIcon))]
+    private string? _iconPath;
+
     public LibraryItem Item { get; } = item;
+
+    public bool HasIcon => IconPath is not null;
 
     public string Title => Item.Title;
 
@@ -39,7 +45,15 @@ public sealed partial class HomeTileViewModel(LibraryItem item, Func<LibraryItem
         }
 
         _coverRequested = true;
-        CoverPath = await coverLoader(Item);
+        var art = await coverLoader(Item);
+        if (art is { IsIcon: true })
+        {
+            IconPath = art.Path;
+        }
+        else
+        {
+            CoverPath = art?.Path;
+        }
     }
 }
 
@@ -235,7 +249,7 @@ public sealed partial class HomeViewModel : ObservableObject
         OnPropertyChanged(nameof(CanRun));
     }
 
-    private Task<string?> LoadCoverAsync(LibraryItem item) => LoadAsync(item, ArtworkKind.Cover);
+    private Task<TileArt?> LoadCoverAsync(LibraryItem item) => TileArt.LoadAsync(_artwork, item);
 
     // Artwork is decoration: a failure just means no image.
     private async Task<string?> LoadAsync(LibraryItem item, ArtworkKind kind)

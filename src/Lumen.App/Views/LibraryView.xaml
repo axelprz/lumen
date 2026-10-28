@@ -79,6 +79,15 @@
                       <ImageBrush ImageSource="{Binding CoverPath, Converter={StaticResource ImagePath}, ConverterParameter=336}" Stretch="UniformToFill" />
                     </Border.Background>
                   </Border>
+                  <!-- No cover: the app's (or package's) icon, centered -->
+                  <Image Source="{Binding IconPath, Converter={StaticResource ImagePath}, ConverterParameter=224}"
+                         Width="112"
+                         Height="112"
+                         Margin="0,0,0,40"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         RenderOptions.BitmapScalingMode="HighQuality"
+                         Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibility}}" />
                   <TextBlock x:Name="Initial"
                              Text="{Binding Initial}"
                              FontSize="72"
@@ -125,6 +134,9 @@
           <Setter TargetName="Cover" Property="Opacity" Value="0.5" />
         </DataTrigger>
         <DataTrigger Binding="{Binding HasCover}" Value="True">
+          <Setter TargetName="Initial" Property="Visibility" Value="Collapsed" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding HasIcon}" Value="True">
           <Setter TargetName="Initial" Property="Visibility" Value="Collapsed" />
         </DataTrigger>
       </DataTemplate.Triggers>

@@ -257,6 +257,30 @@ public sealed class ArtworkServiceTests : IDisposable
         (await service.GetAsync(_game, ArtworkKind.Cover, CancellationToken.None)).ShouldNotBeNull();
     }
 
+    [Fact]
+    public async Task LocalSources_AreTriedFirst_AndCachedLikeDownloads()
+    {
+        var local = new LocalIcons { Image = _png };
+        var service = new ArtworkService(new HttpClient(_http), [new TestSource()], _cache, _overrides, NullLogger<ArtworkService>.Instance, _time, [local]);
+
+        var first = await service.GetAsync(_game, ArtworkKind.Icon, CancellationToken.None);
+        var second = await service.GetAsync(_game, ArtworkKind.Icon, CancellationToken.None);
+
+        first!.ShouldEndWith(".png");
+        second.ShouldBe(first);
+        local.Calls.ShouldBe(1);
+        _http.Calls.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task LocalSources_ThatAreNotImages_AreIgnored()
+    {
+        var local = new LocalIcons { Image = [1, 2, 3, 4] };
+        var service = new ArtworkService(new HttpClient(_http), [], _cache, _overrides, NullLogger<ArtworkService>.Instance, _time, [local]);
+
+        (await service.GetAsync(_game, ArtworkKind.Icon, CancellationToken.None)).ShouldBeNull();
+    }
+
     private string _overrides => _cache + "-overrides";
 
     private ArtworkService Service(params IArtworkSource[] sources) =>
@@ -283,6 +307,21 @@ public sealed class ArtworkServiceTests : IDisposable
 
         public Task<ArtworkCandidates> GetCandidatesAsync(LibraryEntry entry, ArtworkKind kind, CancellationToken ct) =>
             Answer is null ? throw new InvalidOperationException("source bug") : Task.FromResult(Answer);
+    }
+
+    private sealed class LocalIcons : ILocalArtworkSource
+    {
+        public byte[]? Image { get; init; }
+
+        public int Calls { get; private set; }
+
+        public bool CanHandle(LibraryEntry entry, ArtworkKind kind) => kind == ArtworkKind.Icon;
+
+        public Task<byte[]?> GetImageAsync(LibraryEntry entry, ArtworkKind kind, CancellationToken ct)
+        {
+            Calls++;
+            return Task.FromResult(Image);
+        }
     }
 
     private sealed class RoutingHandler : HttpMessageHandler

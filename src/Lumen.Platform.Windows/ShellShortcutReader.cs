@@ -32,12 +32,13 @@ public sealed class ShellShortcutReader : IShortcutReader
             var arguments = new StringBuilder(MaxPath);
             shell.GetArguments(arguments, arguments.Capacity);
             var icon = new StringBuilder(MaxPath);
-            shell.GetIconLocation(icon, icon.Capacity, out _);
+            shell.GetIconLocation(icon, icon.Capacity, out var iconIndex);
 
             return new ShortcutTarget(
                 Expand(target.ToString()),
                 arguments.Length == 0 ? null : arguments.ToString(),
-                Expand(icon.ToString()));
+                Expand(icon.ToString()),
+                iconIndex);
         }
         catch (Exception ex) when (ex is COMException or UnauthorizedAccessException or IOException or InvalidCastException or ArgumentException)
         {
