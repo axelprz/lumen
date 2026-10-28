@@ -7,6 +7,7 @@
              xmlns:vm="clr-namespace:Lumen.App.ViewModels"
              xmlns:conv="clr-namespace:Lumen.App.Converters"
              xmlns:views="clr-namespace:Lumen.App.Views"
+             xmlns:services="clr-namespace:Lumen.App.Services"
              AllowDrop="True"
              PreviewKeyDown="OnPreviewKeyDown"
              DragOver="OnDragOver"
@@ -150,6 +151,7 @@
   <Grid>
   <!-- "Discover apps" covers the page while open -->
   <Border Panel.ZIndex="6"
+          services:GamepadLayer.Priority="2"
           Background="{DynamicResource Lumen.Brush.Background}"
           Padding="40,32,24,16"
           DataContext="{Binding Discover}"
@@ -159,6 +161,7 @@
 
   <!-- The open game's detail view covers the whole page; the library keeps its scroll and filters underneath. -->
   <ContentControl Panel.ZIndex="5"
+                  services:GamepadLayer.Priority="1"
                   Content="{Binding Detail}"
                   Focusable="False"
                   Visibility="{Binding HasDetail, Converter={StaticResource BoolToVisibility}}">

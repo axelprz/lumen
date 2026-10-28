@@ -91,7 +91,7 @@ public partial class App : Application
 
             // Gamepad: works while a Lumen window is in front.
             _gamepad = _host.Services.GetRequiredService<GamepadService>();
-            _gamepad.Attach(window, _quickSearch, _quickSearch.Open, window.FocusPage);
+            _gamepad.Attach(window, _quickSearch, _quickSearch.Open, () => window.PageRoot);
 
             // Started with Windows: stay in the tray until the user opens Lumen.
             if (!options.StartInTray || _showRequested)

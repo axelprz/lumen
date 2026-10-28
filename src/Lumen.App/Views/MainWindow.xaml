@@ -6,6 +6,7 @@
         xmlns:l="clr-namespace:Lumen.App.Localization"
         xmlns:vm="clr-namespace:Lumen.App.ViewModels"
         xmlns:views="clr-namespace:Lumen.App.Views"
+        xmlns:services="clr-namespace:Lumen.App.Services"
         Title="{l:Loc App_Title}"
         Icon="/Assets/Lumen.ico"
         Width="1280"
@@ -89,6 +90,7 @@
     <!-- First-run wizard: covers sidebar and page until finished or skipped -->
     <views:FirstRunView Grid.ColumnSpan="2"
                         Panel.ZIndex="10"
+                        services:GamepadLayer.Priority="3"
                         DataContext="{Binding FirstRun}"
                         Visibility="{Binding IsOpen, Converter={StaticResource BoolToVisibility}}" />
   </Grid>

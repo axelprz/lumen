@@ -255,13 +255,19 @@ Every portable file has `"schema": <int>`; loaders migrate older versions and re
   - **Reading:** `WindowsGamepadReader` (Windows.Gaming.Input; Xbox and compatible pads) only reads and never vibrates. Several pads merge. Connections come from the added/removed events, because the pad list starts empty.
   - **Polling:** `GamepadService` polls about every 16 ms, only while a pad is connected and Lumen is active.
   - **Commands:** `GamepadNavigator` (Core, tested) turns readings into commands like a keyboard would: buttons act on press; a held D-pad/left stick (threshold 0.5, main axis) repeats after 400 ms every 110 ms. Coming back to Lumen ignores what was already held.
-  - **Mapping:**
-    - Directions → arrow keys
-    - A → Enter (Space on checkboxes; opens a closed dropdown)
+  - **Moving focus (spatial):** keyboard arrow navigation stops at row and list edges and is captured by text boxes and dropdowns. So the D-pad/stick don't send arrow keys: `SpatialNavigation` (Core, tested) picks the nearest control that lies entirely in that direction. Distance along the direction counts once and sideways offset counts double, so the pick stays in the row or column. It works across rows, panels and the sidebar.
+    - If nothing is on screen that way, the nearest scroller moves a line (virtualized rows appear) and it looks again.
+    - Candidates are visible, enabled, focusable tab stops. Lists and scrollers themselves are skipped.
+  - **Layers:** panels that cover the page set `GamepadLayer.Priority`: detail = 1, Discover apps = 2, welcome = 3. While one is visible, focus stays inside the highest one.
+  - **Focus recovery:**
+    - When focus is lost or hidden (a page, the detail or the wizard just changed), the next input only puts it back. It goes to the control used last on the page when coming back from a layer; otherwise to the top-left control, preferring the page over the sidebar.
+    - After A or B, this happens right away: opening a detail focuses inside it, and closing it returns to the tile.
+  - **Buttons:**
+    - A → Enter (Space on checkboxes; opens a dropdown; selects a sidebar entry)
     - B → Esc
 
-    These go through WPF's own input pipeline (`InputManager.ProcessInput`), not Windows' `SendInput`. They can only reach Lumen's focused element, and WPF treats them as keyboard input: focus moves spatially, the focus highlight shows, and Enter/Esc bindings run.
-  - **Lumen actions:** Y opens quick search. LB/RB move to the previous/next sidebar section (no wrap; not while the welcome wizard is open) and focus the new page. With nothing focused yet, the first input focuses the window's first control.
+    Both go through WPF's own input pipeline (`InputManager.ProcessInput`), not Windows' `SendInput`, so they can only reach Lumen and existing Enter/Esc handling applies. Inside an open dropdown and in quick search, the D-pad sends arrow keys, since those lists handle them.
+  - **Lumen actions:** Y opens quick search. LB/RB move to the previous/next sidebar section (no wrap; not while the welcome wizard is open) and focus the new page. With nothing focused yet, see focus recovery above.
 - **Home (M3):** the start page. `HomeFeed` (Core, pure) picks "Continue playing" (visible games with a known last-played date, newest first, up to 12) and the featured game (the most recently played; with no history, the newest installed game). Hidden items and apps never appear. The featured game's hero (or cover) fills the page blurred (decoded at 640 px, two layers crossfading); logo (or title), playtime, last played, Play and Details over it. Pointing at or focusing a tile in the row features it after 180 ms. Details opens the game in the library's detail view and Back returns to Home. The row has no scrollbar: the wheel scrolls it sideways. Below it (M4):
   - **Favorites:** favorite games, in the order they were marked, up to 24.
   - **Quick apps:** a compact dock of app icons that open the app with one click. It shows favorite apps; with none marked, the library's apps by name (up to 12).
