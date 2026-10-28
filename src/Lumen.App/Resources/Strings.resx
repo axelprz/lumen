@@ -880,4 +880,25 @@
   <data name="Detail_PlaytimeFromBoth" xml:space="preserve">
     <value>store + Lumen</value>
   </data>
+  <data name="Settings_CloseToTray" xml:space="preserve">
+    <value>Keep Lumen in the notification area when I close the window</value>
+  </data>
+  <data name="Settings_StartWithWindows" xml:space="preserve">
+    <value>Start Lumen with Windows (in the notification area)</value>
+  </data>
+  <data name="Tray_Open" xml:space="preserve">
+    <value>Open Lumen</value>
+  </data>
+  <data name="Tray_Recent" xml:space="preserve">
+    <value>Recently played</value>
+  </data>
+  <data name="Tray_Exit" xml:space="preserve">
+    <value>Exit Lumen</value>
+  </data>
+  <data name="Tray_Hint_Title" xml:space="preserve">
+    <value>Lumen is still running</value>
+  </data>
+  <data name="Tray_Hint_Message" xml:space="preserve">
+    <value>It's in the notification area. To close it completely, right-click its icon and choose Exit Lumen. You can change this in Settings.</value>
+  </data>
 </root>

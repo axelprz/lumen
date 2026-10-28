@@ -7,8 +7,12 @@
     <RootNamespace>Lumen.App</RootNamespace>
     <AssemblyName>Lumen</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\Lumen.ico</ApplicationIcon>
     <SatelliteResourceLanguages>en;es</SatelliteResourceLanguages>
   </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Lumen.ico" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lumen.Core\Lumen.Core.csproj" />
     <ProjectReference Include="..\Lumen.Data\Lumen.Data.csproj" />
@@ -17,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="H.NotifyIcon.Wpf" />
     <PackageReference Include="QRCoder" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Serilog" />

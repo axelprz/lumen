@@ -7,6 +7,7 @@
         xmlns:vm="clr-namespace:Lumen.App.ViewModels"
         xmlns:views="clr-namespace:Lumen.App.Views"
         Title="{l:Loc App_Title}"
+        Icon="/Assets/Lumen.ico"
         Width="1280"
         Height="800"
         MinWidth="960"

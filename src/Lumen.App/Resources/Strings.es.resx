@@ -880,4 +880,25 @@
   <data name="Detail_PlaytimeFromBoth" xml:space="preserve">
     <value>tienda + Lumen</value>
   </data>
+  <data name="Settings_CloseToTray" xml:space="preserve">
+    <value>Al cerrar la ventana, dejar Lumen en el área de notificación</value>
+  </data>
+  <data name="Settings_StartWithWindows" xml:space="preserve">
+    <value>Iniciar Lumen con Windows (en el área de notificación)</value>
+  </data>
+  <data name="Tray_Open" xml:space="preserve">
+    <value>Abrir Lumen</value>
+  </data>
+  <data name="Tray_Recent" xml:space="preserve">
+    <value>Jugados recientemente</value>
+  </data>
+  <data name="Tray_Exit" xml:space="preserve">
+    <value>Salir de Lumen</value>
+  </data>
+  <data name="Tray_Hint_Title" xml:space="preserve">
+    <value>Lumen sigue abierto</value>
+  </data>
+  <data name="Tray_Hint_Message" xml:space="preserve">
+    <value>Está en el área de notificación. Para cerrarlo del todo, hacé clic derecho en su ícono y elegí Salir de Lumen. Podés cambiarlo en Configuración.</value>
+  </data>
 </root>
