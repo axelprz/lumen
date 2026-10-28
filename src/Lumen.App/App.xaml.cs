@@ -25,6 +25,8 @@ public partial class App : Application
     private IHost? _host;
     private SingleInstance? _instance;
     private TrayService? _tray;
+    private HotkeyService? _hotkeys;
+    private QuickSearchWindow? _quickSearch;
     private bool _showRequested;
     private bool _shuttingDown;
 
@@ -78,6 +80,13 @@ public partial class App : Application
             MainWindow = window;
             _tray = _host.Services.GetRequiredService<TrayService>();
             _tray.Attach(window, () => ShutdownAsync(exitCode: 0));
+
+            // Quick search: the global shortcut and the tray open the same box over any app.
+            _quickSearch = _host.Services.GetRequiredService<QuickSearchWindow>();
+            _hotkeys = _host.Services.GetRequiredService<HotkeyService>();
+            _hotkeys.Pressed += (_, _) => _quickSearch.Open();
+            _tray.OpenQuickSearch = _quickSearch.Open;
+            await _hotkeys.StartAsync(CancellationToken.None).ConfigureAwait(true);
 
             // Started with Windows: stay in the tray until the user opens Lumen.
             if (!options.StartInTray || _showRequested)
@@ -138,6 +147,8 @@ public partial class App : Application
 
         _shuttingDown = true;
         _tray?.Dispose(); // removes the icon right away instead of on the next mouse-over
+        _hotkeys?.Dispose();
+        _quickSearch?.CloseForExit();
         if (_host is not null)
         {
             try

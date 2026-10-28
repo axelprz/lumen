@@ -258,7 +258,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         await _library.ReloadUserChoicesAsync(CancellationToken.None);
     }
 
-    private string StoreNameOf(LibraryEntry entry) =>
+    public string StoreNameOf(LibraryEntry entry) =>
         entry.Extra.TryGetValue("family", out var family) && family == "true" && entry.Ref.Source == "steam"
             ? _localizer["Store_SteamFamily"]
             : SourceName(entry.Ref.Source);

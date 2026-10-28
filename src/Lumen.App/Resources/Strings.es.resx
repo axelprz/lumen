@@ -901,4 +901,49 @@
   <data name="Tray_Hint_Message" xml:space="preserve">
     <value>Está en el área de notificación. Para cerrarlo del todo, hacé clic derecho en su ícono y elegí Salir de Lumen. Podés cambiarlo en Configuración.</value>
   </data>
+  <data name="QuickSearch_Title" xml:space="preserve">
+    <value>Búsqueda rápida</value>
+  </data>
+  <data name="QuickSearch_Results" xml:space="preserve">
+    <value>Resultados</value>
+  </data>
+  <data name="QuickSearch_Hint" xml:space="preserve">
+    <value>Escribí para buscar entre tus juegos y aplicaciones.</value>
+  </data>
+  <data name="QuickSearch_NoMatches" xml:space="preserve">
+    <value>No hay coincidencias.</value>
+  </data>
+  <data name="QuickSearch_Game" xml:space="preserve">
+    <value>Juego</value>
+  </data>
+  <data name="QuickSearch_App" xml:space="preserve">
+    <value>Aplicación</value>
+  </data>
+  <data name="QuickSearch_NotInstalled" xml:space="preserve">
+    <value>No instalado</value>
+  </data>
+  <data name="Tray_QuickSearch" xml:space="preserve">
+    <value>Búsqueda rápida ({0})</value>
+  </data>
+  <data name="Settings_Hotkey" xml:space="preserve">
+    <value>Atajo de búsqueda rápida</value>
+  </data>
+  <data name="Settings_Hotkey_Description" xml:space="preserve">
+    <value>Abre un buscador sobre cualquier aplicación. Escribí y presioná Enter para jugar.</value>
+  </data>
+  <data name="Settings_Hotkey_Change" xml:space="preserve">
+    <value>Cambiar</value>
+  </data>
+  <data name="Settings_Hotkey_Reset" xml:space="preserve">
+    <value>Restaurar</value>
+  </data>
+  <data name="Settings_Hotkey_Recording" xml:space="preserve">
+    <value>Presioná el nuevo atajo… (Esc cancela)</value>
+  </data>
+  <data name="Settings_Hotkey_Invalid" xml:space="preserve">
+    <value>Usá Ctrl, Alt o Win junto con una letra, un número, una tecla F o Espacio.</value>
+  </data>
+  <data name="Settings_Hotkey_Taken" xml:space="preserve">
+    <value>Otra aplicación está usando {0}, así que ahora no funciona. Elegí otro.</value>
+  </data>
 </root>

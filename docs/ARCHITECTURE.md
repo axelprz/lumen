@@ -279,12 +279,23 @@ Every portable file has `"schema": <int>`; loaders migrate older versions and re
 - **Accessibility:** buttons whose content is icon + text set `AutomationProperties.Name`; dropdown options override `ToString()` with their label. Clickable things that share a grid cell must be checked for hit-testing (UI Automation `Invoke` bypasses it).
 - **Tray (M7):** `TrayService` puts an H.NotifyIcon `TaskbarIcon` in the notification area (app icon `Assets/Lumen.ico`, also the window and exe icon).
   - Left click opens Lumen.
-  - The menu is built each time it opens: Open, up to 5 recently played games (the same list as Home's "Continue playing", only ones that can run; a click launches them like Play) and Exit. Quick search and routines join with their features.
+  - The menu is built each time it opens: Open, Quick search, up to 5 recently played games (the same list as Home's "Continue playing", only ones that can run; a click launches them like Play) and Exit. Routines join in M8.
   - Efficiency mode stays off (`ForceCreate(false)`), so playtime polling isn't throttled while the window is hidden.
   - **Minimize to tray** (Settings → General, on by default, `settings_local` `ui.closeToTray`): closing the window hides it; the first time, a notification explains where Lumen went (`ui.trayHintShown`). Exit in the menu really closes Lumen. With the setting off, closing the window exits as before. `ShutdownMode` is `OnExplicitShutdown`; `App.ShutdownAsync` is the only way out.
   - **Start with Windows** (Settings → General, off by default): the string value `Lumen` under `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` = `"<Lumen.exe>" --tray` (`WindowsStartupRegistration`). Per user, no admin, also listed in Task Manager → Startup apps; the checkbox reads it from the registry each time. Only Lumen's own value is touched. `--tray` (`StartupOptions`) starts Lumen without opening the window.
   - **One Lumen at a time** (`SingleInstance`): a named mutex per Windows session and install folder (SHA-256 of the folder, so the path isn't in the name). Opening Lumen again signals the running copy (named event) to show its window, then exits. A copy in another folder (portable, development build) runs separately.
-- Global hotkey via `RegisterHotKey` on a hidden message window.
+- **Quick search (M7):** a global shortcut (default `Alt+Shift+Space`) opens a small box over any app; type, Enter runs the result.
+  - **Shortcut:** `HotkeyService` registers it with `RegisterHotKey` on a message-only window (`GlobalHotkeys` in Platform.Windows, with `MOD_NOREPEAT`). Windows only reports that exact combination: no keyboard hook, nothing else typed is seen, no admin.
+  - **Changing it:** Settings → General → "Change" records the next combination (Esc cancels); "Restore default" goes back. `Hotkey` (Core) is the model and the saved text (`settings_local` `ui.hotkey`, e.g. `Ctrl+Alt+K`). It needs Ctrl, Alt or Win (F-keys alone are fine) plus A–Z, 0–9, F1–F24 or Space.
+  - **Shortcut taken:** if another app owns it, Windows refuses; Lumen keeps the previous one (or none) and Settings says so.
+  - **Results:** `QuickSearch` (Core) matches like the library search (accents, case, symbols, roman numerals), then ranks:
+    1. title starts with the text
+    2. a word starts with it
+    3. anywhere
+
+    Ties go to installed items, then the most recently played. Hidden items never appear, at most 8 results, and with no text it lists recently played items. Only items that can run are listed; not-installed games say so, and Enter installs.
+  - **Window:** `QuickSearchWindow` is borderless, topmost and not in the taskbar. It opens centered in the upper part of the main screen with the text field focused. ↑/↓ choose, Enter or click runs, Esc or clicking elsewhere hides it. It is reused, never rebuilt.
+  - The tray menu has "Quick search (shortcut)". The gamepad's Y joins in the gamepad PR.
 
 ## 9. Build, CI and release
 
