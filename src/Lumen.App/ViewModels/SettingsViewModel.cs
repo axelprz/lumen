@@ -11,6 +11,7 @@ namespace Lumen.App.ViewModels;
 /// <summary>Settings page. Grows section by section (language, stores, artwork, sync...) in later milestones.</summary>
 public sealed partial class SettingsViewModel(
     LanguageSettingsViewModel language,
+    WindowSettingsViewModel window,
     FirstRunViewModel firstRun,
     SteamSettingsViewModel steam,
     SteamFamilyViewModel steamFamily,
@@ -26,6 +27,8 @@ public sealed partial class SettingsViewModel(
     private string? _libraryStatus;
 
     public LanguageSettingsViewModel Language { get; } = language;
+
+    public WindowSettingsViewModel Window { get; } = window;
 
     public FirstRunViewModel FirstRun { get; } = firstRun;
 

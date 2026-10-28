@@ -85,4 +85,10 @@ public static class LocalSettingKeys
 
     /// <summary>"1" once the first-run wizard was finished or skipped.</summary>
     public const string FirstRunCompleted = "firstRun.completed";
+
+    /// <summary>"0" when closing the window should exit Lumen; anything else (default) keeps it in the tray.</summary>
+    public const string CloseToTray = "ui.closeToTray";
+
+    /// <summary>"1" once Lumen explained that closing the window leaves it in the tray (shown once).</summary>
+    public const string TrayHintShown = "ui.trayHintShown";
 }
