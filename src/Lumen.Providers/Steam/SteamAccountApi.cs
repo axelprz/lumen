@@ -81,11 +81,15 @@ public sealed class SteamAccountApi(HttpClient http)
         return error != SteamAccountError.None ? new SteamQrPoll(error, Detail: detail) : ParsePoll(json!);
     }
 
-    /// <summary>A fresh access token (~24 h) from the stored refresh token.</summary>
+    /// <summary>
+    /// A fresh access token (~24 h) from the stored refresh token. Sent as plain form fields (as working clients do):
+    /// the input_json form is not accepted for this method. renewal_type 0 = don't rotate the refresh token.
+    /// </summary>
     public async Task<SteamApiResult<string>> RefreshAccessTokenAsync(string refreshToken, string steamId, CancellationToken ct)
     {
-        var input = new JsonObject { ["refresh_token"] = refreshToken, ["steamid"] = steamId };
-        var (error, json, detail) = await PostAsync("IAuthenticationService/GenerateAccessTokenForApp/v1/", input, accessToken: null, ct).ConfigureAwait(false);
+        using var content = new FormUrlEncodedContent([new("refresh_token", refreshToken), new("steamid", steamId), new("renewal_type", "0")]);
+        var (error, json, detail) = await SendAsync(
+            () => http.PostAsync(new Uri(Base + "IAuthenticationService/GenerateAccessTokenForApp/v1/"), content, ct), ct).ConfigureAwait(false);
         if (error != SteamAccountError.None)
         {
             return new(error, null, detail);
