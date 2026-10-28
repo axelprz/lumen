@@ -691,4 +691,66 @@
   <data name="Home_QuickApps" xml:space="preserve">
     <value>Apps rápidas</value>
   </data>
+  <data name="Store_SteamFamily" xml:space="preserve">
+    <value>Steam (familia)</value>
+  </data>
+  <data name="SteamFamily_Title" xml:space="preserve">
+    <value>Biblioteca familiar de Steam</value>
+  </data>
+  <data name="SteamFamily_Description" xml:space="preserve">
+    <value>Mostrá los juegos que tu familia de Steam comparte con vos. Iniciás sesión escaneando un código QR con la app de Steam del celular: Lumen nunca ve tu contraseña. Es opcional: tus propios juegos siguen funcionando con la clave de arriba.</value>
+  </data>
+  <data name="SteamFamily_Connect" xml:space="preserve">
+    <value>Conectar con código QR</value>
+  </data>
+  <data name="SteamFamily_QrName" xml:space="preserve">
+    <value>Código QR para iniciar sesión en Steam</value>
+  </data>
+  <data name="SteamFamily_Steps" xml:space="preserve">
+    <value>1. Abrí la app de Steam en tu celular.
+2. Tocá el escudo (Steam Guard) y elegí “Escanear un código QR”.
+3. Escaneá este código y aprobá el inicio de sesión de “Lumen”.</value>
+  </data>
+  <data name="SteamFamily_Waiting" xml:space="preserve">
+    <value>Esperando que lo apruebes en el celular…</value>
+  </data>
+  <data name="SteamFamily_Expired" xml:space="preserve">
+    <value>El código venció. Volvé a conectar para generar uno nuevo.</value>
+  </data>
+  <data name="SteamFamily_Failed" xml:space="preserve">
+    <value>No se pudo conectar con Steam. Probá de nuevo en un rato.</value>
+  </data>
+  <data name="SteamFamily_Unreachable" xml:space="preserve">
+    <value>No se pudo contactar a Steam. Revisá tu conexión y probá de nuevo.</value>
+  </data>
+  <data name="SteamFamily_Account" xml:space="preserve">
+    <value>Conectado como {0} desde el {1}</value>
+  </data>
+  <data name="SteamFamily_WhatLumenCanDo" xml:space="preserve">
+    <value>Lumen solo puede leer la lista de juegos que comparte tu familia. No puede comprar, cambiar tu cuenta ni ver tu contraseña. El inicio de sesión se guarda cifrado en esta PC y solo se usa con Steam. Desconectar lo elimina.</value>
+  </data>
+  <data name="SteamFamily_Connected" xml:space="preserve">
+    <value>Conectado. Tu familia comparte {0} juegos con vos; ya están en tu biblioteca.</value>
+  </data>
+  <data name="SteamFamily_NoFamily" xml:space="preserve">
+    <value>Conectado, pero esta cuenta no está en una familia de Steam, así que no hay juegos compartidos.</value>
+  </data>
+  <data name="SteamFamily_ConnectedNoList" xml:space="preserve">
+    <value>Conectado. Steam todavía no devolvió los juegos compartidos; van a aparecer en el próximo escaneo.</value>
+  </data>
+  <data name="SteamFamily_Disconnect" xml:space="preserve">
+    <value>Desconectar</value>
+  </data>
+  <data name="SteamFamily_DisconnectTitle" xml:space="preserve">
+    <value>Desconectar Steam</value>
+  </data>
+  <data name="SteamFamily_DisconnectConfirm" xml:space="preserve">
+    <value>¿Desconectar tu cuenta de Steam? Los juegos compartidos salen de tu biblioteca y Lumen le pide a Steam que cancele su inicio de sesión.</value>
+  </data>
+  <data name="SteamFamily_Disconnected" xml:space="preserve">
+    <value>Desconectado. Steam canceló el inicio de sesión de Lumen y se borró de esta PC.</value>
+  </data>
+  <data name="SteamFamily_DisconnectedLocally" xml:space="preserve">
+    <value>Se borró de esta PC, pero Steam no confirmó que canceló el inicio de sesión. Podés quitar “Lumen” de los dispositivos de tu cuenta de Steam (Steam Guard → Administrar dispositivos).</value>
+  </data>
 </root>

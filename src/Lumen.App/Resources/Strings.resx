@@ -691,4 +691,66 @@
   <data name="Home_QuickApps" xml:space="preserve">
     <value>Quick apps</value>
   </data>
+  <data name="Store_SteamFamily" xml:space="preserve">
+    <value>Steam (family)</value>
+  </data>
+  <data name="SteamFamily_Title" xml:space="preserve">
+    <value>Steam family library</value>
+  </data>
+  <data name="SteamFamily_Description" xml:space="preserve">
+    <value>Show the games your Steam family shares with you. You sign in by scanning a QR code with the Steam app on your phone: Lumen never sees your password. Optional: your own games still work with the key above.</value>
+  </data>
+  <data name="SteamFamily_Connect" xml:space="preserve">
+    <value>Connect with a QR code</value>
+  </data>
+  <data name="SteamFamily_QrName" xml:space="preserve">
+    <value>Steam sign-in QR code</value>
+  </data>
+  <data name="SteamFamily_Steps" xml:space="preserve">
+    <value>1. Open the Steam app on your phone.
+2. Tap the shield (Steam Guard) and choose “Scan a QR code”.
+3. Scan this code and approve the sign-in for “Lumen”.</value>
+  </data>
+  <data name="SteamFamily_Waiting" xml:space="preserve">
+    <value>Waiting for you to approve it on your phone…</value>
+  </data>
+  <data name="SteamFamily_Expired" xml:space="preserve">
+    <value>The code expired. Connect again to get a new one.</value>
+  </data>
+  <data name="SteamFamily_Failed" xml:space="preserve">
+    <value>Couldn't connect to Steam. Try again in a moment.</value>
+  </data>
+  <data name="SteamFamily_Unreachable" xml:space="preserve">
+    <value>Couldn't reach Steam. Check your connection and try again.</value>
+  </data>
+  <data name="SteamFamily_Account" xml:space="preserve">
+    <value>Connected as {0} since {1}</value>
+  </data>
+  <data name="SteamFamily_WhatLumenCanDo" xml:space="preserve">
+    <value>Lumen can only read the list of games your family shares. It can't buy anything, change your account or see your password. The sign-in is stored encrypted on this PC and never leaves it except to Steam. Disconnect removes it.</value>
+  </data>
+  <data name="SteamFamily_Connected" xml:space="preserve">
+    <value>Connected. Your family shares {0} games with you; they're in your library now.</value>
+  </data>
+  <data name="SteamFamily_NoFamily" xml:space="preserve">
+    <value>Connected, but this account isn't in a Steam family, so there are no shared games.</value>
+  </data>
+  <data name="SteamFamily_ConnectedNoList" xml:space="preserve">
+    <value>Connected. Steam didn't return the shared games yet; they'll show up on the next rescan.</value>
+  </data>
+  <data name="SteamFamily_Disconnect" xml:space="preserve">
+    <value>Disconnect</value>
+  </data>
+  <data name="SteamFamily_DisconnectTitle" xml:space="preserve">
+    <value>Disconnect Steam</value>
+  </data>
+  <data name="SteamFamily_DisconnectConfirm" xml:space="preserve">
+    <value>Disconnect your Steam account? Shared games will leave your library, and Lumen will ask Steam to cancel its sign-in.</value>
+  </data>
+  <data name="SteamFamily_Disconnected" xml:space="preserve">
+    <value>Disconnected. Steam cancelled Lumen's sign-in and it was deleted from this PC.</value>
+  </data>
+  <data name="SteamFamily_DisconnectedLocally" xml:space="preserve">
+    <value>Deleted from this PC, but Steam didn't confirm cancelling the sign-in. You can remove “Lumen” from the devices in your Steam account (Steam Guard → Manage devices).</value>
+  </data>
 </root>
