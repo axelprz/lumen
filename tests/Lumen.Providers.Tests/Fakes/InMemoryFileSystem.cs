@@ -61,6 +61,15 @@ internal sealed class InMemoryFileSystem : IFileSystem
             .ToList();
     }
 
+    public IReadOnlyList<string> GetDirectories(string directory)
+    {
+        var dir = Normalize(directory);
+        return _directories
+            .Where(d => string.Equals(Parent(d), dir, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(d => d, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
     public Task<string> ReadAllTextAsync(string path, CancellationToken ct)
     {
         path = Normalize(path);

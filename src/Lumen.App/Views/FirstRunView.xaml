@@ -99,7 +99,11 @@
           <views:ArtworkSettingsCard DataContext="{Binding Artwork}" Margin="0,20,0,0" />
         </StackPanel>
 
-        <!-- 4. Done -->
+        <!-- 4. Apps: the same list as "Discover apps" -->
+        <views:DiscoverAppsView DataContext="{Binding Apps}"
+                                Visibility="{Binding DataContext.IsAppsStep, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibility}}" />
+
+        <!-- 5. Done -->
         <StackPanel Visibility="{Binding IsDoneStep, Converter={StaticResource BoolToVisibility}}">
           <TextBlock Text="{l:Loc FirstRun_Done_Title}" Style="{StaticResource StepTitle}" />
           <TextBlock Text="{l:Loc FirstRun_Done_Body}" Style="{StaticResource StepBody}" />

@@ -45,7 +45,7 @@ public sealed partial class LibraryTileViewModel : ObservableObject
         MenuItems = menu;
         CanRunPrimary = LaunchService.PrimaryAction(item.Primary) is not null;
         var playable = item.Primary.IsInstalled;
-        ActionText = localizer[!CanRunPrimary ? "Action_Unavailable" : playable ? "Action_Play" : "Action_Install"];
+        ActionText = localizer[!CanRunPrimary ? "Action_Unavailable" : !playable ? "Action_Install" : item.Kind == ItemKind.App ? "Action_Open" : "Action_Play"];
         StateText = playable ? string.Empty : localizer[CanRunPrimary ? "Library_NotInstalled" : "Library_NotAvailable"];
         Initial = item.Title.Length == 0
             ? "?"

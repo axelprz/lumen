@@ -14,6 +14,9 @@ public interface IFileSystem
     IReadOnlyList<string> GetFiles(string directory, string pattern);
 
     Task<string> ReadAllTextAsync(string path, CancellationToken ct);
+
+    /// <summary>Subfolders (full paths) of <paramref name="directory"/>, non-recursive; empty when it doesn't exist.</summary>
+    IReadOnlyList<string> GetDirectories(string directory);
 }
 
 /// <summary>The real disk. Only ever reads.</summary>
@@ -25,6 +28,9 @@ public sealed class PhysicalFileSystem : IFileSystem
 
     public IReadOnlyList<string> GetFiles(string directory, string pattern) =>
         Directory.Exists(directory) ? Directory.GetFiles(directory, pattern, SearchOption.TopDirectoryOnly) : [];
+
+    public IReadOnlyList<string> GetDirectories(string directory) =>
+        Directory.Exists(directory) ? Directory.GetDirectories(directory) : [];
 
     public async Task<string> ReadAllTextAsync(string path, CancellationToken ct)
     {

@@ -128,7 +128,7 @@ public sealed partial class GameDetailViewModel : ObservableObject
 
     public bool CanRun => LaunchService.PrimaryAction(Selected) is not null;
 
-    public string ActionText => _s.Localizer[!CanRun ? "Action_Unavailable" : Selected.IsInstalled ? "Action_Play" : "Action_Install"];
+    public string ActionText => _s.Localizer[!CanRun ? "Action_Unavailable" : !Selected.IsInstalled ? "Action_Install" : Item.Kind == ItemKind.App ? "Action_Open" : "Action_Play"];
 
     public string StoresText { get; }
 

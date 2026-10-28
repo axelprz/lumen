@@ -16,6 +16,7 @@ using Lumen.Core.Settings;
 using Lumen.Platform.Windows;
 using Lumen.Platform.Windows.Security;
 using Lumen.Providers;
+using Lumen.Providers.Apps;
 using Lumen.Providers.BattleNet;
 using Lumen.Providers.Ea;
 using Lumen.Providers.Epic;
@@ -65,6 +66,8 @@ public static class AppHost
         builder.Services.AddSingleton<IKnownFolders, WindowsKnownFolders>();
         builder.Services.AddSingleton<IPackageCatalog, WindowsPackageCatalog>();
         builder.Services.AddSingleton<ILauncher, ShellLauncher>();
+        builder.Services.AddSingleton<IShortcutReader, ShellShortcutReader>();
+        builder.Services.AddSingleton<IIndirectStrings, ShellIndirectStrings>();
 
         // Settings and secrets (DPAPI, CurrentUser). Secrets are never logged or synced.
         builder.Services.AddSingleton<ISecretProtector, DpapiProtector>();
@@ -91,6 +94,18 @@ public static class AppHost
         builder.Services.AddSingleton<ILibraryProvider, XboxProvider>();
         builder.Services.AddSingleton<IManualItemStore, SqliteManualItemStore>();
         builder.Services.AddSingleton<ILibraryProvider, ManualItemsProvider>();
+
+        // Apps on this PC (M4): suggestions until the user adds them in "Discover apps".
+        builder.Services.AddSingleton<ILibraryProvider>(sp => new StartMenuProvider(
+            sp.GetRequiredService<IKnownFolders>(),
+            sp.GetRequiredService<IFileSystem>(),
+            sp.GetRequiredService<IShortcutReader>(),
+            sp.GetRequiredService<IIndirectStrings>()));
+        builder.Services.AddSingleton<ILibraryProvider>(sp => new StoreAppsProvider(
+            sp.GetRequiredService<IPackageCatalog>(),
+            sp.GetRequiredService<IFileSystem>()));
+        builder.Services.AddSingleton<IAppChoiceStore, SqliteAppChoiceStore>();
+        builder.Services.AddSingleton(_ => TitleCleanup.CreateNormalizer());
         builder.Services.AddSingleton<IDialogService, DialogService>();
         builder.Services.AddSingleton<LibraryAutoRefresh>();
         builder.Services.AddSingleton<ILibraryCache, SqliteLibraryCache>();
@@ -105,7 +120,8 @@ public static class AppHost
             providerTimeout: null,
             merger: sp.GetRequiredService<LibraryMerger>(),
             ruleStore: sp.GetRequiredService<IMergeRuleStore>(),
-            overrideStore: sp.GetRequiredService<IItemOverrideStore>()));
+            overrideStore: sp.GetRequiredService<IItemOverrideStore>(),
+            appChoiceStore: sp.GetRequiredService<IAppChoiceStore>()));
         builder.Services.AddSingleton<LaunchService>();
 
         // Artwork (allowed hosts only): Steam CDN first, then SteamGridDB when the user saved a key. Downloads are
@@ -138,6 +154,7 @@ public static class AppHost
 
         builder.Services.AddSingleton<AccentService>();
         builder.Services.AddSingleton<HomeViewModel>();
+        builder.Services.AddSingleton<DiscoverAppsViewModel>();
         builder.Services.AddSingleton<LibraryViewModel>();
         builder.Services.AddSingleton<SteamSettingsViewModel>();
         builder.Services.AddSingleton<ArtworkSettingsViewModel>();

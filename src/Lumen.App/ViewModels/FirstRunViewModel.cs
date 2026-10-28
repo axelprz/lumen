@@ -17,6 +17,7 @@ public enum FirstRunStep
     Language,
     Stores,
     Keys,
+    Apps,
     Done,
 }
 
@@ -29,9 +30,9 @@ public sealed record StoreRow(string Name, string Detail, StoreState State)
 }
 
 /// <summary>
-/// First-run wizard (PLAN-v1 §4.3): language → detected stores → optional keys → done. Shown over the whole window
-/// the first time Lumen opens (and again from Settings). Finishing or skipping remembers it in <c>settings_local</c>.
-/// Sign-ins (M5) and app curation (M4) become extra steps when those milestones land.
+/// First-run wizard (PLAN-v1 §4.3): language → detected stores → optional keys → apps → done. Shown over the whole
+/// window the first time Lumen opens (and again from Settings). Finishing or skipping remembers it in
+/// <c>settings_local</c>. Sign-ins (M5) become an extra step when that milestone lands.
 /// </summary>
 public sealed partial class FirstRunViewModel : ObservableObject
 {
@@ -46,13 +47,14 @@ public sealed partial class FirstRunViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StepNumber), nameof(IsFirstStep), nameof(IsLastStep), nameof(NextText), nameof(StepText))]
-    [NotifyPropertyChangedFor(nameof(IsLanguageStep), nameof(IsStoresStep), nameof(IsKeysStep), nameof(IsDoneStep))]
+    [NotifyPropertyChangedFor(nameof(IsLanguageStep), nameof(IsStoresStep), nameof(IsKeysStep), nameof(IsAppsStep), nameof(IsDoneStep))]
     private FirstRunStep _step;
 
     public FirstRunViewModel(
         LanguageSettingsViewModel language,
         SteamSettingsViewModel steam,
         ArtworkSettingsViewModel artwork,
+        DiscoverAppsViewModel apps,
         LibraryService library,
         ILocalSettings settings,
         ILocalizer localizer,
@@ -61,6 +63,7 @@ public sealed partial class FirstRunViewModel : ObservableObject
         Language = language;
         Steam = steam;
         Artwork = artwork;
+        Apps = apps;
         _library = library;
         _settings = settings;
         _localizer = localizer;
@@ -81,6 +84,9 @@ public sealed partial class FirstRunViewModel : ObservableObject
     public SteamSettingsViewModel Steam { get; }
 
     public ArtworkSettingsViewModel Artwork { get; }
+
+    /// <summary>The same "Discover apps" list as the library's.</summary>
+    public DiscoverAppsViewModel Apps { get; }
 
     public IReadOnlyList<StoreRow> Stores { get; private set; } = [];
 
@@ -106,6 +112,8 @@ public sealed partial class FirstRunViewModel : ObservableObject
     public bool IsStoresStep => Step == FirstRunStep.Stores;
 
     public bool IsKeysStep => Step == FirstRunStep.Keys;
+
+    public bool IsAppsStep => Step == FirstRunStep.Apps;
 
     public bool IsDoneStep => Step == FirstRunStep.Done;
 

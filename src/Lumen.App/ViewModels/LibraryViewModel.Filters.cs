@@ -137,8 +137,8 @@ public sealed partial class LibraryViewModel
             new(_localizer["Sort_RecentlyAdded"], LibrarySort.RecentlyAdded),
         ];
         StoreOptions = [new FilterOption<string?>(_localizer["Filter_AllStores"], null),
-            .. _library.Entries.Select(e => e.Ref.Source).Distinct()
-                .Select(source => new FilterOption<string?>(source == ManualItem.Source ? _localizer["Store_Manual"] : _storeNames.GetValueOrDefault(source, source), source))
+            .. _library.Items.SelectMany(i => i.Entries).Select(e => e.Ref.Source).Distinct()
+                .Select(source => new FilterOption<string?>(SourceName(source), source))
                 .OrderBy(o => o.Label, StringComparer.CurrentCultureIgnoreCase)];
 
         OnPropertyChanged(nameof(KindOptions));

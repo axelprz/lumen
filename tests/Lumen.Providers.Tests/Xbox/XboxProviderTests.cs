@@ -116,14 +116,4 @@ public sealed class XboxProviderTests
         _fs.AddFixture(UwpDir + @"\AppxManifest.xml", "xbox/uwp/AppxManifest.xml");
         _fs.AddFixture(AppDir + @"\AppxManifest.xml", "xbox/app/AppxManifest.xml");
     }
-
-    private sealed class FakePackageCatalog : IPackageCatalog
-    {
-        public List<InstalledPackage> Packages { get; } = [];
-
-        public bool Throw { get; set; }
-
-        public Task<IReadOnlyList<InstalledPackage>> GetForCurrentUserAsync(CancellationToken ct) =>
-            Throw ? throw new UnauthorizedAccessException() : Task.FromResult<IReadOnlyList<InstalledPackage>>(Packages);
-    }
 }

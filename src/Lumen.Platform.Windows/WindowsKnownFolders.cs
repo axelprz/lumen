@@ -13,6 +13,10 @@ public sealed class WindowsKnownFolders : IKnownFolders
 
     public string ProgramFilesX86 { get; } = Get(Environment.SpecialFolder.ProgramFilesX86);
 
+    public string CommonStartMenuPrograms { get; } = Get(Environment.SpecialFolder.CommonPrograms);
+
+    public string UserStartMenuPrograms { get; } = Get(Environment.SpecialFolder.Programs);
+
     private static string Get(Environment.SpecialFolder folder) =>
         Environment.GetFolderPath(folder, Environment.SpecialFolderOption.DoNotVerify);
 }
