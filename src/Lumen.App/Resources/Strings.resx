@@ -812,4 +812,10 @@
   <data name="EpicAccount_DisconnectedLocally" xml:space="preserve">
     <value>Deleted from this PC, but Epic didn't confirm ending the session. It expires by itself; you can also sign out of all sessions in your Epic account settings.</value>
   </data>
+  <data name="SteamFamily_NeedsReconnect" xml:space="preserve">
+    <value>Steam no longer accepts this sign-in (it was cancelled, expired, or made by an older Lumen). Connect again to see your family's games.</value>
+  </data>
+  <data name="SteamFamily_Reconnect" xml:space="preserve">
+    <value>Connect again</value>
+  </data>
 </root>

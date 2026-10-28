@@ -55,10 +55,12 @@ public sealed class SteamAccountApi(HttpClient http)
     private const string Base = SteamWebApi.BaseAddress;
 
     /// <summary>
-    /// Platform "Steam client" (1): its refresh tokens can mint new access tokens with GenerateAccessTokenForApp, so the
-    /// user scans the QR once. The device name shown in the user's Steam account is just "Lumen", nothing about the PC.
+    /// Platform "mobile app" (3), owner-approved 2026-10-28: only these refresh tokens can mint new access tokens
+    /// through the Web API (GenerateAccessTokenForApp); "Steam client" (1) tokens are refused there with
+    /// AccessDenied (eresult 15, seen on the owner's account), which would mean scanning the QR every day.
+    /// The user's Steam account lists Lumen as a mobile device named just "Lumen", nothing about the PC.
     /// </summary>
-    internal const int PlatformSteamClient = 1;
+    internal const int PlatformMobileApp = 3;
 
     internal const string DeviceName = "Lumen";
 
@@ -67,8 +69,9 @@ public sealed class SteamAccountApi(HttpClient http)
         var input = new JsonObject
         {
             ["device_friendly_name"] = DeviceName,
-            ["platform_type"] = PlatformSteamClient,
-            ["device_details"] = new JsonObject { ["device_friendly_name"] = DeviceName, ["platform_type"] = PlatformSteamClient },
+            ["platform_type"] = PlatformMobileApp,
+            ["device_details"] = new JsonObject { ["device_friendly_name"] = DeviceName, ["platform_type"] = PlatformMobileApp },
+            ["website_id"] = "Mobile",
         };
         var (error, json, detail) = await PostAsync("IAuthenticationService/BeginAuthSessionViaQR/v1/", input, accessToken: null, ct).ConfigureAwait(false);
         return error != SteamAccountError.None ? new(error, null, detail) : ParseBeginQr(json!);

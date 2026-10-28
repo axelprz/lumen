@@ -812,4 +812,10 @@
   <data name="EpicAccount_DisconnectedLocally" xml:space="preserve">
     <value>Se borró de esta PC, pero Epic no confirmó que cerró la sesión. Vence sola; también podés cerrar todas las sesiones desde la configuración de tu cuenta de Epic.</value>
   </data>
+  <data name="SteamFamily_NeedsReconnect" xml:space="preserve">
+    <value>Steam ya no acepta este inicio de sesión (se canceló, venció o lo hizo una versión anterior de Lumen). Volvé a conectar para ver los juegos de tu familia.</value>
+  </data>
+  <data name="SteamFamily_Reconnect" xml:space="preserve">
+    <value>Volver a conectar</value>
+  </data>
 </root>
