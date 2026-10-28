@@ -30,6 +30,7 @@ public sealed partial class LibraryViewModel : ObservableObject
     private readonly AccentService _accent;
     private readonly DiscoverAppsViewModel _discover;
     private readonly CollectionService _collections;
+    private readonly ImageCache _images;
     private readonly IDialogService _dialogs;
     private readonly LibraryFilter _filter;
     private readonly ILocalSettings _settings;
@@ -60,6 +61,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         AccentService accent,
         DiscoverAppsViewModel discover,
         CollectionService collections,
+        ImageCache images,
         IDialogService dialogs,
         LibraryFilter filter,
         ILocalSettings settings,
@@ -81,6 +83,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         _accent = accent;
         _discover = discover;
         _collections = collections;
+        _images = images;
         _collections.Changed += (_, _) => OnCollectionsChanged();
         _dialogs = dialogs;
         _localizer = localizer;
@@ -419,7 +422,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         var primary = item.Primary;
         var stores = string.Join(" · ", item.Entries.Select(StoreNameOf).Distinct());
         var play = new AsyncRelayCommand(() => RunPrimaryActionAsync(primary), () => LaunchService.PrimaryAction(primary) is not null);
-        return new LibraryTileViewModel(item, stores, _localizer, play, BuildMenu(item), LoadCoverAsync, new AsyncRelayCommand(() => OpenDetailAsync(item)))
+        return new LibraryTileViewModel(item, stores, _localizer, play, BuildMenu(item), LoadCoverAsync, new AsyncRelayCommand(() => OpenDetailAsync(item)), _images)
         {
             IsFavorite = _collections.IsFavorite(item),
         };

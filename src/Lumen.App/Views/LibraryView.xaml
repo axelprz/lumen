@@ -36,16 +36,9 @@
       </ContextMenu.ItemContainerStyle>
     </ContextMenu>
     <DataTemplate x:Key="TileTemplate" DataType="{x:Type vm:LibraryTileViewModel}">
-      <Border x:Name="Tile" Width="168" Margin="0,0,20,24" Background="Transparent" ToolTip="{Binding Title}" Loaded="OnTileLoaded">
-        <Border.Style>
-          <Style TargetType="Border">
-            <Style.Triggers>
-              <DataTrigger Binding="{Binding HasMenu}" Value="True">
-                <Setter Property="ContextMenu" Value="{StaticResource TileMenu}" />
-              </DataTrigger>
-            </Style.Triggers>
-          </Style>
-        </Border.Style>
+      <!-- The menu is built when it opens (OnTileContextMenuOpening), not for every tile that scrolls into view -->
+      <Border x:Name="Tile" Width="168" Margin="0,0,20,24" Background="Transparent" ToolTip="{Binding Title}"
+              Loaded="OnTileLoaded" ContextMenuOpening="OnTileContextMenuOpening">
         <StackPanel>
           <Border x:Name="Cover" Height="252" CornerRadius="8" ClipToBounds="True">
             <Border.Background>
@@ -76,11 +69,11 @@
                   <!-- Cover art (rounded through the border); the initial shows until it loads or when there is none. -->
                   <Border CornerRadius="8">
                     <Border.Background>
-                      <ImageBrush ImageSource="{Binding CoverPath, Converter={StaticResource ImagePath}, ConverterParameter=336}" Stretch="UniformToFill" />
+                      <ImageBrush ImageSource="{Binding CoverImage}" Stretch="UniformToFill" />
                     </Border.Background>
                   </Border>
                   <!-- No cover: the app's (or package's) icon, centered -->
-                  <Image Source="{Binding IconPath, Converter={StaticResource ImagePath}, ConverterParameter=224}"
+                  <Image Source="{Binding IconImage}"
                          Width="112"
                          Height="112"
                          Margin="0,0,0,40"

@@ -61,6 +61,20 @@ public partial class LibraryView : UserControl
         }
     }
 
+    // View concern: the tile menu is created only when the user opens it (right click or the menu key).
+    private void OnTileContextMenuOpening(object sender, ContextMenuEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: LibraryTileViewModel { HasMenu: true } tile } element
+            && FindResource("TileMenu") is ContextMenu menu)
+        {
+            menu.DataContext = tile;
+            menu.PlacementTarget = element;
+            menu.IsOpen = true;
+        }
+
+        e.Handled = true;
+    }
+
     // View concern: translate a drag & drop into file paths / URL text for the view model.
     private void OnDragOver(object sender, DragEventArgs e)
     {
