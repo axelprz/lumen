@@ -137,7 +137,19 @@ public sealed class SteamAccountTests
         (await Account().GetSharedGamesAsync(CancellationToken.None)).Status.ShouldBe(SteamFamilyStatus.NotInFamily);
 
         _http.RespondWith(HttpStatusCode.Unauthorized);
-        (await Account().GetSharedGamesAsync(CancellationToken.None)).Status.ShouldBe(SteamFamilyStatus.NeedsReconnect);
+        var account = Account();
+        var changed = 0;
+        account.Changed += (_, _) => changed++;
+        (await account.GetSharedGamesAsync(CancellationToken.None)).Status.ShouldBe(SteamFamilyStatus.NeedsReconnect);
+        (await account.GetSharedGamesAsync(CancellationToken.None)).Status.ShouldBe(SteamFamilyStatus.NeedsReconnect);
+        account.NeedsReconnect.ShouldBeTrue();
+        changed.ShouldBe(1); // announced once, not on every scan
+    }
+
+    [Fact]
+    public void SignIn_IsTheMobileAppType_SoAccessCanBeRenewed()
+    {
+        SteamAccountApi.PlatformMobileApp.ShouldBe(3);
     }
 
     [Fact]

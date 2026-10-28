@@ -62,7 +62,21 @@ public sealed partial class SteamFamilyViewModel : ObservableObject
         _dialogs = dialogs;
         _localizer = localizer;
         _logger = logger;
+        var ui = SynchronizationContext.Current ?? new SynchronizationContext();
+        _account.Changed += (_, _) => ui.Post(_ => ShowReconnectIfNeeded(), null);
     }
+
+    /// <summary>Steam rejected the sign-in (scan): say so on the card and offer to connect again.</summary>
+    private void ShowReconnectIfNeeded()
+    {
+        OnPropertyChanged(nameof(ShowsReconnect));
+        if (_account.NeedsReconnect && State == SteamFamilyState.Connected)
+        {
+            SetStatus(StatusKind.Warning, "SteamFamily_NeedsReconnect");
+        }
+    }
+
+    public bool ShowsReconnect => _account.NeedsReconnect;
 
     public bool IsDisconnected => State == SteamFamilyState.Disconnected;
 

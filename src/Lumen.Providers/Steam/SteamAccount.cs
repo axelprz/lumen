@@ -38,8 +38,11 @@ public sealed class SteamAccount(SteamAccountApi api, ISecretStore secrets, ILoc
     private (string Token, DateTimeOffset Expires)? _access;
     private string? _lastRenewalDetail;
 
-    /// <summary>Raised after connecting or disconnecting.</summary>
+    /// <summary>Raised after connecting, disconnecting, or when Steam starts or stops rejecting the sign-in.</summary>
     public event EventHandler? Changed;
+
+    /// <summary>Steam rejected the stored sign-in (revoked, expired, or from an older Lumen): connect again.</summary>
+    public bool NeedsReconnect { get; private set; }
 
     /// <summary>The signed-in account, or null.</summary>
     public async Task<SteamAccountInfo?> GetInfoAsync(CancellationToken ct)
@@ -86,6 +89,7 @@ public sealed class SteamAccount(SteamAccountApi api, ISecretStore secrets, ILoc
             _access = (access, expires);
         }
 
+        NeedsReconnect = false;
         Changed?.Invoke(this, EventArgs.Empty);
 
         // The caller only needs to know it worked: tokens don't leave this class.
@@ -106,6 +110,7 @@ public sealed class SteamAccount(SteamAccountApi api, ISecretStore secrets, ILoc
         }
 
         _access = null;
+        NeedsReconnect = false;
         await secrets.RemoveAsync(SecretNames.SteamRefreshToken, ct).ConfigureAwait(false);
         foreach (var key in new[] { LocalSettingKeys.SteamAccountId, LocalSettingKeys.SteamAccountName, LocalSettingKeys.SteamAccountSince })
         {
@@ -189,6 +194,12 @@ public sealed class SteamAccount(SteamAccountApi api, ISecretStore secrets, ILoc
         if (error == SteamAccountError.Unauthorized)
         {
             _access = null; // maybe just expired early: the next scan tries a fresh one
+            if (!NeedsReconnect)
+            {
+                NeedsReconnect = true;
+                Changed?.Invoke(this, EventArgs.Empty);
+            }
+
             return new(SteamFamilyStatus.NeedsReconnect, [], detail);
         }
 
