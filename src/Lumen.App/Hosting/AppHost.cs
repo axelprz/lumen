@@ -237,6 +237,10 @@ public static class AppHost
         builder.Services.AddSingleton<LanguageSettingsViewModel>();
         builder.Services.AddSingleton<WindowSettingsViewModel>();
         builder.Services.AddSingleton<TrayService>();
+        builder.Services.AddSingleton<HotkeyService>();
+        builder.Services.AddSingleton(_ => new QuickSearch(TitleCleanup.CreateNormalizer()));
+        builder.Services.AddSingleton<QuickSearchViewModel>();
+        builder.Services.AddSingleton<QuickSearchWindow>();
         builder.Services.AddSingleton<FirstRunViewModel>();
         builder.Services.AddSingleton<SettingsViewModel>();
         builder.Services.AddSingleton<ShellViewModel>();

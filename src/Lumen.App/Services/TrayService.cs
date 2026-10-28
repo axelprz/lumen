@@ -17,11 +17,12 @@ using Microsoft.Extensions.Logging;
 namespace Lumen.App.Services;
 
 /// <summary>
-/// The notification-area icon (PLAN-v1 §4.3): a click opens Lumen; the menu has Open, the most recently played games
+/// The notification-area icon (PLAN-v1 §4.3): a click opens Lumen; the menu has Open, Quick search, the most recently played games
 /// (launched straight from the menu) and Exit. Closing the main window hides it here when "minimize to tray" is on,
 /// with a one-time notice so Lumen never seems to vanish. Lives on the UI thread.
 /// </summary>
 public sealed partial class TrayService(
+    HotkeyService hotkeys,
     LibraryService library,
     CollectionService collections,
     LaunchService launcher,
@@ -37,6 +38,9 @@ public sealed partial class TrayService(
     private Window? _window;
     private Func<Task>? _exit;
     private bool _exiting;
+
+    /// <summary>Opens the quick search box (set once it exists).</summary>
+    public Action? OpenQuickSearch { get; set; }
 
     /// <summary>Shows the icon and takes over the window's close button.</summary>
     /// <param name="exit">Shuts Lumen down (the menu's Exit).</param>
@@ -139,6 +143,10 @@ public sealed partial class TrayService(
 
         menu.Items.Clear();
         menu.Items.Add(Item(localizer["Tray_Open"], ShowWindow, bold: true));
+        if (OpenQuickSearch is { } openSearch)
+        {
+            menu.Items.Add(Item(string.Format(CultureInfo.CurrentCulture, localizer["Tray_QuickSearch"], hotkeys.Current), openSearch));
+        }
 
         var recent = HomeFeed.Build(library.Items, library.FirstSeen, collections.Favorites).ContinuePlaying
             .Where(i => LaunchService.PrimaryAction(i.Primary) is not null)

@@ -901,4 +901,49 @@
   <data name="Tray_Hint_Message" xml:space="preserve">
     <value>It's in the notification area. To close it completely, right-click its icon and choose Exit Lumen. You can change this in Settings.</value>
   </data>
+  <data name="QuickSearch_Title" xml:space="preserve">
+    <value>Quick search</value>
+  </data>
+  <data name="QuickSearch_Results" xml:space="preserve">
+    <value>Results</value>
+  </data>
+  <data name="QuickSearch_Hint" xml:space="preserve">
+    <value>Type to search your games and apps.</value>
+  </data>
+  <data name="QuickSearch_NoMatches" xml:space="preserve">
+    <value>Nothing matches.</value>
+  </data>
+  <data name="QuickSearch_Game" xml:space="preserve">
+    <value>Game</value>
+  </data>
+  <data name="QuickSearch_App" xml:space="preserve">
+    <value>App</value>
+  </data>
+  <data name="QuickSearch_NotInstalled" xml:space="preserve">
+    <value>Not installed</value>
+  </data>
+  <data name="Tray_QuickSearch" xml:space="preserve">
+    <value>Quick search ({0})</value>
+  </data>
+  <data name="Settings_Hotkey" xml:space="preserve">
+    <value>Quick search shortcut</value>
+  </data>
+  <data name="Settings_Hotkey_Description" xml:space="preserve">
+    <value>Opens a search box over any app. Type, then press Enter to play.</value>
+  </data>
+  <data name="Settings_Hotkey_Change" xml:space="preserve">
+    <value>Change</value>
+  </data>
+  <data name="Settings_Hotkey_Reset" xml:space="preserve">
+    <value>Restore default</value>
+  </data>
+  <data name="Settings_Hotkey_Recording" xml:space="preserve">
+    <value>Press the new shortcut… (Esc cancels)</value>
+  </data>
+  <data name="Settings_Hotkey_Invalid" xml:space="preserve">
+    <value>Use Ctrl, Alt or Win together with a letter, a number, an F key or Space.</value>
+  </data>
+  <data name="Settings_Hotkey_Taken" xml:space="preserve">
+    <value>Another app is using {0}, so it doesn't work right now. Choose a different one.</value>
+  </data>
 </root>
