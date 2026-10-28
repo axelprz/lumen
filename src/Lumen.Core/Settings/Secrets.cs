@@ -46,4 +46,13 @@ public interface ILocalSettings
 public static class LocalSettingKeys
 {
     public const string SteamId64 = "steam.steamId64";
+
+    /// <summary>
+    /// UI language: "system", "en" or "es" (<see cref="Localization.LanguageResolver"/>). Machine-local until the sync
+    /// folder arrives (M8), when it moves to <c>config.json</c> → <c>language</c>.
+    /// </summary>
+    public const string Language = "ui.language";
+
+    /// <summary>"1" once the first-run wizard was finished or skipped.</summary>
+    public const string FirstRunCompleted = "firstRun.completed";
 }

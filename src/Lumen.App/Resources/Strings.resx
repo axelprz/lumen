@@ -490,4 +490,82 @@
   <data name="Home_NoHistory" xml:space="preserve">
     <value>The games you play show up here.</value>
   </data>
+  <data name="FirstRun_StepOf" xml:space="preserve">
+    <value>Step {0} of {1}</value>
+  </data>
+  <data name="FirstRun_Skip" xml:space="preserve">
+    <value>Skip</value>
+  </data>
+  <data name="FirstRun_Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="FirstRun_Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="FirstRun_Start" xml:space="preserve">
+    <value>Start using Lumen</value>
+  </data>
+  <data name="FirstRun_Welcome_Title" xml:space="preserve">
+    <value>Welcome to Lumen</value>
+  </data>
+  <data name="FirstRun_Welcome_Body" xml:space="preserve">
+    <value>All your games, from every store, in one place. First, choose your language.</value>
+  </data>
+  <data name="FirstRun_Stores_Title" xml:space="preserve">
+    <value>Your stores</value>
+  </data>
+  <data name="FirstRun_Stores_Body" xml:space="preserve">
+    <value>Lumen reads what each store saves on this PC. It never changes anything in them and doesn't need your passwords.</value>
+  </data>
+  <data name="FirstRun_Stores_Searching" xml:space="preserve">
+    <value>Looking for your stores…</value>
+  </data>
+  <data name="FirstRun_Stores_Summary" xml:space="preserve">
+    <value>Stores with games: {0} · Installed games: {1}</value>
+  </data>
+  <data name="FirstRun_Stores_Hint" xml:space="preserve">
+    <value>Missing a store? Install it, then use “Rescan” in the Library.</value>
+  </data>
+  <data name="FirstRun_Store_Games" xml:space="preserve">
+    <value>{0} games installed</value>
+  </data>
+  <data name="FirstRun_Store_OneGame" xml:space="preserve">
+    <value>{0} game installed</value>
+  </data>
+  <data name="FirstRun_Store_Empty" xml:space="preserve">
+    <value>Installed, no games yet</value>
+  </data>
+  <data name="FirstRun_Store_Problem" xml:space="preserve">
+    <value>Couldn't read it this time</value>
+  </data>
+  <data name="FirstRun_Store_NotInstalled" xml:space="preserve">
+    <value>Not on this PC</value>
+  </data>
+  <data name="FirstRun_Store_Owned" xml:space="preserve">
+    <value>{0} more owned</value>
+  </data>
+  <data name="FirstRun_Keys_Title" xml:space="preserve">
+    <value>Optional: more games and better artwork</value>
+  </data>
+  <data name="FirstRun_Keys_Body" xml:space="preserve">
+    <value>A Steam key also shows the Steam games you own but haven't installed. A SteamGridDB key finds covers for games from other stores. Keys are stored encrypted on this PC and are never shared. You can also do this later in Settings.</value>
+  </data>
+  <data name="FirstRun_Done_Title" xml:space="preserve">
+    <value>All set</value>
+  </data>
+  <data name="FirstRun_Done_Body" xml:space="preserve">
+    <value>Your library is in Lumen. Everything in this welcome can be changed later in Settings.</value>
+  </data>
+  <data name="Language_System" xml:space="preserve">
+    <value>Same as Windows</value>
+  </data>
+  <data name="Settings_General_Title" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Settings_Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Settings_ShowWelcome" xml:space="preserve">
+    <value>Show the welcome again</value>
+  </data>
 </root>

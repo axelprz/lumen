@@ -63,6 +63,12 @@ public sealed partial class LibraryService
     /// <summary>Entries merged into items (one per game across stores), sorted by title.</summary>
     public IReadOnlyList<LibraryItem> Items => Volatile.Read(ref _snapshot).Items;
 
+    /// <summary>What each provider reported in the last scan of every store (null until one finishes).</summary>
+    public IReadOnlyList<ProviderScanReport>? LastFullScan { get; private set; }
+
+    /// <summary>Raised (on any thread) after a scan of every store finishes, even when nothing changed.</summary>
+    public event EventHandler? FullScanCompleted;
+
     /// <summary>When each entry first appeared in Lumen ("Recently added").</summary>
     public IReadOnlyDictionary<ItemRef, DateTimeOffset> FirstSeen => Volatile.Read(ref _firstSeen);
 
@@ -148,6 +154,12 @@ public sealed partial class LibraryService
 
             Volatile.Write(ref _firstSeen, await _cache.LoadFirstSeenAsync(ct).ConfigureAwait(false));
             Publish(bySource.Values.SelectMany(v => v).ToList());
+            if (providers.Count == _providers.Count)
+            {
+                LastFullScan = reports;
+                FullScanCompleted?.Invoke(this, EventArgs.Empty);
+            }
+
             return reports;
         }
         finally

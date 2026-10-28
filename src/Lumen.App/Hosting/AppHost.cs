@@ -141,6 +141,8 @@ public static class AppHost
         builder.Services.AddSingleton<LibraryViewModel>();
         builder.Services.AddSingleton<SteamSettingsViewModel>();
         builder.Services.AddSingleton<ArtworkSettingsViewModel>();
+        builder.Services.AddSingleton<LanguageSettingsViewModel>();
+        builder.Services.AddSingleton<FirstRunViewModel>();
         builder.Services.AddSingleton<SettingsViewModel>();
         builder.Services.AddSingleton<ShellViewModel>();
         builder.Services.AddSingleton<MainWindow>();

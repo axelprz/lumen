@@ -17,7 +17,7 @@ public sealed partial class ShellViewModel : ObservableObject
     [ObservableProperty]
     private SectionViewModel? _selectedSection;
 
-    public ShellViewModel(ILocalizer localizer, HomeViewModel home, LibraryViewModel library, SettingsViewModel settings, AccentService accent)
+    public ShellViewModel(ILocalizer localizer, HomeViewModel home, LibraryViewModel library, SettingsViewModel settings, AccentService accent, FirstRunViewModel firstRun)
     {
         ArgumentNullException.ThrowIfNull(localizer);
         ArgumentNullException.ThrowIfNull(home);
@@ -26,6 +26,7 @@ public sealed partial class ShellViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(accent);
 
         _accent = accent;
+        FirstRun = firstRun;
         Home = home;
         Library = library;
         Settings = settings;
@@ -46,6 +47,9 @@ public sealed partial class ShellViewModel : ObservableObject
     public IReadOnlyList<SectionViewModel> Sections { get; }
 
     public HomeViewModel Home { get; }
+
+    /// <summary>The first-run wizard, shown over everything while open.</summary>
+    public FirstRunViewModel FirstRun { get; }
 
     public LibraryViewModel Library { get; }
 

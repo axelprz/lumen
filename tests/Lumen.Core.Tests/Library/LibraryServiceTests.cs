@@ -261,4 +261,19 @@ public sealed class LibraryServiceTests
     {
         ItemOverride.CleanTitle(new string('a', 300))!.Length.ShouldBe(ItemOverride.MaxTitleLength);
     }
+
+    [Fact]
+    public async Task FullScans_AreRemembered_ScansOfOneStoreAreNot()
+    {
+        var service = Service(new FakeProvider("steam").WithInstalled(Game("steam", "1", "A")), new FakeProvider("manual"));
+        var completed = 0;
+        service.FullScanCompleted += (_, _) => completed++;
+        service.LastFullScan.ShouldBeNull();
+
+        await service.ScanAsync(CancellationToken.None);
+        await service.ScanSourceAsync("manual", CancellationToken.None);
+
+        completed.ShouldBe(1);
+        service.LastFullScan.ShouldNotBeNull().Select(r => r.Source).ShouldBe(["steam", "manual"]);
+    }
 }
