@@ -298,4 +298,32 @@ public sealed class LibraryServiceTests
         service.Items.Select(i => i.Title).ShouldBe(["Game", "Sample App"]);
         service.AppChoices[app.Ref].ShouldBe(AppChoice.Added);
     }
+
+    [Theory]
+    [InlineData(null, "1790000000")]
+    [InlineData("1780000000", "1790000000")]
+    [InlineData("1795000000", "1795000000")]
+    public void InstalledGame_GainsPlaytime_AndTheLatestLastPlayed_FromTheOwnedList(string? localLast, string expectedLast)
+    {
+        var localExtra = new Dictionary<string, string> { ["appid"] = "1", ["library"] = @"C:\Steam" };
+        if (localLast is not null)
+        {
+            localExtra["lastPlayed"] = localLast;
+        }
+
+        var installed = Game("steam", "1", "Sample") with { Extra = localExtra };
+        var owned = Game("steam", "1", "Sample (owned name)", installed: false) with
+        {
+            Extra = new Dictionary<string, string> { ["appid"] = "1", ["playtimeMinutes"] = "600", ["lastPlayed"] = "1790000000" },
+        };
+        var report = new ProviderScanReport("steam", "Steam", ProviderResult.FromScan([installed], []), ProviderResult.FromScan([owned], []));
+
+        var entry = LibraryService.Combine(report, []).ShouldNotBeNull().ShouldHaveSingleItem();
+
+        entry.IsInstalled.ShouldBeTrue();
+        entry.Title.ShouldBe("Sample");
+        entry.Extra["library"].ShouldBe(@"C:\Steam");
+        entry.Extra["playtimeMinutes"].ShouldBe("600");
+        entry.Extra["lastPlayed"].ShouldBe(expectedLast);
+    }
 }
