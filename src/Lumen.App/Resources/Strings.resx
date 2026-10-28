@@ -632,7 +632,7 @@
     <value>Favorites</value>
   </data>
   <data name="Collections_Body" xml:space="preserve">
-    <value>Group games and apps your way. Add items from a game's detail view (More → Collections) or the star.</value>
+    <value>Group games and apps your way. Favorites also show on Home. Add items from a game's detail view (More → Collections) or the star.</value>
   </data>
   <data name="Collections_NewName" xml:space="preserve">
     <value>New collection name</value>
@@ -687,5 +687,8 @@
   </data>
   <data name="Filter_CollectionLabel" xml:space="preserve">
     <value>Collection</value>
+  </data>
+  <data name="Home_QuickApps" xml:space="preserve">
+    <value>Quick apps</value>
   </data>
 </root>

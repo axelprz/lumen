@@ -632,7 +632,7 @@
     <value>Favoritos</value>
   </data>
   <data name="Collections_Body" xml:space="preserve">
-    <value>Agrupá juegos y apps a tu manera. Se agregan desde el detalle de un juego (Más → Colecciones) o con la estrella.</value>
+    <value>Agrupá juegos y apps a tu manera. Los favoritos también aparecen en Inicio. Se agregan desde el detalle de un juego (Más → Colecciones) o con la estrella.</value>
   </data>
   <data name="Collections_NewName" xml:space="preserve">
     <value>Nombre de la colección nueva</value>
@@ -687,5 +687,8 @@
   </data>
   <data name="Filter_CollectionLabel" xml:space="preserve">
     <value>Colección</value>
+  </data>
+  <data name="Home_QuickApps" xml:space="preserve">
+    <value>Apps rápidas</value>
   </data>
 </root>

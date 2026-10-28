@@ -57,10 +57,49 @@ public sealed partial class HomeTileViewModel(LibraryItem item, Func<LibraryItem
     }
 }
 
+/// <summary>An app in Home's "Quick apps" dock: its icon; a click opens it.</summary>
+public sealed partial class QuickAppViewModel(LibraryItem item, ArtworkService artwork) : ObservableObject
+{
+    private bool _iconRequested;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasIcon))]
+    private string? _iconPath;
+
+    public LibraryItem Item { get; } = item;
+
+    public string Title => Item.Title;
+
+    public bool HasIcon => IconPath is not null;
+
+    public string Initial => Item.Title.Length == 0 ? "?" : StringInfo.GetNextTextElement(Item.Title).ToUpper(CultureInfo.CurrentCulture);
+
+    public override string ToString() => Title;
+
+    public async Task EnsureIconAsync()
+    {
+        if (_iconRequested)
+        {
+            return;
+        }
+
+        _iconRequested = true;
+        try
+        {
+            IconPath = await artwork.GetForItemAsync(Item, ArtworkKind.Icon, CancellationToken.None)
+                ?? await artwork.GetForItemAsync(Item, ArtworkKind.Cover, CancellationToken.None);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            // Decoration: the initial stays.
+        }
+    }
+}
+
 /// <summary>
 /// Home (PLAN-v1 §4.3): a hero with the featured game over its blurred background art (logo, Play, playtime, last
-/// played) and the "Continue playing" row. Pointing at a game in the row features it; the accent follows the
-/// featured game. Favorites and quick apps join in M4, pinned routines in M8.
+/// played), the "Continue playing" and "Favorites" rows and the "Quick apps" dock. Pointing at a game in a row
+/// features it; the accent follows the featured game. Pinned routines join in M8.
 /// </summary>
 public sealed partial class HomeViewModel : ObservableObject
 {
@@ -70,6 +109,7 @@ public sealed partial class HomeViewModel : ObservableObject
     private readonly LaunchService _launcher;
     private readonly ArtworkService _artwork;
     private readonly AccentService _accent;
+    private readonly CollectionService _collections;
     private readonly ILocalizer _localizer;
     private readonly SynchronizationContext _ui;
     private LibraryItem? _defaultFeatured;
@@ -91,15 +131,17 @@ public sealed partial class HomeViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(HasNotice))]
     private string? _notice;
 
-    public HomeViewModel(LibraryService library, LaunchService launcher, ArtworkService artwork, AccentService accent, ILocalizer localizer)
+    public HomeViewModel(LibraryService library, LaunchService launcher, ArtworkService artwork, AccentService accent, CollectionService collections, ILocalizer localizer)
     {
         _library = library;
         _launcher = launcher;
         _artwork = artwork;
         _accent = accent;
+        _collections = collections;
         _localizer = localizer;
         _ui = SynchronizationContext.Current ?? new SynchronizationContext();
         _library.Changed += (_, _) => _ui.Post(_ => Rebuild(), null);
+        _collections.Changed += (_, _) => _ui.Post(_ => Rebuild(), null);
         _localizer.CultureChanged += (_, _) => RaiseFeaturedTexts();
     }
 
@@ -107,6 +149,14 @@ public sealed partial class HomeViewModel : ObservableObject
     public event EventHandler<LibraryItem>? DetailRequested;
 
     public IReadOnlyList<HomeTileViewModel> ContinuePlaying { get; private set; } = [];
+
+    public IReadOnlyList<HomeTileViewModel> Favorites { get; private set; } = [];
+
+    public bool HasFavorites => Favorites.Count > 0;
+
+    public IReadOnlyList<QuickAppViewModel> QuickApps { get; private set; } = [];
+
+    public bool HasQuickApps => QuickApps.Count > 0;
 
     public bool HasContinuePlaying => ContinuePlaying.Count > 0;
 
@@ -199,15 +249,43 @@ public sealed partial class HomeViewModel : ObservableObject
         }
     }
 
+    /// <summary>Opens an app from the Quick apps dock.</summary>
+    [RelayCommand]
+    private async Task OpenAppAsync(QuickAppViewModel? app)
+    {
+        Notice = null;
+        if (app is not null && await _launcher.RunPrimaryActionAsync(app.Item.Primary, CancellationToken.None) != LaunchOutcome.Started)
+        {
+            Notice = string.Format(CultureInfo.CurrentCulture, _localizer["Library_LaunchFailed"], app.Title);
+        }
+    }
+
     private void Rebuild()
     {
-        var feed = HomeFeed.Build(_library.Items, _library.FirstSeen);
-        var previous = ContinuePlaying.ToDictionary(t => t.Item.Key);
-        ContinuePlaying = feed.ContinuePlaying
-            .Select(i => previous.TryGetValue(i.Key, out var tile) && ReferenceEquals(tile.Item, i) ? tile : new HomeTileViewModel(i, LoadCoverAsync))
+        var feed = HomeFeed.Build(_library.Items, _library.FirstSeen, _collections.Favorites);
+
+        // Reuse tiles of unchanged items so their covers stay loaded.
+        var previous = new Dictionary<ItemRef, HomeTileViewModel>();
+        foreach (var tile in ContinuePlaying.Concat(Favorites))
+        {
+            previous.TryAdd(tile.Item.Key, tile);
+        }
+
+        HomeTileViewModel Tile(LibraryItem item) =>
+            previous.TryGetValue(item.Key, out var tile) && ReferenceEquals(tile.Item, item) ? tile : new HomeTileViewModel(item, LoadCoverAsync);
+
+        ContinuePlaying = feed.ContinuePlaying.Select(Tile).ToList();
+        Favorites = feed.Favorites.Select(Tile).ToList();
+        var previousApps = QuickApps.ToDictionary(a => a.Item.Key);
+        QuickApps = feed.QuickApps
+            .Select(i => previousApps.TryGetValue(i.Key, out var app) && ReferenceEquals(app.Item, i) ? app : new QuickAppViewModel(i, _artwork))
             .ToList();
         OnPropertyChanged(nameof(ContinuePlaying));
         OnPropertyChanged(nameof(HasContinuePlaying));
+        OnPropertyChanged(nameof(Favorites));
+        OnPropertyChanged(nameof(HasFavorites));
+        OnPropertyChanged(nameof(QuickApps));
+        OnPropertyChanged(nameof(HasQuickApps));
 
         // Keep the game the user is pointing at if it's still there (fresh copy); otherwise show the default.
         _defaultFeatured = feed.Featured;
