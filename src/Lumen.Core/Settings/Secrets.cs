@@ -31,6 +31,9 @@ public static class SecretNames
     public const string SteamWebApiKey = "steam.webApiKey";
 
     public const string SteamGridDbApiKey = "steamgriddb.apiKey";
+
+    /// <summary>Steam sign-in (family sharing): the long-lived refresh token. Access tokens are never stored.</summary>
+    public const string SteamRefreshToken = "steam.refreshToken";
 }
 
 /// <summary>Machine-local preferences that never sync (SQLite <c>settings_local</c>).</summary>
@@ -46,6 +49,13 @@ public interface ILocalSettings
 public static class LocalSettingKeys
 {
     public const string SteamId64 = "steam.steamId64";
+
+    /// <summary>Signed-in Steam account (family sharing), shown in Settings: account name, SteamID64, since when.</summary>
+    public const string SteamAccountName = "steam.account.name";
+
+    public const string SteamAccountId = "steam.account.steamId";
+
+    public const string SteamAccountSince = "steam.account.since";
 
     /// <summary>
     /// UI language: "system", "en" or "es" (<see cref="Localization.LanguageResolver"/>). Machine-local until the sync

@@ -10,7 +10,8 @@ namespace Lumen.Providers.Steam;
 
 /// <summary>
 /// Steam: installed games from the local library folders (no login), plus owned games from the Steam
-/// Web API when the user supplied a key and SteamID64. Only reads Steam's files and registry.
+/// Web API when the user supplied a key and SteamID64, plus games the Steam family shares when the user signed in
+/// (<see cref="SteamAccount"/>). Only reads Steam's files and registry.
 /// </summary>
 public sealed class SteamProvider(
     IRegistryReader registry,
@@ -18,7 +19,8 @@ public sealed class SteamProvider(
     ISecretStore secrets,
     ILocalSettings settings,
     SteamWebApi webApi,
-    TimeProvider? time = null) : ILibraryProvider, ICachingProvider, IWatchableProvider
+    TimeProvider? time = null,
+    SteamAccount? account = null) : ILibraryProvider, ICachingProvider, IWatchableProvider
 {
     public const string SourceId = "steam";
 
@@ -97,33 +99,24 @@ public sealed class SteamProvider(
         }
     }
 
+    /// <summary>
+    /// Owned games (Web API key) and family-shared games (sign-in), each optional. Family games the user also owns are
+    /// left out (the owned copy wins). When one part fails the other still counts (Partial).
+    /// </summary>
     public async Task<ProviderResult> ScanOwnedAsync(CancellationToken ct)
     {
         try
         {
-            var apiKey = await secrets.GetAsync(SecretNames.SteamWebApiKey, ct).ConfigureAwait(false);
-            var steamId = await settings.GetAsync(LocalSettingKeys.SteamId64, ct).ConfigureAwait(false);
-            if (string.IsNullOrWhiteSpace(apiKey) || steamId is null || !SteamWebApi.IsValidSteamId64(steamId))
-            {
-                return ProviderResult.NotConfigured("Steam Web API key or SteamID64 not set.");
-            }
-
             if (_ownedCache is { } cached && _time.GetUtcNow() - cached.At < OwnedCacheLifetime)
             {
                 return cached.Result;
             }
 
-            var result = await webApi.GetOwnedGamesAsync(apiKey, steamId, ct).ConfigureAwait(false);
-            var scan = result.Error switch
-            {
-                SteamApiError.None => ProviderResult.FromScan(ToEntries(result.Games), []),
-                SteamApiError.PrivateProfile => new ProviderResult(
-                    ProviderStatus.Partial,
-                    [],
-                    [new ProviderDiagnostic(DiagnosticSeverity.Warning, "Steam returned no games: the profile's game details are private.")]),
-                SteamApiError.InvalidKey => ProviderResult.Failed($"Steam rejected the Web API key (HTTP {result.Detail})."),
-                _ => ProviderResult.Failed($"Steam Web API unavailable ({result.Error}: {result.Detail})."),
-            };
+            var owned = await ScanOwnedByKeyAsync(ct).ConfigureAwait(false);
+            var family = account is null
+                ? new SteamFamilyResult(SteamFamilyStatus.NotConnected, [])
+                : await account.GetSharedGamesAsync(ct).ConfigureAwait(false);
+            var scan = CombineOwnedAndFamily(owned, family);
 
             // Only good answers are reused; failures are retried on the next scan.
             _ownedCache = scan.Status == ProviderStatus.Ok ? (scan, _time.GetUtcNow()) : null;
@@ -138,6 +131,91 @@ public sealed class SteamProvider(
             return ProviderResult.Failed("Steam: could not read the owned library.", ex);
         }
     }
+
+    internal ProviderResult CombineOwnedAndFamily(ProviderResult owned, SteamFamilyResult family)
+    {
+        if (owned.Status == ProviderStatus.NotConfigured && family.Status == SteamFamilyStatus.NotConnected)
+        {
+            return owned;
+        }
+
+        var diagnostics = owned.Status == ProviderStatus.NotConfigured ? [] : owned.Diagnostics.ToList();
+        var familyFailed = family.Status is SteamFamilyStatus.Failed or SteamFamilyStatus.NeedsReconnect;
+        if (family.Status == SteamFamilyStatus.NeedsReconnect)
+        {
+            diagnostics.Add(new(DiagnosticSeverity.Warning, "Steam family: the sign-in was rejected; connect again in Settings.", family.Detail));
+        }
+        else if (family.Status == SteamFamilyStatus.Failed)
+        {
+            diagnostics.Add(new(DiagnosticSeverity.Warning, "Steam family: shared games unavailable right now.", family.Detail));
+        }
+
+        var entries = owned.IsUsable ? owned.Entries.ToList() : [];
+        var ownedIds = entries.Select(e => e.Ref.ExternalId).ToHashSet(StringComparer.Ordinal);
+        entries.AddRange(ToFamilyEntries(family.Games.Where(g => !ownedIds.Contains(g.AppId))));
+
+        var ownedFailed = owned.Status is ProviderStatus.Failed;
+        var anyUsable = owned.IsUsable || family.Status is SteamFamilyStatus.Ok or SteamFamilyStatus.NotInFamily;
+        if (!anyUsable)
+        {
+            return new ProviderResult(ProviderStatus.Failed, [], diagnostics);
+        }
+
+        return new ProviderResult(ownedFailed || familyFailed || owned.Status == ProviderStatus.Partial ? ProviderStatus.Partial : ProviderStatus.Ok, entries, diagnostics);
+    }
+
+    private async Task<ProviderResult> ScanOwnedByKeyAsync(CancellationToken ct)
+    {
+        var apiKey = await secrets.GetAsync(SecretNames.SteamWebApiKey, ct).ConfigureAwait(false);
+        var steamId = await settings.GetAsync(LocalSettingKeys.SteamId64, ct).ConfigureAwait(false);
+        if (string.IsNullOrWhiteSpace(apiKey) || steamId is null || !SteamWebApi.IsValidSteamId64(steamId))
+        {
+            return ProviderResult.NotConfigured("Steam Web API key or SteamID64 not set.");
+        }
+
+        var result = await webApi.GetOwnedGamesAsync(apiKey, steamId, ct).ConfigureAwait(false);
+        return result.Error switch
+        {
+            SteamApiError.None => ProviderResult.FromScan(ToEntries(result.Games), []),
+            SteamApiError.PrivateProfile => new ProviderResult(
+                ProviderStatus.Partial,
+                [],
+                [new ProviderDiagnostic(DiagnosticSeverity.Warning, "Steam returned no games: the profile's game details are private.")]),
+            SteamApiError.InvalidKey => ProviderResult.Failed($"Steam rejected the Web API key (HTTP {result.Detail})."),
+            _ => ProviderResult.Failed($"Steam Web API unavailable ({result.Error}: {result.Detail})."),
+        };
+    }
+
+    /// <summary>Family-shared games: not installed (an installed copy comes from the local scan), marked "family".</summary>
+    internal IReadOnlyList<LibraryEntry> ToFamilyEntries(IEnumerable<SteamSharedGame> games) =>
+        games
+            .Where(g => !_excluded.Contains(g.AppId))
+            .DistinctBy(g => g.AppId)
+            .Select(g =>
+            {
+                var extra = new Dictionary<string, string>(StringComparer.Ordinal)
+                {
+                    ["appid"] = g.AppId,
+                    ["family"] = "true",
+                    ["familyOwners"] = g.OwnerCount.ToString(CultureInfo.InvariantCulture),
+                    ["playtimeMinutes"] = g.PlaytimeMinutes.ToString(CultureInfo.InvariantCulture),
+                };
+                if (g.LastPlayedUnix > 0)
+                {
+                    extra["lastPlayed"] = g.LastPlayedUnix.ToString(CultureInfo.InvariantCulture);
+                }
+
+                return new LibraryEntry(
+                    new ItemRef(SourceId, g.AppId),
+                    ItemKind.Game,
+                    g.Name,
+                    InstallState.NotInstalled,
+                    null,
+                    LaunchFor(g.AppId),
+                    InstallFor(g.AppId),
+                    extra);
+            })
+            .ToList();
 
     /// <summary>Checks a key/SteamID pair without saving anything (Settings → Steam → Save and test).</summary>
     public Task<SteamOwnedGamesResult> TestConnectionAsync(string apiKey, string steamId64, CancellationToken ct) =>

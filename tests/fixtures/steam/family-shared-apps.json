@@ -1,0 +1,50 @@
+{
+  "response": {
+    "apps": [
+      {
+        "appid": 1000020,
+        "name": "Shared Sample Quest",
+        "owner_steamids": [
+          "76561190000000002"
+        ],
+        "exclude_reason": 0,
+        "app_type": 1,
+        "rt_playtime": 95,
+        "rt_last_played": 1780000000
+      },
+      {
+        "appid": 1000030,
+        "name": "Shared Puzzle",
+        "owner_steamids": [
+          "76561190000000002",
+          "76561190000000003"
+        ],
+        "app_type": 1
+      },
+      {
+        "appid": 1000040,
+        "name": "Not Shareable",
+        "owner_steamids": [
+          "76561190000000002"
+        ],
+        "exclude_reason": 2,
+        "app_type": 1
+      },
+      {
+        "appid": 1000050,
+        "name": "Sample Soundtrack",
+        "owner_steamids": [
+          "76561190000000002"
+        ],
+        "exclude_reason": 0,
+        "app_type": 4
+      },
+      {
+        "appid": 1000060,
+        "name": "   ",
+        "app_type": 1
+      }
+    ],
+    "owner_steamid": "76561190000000001"
+  }
+}

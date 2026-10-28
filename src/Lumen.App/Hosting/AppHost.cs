@@ -83,8 +83,27 @@ public static class AppHost
             return new SteamWebApi(http);
         });
 
+        // Steam sign-in for family sharing (M5): tokens only travel to api.steampowered.com, again on a plain
+        // HttpClient (the access token goes in the query string, which must never be logged).
+        builder.Services.AddSingleton(_ =>
+        {
+            var http = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
+            http.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent());
+            return new SteamAccountApi(http);
+        });
+        builder.Services.AddSingleton(sp => new SteamAccount(
+            sp.GetRequiredService<SteamAccountApi>(),
+            sp.GetRequiredService<ISecretStore>(),
+            sp.GetRequiredService<ILocalSettings>()));
+
         // Library
-        builder.Services.AddSingleton<SteamProvider>();
+        builder.Services.AddSingleton(sp => new SteamProvider(
+            sp.GetRequiredService<IRegistryReader>(),
+            sp.GetRequiredService<IFileSystem>(),
+            sp.GetRequiredService<ISecretStore>(),
+            sp.GetRequiredService<ILocalSettings>(),
+            sp.GetRequiredService<SteamWebApi>(),
+            account: sp.GetRequiredService<SteamAccount>()));
         builder.Services.AddSingleton<ILibraryProvider>(sp => sp.GetRequiredService<SteamProvider>());
         builder.Services.AddSingleton<ILibraryProvider, EpicProvider>();
         builder.Services.AddSingleton<ILibraryProvider, GogProvider>();
@@ -164,6 +183,7 @@ public static class AppHost
         builder.Services.AddSingleton<CollectionsViewModel>();
         builder.Services.AddSingleton<LibraryViewModel>();
         builder.Services.AddSingleton<SteamSettingsViewModel>();
+        builder.Services.AddSingleton<SteamFamilyViewModel>();
         builder.Services.AddSingleton<ArtworkSettingsViewModel>();
         builder.Services.AddSingleton<LanguageSettingsViewModel>();
         builder.Services.AddSingleton<FirstRunViewModel>();

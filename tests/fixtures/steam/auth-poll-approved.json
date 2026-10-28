@@ -1,0 +1,8 @@
+{
+  "response": {
+    "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJpc3MiOiJzdGVhbSIsInN1YiI6Ijc2NTYxMTkwMDAwMDAwMDAxIiwiYXVkIjpbImNsaWVudCIsIndlYiJdLCJleHAiOjE4OTM0NTYwMDAsImp0aSI6IjAwMDBfMDAwMDAwMDBfMDAwMDAifQ.c3ludGhldGlj",
+    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJpc3MiOiJzdGVhbSIsInN1YiI6Ijc2NTYxMTkwMDAwMDAwMDAxIiwiYXVkIjpbImNsaWVudCIsIndlYiJdLCJleHAiOjE3OTAwMDAwMDB9.c3ludGhldGlj",
+    "had_remote_interaction": true,
+    "account_name": "sample_player"
+  }
+}
