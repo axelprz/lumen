@@ -120,6 +120,14 @@
                 <TextBlock Text="{l:Loc Detail_StorePage}" />
               </StackPanel>
             </Button>
+            <Button Command="{Binding UninstallCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
+                    AutomationProperties.Name="{l:Loc Detail_Uninstall}"
+                    Visibility="{Binding CanUninstall, Converter={StaticResource BoolToVisibility}}">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="&#xE74D;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+                <TextBlock Text="{l:Loc Detail_Uninstall}" />
+              </StackPanel>
+            </Button>
             <Button x:Name="MoreButton" Click="OnMoreClick" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
                     AutomationProperties.Name="{l:Loc Detail_More}">
               <StackPanel Orientation="Horizontal">

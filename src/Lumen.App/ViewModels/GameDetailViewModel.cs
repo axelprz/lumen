@@ -144,6 +144,12 @@ public sealed partial class GameDetailViewModel : ObservableObject
 
     public bool IsMerged => Item.IsMerged;
 
+    /// <summary>The installed copy "Uninstall" acts on: the selected store's if installed, else the first installed one.</summary>
+    public LibraryEntry? UninstallTarget =>
+        Item.Entries.OrderBy(e => e == Selected ? 0 : 1).FirstOrDefault(e => EntryActions.Uninstall(e) is not null);
+
+    public bool CanUninstall => UninstallTarget is not null;
+
     public bool IsHidden => Item.IsHidden;
 
     public bool HasCustomTitle => Item.CustomTitle is not null;
@@ -176,6 +182,7 @@ public sealed partial class GameDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(CanRun));
         OnPropertyChanged(nameof(ActionText));
         OnPropertyChanged(nameof(CanOpenStorePage));
+        OnPropertyChanged(nameof(CanUninstall));
         if (_loadingChoices || value is null || !Item.IsMerged || value.Entry == Item.Primary)
         {
             return;
@@ -209,6 +216,39 @@ public sealed partial class GameDetailViewModel : ObservableObject
     {
         var spec = EntryActions.StorePage(Selected) ?? Item.Entries.Select(EntryActions.StorePage).FirstOrDefault(s => s is not null);
         return spec is null ? Task.CompletedTask : _s.Shell.StartAsync(spec, CancellationToken.None);
+    }
+
+    /// <summary>
+    /// Hands uninstalling to the store or to Windows Settings and says what to do there. Lumen deletes nothing; the
+    /// auto refresh notices when the game is gone.
+    /// </summary>
+    [RelayCommand]
+    private async Task UninstallAsync()
+    {
+        Notice = null;
+        var entry = UninstallTarget;
+        if (entry is null || EntryActions.Uninstall(entry) is not { } action)
+        {
+            return;
+        }
+
+        var store = _s.StoreName(entry);
+        try
+        {
+            await _s.Shell.StartAsync(action.Spec, CancellationToken.None);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            Notice = string.Format(CultureInfo.CurrentCulture, _s.Localizer["Detail_UninstallFailed"], store);
+            return;
+        }
+
+        Notice = action.Route switch
+        {
+            UninstallRoute.Store => string.Format(CultureInfo.CurrentCulture, _s.Localizer["Detail_UninstallStore"], store),
+            UninstallRoute.StoreLibrary => string.Format(CultureInfo.CurrentCulture, _s.Localizer["Detail_UninstallStoreLibrary"], store, entry.Title),
+            _ => string.Format(CultureInfo.CurrentCulture, _s.Localizer["Detail_UninstallWindows"], entry.Title),
+        };
     }
 
     [RelayCommand]
