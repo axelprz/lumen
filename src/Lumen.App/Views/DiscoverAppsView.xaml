@@ -55,7 +55,9 @@
                Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}" />
 
     <!-- The list: virtualized, a PC can have a few hundred shortcuts -->
+    <!-- Foreground set explicitly: a ListBox otherwise uses Windows' default (black) text color -->
     <ListBox ItemsSource="{Binding Visible}"
+             Foreground="{DynamicResource Lumen.Brush.Text}"
              Background="Transparent"
              BorderThickness="0"
              HorizontalContentAlignment="Stretch"

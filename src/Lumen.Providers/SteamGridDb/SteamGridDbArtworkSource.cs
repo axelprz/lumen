@@ -81,15 +81,39 @@ public sealed class SteamGridDbArtworkSource(
             }
         }
 
-        var search = await client.SearchAsync(apiKey, entry.Title, ct).ConfigureAwait(false);
-        if (search.Error is not (SgdbError.None or SgdbError.NotFound))
+        // The full title first; stores often add a subtitle SteamGridDB doesn't have ("Home - A Unique Horror
+        // Adventure" is "Home" there), so then the part before it. Only exact (normalized) name matches count.
+        long? match = null;
+        foreach (var title in new[] { entry.Title, MainTitle(entry.Title) }.OfType<string>())
         {
-            return (null, false);
+            var search = await client.SearchAsync(apiKey, title, ct).ConfigureAwait(false);
+            if (search.Error is not (SgdbError.None or SgdbError.NotFound))
+            {
+                return (null, false);
+            }
+
+            var wanted = normalizer.Normalize(title);
+            match = search.Value?.FirstOrDefault(g => normalizer.Normalize(g.Name) == wanted)?.Id;
+            if (match is not null)
+            {
+                break;
+            }
         }
 
-        var wanted = normalizer.Normalize(entry.Title);
-        var match = search.Value?.FirstOrDefault(g => normalizer.Normalize(g.Name) == wanted);
-        await lookups.SetAsync(cacheKey, match?.Id, ct).ConfigureAwait(false);
-        return (match?.Id, true);
+        await lookups.SetAsync(cacheKey, match, ct).ConfigureAwait(false);
+        return (match, true);
+    }
+
+    private static readonly string[] SubtitleSeparators = [" - ", " – ", " — ", ": "];
+
+    /// <summary>The title before its first subtitle separator, or null when there is none (or nothing before it).</summary>
+    internal static string? MainTitle(string title)
+    {
+        var cut = SubtitleSeparators
+            .Select(s => title.IndexOf(s, StringComparison.Ordinal))
+            .Where(i => i > 0)
+            .DefaultIfEmpty(-1)
+            .Min();
+        return cut > 0 && title[..cut].Trim() is { Length: >= 2 } main ? main : null;
     }
 }
