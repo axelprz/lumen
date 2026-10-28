@@ -21,12 +21,16 @@ public sealed record TileMenuItem(string Header, ICommand? Command)
 /// </summary>
 public sealed partial class LibraryTileViewModel : ObservableObject
 {
-    private readonly Func<LibraryItem, Task<string?>> _coverLoader;
+    private readonly Func<LibraryItem, Task<TileArt?>> _coverLoader;
     private bool _coverRequested;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasCover))]
     private string? _coverPath;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasIcon))]
+    private string? _iconPath;
 
     public LibraryTileViewModel(
         LibraryItem item,
@@ -34,7 +38,7 @@ public sealed partial class LibraryTileViewModel : ObservableObject
         ILocalizer localizer,
         ICommand primaryCommand,
         IReadOnlyList<TileMenuItem> menu,
-        Func<LibraryItem, Task<string?>> coverLoader,
+        Func<LibraryItem, Task<TileArt?>> coverLoader,
         ICommand openDetailCommand)
     {
         _coverLoader = coverLoader;
@@ -59,6 +63,9 @@ public sealed partial class LibraryTileViewModel : ObservableObject
 
     public bool HasCover => CoverPath is not null;
 
+    /// <summary>No cover, but an icon (apps, some Store games): shown centered.</summary>
+    public bool HasIcon => IconPath is not null;
+
     /// <summary>Called when the tile becomes visible; loads (or downloads once) the cover. Safe to call repeatedly.</summary>
     public async Task EnsureCoverAsync()
     {
@@ -68,7 +75,15 @@ public sealed partial class LibraryTileViewModel : ObservableObject
         }
 
         _coverRequested = true;
-        CoverPath = await _coverLoader(Item);
+        var art = await _coverLoader(Item);
+        if (art is { IsIcon: true })
+        {
+            IconPath = art.Path;
+        }
+        else
+        {
+            CoverPath = art?.Path;
+        }
     }
 
     public string Title => Item.Title;

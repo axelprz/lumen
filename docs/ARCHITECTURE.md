@@ -151,6 +151,11 @@ Rules: providers only **read** store files; never write into a store's folder or
 - **Curation:** detected apps are suggestions, not library items (`AppCuration`, Core). The user's choice is stored per ref in `app_choices` (migration 0009: `added` / `ignored`, no row = suggestion). It is machine-local until the sync folder (M8) moves ignored apps to `config.json` → `ignoredApps`.
 - **What the library shows:** `LibraryService.Entries` keeps everything scanned, while `Items` only include added apps.
 - **Never suggested:** shortcuts to games Lumen already shows through a store (same normalized title, or a target inside the game's install folder).
+- **Icons (M4):** `ILocalArtworkSource` (Core) supplies images that live on this PC. They are validated (format, ≤ 10 MB) and cached like downloads, and tried before remote sources. Two implementations:
+  - `PackageLogoSource` (Providers), for Store apps and Xbox games: the manifest's `Square44x44Logo`, then `Square150x150Logo`, then the Store logo. Among the shipped variants it prefers `altform-unplated`, then the largest up to 256 px (`targetsize-N`, else `scale-N`); it skips `contrast-*` and light-theme variants and never leaves the package folder.
+  - `ProgramIconSource` (Platform.Windows), for Start menu apps and manual items: the shortcut's icon (path + index), else the target `.exe`. It is read at 256 px with `PrivateExtractIcons` (the file is read as data; nothing runs, no shell extension loads) and converted to PNG by `PngEncoder` (Core, no imaging dependency). Icons without alpha use their mask.
+  - Tiles show the cover when there is one, else the icon centered (apps, and Store games SteamGridDB can't name, e.g. "Solitaire & Casual Games").
+  - SteamGridDB only looks up games (`Kind == Game`), never apps.
 - **Copies of one app** (same target and name, e.g. Discord's two Start menu shortcuts with different arguments) count once: they're never suggested when one copy is in the library, and listed once otherwise.
 
 ## 5. Services (Lumen.Core)
@@ -160,7 +165,7 @@ Rules: providers only **read** store files; never write into a store's folder or
 | `LibraryService` | Runs providers (in parallel, with timeouts), merges entries, applies overrides, persists, raises change events |
 | `LaunchService` | Executes `LaunchSpec`, records "last launched", hands off to `PlaytimeTracker` |
 | `PlaytimeTracker` | Every ~5 s lists processes (`QueryFullProcessImageName`, no admin) and matches image paths under the item's install dir; a session starts on first match and ends after ~30 s with no match; persists sessions |
-| `ArtworkService` | Resolves cover/hero/logo/icon: override → Steam CDN (Steam items) → SteamGridDB (search by title, cache the SGDB game id) → icon extracted from exe → generated placeholder. Disk cache in `%LOCALAPPDATA%\Lumen\cache\artwork`. |
+| `ArtworkService` | Resolves cover/hero/logo/icon: override → local sources (package logos, program icons; M4) → Steam CDN (Steam items) → SteamGridDB (games only; search by title, cache the SGDB game id) → the tile's initial as placeholder. Disk cache in `%LOCALAPPDATA%\Lumen\cache\artwork`. |
 | `AccentService` | Extracts a dominant, saturated color from hero/cover art (quantize + score by chroma and population), ensures WCAG contrast vs. the dark background. Implemented in M3: pure logic in `Lumen.Core.Theming.AccentPicker`, WPF side in `Lumen.App.Services.AccentService` |
 | `SecretStore` | DPAPI with CurrentUser scope (`ISecretProtector`; `DpapiProtector` calls `CryptProtectData` directly, with app-specific entropy, so no extra package) protected values in the SQLite `secrets` table (`ISecretStore` / `SqliteSecretStore`). A value that no longer decrypts (other user or machine) reads as not set. Never logged, never synced. Machine-local non-secret values (e.g. SteamID64) go to `settings_local` via `ILocalSettings`. |
 | `RoutineEngine` | Loads/validates routines, trust checks, executes actions sequentially with cancellation, tracks started processes for undo |

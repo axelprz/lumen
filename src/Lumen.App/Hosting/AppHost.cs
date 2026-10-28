@@ -140,6 +140,9 @@ public static class AppHost
             sp.GetRequiredService<SteamGridDbClient>(),
             sp.GetRequiredService<IArtworkLookupCache>(),
             TitleCleanup.CreateNormalizer()));
+        // Icons read on this PC (no network): package logos, then programs' own icons.
+        builder.Services.AddSingleton<ILocalArtworkSource>(sp => new PackageLogoSource(sp.GetRequiredService<IFileSystem>()));
+        builder.Services.AddSingleton<ILocalArtworkSource>(sp => new ProgramIconSource(sp.GetRequiredService<IShortcutReader>(), sp.GetRequiredService<IFileSystem>()));
         builder.Services.AddSingleton(sp =>
         {
             var http = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
@@ -149,7 +152,8 @@ public static class AppHost
                 sp.GetServices<IArtworkSource>(),
                 paths.ArtworkCacheDirectory,
                 paths.ArtworkOverridesDirectory,
-                sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<ArtworkService>>());
+                sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<ArtworkService>>(),
+                localSources: sp.GetServices<ILocalArtworkSource>());
         });
 
         builder.Services.AddSingleton<AccentService>();

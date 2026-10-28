@@ -70,6 +70,9 @@ internal sealed class InMemoryFileSystem : IFileSystem
             .ToList();
     }
 
+    public async Task<byte[]> ReadAllBytesAsync(string path, CancellationToken ct) =>
+        System.Text.Encoding.UTF8.GetBytes(await ReadAllTextAsync(path, ct));
+
     public Task<string> ReadAllTextAsync(string path, CancellationToken ct)
     {
         path = Normalize(path);

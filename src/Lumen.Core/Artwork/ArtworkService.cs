@@ -48,7 +48,20 @@ public interface IArtworkSource
 }
 
 /// <summary>
-/// Resolves artwork to a local file: the user's override first, then the disk cache, then each source's
+/// Artwork that lives on this PC (app and package icons): no network. The bytes are validated and cached like
+/// downloads.
+/// </summary>
+public interface ILocalArtworkSource
+{
+    bool CanHandle(LibraryEntry entry, ArtworkKind kind);
+
+    /// <returns>A PNG/JPEG/WebP image, or null when this entry has none.</returns>
+    Task<byte[]?> GetImageAsync(LibraryEntry entry, ArtworkKind kind, CancellationToken ct);
+}
+
+/// <summary>
+/// Resolves artwork to a local file: the user's override first, then the disk cache, then local sources (icons),
+/// then each source's
 /// candidate URLs (in registration order, e.g. Steam CDN before SteamGridDB). Downloads are limited in parallel,
 /// deduplicated, size-capped and checked to really be an image before they are kept. A definitive "not found"
 /// is remembered for a week so the network isn't asked again on every start.
@@ -62,6 +75,7 @@ public sealed partial class ArtworkService
 
     private readonly HttpClient _http;
     private readonly IReadOnlyList<IArtworkSource> _sources;
+    private readonly IReadOnlyList<ILocalArtworkSource> _localSources;
     private readonly string _cacheDirectory;
     private readonly string _overridesDirectory;
     private readonly ILogger<ArtworkService> _logger;
@@ -76,11 +90,13 @@ public sealed partial class ArtworkService
         string cacheDirectory,
         string overridesDirectory,
         ILogger<ArtworkService> logger,
-        TimeProvider? time = null)
+        TimeProvider? time = null,
+        IEnumerable<ILocalArtworkSource>? localSources = null)
     {
         _http = http ?? throw new ArgumentNullException(nameof(http));
         ArgumentNullException.ThrowIfNull(sources);
         _sources = sources.ToList();
+        _localSources = localSources?.ToList() ?? [];
         ArgumentException.ThrowIfNullOrWhiteSpace(cacheDirectory);
         ArgumentException.ThrowIfNullOrWhiteSpace(overridesDirectory);
         _cacheDirectory = cacheDirectory;
@@ -122,7 +138,8 @@ public sealed partial class ArtworkService
         }
 
         var sources = _sources.Where(s => s.CanHandle(entry)).ToList();
-        if (sources.Count == 0)
+        var local = _localSources.Where(s => s.CanHandle(entry, kind)).ToList();
+        if (sources.Count == 0 && local.Count == 0)
         {
             return Task.FromResult<string?>(null);
         }
@@ -140,7 +157,7 @@ public sealed partial class ArtworkService
         }
 
         // One download per key even if many tiles ask at once.
-        var lazy = _inFlight.GetOrAdd(basePath, _ => new Lazy<Task<string?>>(() => DownloadAsync(sources, entry, kind, basePath, ct)));
+        var lazy = _inFlight.GetOrAdd(basePath, _ => new Lazy<Task<string?>>(() => DownloadAsync(sources, local, entry, kind, basePath, ct)));
         return AwaitAndForget(basePath, lazy.Value);
     }
 
@@ -242,11 +259,39 @@ public sealed partial class ArtworkService
         }
     }
 
-    private async Task<string?> DownloadAsync(IReadOnlyList<IArtworkSource> sources, LibraryEntry entry, ArtworkKind kind, string basePath, CancellationToken ct)
+    private async Task<string?> DownloadAsync(
+        IReadOnlyList<IArtworkSource> sources,
+        IReadOnlyList<ILocalArtworkSource> local,
+        LibraryEntry entry,
+        ArtworkKind kind,
+        string basePath,
+        CancellationToken ct)
     {
         await _downloads.WaitAsync(ct).ConfigureAwait(false);
         try
         {
+            // Local images first: no network, and a missing icon is a definitive answer.
+            foreach (var source in local)
+            {
+                byte[]? image;
+                try
+                {
+                    image = await source.GetImageAsync(entry, kind, ct).ConfigureAwait(false);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    LogSourceFailed(ex, entry.Ref.ToString(), kind);
+                    image = null;
+                }
+
+                if (image is { Length: > 0 } && image.LongLength <= MaxImageBytes && DetectImageExtension(image) is { } ext)
+                {
+                    var path = basePath + ext;
+                    await WriteAtomicallyAsync(path, image, ct).ConfigureAwait(false);
+                    return path;
+                }
+            }
+
             var allDefinitive = true;
             foreach (var source in sources)
             {

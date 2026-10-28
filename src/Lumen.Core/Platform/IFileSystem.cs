@@ -15,6 +15,9 @@ public interface IFileSystem
 
     Task<string> ReadAllTextAsync(string path, CancellationToken ct);
 
+    /// <summary>Reads a whole (small) file, e.g. an icon. Shares the file with whoever has it open.</summary>
+    Task<byte[]> ReadAllBytesAsync(string path, CancellationToken ct);
+
     /// <summary>Subfolders (full paths) of <paramref name="directory"/>, non-recursive; empty when it doesn't exist.</summary>
     IReadOnlyList<string> GetDirectories(string directory);
 }
@@ -28,6 +31,14 @@ public sealed class PhysicalFileSystem : IFileSystem
 
     public IReadOnlyList<string> GetFiles(string directory, string pattern) =>
         Directory.Exists(directory) ? Directory.GetFiles(directory, pattern, SearchOption.TopDirectoryOnly) : [];
+
+    public async Task<byte[]> ReadAllBytesAsync(string path, CancellationToken ct)
+    {
+        await using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete, 4096, useAsync: true);
+        using var buffer = new MemoryStream();
+        await stream.CopyToAsync(buffer, ct).ConfigureAwait(false);
+        return buffer.ToArray();
+    }
 
     public IReadOnlyList<string> GetDirectories(string directory) =>
         Directory.Exists(directory) ? Directory.GetDirectories(directory) : [];

@@ -92,6 +92,8 @@ public sealed class EntryActionsTests
 
         public IReadOnlyList<string> GetDirectories(string directory) => [];
 
+        public Task<byte[]> ReadAllBytesAsync(string path, CancellationToken ct) => throw new FileNotFoundException();
+
         public Task<string> ReadAllTextAsync(string path, CancellationToken ct) => throw new FileNotFoundException();
     }
 }

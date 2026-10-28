@@ -26,7 +26,8 @@ public sealed class SteamGridDbArtworkSource(
 
     private readonly TimeProvider _time = time ?? TimeProvider.System;
 
-    public bool CanHandle(LibraryEntry entry) => true;
+    // A games database: apps (Discord, Calculator…) would only find wrong matches. They use their own icon.
+    public bool CanHandle(LibraryEntry entry) => entry.Kind == ItemKind.Game;
 
     public async Task<ArtworkCandidates> GetCandidatesAsync(LibraryEntry entry, ArtworkKind kind, CancellationToken ct)
     {

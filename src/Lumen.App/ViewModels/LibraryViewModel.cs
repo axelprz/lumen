@@ -524,21 +524,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         }
     }
 
-    private async Task<string?> LoadCoverAsync(LibraryItem item)
-    {
-        try
-        {
-            return await _artwork.GetForItemAsync(item, ArtworkKind.Cover, CancellationToken.None);
-        }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            LogCoverFailed(ex, item.Key.ToString());
-            return null;
-        }
-    }
-
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Could not load the cover for {Ref}")]
-    private partial void LogCoverFailed(Exception exception, string @ref);
+    private Task<TileArt?> LoadCoverAsync(LibraryItem item) => TileArt.LoadAsync(_artwork, item);
 
     [LoggerMessage(Level = LogLevel.Error, Message = "Could not save a manual item")]
     private partial void LogManualSaveFailed(Exception exception);

@@ -128,6 +128,13 @@ public sealed class SteamGridDbTests
         searches.ShouldBe(["Old Game - A Unique Adventure", "Old Game"]);
     }
 
+    [Fact]
+    public void Apps_AreNeverLookedUp()
+    {
+        Source().CanHandle(_epicGame).ShouldBeTrue();
+        Source().CanHandle(_epicGame with { Kind = ItemKind.App }).ShouldBeFalse();
+    }
+
     [Theory]
     [InlineData("Home - A Unique Horror Adventure", "Home")]
     [InlineData("Sample: The Sequel", "Sample")]
