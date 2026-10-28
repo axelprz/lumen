@@ -181,8 +181,10 @@ public sealed partial class LibraryService
     }
 
     /// <summary>
-    /// Installed entries win; owned entries fill in what is not installed. A scan that failed falls back to
-    /// the matching part of the previous cache. Returns null when nothing new is known (keep the cache).
+    /// Installed entries win; owned entries fill in what is not installed. An installed game that is also in the
+    /// owned list keeps its local data and gains what only the owned list knows (playtime; the latest "last
+    /// played"). A scan that failed falls back to the matching part of the previous cache. Returns null when nothing
+    /// new is known (keep the cache).
     /// </summary>
     public static IReadOnlyList<LibraryEntry>? Combine(ProviderScanReport report, IReadOnlyList<LibraryEntry> previous)
     {
@@ -209,10 +211,40 @@ public sealed partial class LibraryService
 
         foreach (var entry in owned)
         {
-            result.TryAdd(entry.Ref, entry with { State = InstallState.NotInstalled, InstallDirectory = null });
+            if (result.TryGetValue(entry.Ref, out var local))
+            {
+                result[entry.Ref] = local with { Extra = MergeExtra(local.Extra, entry.Extra) };
+            }
+            else
+            {
+                result[entry.Ref] = entry with { State = InstallState.NotInstalled, InstallDirectory = null };
+            }
         }
 
         return result.Values.ToList();
+    }
+
+    /// <summary>Local values win, owned-only keys are added, and "lastPlayed" (unix seconds) keeps the most recent.</summary>
+    private static IReadOnlyDictionary<string, string> MergeExtra(IReadOnlyDictionary<string, string> local, IReadOnlyDictionary<string, string> owned)
+    {
+        if (owned.Count == 0)
+        {
+            return local;
+        }
+
+        var merged = new Dictionary<string, string>(owned, StringComparer.Ordinal);
+        foreach (var (key, value) in local)
+        {
+            merged[key] = value;
+        }
+
+        if (long.TryParse(owned.GetValueOrDefault("lastPlayed"), System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var ownedLast)
+            && (!long.TryParse(local.GetValueOrDefault("lastPlayed"), System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var localLast) || ownedLast > localLast))
+        {
+            merged["lastPlayed"] = owned["lastPlayed"];
+        }
+
+        return merged;
     }
 
     private async Task<ProviderScanReport> ScanProviderAsync(ILibraryProvider provider, CancellationToken ct)
