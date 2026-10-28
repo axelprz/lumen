@@ -39,8 +39,8 @@ public static class EntryActions
 
         var id = entry.Ref.ExternalId;
 
-        // VERIFY: uplay://uninstall/{id} and the Epic library link come from Playnite's store plugins; confirm both
-        // on a real machine (steam://uninstall is documented by Valve).
+        // Verified on Windows 11 (2026-10): Steam and Ubisoft open their own uninstall confirmation, Epic opens its
+        // library, ms-settings:appsfeatures opens Settings → Apps. Links taken from Playnite's store plugins.
         return entry.Ref.Source switch
         {
             "steam" when IsNumber(id) => new(new LaunchSpec(LaunchKind.Uri, $"steam://uninstall/{id}"), UninstallRoute.Store),
