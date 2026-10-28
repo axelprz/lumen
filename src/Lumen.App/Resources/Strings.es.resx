@@ -454,4 +454,19 @@
   <data name="Detail_MergeTypeToSearch" xml:space="preserve">
     <value>Escribí parte del nombre para buscar.</value>
   </data>
+  <data name="Detail_Uninstall" xml:space="preserve">
+    <value>Desinstalar</value>
+  </data>
+  <data name="Detail_UninstallStore" xml:space="preserve">
+    <value>{0} te va a pedir confirmación. Lumen se actualiza solo cuando termine.</value>
+  </data>
+  <data name="Detail_UninstallStoreLibrary" xml:space="preserve">
+    <value>Se abrió la biblioteca de {0}: buscá «{1}», abrí su menú (⋯) y elegí Desinstalar. Lumen se actualiza solo cuando termine.</value>
+  </data>
+  <data name="Detail_UninstallWindows" xml:space="preserve">
+    <value>Se abrió Configuración de Windows → Aplicaciones: buscá «{0}», abrí su menú (⋯) y elegí Desinstalar. Lumen se actualiza cuando vuelvas.</value>
+  </data>
+  <data name="Detail_UninstallFailed" xml:space="preserve">
+    <value>No se pudo abrir {0} para desinstalar. Desinstalalo directamente desde {0}.</value>
+  </data>
 </root>

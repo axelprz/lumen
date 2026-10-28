@@ -454,4 +454,19 @@
   <data name="Detail_MergeTypeToSearch" xml:space="preserve">
     <value>Type part of the name to search.</value>
   </data>
+  <data name="Detail_Uninstall" xml:space="preserve">
+    <value>Uninstall</value>
+  </data>
+  <data name="Detail_UninstallStore" xml:space="preserve">
+    <value>{0} will ask you to confirm. Lumen updates by itself when it's done.</value>
+  </data>
+  <data name="Detail_UninstallStoreLibrary" xml:space="preserve">
+    <value>The {0} library is open: find “{1}”, open its menu (⋯) and choose Uninstall. Lumen updates by itself when it's done.</value>
+  </data>
+  <data name="Detail_UninstallWindows" xml:space="preserve">
+    <value>Windows Settings → Apps is open: search for “{0}”, open its menu (⋯) and choose Uninstall. Lumen updates when you come back.</value>
+  </data>
+  <data name="Detail_UninstallFailed" xml:space="preserve">
+    <value>Couldn't open {0} to uninstall. Uninstall it from {0} directly.</value>
+  </data>
 </root>
