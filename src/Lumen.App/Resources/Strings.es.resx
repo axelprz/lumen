@@ -818,4 +818,57 @@
   <data name="SteamFamily_Reconnect" xml:space="preserve">
     <value>Volver a conectar</value>
   </data>
+  <data name="GogAccount_Title" xml:space="preserve">
+    <value>Cuenta de GOG</value>
+  </data>
+  <data name="GogAccount_Description" xml:space="preserve">
+    <value>Mostrá los juegos de GOG que tenés y no instalaste. Iniciás sesión en la página de GOG en tu navegador: Lumen nunca ve tu contraseña. Es opcional: los juegos de GOG instalados aparecen igual.</value>
+  </data>
+  <data name="GogAccount_SignIn" xml:space="preserve">
+    <value>Iniciar sesión en GOG</value>
+  </data>
+  <data name="GogAccount_Steps" xml:space="preserve">
+    <value>1. Iniciá sesión en la página de GOG que se abrió en tu navegador.
+2. Al entrar, la página puede quedar en blanco: copiá la dirección completa de la barra del navegador (empieza con embed.gog.com/on_login_success).
+3. Pegala abajo y tocá Conectar. Sirve una sola vez y solo por unos minutos.</value>
+  </data>
+  <data name="GogAccount_CodeLabel" xml:space="preserve">
+    <value>Dirección (o código) de GOG</value>
+  </data>
+  <data name="GogAccount_Connect" xml:space="preserve">
+    <value>Conectar</value>
+  </data>
+  <data name="GogAccount_Connecting" xml:space="preserve">
+    <value>Conectando con GOG…</value>
+  </data>
+  <data name="GogAccount_Connected" xml:space="preserve">
+    <value>Conectado. Tus juegos de GOG se están agregando a la biblioteca.</value>
+  </data>
+  <data name="GogAccount_NotACode" xml:space="preserve">
+    <value>Eso no parece la dirección de GOG. Copiá la dirección completa del navegador después de iniciar sesión (tiene "code=").</value>
+  </data>
+  <data name="GogAccount_CodeRejected" xml:space="preserve">
+    <value>GOG no aceptó ese código. Sirve una vez y vence a los pocos minutos: volvé a iniciar sesión para obtener uno nuevo.</value>
+  </data>
+  <data name="GogAccount_Failed" xml:space="preserve">
+    <value>No se pudo conectar con GOG. Probá de nuevo en un rato.</value>
+  </data>
+  <data name="GogAccount_BrowserFailed" xml:space="preserve">
+    <value>No se pudo abrir el navegador.</value>
+  </data>
+  <data name="GogAccount_Account" xml:space="preserve">
+    <value>Conectado como {0} desde el {1}</value>
+  </data>
+  <data name="GogAccount_WhatLumenCanDo" xml:space="preserve">
+    <value>Lumen solo puede leer la lista de juegos que tenés en GOG. No puede comprar, cambiar tu cuenta ni ver tu contraseña. El inicio de sesión se guarda cifrado en esta PC y solo se usa con GOG. GOG no permite cancelarlo desde afuera: Desconectar lo borra de esta PC y vence solo.</value>
+  </data>
+  <data name="GogAccount_DisconnectTitle" xml:space="preserve">
+    <value>Desconectar GOG</value>
+  </data>
+  <data name="GogAccount_DisconnectConfirm" xml:space="preserve">
+    <value>¿Desconectar tu cuenta de GOG? Los juegos que tenés sin instalar salen de tu biblioteca y el inicio de sesión se borra de esta PC.</value>
+  </data>
+  <data name="GogAccount_Disconnected" xml:space="preserve">
+    <value>Desconectado. El inicio de sesión se borró de esta PC.</value>
+  </data>
 </root>

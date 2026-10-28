@@ -1,0 +1,18 @@
+{
+  "page": 1,
+  "totalPages": 2,
+  "totalProducts": 3,
+  "products": [
+    {
+      "id": 1000000001,
+      "title": "Sample Adventure",
+      "isGame": true,
+      "url": "/game/sample_adventure"
+    },
+    {
+      "id": 1000000002,
+      "title": "Sample Soundtrack Bonus",
+      "isGame": false
+    }
+  ]
+}

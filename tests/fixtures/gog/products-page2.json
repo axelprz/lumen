@@ -1,0 +1,12 @@
+{
+  "page": 2,
+  "totalPages": 2,
+  "totalProducts": 3,
+  "products": [
+    {
+      "id": 1000000003,
+      "title": "Sample Strategy",
+      "isGame": true
+    }
+  ]
+}

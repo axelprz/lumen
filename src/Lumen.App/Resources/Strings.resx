@@ -818,4 +818,57 @@
   <data name="SteamFamily_Reconnect" xml:space="preserve">
     <value>Connect again</value>
   </data>
+  <data name="GogAccount_Title" xml:space="preserve">
+    <value>GOG account</value>
+  </data>
+  <data name="GogAccount_Description" xml:space="preserve">
+    <value>Show the GOG games you own but haven't installed. You sign in on GOG's own page in your browser: Lumen never sees your password. Optional: installed GOG games show up without it.</value>
+  </data>
+  <data name="GogAccount_SignIn" xml:space="preserve">
+    <value>Sign in to GOG</value>
+  </data>
+  <data name="GogAccount_Steps" xml:space="preserve">
+    <value>1. Sign in on the GOG page that just opened in your browser.
+2. When you're in, the page may look blank: copy the whole address from the browser's address bar (it starts with embed.gog.com/on_login_success).
+3. Paste it below and choose Connect. It works once and only for a few minutes.</value>
+  </data>
+  <data name="GogAccount_CodeLabel" xml:space="preserve">
+    <value>Address (or code) from GOG</value>
+  </data>
+  <data name="GogAccount_Connect" xml:space="preserve">
+    <value>Connect</value>
+  </data>
+  <data name="GogAccount_Connecting" xml:space="preserve">
+    <value>Connecting to GOG…</value>
+  </data>
+  <data name="GogAccount_Connected" xml:space="preserve">
+    <value>Connected. Your GOG games are being added to the library.</value>
+  </data>
+  <data name="GogAccount_NotACode" xml:space="preserve">
+    <value>That doesn't look like GOG's address. Copy the whole address from the browser after signing in (it contains "code=").</value>
+  </data>
+  <data name="GogAccount_CodeRejected" xml:space="preserve">
+    <value>GOG didn't accept that code. It works once and expires after a few minutes: sign in again to get a new one.</value>
+  </data>
+  <data name="GogAccount_Failed" xml:space="preserve">
+    <value>Couldn't connect to GOG. Try again in a moment.</value>
+  </data>
+  <data name="GogAccount_BrowserFailed" xml:space="preserve">
+    <value>Couldn't open the browser.</value>
+  </data>
+  <data name="GogAccount_Account" xml:space="preserve">
+    <value>Connected as {0} since {1}</value>
+  </data>
+  <data name="GogAccount_WhatLumenCanDo" xml:space="preserve">
+    <value>Lumen can only read the list of games you own on GOG. It can't buy anything, change your account or see your password. The sign-in is stored encrypted on this PC and is only used with GOG. GOG offers no way to cancel it from outside: Disconnect deletes it from this PC, and it expires by itself.</value>
+  </data>
+  <data name="GogAccount_DisconnectTitle" xml:space="preserve">
+    <value>Disconnect GOG</value>
+  </data>
+  <data name="GogAccount_DisconnectConfirm" xml:space="preserve">
+    <value>Disconnect your GOG account? Games you own but haven't installed will leave your library, and the sign-in will be deleted from this PC.</value>
+  </data>
+  <data name="GogAccount_Disconnected" xml:space="preserve">
+    <value>Disconnected. The sign-in was deleted from this PC.</value>
+  </data>
 </root>

@@ -10,8 +10,17 @@ namespace Lumen.Providers.Gog;
 /// GOG: installed games from the registry keys GOG installers write (works with or without GOG Galaxy).
 /// Launches through Galaxy when it is installed, otherwise runs the game's executable. Read-only.
 /// </summary>
-public sealed class GogProvider(IRegistryReader registry, IFileSystem fileSystem) : ILibraryProvider
+public sealed class GogProvider(IRegistryReader registry, IFileSystem fileSystem, GogAccount? account = null, TimeProvider? time = null)
+    : ILibraryProvider, ICachingProvider
 {
+    /// <summary>The owned list barely changes; automatic rescans reuse it for this long (manual Rescan refreshes).</summary>
+    public static readonly TimeSpan OwnedCacheLifetime = TimeSpan.FromMinutes(10);
+
+    private readonly TimeProvider _time = time ?? TimeProvider.System;
+    private (ProviderResult Result, DateTimeOffset At)? _ownedCache;
+
+    public void InvalidateCache() => _ownedCache = null;
+
     public const string SourceId = "gog";
 
     // Verified on Windows 11 (2026-10) with Galaxy installed: these keys exist; dependsOn/launchParam are
@@ -24,7 +33,7 @@ public sealed class GogProvider(IRegistryReader registry, IFileSystem fileSystem
 
     public string DisplayName => "GOG";
 
-    public ProviderCapabilities Capabilities => ProviderCapabilities.InstalledScan;
+    public ProviderCapabilities Capabilities => ProviderCapabilities.InstalledScan | ProviderCapabilities.OwnedLibrary;
 
     public Task<ProviderResult> ScanInstalledAsync(CancellationToken ct)
     {
@@ -61,8 +70,57 @@ public sealed class GogProvider(IRegistryReader registry, IFileSystem fileSystem
         }
     }
 
-    public Task<ProviderResult> ScanOwnedAsync(CancellationToken ct) =>
-        Task.FromResult(ProviderResult.NotConfigured("GOG owned library needs the GOG sign-in (M5)."));
+    public async Task<ProviderResult> ScanOwnedAsync(CancellationToken ct)
+    {
+        try
+        {
+            if (account is null)
+            {
+                return ProviderResult.NotConfigured("GOG sign-in not available.");
+            }
+
+            if (_ownedCache is { } cached && _time.GetUtcNow() - cached.At < OwnedCacheLifetime)
+            {
+                return cached.Result;
+            }
+
+            var owned = await account.GetOwnedAsync(ct).ConfigureAwait(false);
+            var scan = owned.Status switch
+            {
+                GogOwnedStatus.NotConnected => ProviderResult.NotConfigured("Not signed in to GOG."),
+                GogOwnedStatus.NeedsReconnect => ProviderResult.Failed($"GOG: the sign-in was rejected; connect again in Settings ({owned.Detail})."),
+                GogOwnedStatus.Failed => ProviderResult.Failed($"GOG library unavailable ({owned.Detail})."),
+                _ => ProviderResult.FromScan(ToOwnedEntries(owned.Games), []),
+            };
+
+            _ownedCache = scan.Status == ProviderStatus.Ok ? (scan, _time.GetUtcNow()) : null;
+            return scan;
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            return ProviderResult.Failed("GOG: could not read the owned library.", ex);
+        }
+    }
+
+    /// <summary>VERIFY: opens the game's page in GOG Galaxy, where the user installs it.</summary>
+    public static LaunchSpec InstallFor(string gameId) => new(LaunchKind.Uri, $"goggalaxy://openGameView/{gameId}");
+
+    internal static IReadOnlyList<LibraryEntry> ToOwnedEntries(IEnumerable<GogOwnedGame> games) =>
+        games
+            .Select(g => new LibraryEntry(
+                new ItemRef(SourceId, g.Id),
+                ItemKind.Game,
+                g.Title,
+                InstallState.NotInstalled,
+                null,
+                null,
+                InstallFor(g.Id),
+                new Dictionary<string, string>(StringComparer.Ordinal) { ["gameId"] = g.Id }))
+            .ToList();
 
     internal string? FindGalaxyExecutable()
     {
