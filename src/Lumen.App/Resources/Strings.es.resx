@@ -753,4 +753,63 @@
   <data name="SteamFamily_DisconnectedLocally" xml:space="preserve">
     <value>Se borró de esta PC, pero Steam no confirmó que canceló el inicio de sesión. Podés quitar “Lumen” de los dispositivos de tu cuenta de Steam (Steam Guard → Administrar dispositivos).</value>
   </data>
+  <data name="EpicAccount_Title" xml:space="preserve">
+    <value>Cuenta de Epic Games</value>
+  </data>
+  <data name="EpicAccount_Description" xml:space="preserve">
+    <value>Mostrá los juegos de Epic que tenés y no instalaste. Iniciás sesión en la página de Epic en tu navegador: Lumen nunca ve tu contraseña. Es opcional: los juegos de Epic instalados aparecen igual.</value>
+  </data>
+  <data name="EpicAccount_SignIn" xml:space="preserve">
+    <value>Iniciar sesión en Epic</value>
+  </data>
+  <data name="EpicAccount_Steps" xml:space="preserve">
+    <value>1. Iniciá sesión en la página de Epic que se abrió en tu navegador.
+2. Epic muestra después un texto corto con "authorizationCode". Copiá el código (o todo el texto).
+3. Pegalo abajo y tocá Conectar. El código sirve una sola vez y solo por unos minutos.</value>
+  </data>
+  <data name="EpicAccount_CodeLabel" xml:space="preserve">
+    <value>Código de Epic</value>
+  </data>
+  <data name="EpicAccount_Connect" xml:space="preserve">
+    <value>Conectar</value>
+  </data>
+  <data name="EpicAccount_Connecting" xml:space="preserve">
+    <value>Conectando con Epic…</value>
+  </data>
+  <data name="EpicAccount_Connected" xml:space="preserve">
+    <value>Conectado. Tus juegos de Epic se están agregando a la biblioteca.</value>
+  </data>
+  <data name="EpicAccount_NotACode" xml:space="preserve">
+    <value>Eso no parece el código de Epic. Copiá el valor de authorizationCode (32 letras y números) o todo el texto que muestra Epic.</value>
+  </data>
+  <data name="EpicAccount_CodeRejected" xml:space="preserve">
+    <value>Epic no aceptó ese código. Los códigos sirven una vez y vencen a los pocos minutos: volvé a iniciar sesión para obtener uno nuevo.</value>
+  </data>
+  <data name="EpicAccount_ActionRequired" xml:space="preserve">
+    <value>Epic necesita que hagas algo en su sitio primero (por ejemplo aceptar términos nuevos). Iniciá sesión en epicgames.com y después probá de nuevo.</value>
+  </data>
+  <data name="EpicAccount_Failed" xml:space="preserve">
+    <value>No se pudo conectar con Epic. Probá de nuevo en un rato.</value>
+  </data>
+  <data name="EpicAccount_BrowserFailed" xml:space="preserve">
+    <value>No se pudo abrir el navegador.</value>
+  </data>
+  <data name="EpicAccount_Account" xml:space="preserve">
+    <value>Conectado como {0} desde el {1}</value>
+  </data>
+  <data name="EpicAccount_WhatLumenCanDo" xml:space="preserve">
+    <value>Lumen solo puede leer la lista de juegos que tenés en Epic. No puede comprar, cambiar tu cuenta ni ver tu contraseña. El inicio de sesión se guarda cifrado en esta PC y solo se usa con Epic. Desconectar lo elimina.</value>
+  </data>
+  <data name="EpicAccount_DisconnectTitle" xml:space="preserve">
+    <value>Desconectar Epic</value>
+  </data>
+  <data name="EpicAccount_DisconnectConfirm" xml:space="preserve">
+    <value>¿Desconectar tu cuenta de Epic? Los juegos que tenés sin instalar salen de tu biblioteca y Lumen cierra su sesión en Epic.</value>
+  </data>
+  <data name="EpicAccount_Disconnected" xml:space="preserve">
+    <value>Desconectado. Epic cerró la sesión de Lumen y se borró de esta PC.</value>
+  </data>
+  <data name="EpicAccount_DisconnectedLocally" xml:space="preserve">
+    <value>Se borró de esta PC, pero Epic no confirmó que cerró la sesión. Vence sola; también podés cerrar todas las sesiones desde la configuración de tu cuenta de Epic.</value>
+  </data>
 </root>

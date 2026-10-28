@@ -34,6 +34,9 @@ public static class SecretNames
 
     /// <summary>Steam sign-in (family sharing): the long-lived refresh token. Access tokens are never stored.</summary>
     public const string SteamRefreshToken = "steam.refreshToken";
+
+    /// <summary>Epic sign-in: the refresh token (rotates on every use; the newest one is kept).</summary>
+    public const string EpicRefreshToken = "epic.refreshToken";
 }
 
 /// <summary>Machine-local preferences that never sync (SQLite <c>settings_local</c>).</summary>
@@ -56,6 +59,13 @@ public static class LocalSettingKeys
     public const string SteamAccountId = "steam.account.steamId";
 
     public const string SteamAccountSince = "steam.account.since";
+
+    /// <summary>Signed-in Epic account, shown in Settings: display name, account id, since when.</summary>
+    public const string EpicAccountName = "epic.account.name";
+
+    public const string EpicAccountId = "epic.account.id";
+
+    public const string EpicAccountSince = "epic.account.since";
 
     /// <summary>
     /// UI language: "system", "en" or "es" (<see cref="Localization.LanguageResolver"/>). Machine-local until the sync

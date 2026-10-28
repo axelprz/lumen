@@ -1,0 +1,5 @@
+{
+  "errorCode": "errors.com.epicgames.account.oauth.authorization_code_not_found",
+  "errorMessage": "Sorry the authorization code you supplied was not found.",
+  "numericErrorCode": 18059
+}
