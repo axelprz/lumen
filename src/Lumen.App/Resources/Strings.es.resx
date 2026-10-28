@@ -469,4 +469,25 @@
   <data name="Detail_UninstallFailed" xml:space="preserve">
     <value>No se pudo abrir {0} para desinstalar. Desinstalalo directamente desde {0}.</value>
   </data>
+  <data name="Home_ContinuePlaying" xml:space="preserve">
+    <value>Seguir jugando</value>
+  </data>
+  <data name="Home_Details" xml:space="preserve">
+    <value>Ver detalle</value>
+  </data>
+  <data name="Home_PlayedMinutes" xml:space="preserve">
+    <value>{0} min jugados</value>
+  </data>
+  <data name="Home_PlayedHours" xml:space="preserve">
+    <value>{0:0.#} h jugadas</value>
+  </data>
+  <data name="Home_LastPlayed" xml:space="preserve">
+    <value>Última vez: {0}</value>
+  </data>
+  <data name="Home_NoGames" xml:space="preserve">
+    <value>Todavía no hay juegos instalados. Instalá alguno desde tus tiendas o agregalo en la Biblioteca y va a aparecer acá.</value>
+  </data>
+  <data name="Home_NoHistory" xml:space="preserve">
+    <value>Los juegos que juegues van a aparecer acá.</value>
+  </data>
 </root>

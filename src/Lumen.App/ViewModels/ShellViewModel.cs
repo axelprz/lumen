@@ -2,6 +2,8 @@
 // Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using Lumen.App.Services;
+using Lumen.Core.Library;
 using Lumen.Core.Localization;
 
 namespace Lumen.App.ViewModels;
@@ -9,33 +11,79 @@ namespace Lumen.App.ViewModels;
 /// <summary>Main window: sidebar sections and the currently selected one.</summary>
 public sealed partial class ShellViewModel : ObservableObject
 {
+    private readonly AccentService _accent;
+    private bool _returnToHome;
+
     [ObservableProperty]
     private SectionViewModel? _selectedSection;
 
-    public ShellViewModel(ILocalizer localizer, LibraryViewModel library, SettingsViewModel settings)
+    public ShellViewModel(ILocalizer localizer, HomeViewModel home, LibraryViewModel library, SettingsViewModel settings, AccentService accent)
     {
         ArgumentNullException.ThrowIfNull(localizer);
+        ArgumentNullException.ThrowIfNull(home);
         ArgumentNullException.ThrowIfNull(library);
         ArgumentNullException.ThrowIfNull(settings);
+        ArgumentNullException.ThrowIfNull(accent);
 
+        _accent = accent;
+        Home = home;
         Library = library;
         Settings = settings;
         Sections =
         [
-            new SectionViewModel(ShellSection.Home, "Nav_Home", "", localizer),
+            new SectionViewModel(ShellSection.Home, "Nav_Home", "", localizer, home),
             new SectionViewModel(ShellSection.Library, "Nav_Library", "", localizer, library),
             new SectionViewModel(ShellSection.Collections, "Nav_Collections", "", localizer),
             new SectionViewModel(ShellSection.Routines, "Nav_Routines", "", localizer),
             new SectionViewModel(ShellSection.Settings, "Nav_Settings", "", localizer, settings),
         ];
 
-        // Home is a placeholder until M3, so open on the library, which is what M1 delivers.
-        SelectedSection = Sections[1];
+        home.DetailRequested += (_, item) => _ = ShowDetailFromHomeAsync(item);
+        library.DetailClosed += (_, _) => OnDetailClosed();
+        SelectedSection = Sections[0];
     }
 
     public IReadOnlyList<SectionViewModel> Sections { get; }
 
+    public HomeViewModel Home { get; }
+
     public LibraryViewModel Library { get; }
 
     public SettingsViewModel Settings { get; }
+
+    /// <summary>The accent follows what is on screen: Home's featured game, an open detail, else the default.</summary>
+    partial void OnSelectedSectionChanged(SectionViewModel? value)
+    {
+        if (value?.Section != ShellSection.Library)
+        {
+            _returnToHome = false;
+        }
+
+        Home.SetActive(value?.Section == ShellSection.Home);
+        if (value?.Section != ShellSection.Home && !(value?.Section == ShellSection.Library && Library.HasDetail))
+        {
+            _accent.Reset();
+        }
+    }
+
+    // Home has no detail view of its own: show it in the library, and come back to Home when it closes.
+    private async Task ShowDetailFromHomeAsync(LibraryItem item)
+    {
+        SelectedSection = Sections.First(s => s.Section == ShellSection.Library);
+        _returnToHome = true;
+        await Library.ShowDetailAsync(item);
+    }
+
+    private void OnDetailClosed()
+    {
+        if (_returnToHome && SelectedSection?.Section == ShellSection.Library)
+        {
+            _returnToHome = false;
+            SelectedSection = Sections[0];
+        }
+        else
+        {
+            _accent.Reset();
+        }
+    }
 }

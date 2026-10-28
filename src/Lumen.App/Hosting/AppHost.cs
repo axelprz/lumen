@@ -136,6 +136,8 @@ public static class AppHost
                 sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<ArtworkService>>());
         });
 
+        builder.Services.AddSingleton<AccentService>();
+        builder.Services.AddSingleton<HomeViewModel>();
         builder.Services.AddSingleton<LibraryViewModel>();
         builder.Services.AddSingleton<SteamSettingsViewModel>();
         builder.Services.AddSingleton<ArtworkSettingsViewModel>();

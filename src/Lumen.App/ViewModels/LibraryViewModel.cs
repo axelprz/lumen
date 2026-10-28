@@ -27,6 +27,7 @@ public sealed partial class LibraryViewModel : ObservableObject
     private readonly IMergeRuleStore _mergeRules;
     private readonly IItemOverrideStore _overrides;
     private readonly ArtworkService _artwork;
+    private readonly AccentService _accent;
     private readonly IDialogService _dialogs;
     private readonly LibraryFilter _filter;
     private readonly ILocalSettings _settings;
@@ -54,6 +55,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         IMergeRuleStore mergeRules,
         IItemOverrideStore overrides,
         ArtworkService artwork,
+        AccentService accent,
         IDialogService dialogs,
         LibraryFilter filter,
         ILocalSettings settings,
@@ -72,6 +74,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         _mergeRules = mergeRules;
         _overrides = overrides;
         _artwork = artwork;
+        _accent = accent;
         _dialogs = dialogs;
         _localizer = localizer;
         _logger = logger;
@@ -384,6 +387,20 @@ public sealed partial class LibraryViewModel : ObservableObject
     /// <summary>True while a game's detail view covers the grid.</summary>
     public bool HasDetail => Detail is not null;
 
+    /// <summary>Raised when the detail view closes (Back, Esc, or its game left the library).</summary>
+    public event EventHandler? DetailClosed;
+
+    /// <summary>Opens a game's detail view (also used by Home).</summary>
+    public Task ShowDetailAsync(LibraryItem item) => OpenDetailAsync(item);
+
+    partial void OnDetailChanged(GameDetailViewModel? oldValue, GameDetailViewModel? newValue)
+    {
+        if (oldValue is not null && newValue is null)
+        {
+            DetailClosed?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
     private async Task OpenDetailAsync(LibraryItem item)
     {
         var detail = new GameDetailViewModel(
@@ -393,6 +410,10 @@ public sealed partial class LibraryViewModel : ObservableObject
         detail.ArtworkChanged += (_, _) => RefreshTiles(t => t.Item.Entries.Any(e => detail.Item.Entries.Contains(e)));
         Detail = detail;
         await detail.LoadArtworkAsync();
+        if (ReferenceEquals(Detail, detail))
+        {
+            await _accent.ApplyFromImageAsync(detail.HeroPath ?? detail.CoverPath);
+        }
     }
 
     /// <summary>After the library changes, keep the open detail on the same game (it may now be merged/split).</summary>

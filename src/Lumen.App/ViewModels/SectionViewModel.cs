@@ -38,6 +38,9 @@ public sealed class SectionViewModel : ObservableObject
 
     public string Title => _localizer[_titleKey];
 
+    // What screen readers announce for the sidebar entries (instead of the type name).
+    public override string ToString() => Title;
+
     /// <summary>The view model shown in the content area; views are picked by DataTemplate type.</summary>
     public object Page { get; }
 }

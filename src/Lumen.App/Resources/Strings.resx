@@ -469,4 +469,25 @@
   <data name="Detail_UninstallFailed" xml:space="preserve">
     <value>Couldn't open {0} to uninstall. Uninstall it from {0} directly.</value>
   </data>
+  <data name="Home_ContinuePlaying" xml:space="preserve">
+    <value>Continue playing</value>
+  </data>
+  <data name="Home_Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="Home_PlayedMinutes" xml:space="preserve">
+    <value>{0} min played</value>
+  </data>
+  <data name="Home_PlayedHours" xml:space="preserve">
+    <value>{0:0.#} h played</value>
+  </data>
+  <data name="Home_LastPlayed" xml:space="preserve">
+    <value>Last played: {0}</value>
+  </data>
+  <data name="Home_NoGames" xml:space="preserve">
+    <value>No installed games yet. Install one from your stores or add one in the Library, and it will show up here.</value>
+  </data>
+  <data name="Home_NoHistory" xml:space="preserve">
+    <value>The games you play show up here.</value>
+  </data>
 </root>
