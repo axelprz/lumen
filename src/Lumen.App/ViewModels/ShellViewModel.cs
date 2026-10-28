@@ -60,6 +60,25 @@ public sealed partial class ShellViewModel : ObservableObject
 
     public SettingsViewModel Settings { get; }
 
+    /// <summary>Moves to the previous (-1) or next (+1) sidebar section (gamepad LB/RB). No wrap-around.</summary>
+    /// <returns>False when there is no such section or the welcome wizard covers the sidebar.</returns>
+    public bool SelectAdjacentSection(int delta)
+    {
+        if (FirstRun.IsOpen || SelectedSection is null)
+        {
+            return false;
+        }
+
+        var index = Sections.ToList().IndexOf(SelectedSection) + delta;
+        if (index < 0 || index >= Sections.Count)
+        {
+            return false;
+        }
+
+        SelectedSection = Sections[index];
+        return true;
+    }
+
     /// <summary>The accent follows what is on screen: Home's featured game, an open detail, else the default.</summary>
     partial void OnSelectedSectionChanged(SectionViewModel? value)
     {
