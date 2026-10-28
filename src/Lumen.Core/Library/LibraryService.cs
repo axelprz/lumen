@@ -31,7 +31,8 @@ public sealed partial class LibraryService
     private readonly IMergeRuleStore? _ruleStore;
     private readonly IItemOverrideStore? _overrideStore;
     private readonly IAppChoiceStore? _appChoiceStore;
-    private Snapshot _snapshot = new([], [], new UserChoices(MergeRules.None, NoOverrides, NoAppChoices));
+    private readonly IPlaytimeStore? _playtimeStore;
+    private Snapshot _snapshot = new([], [], new UserChoices(MergeRules.None, NoOverrides, NoAppChoices, NoPlaytime));
     private IReadOnlyDictionary<ItemRef, DateTimeOffset> _firstSeen = new Dictionary<ItemRef, DateTimeOffset>();
 
     public LibraryService(
@@ -42,7 +43,8 @@ public sealed partial class LibraryService
         LibraryMerger? merger = null,
         IMergeRuleStore? ruleStore = null,
         IItemOverrideStore? overrideStore = null,
-        IAppChoiceStore? appChoiceStore = null)
+        IAppChoiceStore? appChoiceStore = null,
+        IPlaytimeStore? playtimeStore = null)
     {
         ArgumentNullException.ThrowIfNull(providers);
         _providers = providers.ToList();
@@ -53,7 +55,10 @@ public sealed partial class LibraryService
         _ruleStore = ruleStore;
         _overrideStore = overrideStore;
         _appChoiceStore = appChoiceStore;
+        _playtimeStore = playtimeStore;
     }
+
+    private static readonly IReadOnlyDictionary<ItemRef, PlaytimeTotal> NoPlaytime = new Dictionary<ItemRef, PlaytimeTotal>();
 
     private static readonly IReadOnlyDictionary<ItemRef, ItemOverride> NoOverrides = new Dictionary<ItemRef, ItemOverride>();
 
@@ -101,7 +106,8 @@ public sealed partial class LibraryService
     private async Task<UserChoices> LoadChoicesAsync(CancellationToken ct) => new(
         _ruleStore is null ? MergeRules.None : await _ruleStore.LoadAsync(ct).ConfigureAwait(false),
         _overrideStore is null ? NoOverrides : await _overrideStore.LoadAsync(ct).ConfigureAwait(false),
-        _appChoiceStore is null ? NoAppChoices : await _appChoiceStore.LoadAsync(ct).ConfigureAwait(false));
+        _appChoiceStore is null ? NoAppChoices : await _appChoiceStore.LoadAsync(ct).ConfigureAwait(false),
+        _playtimeStore is null ? NoPlaytime : await _playtimeStore.LoadTotalsAsync(ct).ConfigureAwait(false));
 
     /// <summary>Scans every provider.</summary>
     public Task<IReadOnlyList<ProviderScanReport>> ScanAsync(CancellationToken ct) => ScanCoreAsync(_providers, ct);
@@ -292,6 +298,7 @@ public sealed partial class LibraryService
     {
         choices ??= Volatile.Read(ref _snapshot).Choices;
         var sorted = entries
+            .Select(e => WithPlaytime(e, choices.Playtime))
             .OrderBy(e => e.Title, StringComparer.CurrentCultureIgnoreCase)
             .ThenBy(e => e.Ref.ToString(), StringComparer.Ordinal)
             .ToList();
@@ -343,7 +350,31 @@ public sealed partial class LibraryService
         };
     }
 
-    private sealed record UserChoices(MergeRules Rules, IReadOnlyDictionary<ItemRef, ItemOverride> Overrides, IReadOnlyDictionary<ItemRef, AppChoice> Apps);
+    /// <summary>Adds Lumen's own playtime to the entry (<c>lumenMinutes</c>, <c>lumenLastPlayed</c>); see <see cref="LibraryFilter.PlaytimeMinutes"/>.</summary>
+    private static LibraryEntry WithPlaytime(LibraryEntry entry, IReadOnlyDictionary<ItemRef, PlaytimeTotal> playtime)
+    {
+        var stale = entry.Extra.ContainsKey("lumenMinutes");
+        if (!playtime.TryGetValue(entry.Ref, out var total))
+        {
+            return stale ? entry with { Extra = entry.Extra.Where(kv => !kv.Key.StartsWith("lumen", StringComparison.Ordinal)).ToDictionary(StringComparer.Ordinal) } : entry;
+        }
+
+        // Entries published before carry the previous totals: always start from the store's own data.
+        var extra = entry.Extra.Where(kv => !kv.Key.StartsWith("lumen", StringComparison.Ordinal)).ToDictionary(StringComparer.Ordinal);
+        extra["lumenMinutes"] = total.Minutes.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        if (total.LastPlayed is { } last)
+        {
+            extra["lumenLastPlayed"] = last.ToUnixTimeSeconds().ToString(System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        return entry with { Extra = extra };
+    }
+
+    private sealed record UserChoices(
+        MergeRules Rules,
+        IReadOnlyDictionary<ItemRef, ItemOverride> Overrides,
+        IReadOnlyDictionary<ItemRef, AppChoice> Apps,
+        IReadOnlyDictionary<ItemRef, PlaytimeTotal> Playtime);
 
     // Entries, items and the choices they were built with are swapped together so readers never see a mix.
     private sealed record Snapshot(IReadOnlyList<LibraryEntry> Entries, IReadOnlyList<LibraryItem> Items, UserChoices Choices);

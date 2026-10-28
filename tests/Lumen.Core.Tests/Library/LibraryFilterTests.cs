@@ -113,6 +113,24 @@ public sealed class LibraryFilterTests
     }
 
     [Fact]
+    public void Playtime_StoreNumberWins_LumenCountsWhereTheStoreHasNone_AndLastPlayedIsTheLatest()
+    {
+        static IReadOnlyDictionary<string, string> X(params (string K, string V)[] kv) => kv.ToDictionary(p => p.K, p => p.V);
+        var steam = Game("steam", "1", "Sample") with { Extra = X(("playtimeMinutes", "600"), ("lumenMinutes", "45"), ("lastPlayed", "1790000000")) };
+        var epic = Game("epic", "x", "Sample") with { Extra = X(("lumenMinutes", "90"), ("lumenLastPlayed", "1795000000")) };
+
+        LibraryFilter.PlaytimeMinutes(Item(steam)).ShouldBe(600); // Steam's number; Lumen's 45 min are informational
+        LibraryFilter.PlaytimeMinutes(Item(epic)).ShouldBe(90);
+        LibraryFilter.PlaytimeMinutes(new LibraryItem([steam, epic], steam)).ShouldBe(690);
+        LibraryFilter.LastPlayed(new LibraryItem([steam, epic], steam)).ShouldBe(DateTimeOffset.FromUnixTimeSeconds(1795000000));
+
+        LibraryFilter.SourceOfPlaytime(Item(steam)).ShouldBe(PlaytimeSource.Store);
+        LibraryFilter.SourceOfPlaytime(Item(epic)).ShouldBe(PlaytimeSource.Lumen);
+        LibraryFilter.SourceOfPlaytime(new LibraryItem([steam, epic], steam)).ShouldBe(PlaytimeSource.StoreAndLumen);
+        LibraryFilter.SourceOfPlaytime(_tool).ShouldBe(PlaytimeSource.None);
+    }
+
+    [Fact]
     public void HiddenItems_OnlyShowInTheHiddenView()
     {
         var hidden = _alpha with { IsHidden = true };

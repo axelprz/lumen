@@ -45,6 +45,12 @@ public partial class App : Application
             await _host.Services.GetRequiredService<FirstRunViewModel>().OpenIfNeededAsync(CancellationToken.None).ConfigureAwait(true);
             await _host.Services.GetRequiredService<CollectionService>().LoadAsync(CancellationToken.None).ConfigureAwait(true);
 
+            // Playtime: close sessions a previous run left open (Lumen closed mid-game), then keep totals current.
+            var playtime = _host.Services.GetRequiredService<PlaytimeTracker>();
+            await playtime.RecoverAsync(CancellationToken.None).ConfigureAwait(true);
+            var library = _host.Services.GetRequiredService<LibraryService>();
+            playtime.SessionsChanged += (_, _) => _ = library.ReloadUserChoicesAsync(CancellationToken.None);
+
             var window = _host.Services.GetRequiredService<MainWindow>();
             window.Closed += OnMainWindowClosed;
             MainWindow = window;

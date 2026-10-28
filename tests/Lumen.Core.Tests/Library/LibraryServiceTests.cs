@@ -326,4 +326,38 @@ public sealed class LibraryServiceTests
         entry.Extra["playtimeMinutes"].ShouldBe("600");
         entry.Extra["lastPlayed"].ShouldBe(expectedLast);
     }
+
+    [Fact]
+    public async Task LumenPlaytime_IsAddedToEntries_AndReplacedOnReload()
+    {
+        var store = new MemoryTotals();
+        store.Totals[new ItemRef("epic", "x")] = new PlaytimeTotal(90, DateTimeOffset.FromUnixTimeSeconds(1795000000));
+        var service = new LibraryService([new FakeProvider("epic").WithInstalled(Game("epic", "x", "Sample"))], _cache, NullLogger<LibraryService>.Instance, playtimeStore: store);
+        await service.LoadCachedAsync(CancellationToken.None);
+        await service.ScanAsync(CancellationToken.None);
+
+        LibraryFilter.PlaytimeMinutes(service.Items.Single()).ShouldBe(90);
+
+        store.Totals[new ItemRef("epic", "x")] = new PlaytimeTotal(150, DateTimeOffset.FromUnixTimeSeconds(1796000000));
+        await service.ReloadUserChoicesAsync(CancellationToken.None);
+
+        LibraryFilter.PlaytimeMinutes(service.Items.Single()).ShouldBe(150);
+        LibraryFilter.LastPlayed(service.Items.Single()).ShouldBe(DateTimeOffset.FromUnixTimeSeconds(1796000000));
+    }
+
+    private sealed class MemoryTotals : IPlaytimeStore
+    {
+        public Dictionary<ItemRef, PlaytimeTotal> Totals { get; } = [];
+
+        public Task<long> StartAsync(ItemRef itemRef, DateTimeOffset start, CancellationToken ct) => Task.FromResult(1L);
+
+        public Task ExtendAsync(long sessionId, DateTimeOffset lastSeen, CancellationToken ct) => Task.CompletedTask;
+
+        public Task FinishAsync(long sessionId, DateTimeOffset end, TimeSpan minimum, CancellationToken ct) => Task.CompletedTask;
+
+        public Task CloseLeftoversAsync(TimeSpan minimum, CancellationToken ct) => Task.CompletedTask;
+
+        public Task<IReadOnlyDictionary<ItemRef, PlaytimeTotal>> LoadTotalsAsync(CancellationToken ct) =>
+            Task.FromResult<IReadOnlyDictionary<ItemRef, PlaytimeTotal>>(new Dictionary<ItemRef, PlaytimeTotal>(Totals));
+    }
 }

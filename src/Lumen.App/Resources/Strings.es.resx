@@ -871,4 +871,13 @@
   <data name="GogAccount_Disconnected" xml:space="preserve">
     <value>Desconectado. El inicio de sesión se borró de esta PC.</value>
   </data>
+  <data name="Detail_PlaytimeFromStore" xml:space="preserve">
+    <value>según la tienda</value>
+  </data>
+  <data name="Detail_PlaytimeFromLumen" xml:space="preserve">
+    <value>medido por Lumen</value>
+  </data>
+  <data name="Detail_PlaytimeFromBoth" xml:space="preserve">
+    <value>tienda + Lumen</value>
+  </data>
 </root>
