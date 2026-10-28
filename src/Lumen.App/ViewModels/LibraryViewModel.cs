@@ -29,6 +29,7 @@ public sealed partial class LibraryViewModel : ObservableObject
     private readonly ArtworkService _artwork;
     private readonly AccentService _accent;
     private readonly DiscoverAppsViewModel _discover;
+    private readonly CollectionService _collections;
     private readonly IDialogService _dialogs;
     private readonly LibraryFilter _filter;
     private readonly ILocalSettings _settings;
@@ -58,6 +59,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         ArtworkService artwork,
         AccentService accent,
         DiscoverAppsViewModel discover,
+        CollectionService collections,
         IDialogService dialogs,
         LibraryFilter filter,
         ILocalSettings settings,
@@ -78,6 +80,8 @@ public sealed partial class LibraryViewModel : ObservableObject
         _artwork = artwork;
         _accent = accent;
         _discover = discover;
+        _collections = collections;
+        _collections.Changed += (_, _) => OnCollectionsChanged();
         _dialogs = dialogs;
         _localizer = localizer;
         _logger = logger;
@@ -298,6 +302,17 @@ public sealed partial class LibraryViewModel : ObservableObject
             menu.Add(new(_localizer["Tile_Remove"], new AsyncRelayCommand(() => RemoveManualItemAsync(manual))));
         }
 
+        // Favorites: one click from the tile.
+        if (menu.Count > 0)
+        {
+            menu.Add(new(string.Empty, null));
+        }
+
+        var favorite = _collections.IsFavorite(item);
+        menu.Add(new(
+            _localizer[favorite ? "Tile_RemoveFavorite" : "Tile_AddFavorite"],
+            new AsyncRelayCommand(() => SetFavoriteAsync(item, !favorite))));
+
         // A detected app the user added: take it back out (it returns to "Discover apps").
         var detected = item.Entries.FirstOrDefault(e => AppCuration.IsCandidateSource(e.Ref.Source));
         if (detected is not null)
@@ -401,7 +416,10 @@ public sealed partial class LibraryViewModel : ObservableObject
         var primary = item.Primary;
         var stores = string.Join(" · ", item.Entries.Select(StoreNameOf).Distinct());
         var play = new AsyncRelayCommand(() => RunPrimaryActionAsync(primary), () => LaunchService.PrimaryAction(primary) is not null);
-        return new LibraryTileViewModel(item, stores, _localizer, play, BuildMenu(item), LoadCoverAsync, new AsyncRelayCommand(() => OpenDetailAsync(item)));
+        return new LibraryTileViewModel(item, stores, _localizer, play, BuildMenu(item), LoadCoverAsync, new AsyncRelayCommand(() => OpenDetailAsync(item)))
+        {
+            IsFavorite = _collections.IsFavorite(item),
+        };
     }
 
     [ObservableProperty]
@@ -429,7 +447,7 @@ public sealed partial class LibraryViewModel : ObservableObject
     {
         var detail = new GameDetailViewModel(
             item,
-            new DetailServices(_launcher, _shell, _artwork, _mergeRules, _overrides, _library, _dialogs, _fileSystem, _localizer, StoreNameOf),
+            new DetailServices(_launcher, _shell, _artwork, _mergeRules, _overrides, _collections, _library, _dialogs, _fileSystem, _localizer, StoreNameOf),
             () => Detail = null);
         detail.ArtworkChanged += (_, _) => RefreshTiles(t => t.Item.Entries.Any(e => detail.Item.Entries.Contains(e)));
         Detail = detail;
@@ -525,6 +543,35 @@ public sealed partial class LibraryViewModel : ObservableObject
     }
 
     private Task<TileArt?> LoadCoverAsync(LibraryItem item) => TileArt.LoadAsync(_artwork, item);
+
+    private async Task SetFavoriteAsync(LibraryItem item, bool favorite)
+    {
+        Notice = null;
+        try
+        {
+            await _collections.SetFavoriteAsync(item, favorite, CancellationToken.None);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            LogCollectionFailed(ex);
+            Notice = _localizer["Collections_SaveFailed"];
+        }
+    }
+
+    /// <summary>
+    /// Collections changed: refresh only the tiles whose favorite star (and menu) changed, the collection filter's
+    /// options and the open detail view.
+    /// </summary>
+    private void OnCollectionsChanged()
+    {
+        RefreshTiles(t => t.IsFavorite != _collections.IsFavorite(t.Item));
+        BuildFilterOptions();
+        ApplyFilter();
+        Detail?.RefreshCollections();
+    }
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Could not change a collection")]
+    private partial void LogCollectionFailed(Exception exception);
 
     [LoggerMessage(Level = LogLevel.Error, Message = "Could not save a manual item")]
     private partial void LogManualSaveFailed(Exception exception);

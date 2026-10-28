@@ -38,6 +38,27 @@ public sealed partial class LibraryViewModel
     [ObservableProperty]
     private FilterOption<LibrarySort>? _selectedSort;
 
+    [ObservableProperty]
+    private FilterOption<string?>? _selectedCollection;
+
+    /// <summary>"All collections", Favorites and the user's collections.</summary>
+    public IReadOnlyList<FilterOption<string?>> CollectionOptions { get; private set; } = [];
+
+    /// <summary>Shows one collection (Collections page → Open). Other filters are cleared so the whole collection shows.</summary>
+    public void ShowCollection(string id)
+    {
+        _suspendFilter = true;
+        SearchText = string.Empty;
+        SelectedKind = KindOptions[0];
+        SelectedStore = StoreOptions[0];
+        SelectedInstall = InstallOptions[0];
+        SelectedCollection = CollectionOptions.FirstOrDefault(o => o.Value == id) ?? CollectionOptions[0];
+        ShowHidden = false;
+        Detail = null;
+        _suspendFilter = false;
+        ApplyFilter();
+    }
+
     /// <summary>Showing only the hidden items (to find and unhide them) instead of the library.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HiddenToggleText))]
@@ -78,6 +99,8 @@ public sealed partial class LibraryViewModel
 
     partial void OnSelectedInstallChanged(FilterOption<InstallFilter>? value) => ApplyFilter();
 
+    partial void OnSelectedCollectionChanged(FilterOption<string?>? value) => ApplyFilter();
+
     partial void OnShowHiddenChanged(bool value) => ApplyFilter();
 
     [RelayCommand]
@@ -103,6 +126,7 @@ public sealed partial class LibraryViewModel
         SelectedKind = KindOptions[0];
         SelectedStore = StoreOptions[0];
         SelectedInstall = InstallOptions[0];
+        SelectedCollection = CollectionOptions[0];
         _suspendFilter = false;
         ApplyFilter();
     }
@@ -115,6 +139,7 @@ public sealed partial class LibraryViewModel
         var install = SelectedInstall?.Value ?? InstallFilter.All;
         var sort = SelectedSort?.Value ?? LibrarySort.Name;
         var store = SelectedStore?.Value;
+        var collection = SelectedCollection?.Value;
 
         _suspendFilter = true;
         KindOptions =
@@ -144,11 +169,19 @@ public sealed partial class LibraryViewModel
         OnPropertyChanged(nameof(KindOptions));
         OnPropertyChanged(nameof(InstallOptions));
         OnPropertyChanged(nameof(SortOptions));
+        CollectionOptions =
+        [
+            new FilterOption<string?>(_localizer["Filter_AllCollections"], null),
+            .. _collections.All.Select(c => new FilterOption<string?>(CollectionsViewModel.DisplayName(c, _localizer), c.Id)),
+        ];
+
         OnPropertyChanged(nameof(StoreOptions));
+        OnPropertyChanged(nameof(CollectionOptions));
         SelectedKind = KindOptions.First(o => o.Value == kind);
         SelectedInstall = InstallOptions.First(o => o.Value == install);
         SelectedSort = SortOptions.First(o => o.Value == sort);
         SelectedStore = StoreOptions.FirstOrDefault(o => o.Value == store) ?? StoreOptions[0];
+        SelectedCollection = CollectionOptions.FirstOrDefault(o => o.Value == collection) ?? CollectionOptions[0];
         _suspendFilter = false;
     }
 
@@ -174,7 +207,8 @@ public sealed partial class LibraryViewModel
         SelectedStore?.Value,
         SelectedInstall?.Value ?? InstallFilter.All,
         SelectedSort?.Value ?? LibrarySort.Name,
-        ShowHidden);
+        ShowHidden,
+        SelectedCollection?.Value);
 
     /// <summary>Shows the tiles that match the current query, in its order. Tiles are reused, so covers stay loaded.</summary>
     private void ApplyFilter()
@@ -185,7 +219,7 @@ public sealed partial class LibraryViewModel
         }
 
         var byItem = TilesByItem();
-        var visible = _filter.Apply(_allTiles.Select(t => t.Item).ToList(), CurrentQuery(), _library.FirstSeen);
+        var visible = _filter.Apply(_allTiles.Select(t => t.Item).ToList(), CurrentQuery(), _library.FirstSeen, _collections.All);
         Items.Clear();
         foreach (var item in visible)
         {

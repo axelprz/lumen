@@ -628,4 +628,64 @@
   <data name="Discover_NoMatches" xml:space="preserve">
     <value>No apps match your search.</value>
   </data>
+  <data name="Collections_Favorites" xml:space="preserve">
+    <value>Favorites</value>
+  </data>
+  <data name="Collections_Body" xml:space="preserve">
+    <value>Group games and apps your way. Favorites also show on Home. Add items from a game's detail view (More → Collections) or the star.</value>
+  </data>
+  <data name="Collections_NewName" xml:space="preserve">
+    <value>New collection name</value>
+  </data>
+  <data name="Collections_Create" xml:space="preserve">
+    <value>Create collection</value>
+  </data>
+  <data name="Collections_Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="Collections_Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="Collections_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Collections_DeleteTitle" xml:space="preserve">
+    <value>Delete collection</value>
+  </data>
+  <data name="Collections_DeleteConfirm" xml:space="preserve">
+    <value>Delete the collection “{0}”? The games and apps in it stay in your library.</value>
+  </data>
+  <data name="Collections_SaveFailed" xml:space="preserve">
+    <value>Couldn't save that change to your collections. Try again.</value>
+  </data>
+  <data name="Detail_Favorite" xml:space="preserve">
+    <value>Favorite</value>
+  </data>
+  <data name="Detail_AddFavorite" xml:space="preserve">
+    <value>Add to favorites</value>
+  </data>
+  <data name="Detail_Collections" xml:space="preserve">
+    <value>Collections…</value>
+  </data>
+  <data name="Detail_NoCollections" xml:space="preserve">
+    <value>You have no collections yet. Create one here.</value>
+  </data>
+  <data name="Detail_CreateCollection" xml:space="preserve">
+    <value>Create and add</value>
+  </data>
+  <data name="Detail_Done" xml:space="preserve">
+    <value>Done</value>
+  </data>
+  <data name="Tile_AddFavorite" xml:space="preserve">
+    <value>Add to favorites</value>
+  </data>
+  <data name="Tile_RemoveFavorite" xml:space="preserve">
+    <value>Remove from favorites</value>
+  </data>
+  <data name="Filter_AllCollections" xml:space="preserve">
+    <value>All collections</value>
+  </data>
+  <data name="Filter_CollectionLabel" xml:space="preserve">
+    <value>Collection</value>
+  </data>
 </root>

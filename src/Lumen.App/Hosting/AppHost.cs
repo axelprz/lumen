@@ -105,6 +105,8 @@ public static class AppHost
             sp.GetRequiredService<IPackageCatalog>(),
             sp.GetRequiredService<IFileSystem>()));
         builder.Services.AddSingleton<IAppChoiceStore, SqliteAppChoiceStore>();
+        builder.Services.AddSingleton<ICollectionStore, SqliteCollectionStore>();
+        builder.Services.AddSingleton<CollectionService>();
         builder.Services.AddSingleton(_ => TitleCleanup.CreateNormalizer());
         builder.Services.AddSingleton<IDialogService, DialogService>();
         builder.Services.AddSingleton<LibraryAutoRefresh>();
@@ -159,6 +161,7 @@ public static class AppHost
         builder.Services.AddSingleton<AccentService>();
         builder.Services.AddSingleton<HomeViewModel>();
         builder.Services.AddSingleton<DiscoverAppsViewModel>();
+        builder.Services.AddSingleton<CollectionsViewModel>();
         builder.Services.AddSingleton<LibraryViewModel>();
         builder.Services.AddSingleton<SteamSettingsViewModel>();
         builder.Services.AddSingleton<ArtworkSettingsViewModel>();

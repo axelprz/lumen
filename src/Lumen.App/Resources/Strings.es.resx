@@ -628,4 +628,64 @@
   <data name="Discover_NoMatches" xml:space="preserve">
     <value>Ninguna app coincide con tu búsqueda.</value>
   </data>
+  <data name="Collections_Favorites" xml:space="preserve">
+    <value>Favoritos</value>
+  </data>
+  <data name="Collections_Body" xml:space="preserve">
+    <value>Agrupá juegos y apps a tu manera. Los favoritos también aparecen en Inicio. Se agregan desde el detalle de un juego (Más → Colecciones) o con la estrella.</value>
+  </data>
+  <data name="Collections_NewName" xml:space="preserve">
+    <value>Nombre de la colección nueva</value>
+  </data>
+  <data name="Collections_Create" xml:space="preserve">
+    <value>Crear colección</value>
+  </data>
+  <data name="Collections_Open" xml:space="preserve">
+    <value>Abrir</value>
+  </data>
+  <data name="Collections_Rename" xml:space="preserve">
+    <value>Renombrar</value>
+  </data>
+  <data name="Collections_Delete" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="Collections_DeleteTitle" xml:space="preserve">
+    <value>Eliminar colección</value>
+  </data>
+  <data name="Collections_DeleteConfirm" xml:space="preserve">
+    <value>¿Eliminar la colección “{0}”? Los juegos y apps que tiene siguen en tu biblioteca.</value>
+  </data>
+  <data name="Collections_SaveFailed" xml:space="preserve">
+    <value>No se pudo guardar ese cambio en tus colecciones. Probá de nuevo.</value>
+  </data>
+  <data name="Detail_Favorite" xml:space="preserve">
+    <value>Favorito</value>
+  </data>
+  <data name="Detail_AddFavorite" xml:space="preserve">
+    <value>Agregar a favoritos</value>
+  </data>
+  <data name="Detail_Collections" xml:space="preserve">
+    <value>Colecciones…</value>
+  </data>
+  <data name="Detail_NoCollections" xml:space="preserve">
+    <value>Todavía no tenés colecciones. Creá una acá.</value>
+  </data>
+  <data name="Detail_CreateCollection" xml:space="preserve">
+    <value>Crear y agregar</value>
+  </data>
+  <data name="Detail_Done" xml:space="preserve">
+    <value>Listo</value>
+  </data>
+  <data name="Tile_AddFavorite" xml:space="preserve">
+    <value>Agregar a favoritos</value>
+  </data>
+  <data name="Tile_RemoveFavorite" xml:space="preserve">
+    <value>Quitar de favoritos</value>
+  </data>
+  <data name="Filter_AllCollections" xml:space="preserve">
+    <value>Todas las colecciones</value>
+  </data>
+  <data name="Filter_CollectionLabel" xml:space="preserve">
+    <value>Colección</value>
+  </data>
 </root>

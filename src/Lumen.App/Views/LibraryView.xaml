@@ -99,6 +99,17 @@
                              Margin="0,0,0,40" />
                 </Grid>
               </Button>
+              <!-- Favorite star -->
+              <Border HorizontalAlignment="Right"
+                      VerticalAlignment="Top"
+                      Margin="8"
+                      Padding="5,4"
+                      CornerRadius="4"
+                      Background="#B30F1115"
+                      IsHitTestVisible="False"
+                      Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibility}}">
+                <TextBlock Text="&#xE735;" Style="{StaticResource Lumen.Text.Icon}" FontSize="12" Foreground="{DynamicResource Lumen.Brush.Warning}" />
+              </Border>
               <Border HorizontalAlignment="Left"
                       VerticalAlignment="Top"
                       Margin="8"
@@ -260,6 +271,7 @@
       <ComboBox ItemsSource="{Binding KindOptions}" SelectedItem="{Binding SelectedKind}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_TypeLabel}" />
       <ComboBox ItemsSource="{Binding StoreOptions}" SelectedItem="{Binding SelectedStore}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_StoreLabel}" />
       <ComboBox ItemsSource="{Binding InstallOptions}" SelectedItem="{Binding SelectedInstall}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_StateLabel}" />
+      <ComboBox ItemsSource="{Binding CollectionOptions}" SelectedItem="{Binding SelectedCollection}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_CollectionLabel}" />
       <ComboBox ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SelectedSort}" DisplayMemberPath="Label" MinWidth="180" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Sort_Label}" />
       <Button Command="{Binding ClearFiltersCommand}"
               Content="{l:Loc Filter_Clear}"

@@ -103,6 +103,16 @@ public sealed class LibraryFilterTests
         new Dictionary<string, string> { ["lastPlayed"] = lastPlayed.ToString(System.Globalization.CultureInfo.InvariantCulture), ["playtimeMinutes"] = minutes.ToString(System.Globalization.CultureInfo.InvariantCulture) };
 
     [Fact]
+    public void CollectionFilter_ShowsOnlyItsItems_AndUnknownIdsShowNothing()
+    {
+        var collections = new[] { new Collection("work", "Work", [_alpha.Key, _tool.Key]) };
+
+        _filter.Apply(All, new LibraryQuery(Collection: "work"), _noDates, collections).ShouldBe([_alpha, _tool]);
+        _filter.Apply(All, new LibraryQuery(Collection: "gone"), _noDates, collections).ShouldBeEmpty();
+        new LibraryQuery(Collection: "work").IsFiltering.ShouldBeTrue();
+    }
+
+    [Fact]
     public void HiddenItems_OnlyShowInTheHiddenView()
     {
         var hidden = _alpha with { IsHidden = true };
