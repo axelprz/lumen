@@ -2,4 +2,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Lumen.Core\Lumen.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- Fixture-driven tests: synthetic routine files live in tests/fixtures/routines/. -->
+    <None Include="..\fixtures\routines\**\*" LinkBase="fixtures\routines" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "id": "game-night",
+  "name": { "en": "Game night", "es": "Noche de juegos" },
+  "description": "Open the game, chat and the stream page; close the launcher.",
+  "pinned": true,
+  "variables": { "tools": "%LOCALAPPDATA%\\SampleTools" },
+  "actions": [
+    { "type": "launch", "ref": "steam:400" },
+    { "type": "launch", "path": "{tools}\\Chat\\chat.exe", "args": "--start-minimized", "skipIfRunning": true },
+    { "type": "wait", "ms": 2000 },
+    { "type": "url", "url": "https://example.com/stream" },
+    { "type": "folder", "path": "%USERPROFILE%\\Videos" },
+    { "type": "close", "processes": ["samplelauncher.exe"], "graceMs": 3000, "force": true, "label": "Close the launcher" }
+  ]
+}
