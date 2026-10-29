@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "id": "Broken Id",
+  "name": "",
+  "extra": true,
+  "actions": [
+    { "type": "launch", "ref": "steam:1", "path": "C:\\Games\\x.exe" },
+    { "type": "url", "url": "file:///C:/Windows/System32/calc.exe" },
+    { "type": "wait", "ms": -5 },
+    { "type": "close" },
+    { "type": "teleport" }
+  ]
+}

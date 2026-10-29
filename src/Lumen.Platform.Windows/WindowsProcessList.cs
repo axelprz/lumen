@@ -47,6 +47,27 @@ public sealed partial class WindowsProcessList : IProcessList
         return paths;
     }
 
+    /// <summary>One process's image path with "limited information" access, or null.</summary>
+    internal static unsafe string? ImagePathOf(int processId)
+    {
+        var handle = OpenProcess(QueryLimitedInformation, false, (uint)processId);
+        if (handle == IntPtr.Zero)
+        {
+            return null;
+        }
+
+        try
+        {
+            var buffer = stackalloc char[1024];
+            var length = 1024u;
+            return QueryFullProcessImageNameW(handle, 0, buffer, ref length) ? new string(buffer, 0, (int)length) : null;
+        }
+        finally
+        {
+            CloseHandle(handle);
+        }
+    }
+
     [LibraryImport("kernel32.dll")]
     private static partial IntPtr OpenProcess(uint access, [MarshalAs(UnmanagedType.Bool)] bool inheritHandle, uint processId);
 

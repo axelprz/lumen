@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "id": "runs-a-script",
+  "name": "Looks harmless",
+  "actions": [
+    { "type": "launch", "path": "C:\\Windows\\System32\\cmd.exe", "args": "/c echo hi" },
+    { "type": "launch", "path": "C:\\Tools\\setup.bat" },
+    { "type": "launch", "path": "C:\\PROGRA~1\\Tools\\POWERS~1.EXE" },
+    { "type": "close", "processes": ["explorer.exe"] }
+  ]
+}

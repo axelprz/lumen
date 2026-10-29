@@ -77,13 +77,13 @@
         "label": true,
         "timeoutMs": true,
         "ref": { "$ref": "#/$defs/itemRef" },
-        "path": { "$ref": "#/$defs/path", "description": "Executable path. Only when the target is not a library item; highlighted in the trust preview." },
-        "args": { "type": "string", "maxLength": 2000 },
+        "path": { "$ref": "#/$defs/path", "description": "Full path to an .exe (no scripts, shortcuts or command lines; see ARCHITECTURE §7). Only when the target is not a library item; highlighted in the trust preview." },
+        "args": { "type": "string", "maxLength": 2000, "description": "Only with path: a library item opens the way its store does." },
         "workingDirectory": { "$ref": "#/$defs/path" },
         "skipIfRunning": { "type": "boolean", "default": true }
       },
       "oneOf": [
-        { "required": ["type", "ref"], "not": { "required": ["path"] } },
+        { "required": ["type", "ref"], "not": { "anyOf": [ { "required": ["path"] }, { "required": ["args"] }, { "required": ["workingDirectory"] } ] } },
         { "required": ["type", "path"], "not": { "required": ["ref"] } }
       ]
     },

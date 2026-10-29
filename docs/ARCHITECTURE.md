@@ -234,13 +234,44 @@ Every portable file has `"schema": <int>`; loaders migrate older versions and re
 
 ## 7. Routine execution & trust
 
-- Canonical JSON for hashing: parse → re-serialize with sorted keys, no whitespace → SHA-256.
-- States: `Trusted` (hash matches `routine_trust`), `Untrusted` (new or changed). Untrusted routines cannot run until approved in the preview dialog.
-- Preview lists every action in plain language. `close` actions and `launch` with a raw executable path outside known library items are highlighted.
-- Executor: sequential, each action with a timeout; failures are reported per action and do not stop later actions unless `"stopOnError": true`.
-- `close`: `CloseMainWindow` first, wait `graceMs`, then `Kill` only if `"force": true`.
-- Undo closes only processes started by that run (tracked by PID + start time).
-- v1 never executes scripts/shell commands and never elevates.
+Implemented in M8 (engine: `Lumen.Core/Routines`).
+
+- **Reading (`RoutineParser`):** hand-written validation against `routine.schema.json`, without JsonSchema.Net, so no new dependency.
+  - Refused: unknown or repeated keys, wrong types, out-of-range values, files over 256 KB, comments and trailing commas.
+  - Every problem is listed at once. A file with any error can never run.
+  - Tightened from the first schema draft: `args` / `workingDirectory` only go with `path`. A library item opens the way its store does.
+- **Hash (`RoutineJson.Hash`):** parse → re-write with sorted keys and no whitespace → SHA-256. Reformatting or reordering keys keeps a routine trusted; any change of meaning doesn't. Lumen's own writer (`RoutineJson.Serialize`) leaves defaults out, so the hash is stable from the first save.
+- **Trust (`IRoutineTrustStore`, SQLite `routine_trust`, migration 0013, never synced):**
+  - Approval stores id → hash on this PC.
+  - `Trusted` = the file's hash matches; `NeedsReview` = new, or changed outside Lumen; `Invalid` = errors or a blocked step.
+  - Only trusted routines run. Approval happens after the full preview.
+- **Owner-approved limits (2026-10-28, `RoutineSafety`):**
+  - **Open:** library items, or any `.exe` given by full path.
+    - Never shells, script hosts, interpreters, or Windows tools that run other code, install, elevate or change the system: `cmd`, PowerShell, `wscript`, `mshta`, `python`, `node`, `java`, `rundll32`, `msiexec`, `reg`, `schtasks`, `explorer`… (full list in code). The same rule applies to a library app that is one of those (e.g. the Start menu's PowerShell).
+    - Never `.bat`, `.cmd`, `.ps1`, `.vbs`, `.lnk` or any non-`.exe` file.
+    - Never 8.3 short names (`POWERS~1.EXE`), device or `\\?\` paths.
+    - Paths are normalized (`..`) before checking.
+    - Right before starting, the exe's version-info original name is checked too, so a renamed `cmd.exe` is still refused.
+  - **Close:** library items (processes in their install folder) or programs by name. Never Windows' own processes (`explorer`, `dwm`, `svchost`, `csrss`…) or Lumen, even when found through a folder.
+  - A blocked step makes the whole routine impossible to approve.
+- **Preview (`RoutineReview`):** every step in order with variables and `%ENV%` already expanded. It flags:
+  - programs outside the library
+  - close and force-close steps
+  - items missing from this PC's library
+  - missing files and folders
+  - blocked steps
+- **Runner (`RoutineRunner`):**
+  - **Order and errors:** sequential, each step with a time limit (`timeoutMs`; default 60 s, or the wait plus 5 s). Failures are reported per step and later steps still run unless `"stopOnError": true` (then the rest are "not run").
+  - **Safety:** every safety check runs again before acting.
+  - **Programs:** start through `IProcessControl.Start` with `UseShellExecute = false` (as the current user; a program that requires admin fails instead of prompting).
+  - **Library items:** launch through `LaunchService`, so playtime tracking applies, and only when installed (a routine never starts an install).
+  - **Web pages and folders:** URLs must be http/https. Folders open with `explorer.exe "<folder>"` and only when the path is an existing folder.
+  - **Already running:** `skipIfRunning` (default) skips a program already running from that path, or a game with a process in its folder.
+  - **Close:** asks politely (`CloseMainWindow`), waits `graceMs`, and ends the program only with `"force": true`.
+- **Undo:** closes politely only what that run opened.
+  - Programs: tracked by id + start time.
+  - Library items: processes in the item's folder that started after the run began, because store launchers don't report the game's process.
+- v1 never executes scripts or shell commands and never elevates.
 
 ## 8. UI composition (Lumen.App)
 
