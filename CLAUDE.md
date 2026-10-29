@@ -47,6 +47,7 @@ The WPF app only runs on Windows. When working from a non-Windows environment, k
 5. **Routines never run scripts or shell commands in v1.** Untrusted (new/changed) routines require explicit user approval via the preview before running.
 6. **No loading third-party code at runtime** (no plugins, no themes with code) in v1.
 7. Providers never throw out of a scan; they return partial results + diagnostics.
+8. **Never pose as a device or app Lumen isn't.** No sign-in that claims to be a store's mobile app, or that copies another device's identity. Store sign-ins only through the store's own web sign-in page, approved by the user (Epic, GOG). **Steam has no sign-in at all**: only the user's Web API key and public profile data. After the 2026-10-28 incident, Steam flagged an account when Lumen signed in as its mobile app.
 
 ## Definition of done (every PR)
 

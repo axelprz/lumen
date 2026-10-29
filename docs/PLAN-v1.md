@@ -132,6 +132,7 @@ Owner requirement: nobody outside the person using Lumen may be able to get at t
 - **Disconnect** revokes the token at the store when the store supports it, then deletes it locally.
 - **Transparency in Settings:** per account, show whether it is connected, which account, since when, and what Lumen can do with it.
 - **Honest limits (documented in the README):** DPAPI protects against other Windows users and against a copied database or disk; it cannot protect against malware already running as the same Windows user. Signing out of Lumen or Windows does not revoke the token; Disconnect does.
+- **Never pose as a device or app Lumen isn't** (owner decision, 2026-10-29). Epic and GOG keep their web sign-in, with the code pasted by the user. **Steam has no sign-in**: family games come from the members' public profiles with the user's key, because signing in as the Steam mobile app got the owner's account flagged and could do the same to anyone.
 - Any change to these flows is reviewed by the owner before merging.
 
 ### 4.9 UI rework (M10, before 1.0)
