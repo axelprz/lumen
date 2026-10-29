@@ -128,8 +128,9 @@ public static class AppHost
             sp.GetRequiredService<IFileSystem>(),
             sp.GetRequiredService<ISecretStore>(),
             sp.GetRequiredService<ILocalSettings>(),
-            sp.GetRequiredService<SteamWebApi>(),
-            account: sp.GetRequiredService<SteamAccount>()));
+            sp.GetRequiredService<SteamWebApi>()));
+        // Steam sign-in (family games) is turned off: Steam flagged the account after Lumen signed in presenting
+        // itself as the mobile app (2026-10-28). SteamAccount stays only to revoke a stored sign-in at start-up.
         builder.Services.AddSingleton<ILibraryProvider>(sp => sp.GetRequiredService<SteamProvider>());
         builder.Services.AddSingleton<ILibraryProvider>(sp => new EpicProvider(
             sp.GetRequiredService<IRegistryReader>(),
@@ -231,7 +232,6 @@ public static class AppHost
         builder.Services.AddSingleton<CollectionsViewModel>();
         builder.Services.AddSingleton<LibraryViewModel>();
         builder.Services.AddSingleton<SteamSettingsViewModel>();
-        builder.Services.AddSingleton<SteamFamilyViewModel>();
         builder.Services.AddSingleton<EpicAccountViewModel>();
         builder.Services.AddSingleton<GogAccountViewModel>();
         builder.Services.AddSingleton<ArtworkSettingsViewModel>();
