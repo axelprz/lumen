@@ -312,6 +312,9 @@ public sealed partial class RoutinesViewModel : ObservableObject
     {
         var undoable = Routines.Where(r => r.CanUndo).Select(r => r.Entry.Id).ToHashSet(StringComparer.Ordinal);
         var results = Routines.Where(r => r.HasResult).ToDictionary(r => r.Entry.Id, r => r.ResultText, StringComparer.Ordinal);
+
+        // Cards are rebuilt whenever the library changes (playtime, installs): keep what the user was looking at.
+        var stillOpen = Routines.Where(r => r.CanForceClose).ToDictionary(r => r.Entry.Id, r => r.StillOpen, StringComparer.Ordinal);
         Routines.Clear();
         foreach (var entry in _routines.Entries.OrderBy(e => e.Routine?.Name.For(CultureInfo.CurrentUICulture) ?? e.FileId, StringComparer.CurrentCultureIgnoreCase))
         {
@@ -319,6 +322,7 @@ public sealed partial class RoutinesViewModel : ObservableObject
             {
                 CanUndo = undoable.Contains(entry.Id) && _routines.LastRun(entry.Id) is not null,
                 ResultText = results.GetValueOrDefault(entry.Id),
+                StillOpen = stillOpen.GetValueOrDefault(entry.Id) ?? [],
             });
         }
 
