@@ -272,6 +272,10 @@
                       <Button Content="{l:Loc Routine_Undo}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0"
                               Command="{Binding DataContext.UndoCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
                               Visibility="{Binding CanUndo, Converter={StaticResource BoolToVisibility}}" />
+                      <Button Content="{l:Loc Routine_ForceClose}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0"
+                              Foreground="{DynamicResource Lumen.Brush.Warning}"
+                              Command="{Binding DataContext.ForceCloseCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
+                              Visibility="{Binding CanForceClose, Converter={StaticResource BoolToVisibility}}" />
                       <Button Content="{l:Loc Routine_Edit}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0"
                               Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
                               Visibility="{Binding CanEdit, Converter={StaticResource BoolToVisibility}}" />

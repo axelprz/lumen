@@ -285,7 +285,7 @@ Implemented in M8 (engine: `Lumen.Core/Routines`).
   - **Web pages and folders:** URLs must be http/https. Folders open with `explorer.exe "<folder>"` and only when the path is an existing folder.
   - **Already running:** `skipIfRunning` (default) skips a program already running from that path, or a game with a process in its folder.
   - **Close:** asks politely (`CloseMainWindow`), waits `graceMs`, and ends the program only with `"force": true`.
-- **Undo:** closes politely only what that run opened.
+- **Undo:** closes politely only what that run opened. Games often ignore that request or just minimize. Undo then reports which programs are still open, and **Force close** (after a confirmation that unsaved progress is lost) ends exactly those processes (id + start time), never Windows' own or Lumen. Owner test 2026-10-29: a Steam game only minimized.
   - Programs: tracked by id + start time.
   - Library items: processes in the item's folder that started after the run began, because store launchers don't report the game's process.
 - **Files and service (`RoutineService`):**

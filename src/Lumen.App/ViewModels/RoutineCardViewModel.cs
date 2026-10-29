@@ -21,6 +21,13 @@ public sealed partial class RoutineCardViewModel : ObservableObject
     [ObservableProperty]
     private bool _isRunning;
 
+    /// <summary>Programs that ignored Undo's polite request; "Force close" ends exactly these.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanForceClose))]
+    private IReadOnlyList<Lumen.Core.Platform.RunningProcess> _stillOpen = [];
+
+    public bool CanForceClose => StillOpen.Count > 0;
+
     public RoutineCardViewModel(RoutineEntry entry, ILocalizer loc)
     {
         Entry = entry;
