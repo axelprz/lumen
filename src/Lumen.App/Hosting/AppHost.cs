@@ -91,6 +91,10 @@ public static class AppHost
             http.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent());
             return new SteamAccountApi(http);
         });
+        builder.Services.AddSingleton(sp => new SteamFamilyMembers(
+            sp.GetRequiredService<SteamWebApi>(),
+            sp.GetRequiredService<ISecretStore>(),
+            sp.GetRequiredService<ILocalSettings>()));
         builder.Services.AddSingleton(sp => new SteamAccount(
             sp.GetRequiredService<SteamAccountApi>(),
             sp.GetRequiredService<ISecretStore>(),
@@ -128,9 +132,11 @@ public static class AppHost
             sp.GetRequiredService<IFileSystem>(),
             sp.GetRequiredService<ISecretStore>(),
             sp.GetRequiredService<ILocalSettings>(),
-            sp.GetRequiredService<SteamWebApi>()));
-        // Steam sign-in (family games) is turned off: Steam flagged the account after Lumen signed in presenting
-        // itself as the mobile app (2026-10-28). SteamAccount stays only to revoke a stored sign-in at start-up.
+            sp.GetRequiredService<SteamWebApi>(),
+            family: sp.GetRequiredService<SteamFamilyMembers>()));
+        // Steam sign-in is turned off: Steam flagged the account after Lumen signed in presenting itself as the
+        // mobile app (2026-10-28). Family games now come from the members' public profiles with the user's key;
+        // SteamAccount stays only to revoke a sign-in stored by an earlier version.
         builder.Services.AddSingleton<ILibraryProvider>(sp => sp.GetRequiredService<SteamProvider>());
         builder.Services.AddSingleton<ILibraryProvider>(sp => new EpicProvider(
             sp.GetRequiredService<IRegistryReader>(),
@@ -232,6 +238,7 @@ public static class AppHost
         builder.Services.AddSingleton<CollectionsViewModel>();
         builder.Services.AddSingleton<LibraryViewModel>();
         builder.Services.AddSingleton<SteamSettingsViewModel>();
+        builder.Services.AddSingleton<SteamFamilyViewModel>();
         builder.Services.AddSingleton<EpicAccountViewModel>();
         builder.Services.AddSingleton<GogAccountViewModel>();
         builder.Services.AddSingleton<ArtworkSettingsViewModel>();

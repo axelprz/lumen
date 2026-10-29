@@ -83,6 +83,9 @@ public static class LocalSettingKeys
     /// </summary>
     public const string Language = "ui.language";
 
+    /// <summary>Steam family members whose public game lists Lumen shows (comma-separated SteamID64s, up to 5).</summary>
+    public const string SteamFamilyMembers = "steam.family.members";
+
     /// <summary>"1" once the first-run wizard was finished or skipped.</summary>
     public const string FirstRunCompleted = "firstRun.completed";
 

@@ -1,52 +1,55 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)
 
+using System.Collections.ObjectModel;
 using System.Globalization;
-using System.IO;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Lumen.App.Services;
 using Lumen.Core.Localization;
+using Lumen.Core.Settings;
 using Lumen.Providers.Steam;
 using Microsoft.Extensions.Logging;
-using QRCoder;
 
 namespace Lumen.App.ViewModels;
 
-public enum SteamFamilyState
+/// <summary>A family member as shown on the card.</summary>
+public sealed partial class FamilyMemberOption(string steamId, string name, bool isMember) : ObservableObject
 {
-    Disconnected,
+    public string SteamId { get; } = steamId;
 
-    /// <summary>A QR is on screen, waiting for the phone.</summary>
-    Connecting,
-    Connected,
+    public string Name { get; } = name;
+
+    [ObservableProperty]
+    private bool _isMember = isMember;
+
+    public override string ToString() => Name;
 }
 
 /// <summary>
-/// Settings → Steam family library (PLAN-v1 §4.8). Sign-in by scanning a QR with the Steam mobile app (no password
-/// in Lumen); afterwards the card shows the account, since when, and exactly what Lumen can do. Disconnect revokes
-/// at Steam and deletes the token here, and says so when Steam couldn't confirm.
+/// Settings → Steam family, without any sign-in: the user picks family members (from their friend list, or by
+/// profile link), and Lumen shows those members' public games with the user's own Web API key. The card says plainly
+/// what is read and what isn't.
 /// </summary>
 public sealed partial class SteamFamilyViewModel : ObservableObject
 {
-    private readonly SteamAccount _account;
+    private readonly SteamFamilyMembers _family;
+    private readonly SteamWebApi _api;
+    private readonly ISecretStore _secrets;
+    private readonly ILocalSettings _settings;
     private readonly LibraryViewModel _library;
-    private readonly IDialogService _dialogs;
     private readonly ILocalizer _localizer;
     private readonly ILogger<SteamFamilyViewModel> _logger;
-    private CancellationTokenSource? _signIn;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsDisconnected), nameof(IsConnecting), nameof(IsConnected))]
-    private SteamFamilyState _state;
+    [NotifyPropertyChangedFor(nameof(NeedsKey))]
+    private bool _hasKey;
 
     [ObservableProperty]
-    private ImageSource? _qrImage;
+    [NotifyPropertyChangedFor(nameof(IsNotPicking))]
+    private bool _isPicking;
 
     [ObservableProperty]
-    private string? _accountText;
+    private string _profileInput = string.Empty;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasStatus))]
@@ -55,34 +58,30 @@ public sealed partial class SteamFamilyViewModel : ObservableObject
     [ObservableProperty]
     private StatusKind _statusKind;
 
-    public SteamFamilyViewModel(SteamAccount account, LibraryViewModel library, IDialogService dialogs, ILocalizer localizer, ILogger<SteamFamilyViewModel> logger)
+    public SteamFamilyViewModel(
+        SteamFamilyMembers family, SteamWebApi api, ISecretStore secrets, ILocalSettings settings,
+        LibraryViewModel library, ILocalizer localizer, ILogger<SteamFamilyViewModel> logger)
     {
-        _account = account;
+        _family = family;
+        _api = api;
+        _secrets = secrets;
+        _settings = settings;
         _library = library;
-        _dialogs = dialogs;
         _localizer = localizer;
         _logger = logger;
-        var ui = SynchronizationContext.Current ?? new SynchronizationContext();
-        _account.Changed += (_, _) => ui.Post(_ => ShowReconnectIfNeeded(), null);
     }
 
-    /// <summary>Steam rejected the sign-in (scan): say so on the card and offer to connect again.</summary>
-    private void ShowReconnectIfNeeded()
-    {
-        OnPropertyChanged(nameof(ShowsReconnect));
-        if (_account.NeedsReconnect && State == SteamFamilyState.Connected)
-        {
-            SetStatus(StatusKind.Warning, "SteamFamily_NeedsReconnect");
-        }
-    }
+    /// <summary>The chosen members.</summary>
+    public ObservableCollection<FamilyMemberOption> Members { get; } = [];
 
-    public bool ShowsReconnect => _account.NeedsReconnect;
+    /// <summary>Friends to choose from (while picking).</summary>
+    public ObservableCollection<FamilyMemberOption> Friends { get; } = [];
 
-    public bool IsDisconnected => State == SteamFamilyState.Disconnected;
+    public bool NeedsKey => !HasKey;
 
-    public bool IsConnecting => State == SteamFamilyState.Connecting;
+    public bool IsNotPicking => !IsPicking;
 
-    public bool IsConnected => State == SteamFamilyState.Connected;
+    public bool HasMembers => Members.Count > 0;
 
     public bool HasStatus => !string.IsNullOrEmpty(Status);
 
@@ -90,175 +89,176 @@ public sealed partial class SteamFamilyViewModel : ObservableObject
     {
         try
         {
-            await ShowAccountAsync(ct);
+            var (key, own) = await KeyAndIdAsync(ct);
+            HasKey = key is not null && own is not null;
+            var ids = await _family.GetIdsAsync(ct);
+            await ShowMembersAsync(key, ids, ct);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            LogFailed(ex);
-        }
-    }
-
-    /// <summary>Shows a QR and waits (polling) until the phone approves, the code expires, or the user cancels.</summary>
-    [RelayCommand]
-    private async Task ConnectAsync()
-    {
-        _signIn?.Cancel();
-        _signIn = new CancellationTokenSource(TimeSpan.FromMinutes(10));
-        var ct = _signIn.Token;
-        SetStatus(StatusKind.None, null);
-        try
-        {
-            var begin = await _account.StartQrAsync(ct);
-            if (begin.Value is not { } session)
-            {
-                SetStatus(StatusKind.Error, "SteamFamily_Unreachable");
-                return;
-            }
-
-            QrImage = RenderQr(session.ChallengeUrl);
-            State = SteamFamilyState.Connecting;
-            SetStatus(StatusKind.Working, "SteamFamily_Waiting");
-
-            while (!ct.IsCancellationRequested)
-            {
-                await Task.Delay(session.Interval, ct);
-                var poll = await _account.PollAsync(session, ct);
-                if (poll.IsApproved)
-                {
-                    await OnConnectedAsync(ct);
-                    return;
-                }
-
-                switch (poll.Error)
-                {
-                    case SteamAccountError.None when poll.NewChallengeUrl is { } url:
-                        QrImage = RenderQr(url); // Steam rotates the code; the old one stops working
-                        break;
-                    case SteamAccountError.None or SteamAccountError.Network or SteamAccountError.RateLimited:
-                        break; // keep waiting
-                    case SteamAccountError.SessionExpired:
-                        EndConnecting(StatusKind.Warning, "SteamFamily_Expired");
-                        return;
-                    default:
-                        LogPollFailed(poll.Error, poll.Detail);
-                        EndConnecting(StatusKind.Error, "SteamFamily_Failed");
-                        return;
-                }
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            if (State == SteamFamilyState.Connecting)
-            {
-                EndConnecting(StatusKind.Warning, "SteamFamily_Expired");
-            }
-        }
-        catch (Exception ex)
-        {
-            LogFailed(ex);
-            EndConnecting(StatusKind.Error, "SteamFamily_Failed");
+            LogLoadFailed(ex);
         }
     }
 
     [RelayCommand]
-    private void CancelConnect()
+    private async Task PickFromFriendsAsync()
     {
-        _signIn?.Cancel();
-        EndConnecting(StatusKind.None, null);
-    }
-
-    [RelayCommand]
-    private async Task DisconnectAsync()
-    {
-        if (!_dialogs.Confirm(_localizer["SteamFamily_DisconnectTitle"], _localizer["SteamFamily_DisconnectConfirm"]))
+        Status = null;
+        var (key, own) = await KeyAndIdAsync(CancellationToken.None);
+        if (key is null || own is null)
         {
+            HasKey = false;
             return;
         }
 
+        SetStatus(StatusKind.Working, "SteamFamily_LoadingFriends");
+        var friends = await _api.GetFriendIdsAsync(key, own, CancellationToken.None);
+        if (friends.Error != SteamApiError.None)
+        {
+            SetStatus(StatusKind.Warning, friends.Error == SteamApiError.PrivateProfile ? "SteamFamily_FriendsPrivate" : "SteamFamily_Unreachable");
+            return;
+        }
+
+        var named = new List<SteamProfile>();
+        foreach (var chunk in friends.Profiles.Select(p => p.SteamId).Chunk(100))
+        {
+            var profiles = await _api.GetProfilesAsync(key, chunk, CancellationToken.None);
+            named.AddRange(profiles.Profiles);
+        }
+
+        var memberIds = Members.Select(m => m.SteamId).ToHashSet(StringComparer.Ordinal);
+        Friends.Clear();
+        foreach (var friend in named.OrderBy(p => p.Name, StringComparer.CurrentCultureIgnoreCase))
+        {
+            Friends.Add(new FamilyMemberOption(friend.SteamId, friend.Name, memberIds.Contains(friend.SteamId)));
+        }
+
+        Status = null;
+        IsPicking = true;
+        if (Friends.Count == 0)
+        {
+            SetStatus(StatusKind.None, "SteamFamily_NoFriends");
+        }
+    }
+
+    [RelayCommand]
+    private async Task SavePickAsync()
+    {
+        var chosen = Friends.Where(f => f.IsMember).Select(f => f.SteamId).ToList();
+        if (chosen.Count > SteamFamilyMembers.MaxMembers)
+        {
+            Status = string.Format(CultureInfo.CurrentCulture, _localizer["SteamFamily_TooMany"], SteamFamilyMembers.MaxMembers);
+            StatusKind = StatusKind.Warning;
+            return;
+        }
+
+        IsPicking = false;
+        await SaveAsync(chosen);
+    }
+
+    [RelayCommand]
+    private void CancelPick()
+    {
+        IsPicking = false;
+        Status = null;
+    }
+
+    /// <summary>Adds a member by profile link (<c>/profiles/7656…</c> or <c>/id/name</c>) or SteamID64.</summary>
+    [RelayCommand]
+    private async Task AddByProfileAsync()
+    {
+        var (key, _) = await KeyAndIdAsync(CancellationToken.None);
+        if (key is null)
+        {
+            HasKey = false;
+            return;
+        }
+
+        var id = SteamWebApi.ExtractSteamId64(ProfileInput);
+        if (id is null && SteamWebApi.ExtractVanityName(ProfileInput) is { } vanity)
+        {
+            (_, id) = await _api.ResolveVanityAsync(key, vanity, CancellationToken.None);
+        }
+
+        if (id is null)
+        {
+            SetStatus(StatusKind.Warning, "SteamFamily_ProfileNotFound");
+            return;
+        }
+
+        if (Members.Count >= SteamFamilyMembers.MaxMembers && Members.All(m => m.SteamId != id))
+        {
+            Status = string.Format(CultureInfo.CurrentCulture, _localizer["SteamFamily_TooMany"], SteamFamilyMembers.MaxMembers);
+            StatusKind = StatusKind.Warning;
+            return;
+        }
+
+        ProfileInput = string.Empty;
+        await SaveAsync(Members.Select(m => m.SteamId).Append(id).ToList());
+    }
+
+    [RelayCommand]
+    private async Task RemoveAsync(FamilyMemberOption? member)
+    {
+        if (member is not null)
+        {
+            await SaveAsync(Members.Where(m => m.SteamId != member.SteamId).Select(m => m.SteamId).ToList());
+        }
+    }
+
+    private async Task SaveAsync(IReadOnlyList<string> ids)
+    {
         try
         {
-            var revoked = await _account.DisconnectAsync(CancellationToken.None);
-            State = SteamFamilyState.Disconnected;
-            AccountText = null;
-            SetStatus(revoked ? StatusKind.Success : StatusKind.Warning, revoked ? "SteamFamily_Disconnected" : "SteamFamily_DisconnectedLocally");
+            await _family.SetIdsAsync(ids, CancellationToken.None);
+            var (key, _) = await KeyAndIdAsync(CancellationToken.None);
+            await ShowMembersAsync(key, await _family.GetIdsAsync(CancellationToken.None), CancellationToken.None);
+            SetStatus(StatusKind.Success, "SteamFamily_Saved");
             await _library.RescanCommand.ExecuteAsync(null);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            LogFailed(ex);
-            SetStatus(StatusKind.Error, "SteamFamily_Failed");
+            LogSaveFailed(ex);
+            SetStatus(StatusKind.Error, "SteamFamily_Unreachable");
         }
     }
 
-    private async Task OnConnectedAsync(CancellationToken ct)
+    private async Task ShowMembersAsync(string? key, IReadOnlyList<string> ids, CancellationToken ct)
     {
-        QrImage = null;
-        await ShowAccountAsync(ct);
-
-        // Say right away what the sign-in gives: shared games, or that the account has no family.
-        var family = await _account.GetSharedGamesAsync(ct);
-        switch (family.Status)
+        var names = new Dictionary<string, string>(StringComparer.Ordinal);
+        if (key is not null && ids.Count > 0)
         {
-            case SteamFamilyStatus.Ok:
-                SetStatus(StatusKind.Success, "SteamFamily_Connected", family.Games.Count);
-                break;
-            case SteamFamilyStatus.NotInFamily:
-                SetStatus(StatusKind.Warning, "SteamFamily_NoFamily");
-                break;
-            default:
-                SetStatus(StatusKind.Warning, "SteamFamily_ConnectedNoList");
-                break;
+            foreach (var profile in (await _api.GetProfilesAsync(key, ids.ToList(), ct)).Profiles)
+            {
+                names[profile.SteamId] = profile.Name;
+            }
         }
 
-        await _library.RescanCommand.ExecuteAsync(null);
-    }
-
-    private async Task ShowAccountAsync(CancellationToken ct)
-    {
-        var info = await _account.GetInfoAsync(ct);
-        State = info is null ? SteamFamilyState.Disconnected : SteamFamilyState.Connected;
-        AccountText = info is null
-            ? null
-            : string.Format(CultureInfo.CurrentCulture, _localizer["SteamFamily_Account"], info.AccountName, info.ConnectedSince.LocalDateTime.ToString("d", CultureInfo.CurrentCulture));
-    }
-
-    private void EndConnecting(StatusKind kind, string? key)
-    {
-        QrImage = null;
-        if (State == SteamFamilyState.Connecting)
+        Members.Clear();
+        foreach (var id in ids)
         {
-            State = SteamFamilyState.Disconnected;
+            Members.Add(new FamilyMemberOption(id, names.GetValueOrDefault(id, id), isMember: true));
         }
 
-        SetStatus(kind, key);
+        OnPropertyChanged(nameof(HasMembers));
     }
 
-    private void SetStatus(StatusKind kind, string? key, params object[] args)
+    private async Task<(string? Key, string? OwnId)> KeyAndIdAsync(CancellationToken ct)
+    {
+        var key = await _secrets.GetAsync(SecretNames.SteamWebApiKey, ct);
+        var own = await _settings.GetAsync(LocalSettingKeys.SteamId64, ct);
+        return (string.IsNullOrWhiteSpace(key) ? null : key, SteamWebApi.IsValidSteamId64(own) ? own : null);
+    }
+
+    private void SetStatus(StatusKind kind, string key)
     {
         StatusKind = kind;
-        Status = key is null ? null : args.Length == 0 ? _localizer[key] : string.Format(CultureInfo.CurrentCulture, _localizer[key], args);
+        Status = _localizer[key];
     }
 
-    /// <summary>The challenge URL as a QR image (black on white, with a quiet zone so phones read it on a dark page).</summary>
-    private static BitmapImage RenderQr(string url)
-    {
-        using var generator = new QRCodeGenerator();
-        using var data = generator.CreateQrCode(url, QRCodeGenerator.ECCLevel.M);
-        var png = new PngByteQRCode(data).GetGraphic(8);
-        var image = new BitmapImage();
-        using var stream = new MemoryStream(png);
-        image.BeginInit();
-        image.CacheOption = BitmapCacheOption.OnLoad;
-        image.StreamSource = stream;
-        image.EndInit();
-        image.Freeze();
-        return image;
-    }
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Could not load the Steam family members")]
+    private partial void LogLoadFailed(Exception exception);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Steam family sign-in step failed")]
-    private partial void LogFailed(Exception exception);
-
-    // Error kind and status code only: never URLs or tokens.
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Steam family sign-in was refused: {Error} {Detail}")]
-    private partial void LogPollFailed(SteamAccountError error, string? detail);
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Could not save the Steam family members")]
+    private partial void LogSaveFailed(Exception exception);
 }

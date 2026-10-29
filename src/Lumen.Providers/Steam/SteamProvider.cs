@@ -10,8 +10,8 @@ namespace Lumen.Providers.Steam;
 
 /// <summary>
 /// Steam: installed games from the local library folders (no login), plus owned games from the Steam
-/// Web API when the user supplied a key and SteamID64, plus games the Steam family shares when the user signed in
-/// (<see cref="SteamAccount"/>). Only reads Steam's files and registry.
+/// Web API when the user supplied a key and SteamID64, plus the public libraries of the family members the user picked
+/// (<see cref="SteamFamilyMembers"/>, same key, no sign-in). Only reads Steam's files and registry.
 /// </summary>
 public sealed class SteamProvider(
     IRegistryReader registry,
@@ -20,7 +20,7 @@ public sealed class SteamProvider(
     ILocalSettings settings,
     SteamWebApi webApi,
     TimeProvider? time = null,
-    SteamAccount? account = null) : ILibraryProvider, ICachingProvider, IWatchableProvider
+    SteamFamilyMembers? family = null) : ILibraryProvider, ICachingProvider, IWatchableProvider
 {
     public const string SourceId = "steam";
 
@@ -100,7 +100,7 @@ public sealed class SteamProvider(
     }
 
     /// <summary>
-    /// Owned games (Web API key) and family-shared games (sign-in), each optional. Family games the user also owns are
+    /// Owned games and family members' games (both with the Web API key), each optional. Family games the user also owns are
     /// left out (the owned copy wins). When one part fails the other still counts (Partial).
     /// </summary>
     public async Task<ProviderResult> ScanOwnedAsync(CancellationToken ct)
@@ -113,10 +113,10 @@ public sealed class SteamProvider(
             }
 
             var owned = await ScanOwnedByKeyAsync(ct).ConfigureAwait(false);
-            var family = account is null
+            var shared = family is null
                 ? new SteamFamilyResult(SteamFamilyStatus.NotConnected, [])
-                : await account.GetSharedGamesAsync(ct).ConfigureAwait(false);
-            var scan = CombineOwnedAndFamily(owned, family);
+                : await family.GetSharedGamesAsync(ct).ConfigureAwait(false);
+            var scan = CombineOwnedAndFamily(owned, shared);
 
             // Only good answers are reused; failures are retried on the next scan.
             _ownedCache = scan.Status == ProviderStatus.Ok ? (scan, _time.GetUtcNow()) : null;
@@ -148,6 +148,11 @@ public sealed class SteamProvider(
         else if (family.Status == SteamFamilyStatus.Failed)
         {
             diagnostics.Add(new(DiagnosticSeverity.Warning, "Steam family: shared games unavailable right now.", family.Detail));
+        }
+
+        if (family.PrivateMembers > 0)
+        {
+            diagnostics.Add(new(DiagnosticSeverity.Info, $"Steam family: {family.PrivateMembers} member(s) keep their game details private, so their games can't be listed."));
         }
 
         var entries = owned.IsUsable ? owned.Entries.ToList() : [];
@@ -198,8 +203,14 @@ public sealed class SteamProvider(
                     ["appid"] = g.AppId,
                     ["family"] = "true",
                     ["familyOwners"] = g.OwnerCount.ToString(CultureInfo.InvariantCulture),
-                    ["playtimeMinutes"] = g.PlaytimeMinutes.ToString(CultureInfo.InvariantCulture),
                 };
+
+                // Members' hours are theirs: only the user's own figures (none from public profiles) are kept.
+                if (g.PlaytimeMinutes > 0)
+                {
+                    extra["playtimeMinutes"] = g.PlaytimeMinutes.ToString(CultureInfo.InvariantCulture);
+                }
+
                 if (g.LastPlayedUnix > 0)
                 {
                     extra["lastPlayed"] = g.LastPlayedUnix.ToString(CultureInfo.InvariantCulture);

@@ -23,7 +23,11 @@ public enum SteamFamilyStatus
     Failed,
 }
 
-public sealed record SteamFamilyResult(SteamFamilyStatus Status, IReadOnlyList<SteamSharedGame> Games, string? Detail = null);
+public sealed record SteamFamilyResult(SteamFamilyStatus Status, IReadOnlyList<SteamSharedGame> Games, string? Detail = null)
+{
+    /// <summary>Family members whose game details are private (their games can't be listed).</summary>
+    public int PrivateMembers { get; init; }
+}
 
 /// <summary>
 /// The optional Steam sign-in for family sharing (PLAN-v1 §4.8): QR sign-in approved on the phone (Lumen never sees a
