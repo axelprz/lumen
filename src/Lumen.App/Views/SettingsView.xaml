@@ -75,7 +75,6 @@
       </Border>
 
       <views:SteamSettingsCard DataContext="{Binding Steam}" />
-      <views:SteamFamilyCard DataContext="{Binding SteamFamily}" Margin="0,20,0,0" />
       <views:EpicAccountCard DataContext="{Binding Epic}" Margin="0,20,0,0" />
       <views:GogAccountCard DataContext="{Binding Gog}" Margin="0,20,0,0" />
       <views:ArtworkSettingsCard DataContext="{Binding Artwork}" Margin="0,20,0,0" />

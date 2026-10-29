@@ -13,6 +13,7 @@ using Lumen.App.Services;
 using Lumen.Core.Localization;
 using Lumen.Core.Shell;
 using Lumen.Platform.Windows;
+using Lumen.Providers.Steam;
 using Lumen.Platform.Windows.Windowing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -118,6 +119,9 @@ public partial class App : Application
         // From now on, notice installs/uninstalls by themselves (store folders + coming back to the window).
         var autoRefresh = _host.Services.GetRequiredService<LibraryAutoRefresh>();
         await autoRefresh.StartAsync(CancellationToken.None).ConfigureAwait(true);
+
+        // Steam sign-in is turned off; a sign-in kept from an earlier version is revoked at Steam and deleted.
+        _ = RetireSteamSignInAsync(_host.Services.GetRequiredService<SteamAccount>());
         MainWindow.Activated += (_, _) => autoRefresh.OnWindowActivated();
     }
 
@@ -131,6 +135,24 @@ public partial class App : Application
 
     private async void OnMainWindowClosed(object? sender, EventArgs e) =>
         await ShutdownAsync(exitCode: 0).ConfigureAwait(true);
+
+    private static async Task RetireSteamSignInAsync(SteamAccount account)
+    {
+        try
+        {
+            if (await account.GetInfoAsync(CancellationToken.None).ConfigureAwait(false) is null)
+            {
+                return;
+            }
+
+            var revoked = await account.DisconnectAsync(CancellationToken.None).ConfigureAwait(false);
+            Log.Information("Steam sign-in removed (feature turned off); revoked at Steam: {Revoked}", revoked);
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            Log.Warning(ex, "Could not remove the stored Steam sign-in");
+        }
+    }
 
     private void OnShowRequested()
     {
