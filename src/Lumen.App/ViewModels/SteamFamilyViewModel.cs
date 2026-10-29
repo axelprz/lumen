@@ -83,8 +83,9 @@ public sealed partial class SteamFamilyViewModel : ObservableObject
 
         _family.Reset();
         ShowAccount(account);
-        SetStatus(StatusKind.Success, "SteamWeb_Connected");
+        SetStatus(StatusKind.Working, "SteamWeb_Connected");
         await _library.RescanCommand.ExecuteAsync(null);
+        SetStatus(StatusKind.Success, "SteamWeb_Ready");
     }
 
     [RelayCommand]

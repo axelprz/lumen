@@ -30,6 +30,10 @@ public sealed class SteamFamilyAccess(ISteamWebSession session, SteamAccountApi 
         SetNeedsReconnect(false);
     }
 
+    /// <summary>The web session's token when signed in (cached), else null. Also used for the user's own library.</summary>
+    public async Task<SteamWebToken?> TokenIfSignedInAsync(CancellationToken ct) =>
+        await session.IsSignedInAsync(ct).ConfigureAwait(false) ? await TokenAsync(ct).ConfigureAwait(false) : null;
+
     public async Task<SteamFamilyResult> GetSharedGamesAsync(CancellationToken ct)
     {
         if (!await session.IsSignedInAsync(ct).ConfigureAwait(false))

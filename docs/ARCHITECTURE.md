@@ -163,6 +163,7 @@ Sign-in on Steam's own website, as Playnite does (2026-10-29).
   - no dev tools, password saving, autofill, context menu, host objects or web messages
 - **Getting the token:** once on a store page that isn't `/login`, Lumen runs one read-only script (`SteamStorePage.ReadConfigScript`) that reads `#application_config`'s `data-userinfo` and `data-store_user_config`. The `webapi_token` there is the access token Steam's store page gives the browser.
 - **Family games:** `SteamFamilyAccess` calls `IFamilyGroupsService/GetFamilyGroupForUser` + `GetSharedLibraryApps` with it, the same requests as Playnite's `FamilyGroupsService`.
+- **Own library too:** while signed in, `SteamProvider` reads the user's own owned games with the same token (`IPlayerService/GetOwnedGames` with `access_token`, as Playnite's `GetOwnedGamesWeb`). The Web API key is only a fallback. On 2026-10-29 the owner's key started returning 401, most likely revoked by Steam along with the account restriction.
 - **Token lifetime:** in memory only, reused until 10 min before its `exp`. A new one comes from opening the store page in an invisible browser (a hidden popup window, never shown), about once a day.
 - **When Steam stops accepting the session:** the card asks to sign in again.
 - **Stored:** only the account's SteamID64, display name and sign-in date (`settings_local` `steam.web.*`).

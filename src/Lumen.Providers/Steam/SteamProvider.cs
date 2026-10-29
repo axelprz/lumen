@@ -164,8 +164,18 @@ public sealed class SteamProvider(
         return new ProviderResult(ownedFailed || familyFailed || owned.Status == ProviderStatus.Partial ? ProviderStatus.Partial : ProviderStatus.Ok, entries, diagnostics);
     }
 
+    // Signed in on Steam's website: the account's own session reads its library (no key needed). Otherwise the key.
     private async Task<ProviderResult> ScanOwnedByKeyAsync(CancellationToken ct)
     {
+        if (family is not null && await family.TokenIfSignedInAsync(ct).ConfigureAwait(false) is { } token)
+        {
+            var mine = await webApi.GetOwnedGamesWithTokenAsync(token.AccessToken, token.SteamId, ct).ConfigureAwait(false);
+            if (mine.Error == SteamApiError.None)
+            {
+                return ProviderResult.FromScan(ToEntries(mine.Games), []);
+            }
+        }
+
         var apiKey = await secrets.GetAsync(SecretNames.SteamWebApiKey, ct).ConfigureAwait(false);
         var steamId = await settings.GetAsync(LocalSettingKeys.SteamId64, ct).ConfigureAwait(false);
         if (string.IsNullOrWhiteSpace(apiKey) || steamId is null || !SteamWebApi.IsValidSteamId64(steamId))
@@ -181,7 +191,7 @@ public sealed class SteamProvider(
                 ProviderStatus.Partial,
                 [],
                 [new ProviderDiagnostic(DiagnosticSeverity.Warning, "Steam returned no games: the profile's game details are private.")]),
-            SteamApiError.InvalidKey => ProviderResult.Failed($"Steam rejected the Web API key (HTTP {result.Detail})."),
+            SteamApiError.InvalidKey => ProviderResult.Failed($"Steam rejected the Web API key (HTTP {result.Detail}). Signing in on Steam's website in Settings reads the library without a key."),
             _ => ProviderResult.Failed($"Steam Web API unavailable ({result.Error}: {result.Detail})."),
         };
     }

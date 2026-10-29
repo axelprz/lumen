@@ -909,7 +909,7 @@
     <value>Signed in as {0} since {1}</value>
   </data>
   <data name="SteamWeb_WhatLumenDoes" xml:space="preserve">
-    <value>Lumen only reads the list of games your family shares. The session stays in Lumen's own browser on this PC, protected by your Windows account. Lumen never buys, changes settings or reads anything else. Disconnect signs out on Steam and deletes that browser's data.</value>
+    <value>Lumen only reads your list of games and the ones your family shares. The session stays in Lumen's own browser on this PC, protected by your Windows account. Lumen never buys, changes settings or reads anything else. Disconnect signs out on Steam and deletes that browser's data.</value>
   </data>
   <data name="SteamWeb_Connected" xml:space="preserve">
     <value>Signed in. Updating your library…</value>
@@ -922,5 +922,8 @@
   </data>
   <data name="SteamWeb_NeedsReconnect" xml:space="preserve">
     <value>Steam no longer accepts this sign-in (it expired or was ended elsewhere). Sign in again to see family games.</value>
+  </data>
+  <data name="SteamWeb_Ready" xml:space="preserve">
+    <value>Done. Your library now includes your own Steam games and the ones your family shares.</value>
   </data>
 </root>
