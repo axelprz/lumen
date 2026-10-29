@@ -697,61 +697,11 @@
   <data name="SteamFamily_Title" xml:space="preserve">
     <value>Biblioteca familiar de Steam</value>
   </data>
-  <data name="SteamFamily_Description" xml:space="preserve">
-    <value>Mostrá los juegos que tu familia de Steam comparte con vos. Iniciás sesión escaneando un código QR con la app de Steam del celular: Lumen nunca ve tu contraseña. Es opcional: tus propios juegos siguen funcionando con la clave de arriba.</value>
-  </data>
-  <data name="SteamFamily_Connect" xml:space="preserve">
-    <value>Conectar con código QR</value>
-  </data>
-  <data name="SteamFamily_QrName" xml:space="preserve">
-    <value>Código QR para iniciar sesión en Steam</value>
-  </data>
-  <data name="SteamFamily_Steps" xml:space="preserve">
-    <value>1. Abrí la app de Steam en tu celular.
-2. Tocá el escudo (Steam Guard) y elegí “Escanear un código QR”.
-3. Escaneá este código y aprobá el inicio de sesión de “Lumen”.</value>
-  </data>
-  <data name="SteamFamily_Waiting" xml:space="preserve">
-    <value>Esperando que lo apruebes en el celular…</value>
-  </data>
-  <data name="SteamFamily_Expired" xml:space="preserve">
-    <value>El código venció. Volvé a conectar para generar uno nuevo.</value>
-  </data>
-  <data name="SteamFamily_Failed" xml:space="preserve">
-    <value>No se pudo conectar con Steam. Probá de nuevo en un rato.</value>
-  </data>
   <data name="SteamFamily_Unreachable" xml:space="preserve">
     <value>No se pudo contactar a Steam. Revisá tu conexión y probá de nuevo.</value>
   </data>
-  <data name="SteamFamily_Account" xml:space="preserve">
-    <value>Conectado como {0} desde el {1}</value>
-  </data>
-  <data name="SteamFamily_WhatLumenCanDo" xml:space="preserve">
-    <value>Lumen solo puede leer la lista de juegos que comparte tu familia. No puede comprar, cambiar tu cuenta ni ver tu contraseña. El inicio de sesión se guarda cifrado en esta PC y solo se usa con Steam. Desconectar lo elimina.</value>
-  </data>
-  <data name="SteamFamily_Connected" xml:space="preserve">
-    <value>Conectado. Tu familia comparte {0} juegos con vos; ya están en tu biblioteca.</value>
-  </data>
-  <data name="SteamFamily_NoFamily" xml:space="preserve">
-    <value>Conectado, pero esta cuenta no está en una familia de Steam, así que no hay juegos compartidos.</value>
-  </data>
-  <data name="SteamFamily_ConnectedNoList" xml:space="preserve">
-    <value>Conectado. Steam todavía no devolvió los juegos compartidos; van a aparecer en el próximo escaneo.</value>
-  </data>
   <data name="SteamFamily_Disconnect" xml:space="preserve">
     <value>Desconectar</value>
-  </data>
-  <data name="SteamFamily_DisconnectTitle" xml:space="preserve">
-    <value>Desconectar Steam</value>
-  </data>
-  <data name="SteamFamily_DisconnectConfirm" xml:space="preserve">
-    <value>¿Desconectar tu cuenta de Steam? Los juegos compartidos salen de tu biblioteca y Lumen le pide a Steam que cancele su inicio de sesión.</value>
-  </data>
-  <data name="SteamFamily_Disconnected" xml:space="preserve">
-    <value>Desconectado. Steam canceló el inicio de sesión de Lumen y se borró de esta PC.</value>
-  </data>
-  <data name="SteamFamily_DisconnectedLocally" xml:space="preserve">
-    <value>Se borró de esta PC, pero Steam no confirmó que canceló el inicio de sesión. Podés quitar “Lumen” de los dispositivos de tu cuenta de Steam (Steam Guard → Administrar dispositivos).</value>
   </data>
   <data name="EpicAccount_Title" xml:space="preserve">
     <value>Cuenta de Epic Games</value>
@@ -811,12 +761,6 @@
   </data>
   <data name="EpicAccount_DisconnectedLocally" xml:space="preserve">
     <value>Se borró de esta PC, pero Epic no confirmó que cerró la sesión. Vence sola; también podés cerrar todas las sesiones desde la configuración de tu cuenta de Epic.</value>
-  </data>
-  <data name="SteamFamily_NeedsReconnect" xml:space="preserve">
-    <value>Steam ya no acepta este inicio de sesión (se canceló, venció o lo hizo una versión anterior de Lumen). Volvé a conectar para ver los juegos de tu familia.</value>
-  </data>
-  <data name="SteamFamily_Reconnect" xml:space="preserve">
-    <value>Volver a conectar</value>
   </data>
   <data name="GogAccount_Title" xml:space="preserve">
     <value>Cuenta de GOG</value>
@@ -945,5 +889,38 @@
   </data>
   <data name="Settings_Hotkey_Taken" xml:space="preserve">
     <value>Otra aplicación está usando {0}, así que ahora no funciona. Elegí otro.</value>
+  </data>
+  <data name="SteamWeb_Description" xml:space="preserve">
+    <value>Muestra los juegos que tu familia de Steam comparte con vos. Iniciás sesión en la web oficial de Steam, dentro de Lumen, como en cualquier navegador.</value>
+  </data>
+  <data name="SteamWeb_SignIn" xml:space="preserve">
+    <value>Iniciar sesión en la web de Steam</value>
+  </data>
+  <data name="SteamWeb_SignInAgain" xml:space="preserve">
+    <value>Volver a iniciar sesión</value>
+  </data>
+  <data name="SteamWeb_HowItWorks" xml:space="preserve">
+    <value>Se abre una ventana con la página real de inicio de sesión de Steam: escaneá el QR con la app de Steam o usá tu cuenta ahí. Lumen no ve lo que escribís y no se hace pasar por ninguna otra app ni dispositivo.</value>
+  </data>
+  <data name="SteamWeb_WindowTitle" xml:space="preserve">
+    <value>Steam — iniciar sesión</value>
+  </data>
+  <data name="SteamWeb_Account" xml:space="preserve">
+    <value>Sesión iniciada como {0} desde el {1}</value>
+  </data>
+  <data name="SteamWeb_WhatLumenDoes" xml:space="preserve">
+    <value>Lumen solo lee la lista de juegos que comparte tu familia. La sesión queda en el navegador propio de Lumen en esta PC, protegida por tu cuenta de Windows. Lumen nunca compra, no cambia ajustes ni lee nada más. Desconectar cierra la sesión en Steam y borra los datos de ese navegador.</value>
+  </data>
+  <data name="SteamWeb_Connected" xml:space="preserve">
+    <value>Sesión iniciada. Actualizando tu biblioteca…</value>
+  </data>
+  <data name="SteamWeb_Disconnected" xml:space="preserve">
+    <value>Se cerró la sesión en Steam y se borraron los datos del navegador.</value>
+  </data>
+  <data name="SteamWeb_DisconnectedLocally" xml:space="preserve">
+    <value>Se borraron los datos del navegador acá, pero Steam no confirmó el cierre de sesión. Si querés, terminá la sesión en Steam → Configuración → Seguridad.</value>
+  </data>
+  <data name="SteamWeb_NeedsReconnect" xml:space="preserve">
+    <value>Steam ya no acepta esta sesión (venció o se cerró en otro lado). Volvé a iniciar sesión para ver los juegos de la familia.</value>
   </data>
 </root>

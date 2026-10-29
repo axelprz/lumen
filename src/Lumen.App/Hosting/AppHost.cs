@@ -91,6 +91,16 @@ public static class AppHost
             http.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent());
             return new SteamAccountApi(http);
         });
+        // Steam family (2026-10-29): sign-in on Steam's own website in a built-in browser, as Playnite does. The QR
+        // sign-in as the mobile app got the owner's account flagged (2026-10-28); SteamAccount stays only to revoke
+        // a sign-in stored by that older version.
+        builder.Services.AddSingleton(sp => new SteamWebSession(
+            paths,
+            sp.GetRequiredService<ILocalSettings>(),
+            sp.GetRequiredService<ILocalizer>(),
+            sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<SteamWebSession>>()));
+        builder.Services.AddSingleton<ISteamWebSession>(sp => sp.GetRequiredService<SteamWebSession>());
+        builder.Services.AddSingleton(sp => new SteamFamilyAccess(sp.GetRequiredService<ISteamWebSession>(), sp.GetRequiredService<SteamAccountApi>()));
         builder.Services.AddSingleton(sp => new SteamAccount(
             sp.GetRequiredService<SteamAccountApi>(),
             sp.GetRequiredService<ISecretStore>(),
@@ -128,9 +138,8 @@ public static class AppHost
             sp.GetRequiredService<IFileSystem>(),
             sp.GetRequiredService<ISecretStore>(),
             sp.GetRequiredService<ILocalSettings>(),
-            sp.GetRequiredService<SteamWebApi>()));
-        // Steam sign-in (family games) is turned off: Steam flagged the account after Lumen signed in presenting
-        // itself as the mobile app (2026-10-28). SteamAccount stays only to revoke a stored sign-in at start-up.
+            sp.GetRequiredService<SteamWebApi>(),
+            family: sp.GetRequiredService<SteamFamilyAccess>()));
         builder.Services.AddSingleton<ILibraryProvider>(sp => sp.GetRequiredService<SteamProvider>());
         builder.Services.AddSingleton<ILibraryProvider>(sp => new EpicProvider(
             sp.GetRequiredService<IRegistryReader>(),
@@ -232,6 +241,7 @@ public static class AppHost
         builder.Services.AddSingleton<CollectionsViewModel>();
         builder.Services.AddSingleton<LibraryViewModel>();
         builder.Services.AddSingleton<SteamSettingsViewModel>();
+        builder.Services.AddSingleton<SteamFamilyViewModel>();
         builder.Services.AddSingleton<EpicAccountViewModel>();
         builder.Services.AddSingleton<GogAccountViewModel>();
         builder.Services.AddSingleton<ArtworkSettingsViewModel>();

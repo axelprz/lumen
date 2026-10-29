@@ -125,13 +125,16 @@ Each milestone ends with a working, tested build on `main`. Order matters; later
 
 Owner requirement: nobody outside the person using Lumen may be able to get at their credentials, and Lumen must be transparent about what it stores. Every sign-in follows these rules:
 
-- **Lumen never sees passwords** when the store offers an alternative. Steam: sign in by scanning a QR code with the Steam mobile app (approval happens on the phone). Epic/GOG: the store's own login page in the system browser; Lumen only receives the authorization code.
+- **Lumen never sees passwords** when the store offers an alternative. Steam: Steam's own sign-in page in Lumen's built-in browser (scan its QR with the Steam app, or sign in there). Lumen never reads that page. Epic/GOG: the store's own login page in the system browser; Lumen only receives the authorization code.
 - **Only what is needed is stored:** the long-lived refresh token, encrypted with DPAPI (CurrentUser + app entropy) in the local database. Short-lived access tokens live only in memory.
 - **Never logged, never synced, never in the repo, never sent anywhere except the store that issued it.** Requests that carry a token use a plain `HttpClient` (no URL logging); errors carry status codes only.
 - **Read-only:** Lumen only reads library data (owned/shared games). It never buys, changes account settings or touches anything else.
 - **Disconnect** revokes the token at the store when the store supports it, then deletes it locally.
 - **Transparency in Settings:** per account, show whether it is connected, which account, since when, and what Lumen can do with it.
 - **Honest limits (documented in the README):** DPAPI protects against other Windows users and against a copied database or disk; it cannot protect against malware already running as the same Windows user. Signing out of Lumen or Windows does not revoke the token; Disconnect does.
+- **Never pose as a device or app Lumen isn't** (owner decision, 2026-10-29). Signing in as the Steam mobile app got the owner's account flagged (2026-10-28) and could do the same to anyone.
+  - Steam now signs in on its own website inside Lumen's built-in browser (WebView2), as Playnite does.
+  - Epic and GOG keep their web sign-in with the pasted code.
 - Any change to these flows is reviewed by the owner before merging.
 
 ### 4.9 UI rework (M10, before 1.0)

@@ -43,10 +43,15 @@ The WPF app only runs on Windows. When working from a non-Windows environment, k
 1. **No secrets in the repo.** API keys (Steam, SteamGridDB) and account tokens (Epic, GOG, Steam sign-in) are entered by the user and stored with DPAPI (`DataProtectionScope.CurrentUser`). Never log them, never sync them, never put them in URLs that get logged. Sign-in flows follow PLAN-v1 §4.8 (no passwords when avoidable, refresh token only, revoke on disconnect, transparent in Settings).
 2. **Read-only toward stores.** Never write to a store's files, folders or registry keys.
 3. **No elevation.** Nothing requires or requests admin.
-4. **No telemetry, no analytics, no remote config.** Network calls only to: Steam Web API, Steam CDN, SteamGridDB, Epic/GOG auth and library endpoints, GitHub Releases.
+4. **No telemetry, no analytics, no remote config.** Network calls only to: Steam Web API, Steam CDN, SteamGridDB, Epic/GOG auth and library endpoints, GitHub Releases. Also Steam's own websites (store/login/help/community), and only inside the built-in Steam sign-in browser.
 5. **Routines never run scripts or shell commands in v1.** Untrusted (new/changed) routines require explicit user approval via the preview before running.
 6. **No loading third-party code at runtime** (no plugins, no themes with code) in v1.
 7. Providers never throw out of a scan; they return partial results + diagnostics.
+8. **Never pose as a device or app Lumen isn't.** No sign-in that claims to be a store's mobile app or copies another device's identity. Store sign-ins only through the store's own web sign-in page, approved by the user:
+   - Epic and GOG: the code the user pastes from the browser.
+   - Steam: its website in Lumen's built-in browser, as Playnite does.
+
+   The rule comes from the 2026-10-28 incident, when Steam flagged an account after Lumen signed in as its mobile app.
 
 ## Definition of done (every PR)
 

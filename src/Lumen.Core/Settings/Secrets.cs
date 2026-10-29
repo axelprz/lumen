@@ -83,6 +83,15 @@ public static class LocalSettingKeys
     /// </summary>
     public const string Language = "ui.language";
 
+    /// <summary>SteamID64 of the account signed in on Steam's website (built-in browser); present = signed in.</summary>
+    public const string SteamWebAccountId = "steam.web.accountId";
+
+    /// <summary>That account's display name, for Settings.</summary>
+    public const string SteamWebAccountName = "steam.web.accountName";
+
+    /// <summary>When the user signed in (ISO 8601), for Settings.</summary>
+    public const string SteamWebAccountSince = "steam.web.since";
+
     /// <summary>"1" once the first-run wizard was finished or skipped.</summary>
     public const string FirstRunCompleted = "firstRun.completed";
 

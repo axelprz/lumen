@@ -242,7 +242,7 @@ public sealed class SteamFamilyInProviderTests
 
         var reconnect = Combine(owned, new(SteamFamilyStatus.NeedsReconnect, []));
         reconnect.Status.ShouldBe(ProviderStatus.Partial);
-        reconnect.Diagnostics.ShouldContain(d => d.Severity == DiagnosticSeverity.Warning && d.Message.Contains("connect again", StringComparison.Ordinal));
+        reconnect.Diagnostics.ShouldContain(d => d.Severity == DiagnosticSeverity.Warning && d.Message.Contains("sign in again", StringComparison.Ordinal));
 
         Combine(ProviderResult.Failed("key rejected"), new(SteamFamilyStatus.Ok, [Shared])).Status.ShouldBe(ProviderStatus.Partial);
         Combine(ProviderResult.Failed("key rejected"), new(SteamFamilyStatus.Failed, [])).Status.ShouldBe(ProviderStatus.Failed);
