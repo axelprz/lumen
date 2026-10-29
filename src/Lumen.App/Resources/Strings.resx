@@ -926,4 +926,307 @@
   <data name="SteamWeb_Ready" xml:space="preserve">
     <value>Done. Your library now includes your own Steam games and the ones your family shares.</value>
   </data>
+  <data name="Routine_Body" xml:space="preserve">
+    <value>A routine does several things with one click: open games, apps, web pages and folders, wait, or close programs. Routines never run scripts or commands.</value>
+  </data>
+  <data name="Routine_Empty" xml:space="preserve">
+    <value>No routines yet. Create one with “New routine”, or import a .json file.</value>
+  </data>
+  <data name="Routine_New" xml:space="preserve">
+    <value>New routine</value>
+  </data>
+  <data name="Routine_Import" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="Routine_OpenFolder" xml:space="preserve">
+    <value>Open folder</value>
+  </data>
+  <data name="Routine_Run" xml:space="preserve">
+    <value>Run</value>
+  </data>
+  <data name="Routine_Review" xml:space="preserve">
+    <value>Review</value>
+  </data>
+  <data name="Routine_Details" xml:space="preserve">
+    <value>See why</value>
+  </data>
+  <data name="Routine_Undo" xml:space="preserve">
+    <value>Undo</value>
+  </data>
+  <data name="Routine_Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Routine_Export" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="Routine_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Routine_OneStep" xml:space="preserve">
+    <value>1 step</value>
+  </data>
+  <data name="Routine_Steps" xml:space="preserve">
+    <value>{0} steps</value>
+  </data>
+  <data name="Routine_HasErrors" xml:space="preserve">
+    <value>Has errors</value>
+  </data>
+  <data name="Routine_State_Ready" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <data name="Routine_State_NeedsReview" xml:space="preserve">
+    <value>Needs your review</value>
+  </data>
+  <data name="Routine_State_Blocked" xml:space="preserve">
+    <value>Has a blocked step</value>
+  </data>
+  <data name="Routine_State_Invalid" xml:space="preserve">
+    <value>Can't be used</value>
+  </data>
+  <data name="Routine_Running" xml:space="preserve">
+    <value>Running…</value>
+  </data>
+  <data name="Routine_Result_AllOk" xml:space="preserve">
+    <value>Done: every step worked.</value>
+  </data>
+  <data name="Routine_Result_Some" xml:space="preserve">
+    <value>Done: {0} of {1} steps worked. {2}</value>
+  </data>
+  <data name="Routine_Result_StepProblem" xml:space="preserve">
+    <value>Step {0}: {1}</value>
+  </data>
+  <data name="Routine_Result_Changed" xml:space="preserve">
+    <value>The file changed since you approved it: review it again.</value>
+  </data>
+  <data name="Routine_Result_Failed" xml:space="preserve">
+    <value>The routine couldn't run.</value>
+  </data>
+  <data name="Routine_Undone" xml:space="preserve">
+    <value>Asked {0} program(s) to close.</value>
+  </data>
+  <data name="Routine_Problem_Blocked" xml:space="preserve">
+    <value>it's not allowed (see Lumen's safety rules).</value>
+  </data>
+  <data name="Routine_Problem_NotInLibrary" xml:space="preserve">
+    <value>it's not in your library on this PC.</value>
+  </data>
+  <data name="Routine_Problem_NotInstalled" xml:space="preserve">
+    <value>it's not installed.</value>
+  </data>
+  <data name="Routine_Problem_NotFound" xml:space="preserve">
+    <value>the program or folder wasn't found.</value>
+  </data>
+  <data name="Routine_Problem_CouldNotStart" xml:space="preserve">
+    <value>it couldn't be opened.</value>
+  </data>
+  <data name="Routine_Problem_StillRunning" xml:space="preserve">
+    <value>it didn't close in time.</value>
+  </data>
+  <data name="Routine_Problem_TimedOut" xml:space="preserve">
+    <value>it took too long.</value>
+  </data>
+  <data name="Routine_Problem_None" xml:space="preserve">
+    <value>something went wrong.</value>
+  </data>
+  <data name="Routine_Problem_PickProgram" xml:space="preserve">
+    <value>Choose a program (.exe) first.</value>
+  </data>
+  <data name="Routine_Problem_Url" xml:space="preserve">
+    <value>Write an address that starts with http:// or https://.</value>
+  </data>
+  <data name="Routine_Problem_Wait" xml:space="preserve">
+    <value>Write a number of seconds from 0 to 300.</value>
+  </data>
+  <data name="Routine_Problem_ProcessName" xml:space="preserve">
+    <value>Write a program name like discord.exe.</value>
+  </data>
+  <data name="Routine_Problem_NoSteps" xml:space="preserve">
+    <value>Add at least one step.</value>
+  </data>
+  <data name="Routine_Problem_TooMany" xml:space="preserve">
+    <value>A routine can have up to {0} steps.</value>
+  </data>
+  <data name="Routine_Problem_Save" xml:space="preserve">
+    <value>The routine couldn't be saved.</value>
+  </data>
+  <data name="Routine_Review_Title" xml:space="preserve">
+    <value>Review before running</value>
+  </data>
+  <data name="Routine_Review_Hint" xml:space="preserve">
+    <value>This routine is new or was changed outside Lumen. Check every step; it only runs after you approve it.</value>
+  </data>
+  <data name="Routine_Review_TrustedHint" xml:space="preserve">
+    <value>You already approved this routine. These are its steps.</value>
+  </data>
+  <data name="Routine_Review_BlockedHint" xml:space="preserve">
+    <value>This routine has a step Lumen never runs, so it can't be approved. You can edit it and remove that step.</value>
+  </data>
+  <data name="Routine_Review_Errors" xml:space="preserve">
+    <value>This file has errors</value>
+  </data>
+  <data name="Routine_ApproveAndRun" xml:space="preserve">
+    <value>Approve and run</value>
+  </data>
+  <data name="Routine_Approve" xml:space="preserve">
+    <value>Approve</value>
+  </data>
+  <data name="Routine_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Routine_Step_LaunchItem" xml:space="preserve">
+    <value>Open {0}</value>
+  </data>
+  <data name="Routine_Step_LaunchProgram" xml:space="preserve">
+    <value>Open the program {0}</value>
+  </data>
+  <data name="Routine_Step_LaunchProgramArgs" xml:space="preserve">
+    <value>Open the program {0} with “{1}”</value>
+  </data>
+  <data name="Routine_Step_Url" xml:space="preserve">
+    <value>Open the web page {0}</value>
+  </data>
+  <data name="Routine_Step_Folder" xml:space="preserve">
+    <value>Open the folder {0}</value>
+  </data>
+  <data name="Routine_Step_Wait" xml:space="preserve">
+    <value>Wait {0} seconds</value>
+  </data>
+  <data name="Routine_Step_Close" xml:space="preserve">
+    <value>Close {0}</value>
+  </data>
+  <data name="Routine_Note_OutsideLibrary" xml:space="preserve">
+    <value>Not in your library: check it's the program you expect</value>
+  </data>
+  <data name="Routine_Note_Closes" xml:space="preserve">
+    <value>Closes programs (asks them to close first)</value>
+  </data>
+  <data name="Routine_Note_ForcesClose" xml:space="preserve">
+    <value>Closes programs, and ends them if they don't close (unsaved work is lost)</value>
+  </data>
+  <data name="Routine_Note_NotInLibrary" xml:space="preserve">
+    <value>Not in your library on this PC</value>
+  </data>
+  <data name="Routine_Note_NotFound" xml:space="preserve">
+    <value>Not found on this PC</value>
+  </data>
+  <data name="Routine_Blocked_NotAbsolute" xml:space="preserve">
+    <value>Blocked: it needs a full path like C:\Games\game.exe</value>
+  </data>
+  <data name="Routine_Blocked_NotAProgram" xml:space="preserve">
+    <value>Blocked: only programs (.exe) can be opened, never scripts or shortcuts</value>
+  </data>
+  <data name="Routine_Blocked_ScriptHost" xml:space="preserve">
+    <value>Blocked: command lines, scripts and system tools are never run</value>
+  </data>
+  <data name="Routine_Blocked_ShortName" xml:space="preserve">
+    <value>Blocked: short names with ~ aren't allowed</value>
+  </data>
+  <data name="Routine_Blocked_ProtectedProcess" xml:space="preserve">
+    <value>Blocked: Windows' own programs and Lumen are never closed</value>
+  </data>
+  <data name="Routine_Blocked_NotAWebPage" xml:space="preserve">
+    <value>Blocked: only http:// and https:// pages</value>
+  </data>
+  <data name="Routine_Editor_Title" xml:space="preserve">
+    <value>Routine</value>
+  </data>
+  <data name="Routine_Editor_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Routine_Editor_Steps" xml:space="preserve">
+    <value>Steps</value>
+  </data>
+  <data name="Routine_Editor_NoSteps" xml:space="preserve">
+    <value>No steps yet. Add the first one below.</value>
+  </data>
+  <data name="Routine_Editor_AddStep" xml:space="preserve">
+    <value>Add a step</value>
+  </data>
+  <data name="Routine_Editor_SearchLibrary" xml:space="preserve">
+    <value>Search your library and pick a result</value>
+  </data>
+  <data name="Routine_Editor_Browse" xml:space="preserve">
+    <value>Choose…</value>
+  </data>
+  <data name="Routine_Editor_ProgramPath" xml:space="preserve">
+    <value>Program (.exe)</value>
+  </data>
+  <data name="Routine_Editor_Arguments" xml:space="preserve">
+    <value>Arguments (optional)</value>
+  </data>
+  <data name="Routine_Editor_Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Routine_Editor_PickFolder" xml:space="preserve">
+    <value>Choose a folder…</value>
+  </data>
+  <data name="Routine_Editor_Seconds" xml:space="preserve">
+    <value>seconds</value>
+  </data>
+  <data name="Routine_Editor_ProcessName" xml:space="preserve">
+    <value>Program name, e.g. discord.exe</value>
+  </data>
+  <data name="Routine_Editor_Force" xml:space="preserve">
+    <value>End it if it doesn't close (unsaved work is lost)</value>
+  </data>
+  <data name="Routine_Editor_StopOnError" xml:space="preserve">
+    <value>Stop at the first step that fails</value>
+  </data>
+  <data name="Routine_Editor_Pinned" xml:space="preserve">
+    <value>Show on Home</value>
+  </data>
+  <data name="Routine_Editor_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Routine_MoveUp" xml:space="preserve">
+    <value>Move up</value>
+  </data>
+  <data name="Routine_MoveDown" xml:space="preserve">
+    <value>Move down</value>
+  </data>
+  <data name="Routine_RemoveStep" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="Routine_Kind_LaunchItem" xml:space="preserve">
+    <value>Open a game or app</value>
+  </data>
+  <data name="Routine_Kind_LaunchProgram" xml:space="preserve">
+    <value>Open a program (.exe)</value>
+  </data>
+  <data name="Routine_Kind_Url" xml:space="preserve">
+    <value>Open a web page</value>
+  </data>
+  <data name="Routine_Kind_Folder" xml:space="preserve">
+    <value>Open a folder</value>
+  </data>
+  <data name="Routine_Kind_Wait" xml:space="preserve">
+    <value>Wait</value>
+  </data>
+  <data name="Routine_Kind_CloseItem" xml:space="preserve">
+    <value>Close a game or app</value>
+  </data>
+  <data name="Routine_Kind_CloseProgram" xml:space="preserve">
+    <value>Close a program by name</value>
+  </data>
+  <data name="Routine_ProgramFilter" xml:space="preserve">
+    <value>Programs (*.exe)|*.exe</value>
+  </data>
+  <data name="Routine_FileFilter" xml:space="preserve">
+    <value>Lumen routine (*.json)|*.json</value>
+  </data>
+  <data name="Routine_ImportFailed" xml:space="preserve">
+    <value>That file can't be imported: {0}</value>
+  </data>
+  <data name="Routine_Exported" xml:space="preserve">
+    <value>Saved as {0}.</value>
+  </data>
+  <data name="Routine_ExportFailed" xml:space="preserve">
+    <value>The routine couldn't be exported.</value>
+  </data>
+  <data name="Routine_DeleteTitle" xml:space="preserve">
+    <value>Delete routine</value>
+  </data>
+  <data name="Routine_DeleteConfirm" xml:space="preserve">
+    <value>Delete “{0}”? This removes the routine file; nothing else is touched.</value>
+  </data>
 </root>

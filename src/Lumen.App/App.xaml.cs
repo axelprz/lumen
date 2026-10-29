@@ -115,6 +115,7 @@ public partial class App : Application
         // The window is already visible: load settings, show the cached library, then rescan in the background.
         await _host.Services.GetRequiredService<SettingsViewModel>().InitializeAsync(CancellationToken.None).ConfigureAwait(true);
         await _host.Services.GetRequiredService<LibraryViewModel>().InitializeAsync(CancellationToken.None).ConfigureAwait(true);
+        await _host.Services.GetRequiredService<RoutinesViewModel>().InitializeAsync(CancellationToken.None).ConfigureAwait(true);
 
         // From now on, notice installs/uninstalls by themselves (store folders + coming back to the window).
         var autoRefresh = _host.Services.GetRequiredService<LibraryAutoRefresh>();

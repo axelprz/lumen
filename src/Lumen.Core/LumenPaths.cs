@@ -35,6 +35,9 @@ public sealed record LumenPaths
     /// <summary>Where portable JSON lives when the user has not chosen a sync folder.</summary>
     public string DefaultPortableDirectory => Path.Combine(RoamingDataDirectory, "portable");
 
+    /// <summary>Routine files (<c>{id}.json</c>) until a sync folder is chosen.</summary>
+    public string DefaultRoutinesDirectory => Path.Combine(DefaultPortableDirectory, "routines");
+
     /// <summary>Builds the paths from the OS base folders (e.g. LocalApplicationData and ApplicationData).</summary>
     public static LumenPaths FromBaseDirectories(string localBaseDirectory, string roamingBaseDirectory) =>
         new(
