@@ -239,6 +239,26 @@ public static class AppHost
         builder.Services.AddSingleton<HomeViewModel>();
         builder.Services.AddSingleton<DiscoverAppsViewModel>();
         builder.Services.AddSingleton<CollectionsViewModel>();
+
+        // Routines (M8): files in Lumen's portable folder; approvals per machine; programs start without a shell.
+        builder.Services.AddSingleton<IUserFiles>(new PhysicalUserFiles(paths.DefaultPortableDirectory));
+        builder.Services.AddSingleton<Lumen.Core.Routines.IRoutineTrustStore>(sp => new SqliteRoutineTrustStore(sp.GetRequiredService<ISqliteConnectionFactory>()));
+        builder.Services.AddSingleton<IProcessControl, WindowsProcessControl>();
+        builder.Services.AddSingleton(sp => new Lumen.Core.Routines.RoutineRunner(
+            sp.GetRequiredService<IProcessControl>(),
+            sp.GetRequiredService<ILauncher>(),
+            sp.GetRequiredService<LaunchService>(),
+            sp.GetRequiredService<IFileSystem>(),
+            sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Lumen.Core.Routines.RoutineRunner>>()));
+        builder.Services.AddSingleton(sp => new Lumen.Core.Routines.RoutineService(
+            paths.DefaultRoutinesDirectory,
+            sp.GetRequiredService<IFileSystem>(),
+            sp.GetRequiredService<IUserFiles>(),
+            sp.GetRequiredService<Lumen.Core.Routines.IRoutineTrustStore>(),
+            sp.GetRequiredService<Lumen.Core.Routines.RoutineRunner>(),
+            sp.GetRequiredService<LibraryService>(),
+            sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Lumen.Core.Routines.RoutineService>>()));
+        builder.Services.AddSingleton<RoutinesViewModel>();
         builder.Services.AddSingleton<LibraryViewModel>();
         builder.Services.AddSingleton<SteamSettingsViewModel>();
         builder.Services.AddSingleton<SteamFamilyViewModel>();

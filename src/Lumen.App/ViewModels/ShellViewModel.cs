@@ -17,7 +17,7 @@ public sealed partial class ShellViewModel : ObservableObject
     [ObservableProperty]
     private SectionViewModel? _selectedSection;
 
-    public ShellViewModel(ILocalizer localizer, HomeViewModel home, LibraryViewModel library, SettingsViewModel settings, AccentService accent, FirstRunViewModel firstRun, CollectionsViewModel collections)
+    public ShellViewModel(ILocalizer localizer, HomeViewModel home, LibraryViewModel library, SettingsViewModel settings, AccentService accent, FirstRunViewModel firstRun, CollectionsViewModel collections, RoutinesViewModel routines)
     {
         ArgumentNullException.ThrowIfNull(localizer);
         ArgumentNullException.ThrowIfNull(home);
@@ -35,7 +35,7 @@ public sealed partial class ShellViewModel : ObservableObject
             new SectionViewModel(ShellSection.Home, "Nav_Home", "", localizer, home),
             new SectionViewModel(ShellSection.Library, "Nav_Library", "", localizer, library),
             new SectionViewModel(ShellSection.Collections, "Nav_Collections", "", localizer, collections),
-            new SectionViewModel(ShellSection.Routines, "Nav_Routines", "", localizer),
+            new SectionViewModel(ShellSection.Routines, "Nav_Routines", "", localizer, routines),
             new SectionViewModel(ShellSection.Settings, "Nav_Settings", "", localizer, settings),
         ];
 

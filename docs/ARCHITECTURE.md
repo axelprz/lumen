@@ -288,6 +288,29 @@ Implemented in M8 (engine: `Lumen.Core/Routines`).
 - **Undo:** closes politely only what that run opened.
   - Programs: tracked by id + start time.
   - Library items: processes in the item's folder that started after the run began, because store launchers don't report the game's process.
+- **Files and service (`RoutineService`):**
+  - **Where:** routines are `{id}.json` in `%APPDATA%\Lumen\portableoutines`, until the sync folder (M8) takes over. The file name must match the id.
+  - **Writing:** goes through `IUserFiles` (`PhysicalUserFiles`), which only writes inside Lumen's portable folder (temp file, then rename) plus a file the user picked in a save dialog (export). `IFileSystem` stays read-only, so rule 2 holds.
+  - **Running:** reads the file again and runs only when its hash still equals the approved one.
+  - **Saving from the editor** approves the routine (the user wrote every step), unless it has a blocked step.
+  - **Import** copies the file and always starts with the preview; replacing a routine drops its approval.
+  - **Export** writes Lumen's own form of the routine. Delete removes the file and its approval.
+  - **Undo:** the last run per routine is kept in memory for Undo.
+- **UI (`RoutinesViewModel`, Routines page):**
+  - **Cards:** name, step count, and state (Ready / Needs your review / Has a blocked step / Can't be used). Buttons: Run, Review, See why, Undo, Edit, Export, Delete; at the top, New, Import and Open folder.
+  - **Run:** an unapproved routine opens the preview instead. After a run the card says how many steps worked and the first problem.
+  - **Preview (`RoutineReviewViewModel`):** every step as a sentence (`RoutineText`). Programs outside the library and close steps are highlighted, blocked steps marked, validator errors listed. "Approve and run" and "Approve" only show when allowed.
+  - **Editor (`RoutineEditorViewModel`):** a name, then steps added from a list:
+    - open a game or app (library search)
+    - open a program (.exe picker, optional arguments)
+    - open a web page
+    - open a folder (picker)
+    - wait
+    - close a game or app
+    - close a program by name (optional force)
+
+    Each step is checked with the same review as the preview, so the editor warns exactly the same way. Steps can be reordered and removed. Options: "stop at the first step that fails" and "show on Home".
+  - The preview and the editor cover the page as a gamepad layer; Esc / B closes them.
 - v1 never executes scripts or shell commands and never elevates.
 
 ## 8. UI composition (Lumen.App)
