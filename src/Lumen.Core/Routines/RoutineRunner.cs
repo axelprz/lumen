@@ -37,6 +37,9 @@ public enum StepProblem
 
 public sealed record StepResult(int Index, StepOutcome Outcome, StepProblem Problem = StepProblem.None);
 
+/// <summary>What Undo did: how many programs it asked to close, and which ones are still open (games often ignore it).</summary>
+public sealed record UndoResult(int Asked, IReadOnlyList<RunningProcess> StillRunning);
+
 /// <summary>One run of a routine: what each step did and what it opened (for undo).</summary>
 public sealed class RoutineRun(Routine routine, DateTimeOffset startedAt)
 {
@@ -125,8 +128,7 @@ public sealed partial class RoutineRunner(
     }
 
     /// <summary>Closes what this run opened that is still running (asks first; never forces).</summary>
-    /// <returns>How many programs were asked to close.</returns>
-    public async Task<int> UndoAsync(RoutineRun run, CancellationToken ct)
+    public async Task<UndoResult> UndoAsync(RoutineRun run, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(run);
         var targets = run.Started.Where(processes.IsRunning).ToList();
@@ -142,9 +144,28 @@ public sealed partial class RoutineRunner(
             processes.RequestClose(process);
         }
 
-        await WaitUntilClosedAsync(targets, UndoGrace, ct).ConfigureAwait(false);
-        LogUndone(run.Routine.Id, targets.Count);
-        return targets.Count;
+        var left = await WaitUntilClosedAsync(targets, UndoGrace, ct).ConfigureAwait(false);
+        LogUndone(run.Routine.Id, targets.Count, left.Count);
+        return new UndoResult(targets.Count, left);
+    }
+
+    /// <summary>
+    /// Ends programs that ignored Undo's request, after the user confirmed. Only those exact processes (id + start
+    /// time), and never Windows' own or Lumen.
+    /// </summary>
+    /// <returns>How many are still running afterwards.</returns>
+    public async Task<int> ForceCloseAsync(IReadOnlyList<RunningProcess> targets, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(targets);
+        var safe = targets.Where(p => !RoutineSafety.IsProtectedProcess(p.Name) && processes.IsRunning(p)).ToList();
+        foreach (var process in safe)
+        {
+            processes.Kill(process);
+        }
+
+        var left = await WaitUntilClosedAsync(safe, TimeSpan.FromSeconds(2), ct).ConfigureAwait(false);
+        LogForced(safe.Count, left.Count);
+        return left.Count;
     }
 
     private async Task<StepResult> RunStepAsync(int index, RoutineAction action, Routine routine, RoutineRun run, Func<ItemRef, LibraryItem?> findItem, CancellationToken ct)
@@ -359,8 +380,11 @@ public sealed partial class RoutineRunner(
     [LoggerMessage(Level = LogLevel.Information, Message = "Routine {Id}: finished (all steps ok: {Ok})")]
     private partial void LogFinished(string id, bool ok);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Routine {Id}: undo asked {Count} programs to close")]
-    private partial void LogUndone(string id, int count);
+    [LoggerMessage(Level = LogLevel.Information, Message = "Routine {Id}: undo asked {Count} programs to close; {Left} still open")]
+    private partial void LogUndone(string id, int count, int left);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Routines: the user forced {Count} programs to close; {Left} still open")]
+    private partial void LogForced(int count, int left);
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Routine {Id}: step {Index} failed")]
     private partial void LogStepFailed(Exception exception, string id, int index);

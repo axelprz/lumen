@@ -171,15 +171,18 @@ public sealed partial class RoutineService(
     /// <summary>The last run of this routine in this session, if it opened something that can be closed.</summary>
     public RoutineRun? LastRun(string id) => _lastRuns.TryGetValue(id, out var run) && run.CanUndo ? run : null;
 
-    public async Task<int> UndoAsync(string id, CancellationToken ct)
+    public async Task<UndoResult> UndoAsync(string id, CancellationToken ct)
     {
         if (!_lastRuns.Remove(id, out var run))
         {
-            return 0;
+            return new UndoResult(0, []);
         }
 
         return await runner.UndoAsync(run, ct).ConfigureAwait(false);
     }
+
+    /// <summary>Ends what ignored Undo (the user confirmed first). See <see cref="RoutineRunner.ForceCloseAsync"/>.</summary>
+    public Task<int> ForceCloseAsync(IReadOnlyList<RunningProcess> stillRunning, CancellationToken ct) => runner.ForceCloseAsync(stillRunning, ct);
 
     /// <summary>A free id for a new routine named <paramref name="name"/> ("game-night", "game-night-2", …).</summary>
     public string NewId(string name)

@@ -1229,4 +1229,22 @@
   <data name="Routine_DeleteConfirm" xml:space="preserve">
     <value>Delete “{0}”? This removes the routine file; nothing else is touched.</value>
   </data>
+  <data name="Routine_UndoStillOpen" xml:space="preserve">
+    <value>Asked to close, but {0} program(s) are still open ({1}). Some games ignore the request or just minimize.</value>
+  </data>
+  <data name="Routine_ForceClose" xml:space="preserve">
+    <value>Force close</value>
+  </data>
+  <data name="Routine_ForceTitle" xml:space="preserve">
+    <value>Force close</value>
+  </data>
+  <data name="Routine_ForceConfirm" xml:space="preserve">
+    <value>End {0} now? Anything not saved in it is lost.</value>
+  </data>
+  <data name="Routine_Forced" xml:space="preserve">
+    <value>Closed.</value>
+  </data>
+  <data name="Routine_ForceFailed" xml:space="preserve">
+    <value>Windows didn't let Lumen close it. Close it from the program itself or Task Manager.</value>
+  </data>
 </root>

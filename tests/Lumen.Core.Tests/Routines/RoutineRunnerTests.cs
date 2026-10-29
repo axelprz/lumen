@@ -132,11 +132,43 @@ public sealed class RoutineRunnerTests
         var gameProcess = _processes.Add(@"C:\Games\Sample Game\game.exe", DateTimeOffset.UtcNow.AddSeconds(5));
         var unrelated = _processes.Add(@"C:\Other\other.exe", DateTimeOffset.UtcNow.AddSeconds(5));
 
-        var closed = await _runner.UndoAsync(run, CancellationToken.None);
+        var undo = await _runner.UndoAsync(run, CancellationToken.None);
 
-        closed.ShouldBe(2); // chat + the game's process; not the older one, not the unrelated one
+        undo.Asked.ShouldBe(2); // chat + the game's process; not the older one, not the unrelated one
+        undo.StillRunning.ShouldBeEmpty();
         _processes.Running.ShouldBe([before, unrelated]);
         _processes.Running.ShouldNotContain(gameProcess);
+    }
+
+    [Fact]
+    public async Task Undo_ReportsWhatIgnoredIt_AndForceClosesOnlyThose()
+    {
+        var game = Game("steam", "400", "Sample Game");
+        var run = await RunAsync(Routine(new LaunchAction(game.Ref, null)), game);
+        var stubborn = _processes.Add(@"C:\Games\Sample Game\game.exe", DateTimeOffset.UtcNow.AddSeconds(5));
+        _processes.Stubborn.Add(stubborn.Id);
+        var other = _processes.Add(@"C:\Other\other.exe");
+
+        var undo = await _runner.UndoAsync(run, CancellationToken.None);
+
+        undo.StillRunning.ShouldBe([stubborn]);
+        _processes.Killed.ShouldBeEmpty(); // undo itself never forces
+
+        var left = await _runner.ForceCloseAsync(undo.StillRunning, CancellationToken.None);
+
+        left.ShouldBe(0);
+        _processes.Killed.ShouldBe([stubborn.Id]);
+        _processes.Running.ShouldBe([other]);
+    }
+
+    [Fact]
+    public async Task ForceClose_NeverEndsWindowsProcesses()
+    {
+        var explorer = _processes.Add(@"C:\Windows\explorer.exe");
+
+        await _runner.ForceCloseAsync([explorer], CancellationToken.None);
+
+        _processes.Killed.ShouldBeEmpty();
     }
 
     [Fact]

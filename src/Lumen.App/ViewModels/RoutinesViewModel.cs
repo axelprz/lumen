@@ -178,9 +178,32 @@ public sealed partial class RoutinesViewModel : ObservableObject
             return;
         }
 
-        var closed = await _routines.UndoAsync(card.Entry.Id, CancellationToken.None);
+        var result = await _routines.UndoAsync(card.Entry.Id, CancellationToken.None);
         card.CanUndo = false;
-        card.ResultText = string.Format(CultureInfo.CurrentCulture, _loc["Routine_Undone"], closed);
+        card.StillOpen = result.StillRunning;
+        card.ResultText = result.StillRunning.Count == 0
+            ? string.Format(CultureInfo.CurrentCulture, _loc["Routine_Undone"], result.Asked)
+            : string.Format(CultureInfo.CurrentCulture, _loc["Routine_UndoStillOpen"], result.StillRunning.Count, string.Join(", ", result.StillRunning.Select(p => p.Name).Distinct()));
+    }
+
+    /// <summary>Ends what ignored Undo, after a confirmation that unsaved progress is lost.</summary>
+    [RelayCommand]
+    private async Task ForceCloseAsync(RoutineCardViewModel? card)
+    {
+        if (card is not { CanForceClose: true })
+        {
+            return;
+        }
+
+        var names = string.Join(", ", card.StillOpen.Select(p => p.Name).Distinct());
+        if (!_dialogs.Confirm(_loc["Routine_ForceTitle"], string.Format(CultureInfo.CurrentCulture, _loc["Routine_ForceConfirm"], names)))
+        {
+            return;
+        }
+
+        var left = await _routines.ForceCloseAsync(card.StillOpen, CancellationToken.None);
+        card.StillOpen = [];
+        card.ResultText = left == 0 ? _loc["Routine_Forced"] : _loc["Routine_ForceFailed"];
     }
 
     [RelayCommand]
