@@ -36,16 +36,31 @@ public sealed partial class SteamWebApi(HttpClient http)
 {
     public const string BaseAddress = "https://api.steampowered.com/";
 
-    public async Task<SteamOwnedGamesResult> GetOwnedGamesAsync(string apiKey, string steamId64, CancellationToken ct)
+    public Task<SteamOwnedGamesResult> GetOwnedGamesAsync(string apiKey, string steamId64, CancellationToken ct)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        return GetOwnedAsync("key=" + Uri.EscapeDataString(apiKey), steamId64, ct);
+    }
+
+    /// <summary>
+    /// The same list with the access token Steam's store page gives a signed-in browser (no key needed; as Playnite
+    /// does). Works for private profiles too, since it is the account itself asking.
+    /// </summary>
+    public Task<SteamOwnedGamesResult> GetOwnedGamesWithTokenAsync(string accessToken, string steamId64, CancellationToken ct)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(accessToken);
+        return GetOwnedAsync("access_token=" + Uri.EscapeDataString(accessToken), steamId64, ct);
+    }
+
+    private async Task<SteamOwnedGamesResult> GetOwnedAsync(string credential, string steamId64, CancellationToken ct)
+    {
         if (!IsValidSteamId64(steamId64))
         {
             throw new ArgumentException("Not a SteamID64.", nameof(steamId64));
         }
 
         var uri = new Uri(
-            $"{BaseAddress}IPlayerService/GetOwnedGames/v1/?key={Uri.EscapeDataString(apiKey)}&steamid={steamId64}&include_appinfo=1&include_played_free_games=1&format=json");
+            $"{BaseAddress}IPlayerService/GetOwnedGames/v1/?{credential}&steamid={steamId64}&include_appinfo=1&include_played_free_games=1&format=json");
 
         HttpResponseMessage response;
         try

@@ -909,7 +909,7 @@
     <value>Sesión iniciada como {0} desde el {1}</value>
   </data>
   <data name="SteamWeb_WhatLumenDoes" xml:space="preserve">
-    <value>Lumen solo lee la lista de juegos que comparte tu familia. La sesión queda en el navegador propio de Lumen en esta PC, protegida por tu cuenta de Windows. Lumen nunca compra, no cambia ajustes ni lee nada más. Desconectar cierra la sesión en Steam y borra los datos de ese navegador.</value>
+    <value>Lumen solo lee tu lista de juegos y la que comparte tu familia. La sesión queda en el navegador propio de Lumen en esta PC, protegida por tu cuenta de Windows. Lumen nunca compra, no cambia ajustes ni lee nada más. Desconectar cierra la sesión en Steam y borra los datos de ese navegador.</value>
   </data>
   <data name="SteamWeb_Connected" xml:space="preserve">
     <value>Sesión iniciada. Actualizando tu biblioteca…</value>
@@ -922,5 +922,8 @@
   </data>
   <data name="SteamWeb_NeedsReconnect" xml:space="preserve">
     <value>Steam ya no acepta esta sesión (venció o se cerró en otro lado). Volvé a iniciar sesión para ver los juegos de la familia.</value>
+  </data>
+  <data name="SteamWeb_Ready" xml:space="preserve">
+    <value>Listo. Tu biblioteca ya incluye tus juegos de Steam y los que comparte tu familia.</value>
   </data>
 </root>

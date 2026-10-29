@@ -96,6 +96,32 @@ public sealed class SteamFamilyAccessTests
         _session.Reads.ShouldBe(2);
     }
 
+    [Fact]
+    public async Task SignedIn_OwnLibraryComesFromTheSession_EvenWithARejectedKey()
+    {
+        _session.SignedIn = true;
+        _session.Token = new SteamWebToken(SteamId, Jwt(DateTimeOffset.UtcNow.AddHours(20)));
+        var secrets = new FakeSecretStore();
+        secrets.Values[Lumen.Core.Settings.SecretNames.SteamWebApiKey] = "TESTKEY0000000000000000000000000";
+        _http.Respond = request => request.RequestUri!.Query.Contains("key=", StringComparison.Ordinal)
+            ? new HttpResponseMessage(HttpStatusCode.Unauthorized)
+            : request.RequestUri.AbsolutePath.Contains("GetOwnedGames", StringComparison.Ordinal)
+                ? Json(Fixtures.Read("steam/owned_games.json"))
+                : request.RequestUri.AbsolutePath.Contains("GetFamilyGroupForUser", StringComparison.Ordinal)
+                    ? Json(Fixtures.Read("steam/family-not-member.json"))
+                    : new HttpResponseMessage(HttpStatusCode.NotFound);
+        var provider = new SteamProvider(
+            new FakeRegistry(), new InMemoryFileSystem(), secrets, new FakeLocalSettings(),
+            new SteamWebApi(new HttpClient(_http)), family: Access());
+
+        var owned = await provider.ScanOwnedAsync(CancellationToken.None);
+
+        owned.Status.ShouldBe(Lumen.Core.Library.ProviderStatus.Ok);
+        owned.Entries.ShouldNotBeEmpty();
+        _http.Requests.ShouldContain(u => u.AbsolutePath == "/IPlayerService/GetOwnedGames/v1/" && u.Query.Contains("access_token=", StringComparison.Ordinal));
+        _http.Requests.ShouldNotContain(u => u.Query.Contains("key=", StringComparison.Ordinal)); // the key isn't needed
+    }
+
     private SteamFamilyAccess Access() => new(_session, new SteamAccountApi(new HttpClient(_http)));
 
     // What WebView2's ExecuteScriptAsync returns for our script: a JSON string holding {user, store}.
