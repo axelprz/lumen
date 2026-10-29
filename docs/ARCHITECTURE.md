@@ -289,7 +289,7 @@ Implemented in M8 (engine: `Lumen.Core/Routines`).
   - Programs: tracked by id + start time.
   - Library items: processes in the item's folder that started after the run began, because store launchers don't report the game's process.
 - **Files and service (`RoutineService`):**
-  - **Where:** routines are `{id}.json` in `%APPDATA%\Lumen\portableoutines`, until the sync folder (M8) takes over. The file name must match the id.
+  - **Where:** routines are `{id}.json` in `%APPDATA%\Lumen\portable\routines`, until the sync folder (M8) takes over. The file name must match the id.
   - **Writing:** goes through `IUserFiles` (`PhysicalUserFiles`), which only writes inside Lumen's portable folder (temp file, then rename) plus a file the user picked in a save dialog (export). `IFileSystem` stays read-only, so rule 2 holds.
   - **Running:** reads the file again and runs only when its hash still equals the approved one.
   - **Saving from the editor** approves the routine (the user wrote every step), unless it has a blocked step.
