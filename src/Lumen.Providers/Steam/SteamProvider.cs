@@ -10,8 +10,8 @@ namespace Lumen.Providers.Steam;
 
 /// <summary>
 /// Steam: installed games from the local library folders (no login), plus owned games from the Steam
-/// Web API when the user supplied a key and SteamID64, plus games the Steam family shares when the user signed in
-/// (<see cref="SteamAccount"/>). Only reads Steam's files and registry.
+/// Web API when the user supplied a key and SteamID64, plus games the Steam family shares when the user signed in on
+/// Steam's website (<see cref="SteamFamilyAccess"/>). Only reads Steam's files and registry.
 /// </summary>
 public sealed class SteamProvider(
     IRegistryReader registry,
@@ -20,7 +20,7 @@ public sealed class SteamProvider(
     ILocalSettings settings,
     SteamWebApi webApi,
     TimeProvider? time = null,
-    SteamAccount? account = null) : ILibraryProvider, ICachingProvider, IWatchableProvider
+    SteamFamilyAccess? family = null) : ILibraryProvider, ICachingProvider, IWatchableProvider
 {
     public const string SourceId = "steam";
 
@@ -113,10 +113,10 @@ public sealed class SteamProvider(
             }
 
             var owned = await ScanOwnedByKeyAsync(ct).ConfigureAwait(false);
-            var family = account is null
+            var shared = family is null
                 ? new SteamFamilyResult(SteamFamilyStatus.NotConnected, [])
-                : await account.GetSharedGamesAsync(ct).ConfigureAwait(false);
-            var scan = CombineOwnedAndFamily(owned, family);
+                : await family.GetSharedGamesAsync(ct).ConfigureAwait(false);
+            var scan = CombineOwnedAndFamily(owned, shared);
 
             // Only good answers are reused; failures are retried on the next scan.
             _ownedCache = scan.Status == ProviderStatus.Ok ? (scan, _time.GetUtcNow()) : null;
@@ -143,7 +143,7 @@ public sealed class SteamProvider(
         var familyFailed = family.Status is SteamFamilyStatus.Failed or SteamFamilyStatus.NeedsReconnect;
         if (family.Status == SteamFamilyStatus.NeedsReconnect)
         {
-            diagnostics.Add(new(DiagnosticSeverity.Warning, "Steam family: the sign-in was rejected; connect again in Settings.", family.Detail));
+            diagnostics.Add(new(DiagnosticSeverity.Warning, "Steam family: Steam no longer accepts the sign-in; sign in again in Settings.", family.Detail));
         }
         else if (family.Status == SteamFamilyStatus.Failed)
         {

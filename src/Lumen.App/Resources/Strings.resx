@@ -697,61 +697,11 @@
   <data name="SteamFamily_Title" xml:space="preserve">
     <value>Steam family library</value>
   </data>
-  <data name="SteamFamily_Description" xml:space="preserve">
-    <value>Show the games your Steam family shares with you. You sign in by scanning a QR code with the Steam app on your phone: Lumen never sees your password. Optional: your own games still work with the key above.</value>
-  </data>
-  <data name="SteamFamily_Connect" xml:space="preserve">
-    <value>Connect with a QR code</value>
-  </data>
-  <data name="SteamFamily_QrName" xml:space="preserve">
-    <value>Steam sign-in QR code</value>
-  </data>
-  <data name="SteamFamily_Steps" xml:space="preserve">
-    <value>1. Open the Steam app on your phone.
-2. Tap the shield (Steam Guard) and choose “Scan a QR code”.
-3. Scan this code and approve the sign-in for “Lumen”.</value>
-  </data>
-  <data name="SteamFamily_Waiting" xml:space="preserve">
-    <value>Waiting for you to approve it on your phone…</value>
-  </data>
-  <data name="SteamFamily_Expired" xml:space="preserve">
-    <value>The code expired. Connect again to get a new one.</value>
-  </data>
-  <data name="SteamFamily_Failed" xml:space="preserve">
-    <value>Couldn't connect to Steam. Try again in a moment.</value>
-  </data>
   <data name="SteamFamily_Unreachable" xml:space="preserve">
     <value>Couldn't reach Steam. Check your connection and try again.</value>
   </data>
-  <data name="SteamFamily_Account" xml:space="preserve">
-    <value>Connected as {0} since {1}</value>
-  </data>
-  <data name="SteamFamily_WhatLumenCanDo" xml:space="preserve">
-    <value>Lumen can only read the list of games your family shares. It can't buy anything, change your account or see your password. The sign-in is stored encrypted on this PC and never leaves it except to Steam. Disconnect removes it.</value>
-  </data>
-  <data name="SteamFamily_Connected" xml:space="preserve">
-    <value>Connected. Your family shares {0} games with you; they're in your library now.</value>
-  </data>
-  <data name="SteamFamily_NoFamily" xml:space="preserve">
-    <value>Connected, but this account isn't in a Steam family, so there are no shared games.</value>
-  </data>
-  <data name="SteamFamily_ConnectedNoList" xml:space="preserve">
-    <value>Connected. Steam didn't return the shared games yet; they'll show up on the next rescan.</value>
-  </data>
   <data name="SteamFamily_Disconnect" xml:space="preserve">
     <value>Disconnect</value>
-  </data>
-  <data name="SteamFamily_DisconnectTitle" xml:space="preserve">
-    <value>Disconnect Steam</value>
-  </data>
-  <data name="SteamFamily_DisconnectConfirm" xml:space="preserve">
-    <value>Disconnect your Steam account? Shared games will leave your library, and Lumen will ask Steam to cancel its sign-in.</value>
-  </data>
-  <data name="SteamFamily_Disconnected" xml:space="preserve">
-    <value>Disconnected. Steam cancelled Lumen's sign-in and it was deleted from this PC.</value>
-  </data>
-  <data name="SteamFamily_DisconnectedLocally" xml:space="preserve">
-    <value>Deleted from this PC, but Steam didn't confirm cancelling the sign-in. You can remove “Lumen” from the devices in your Steam account (Steam Guard → Manage devices).</value>
   </data>
   <data name="EpicAccount_Title" xml:space="preserve">
     <value>Epic Games account</value>
@@ -811,12 +761,6 @@
   </data>
   <data name="EpicAccount_DisconnectedLocally" xml:space="preserve">
     <value>Deleted from this PC, but Epic didn't confirm ending the session. It expires by itself; you can also sign out of all sessions in your Epic account settings.</value>
-  </data>
-  <data name="SteamFamily_NeedsReconnect" xml:space="preserve">
-    <value>Steam no longer accepts this sign-in (it was cancelled, expired, or made by an older Lumen). Connect again to see your family's games.</value>
-  </data>
-  <data name="SteamFamily_Reconnect" xml:space="preserve">
-    <value>Connect again</value>
   </data>
   <data name="GogAccount_Title" xml:space="preserve">
     <value>GOG account</value>
@@ -945,5 +889,38 @@
   </data>
   <data name="Settings_Hotkey_Taken" xml:space="preserve">
     <value>Another app is using {0}, so it doesn't work right now. Choose a different one.</value>
+  </data>
+  <data name="SteamWeb_Description" xml:space="preserve">
+    <value>Shows the games your Steam family shares with you. You sign in on Steam's own website, inside Lumen, like in any browser.</value>
+  </data>
+  <data name="SteamWeb_SignIn" xml:space="preserve">
+    <value>Sign in on Steam's website</value>
+  </data>
+  <data name="SteamWeb_SignInAgain" xml:space="preserve">
+    <value>Sign in again</value>
+  </data>
+  <data name="SteamWeb_HowItWorks" xml:space="preserve">
+    <value>A window with Steam's real sign-in page opens: scan the QR with the Steam app or use your account there. Lumen doesn't see what you type and doesn't pretend to be any other app or device.</value>
+  </data>
+  <data name="SteamWeb_WindowTitle" xml:space="preserve">
+    <value>Steam — sign in</value>
+  </data>
+  <data name="SteamWeb_Account" xml:space="preserve">
+    <value>Signed in as {0} since {1}</value>
+  </data>
+  <data name="SteamWeb_WhatLumenDoes" xml:space="preserve">
+    <value>Lumen only reads the list of games your family shares. The session stays in Lumen's own browser on this PC, protected by your Windows account. Lumen never buys, changes settings or reads anything else. Disconnect signs out on Steam and deletes that browser's data.</value>
+  </data>
+  <data name="SteamWeb_Connected" xml:space="preserve">
+    <value>Signed in. Updating your library…</value>
+  </data>
+  <data name="SteamWeb_Disconnected" xml:space="preserve">
+    <value>Signed out on Steam, and the browser's data was deleted.</value>
+  </data>
+  <data name="SteamWeb_DisconnectedLocally" xml:space="preserve">
+    <value>The browser's data was deleted here, but Steam didn't confirm the sign-out. If you want, end the session in Steam → Settings → Security.</value>
+  </data>
+  <data name="SteamWeb_NeedsReconnect" xml:space="preserve">
+    <value>Steam no longer accepts this sign-in (it expired or was ended elsewhere). Sign in again to see family games.</value>
   </data>
 </root>

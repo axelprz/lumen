@@ -14,6 +14,7 @@ public sealed partial class SettingsViewModel(
     WindowSettingsViewModel window,
     FirstRunViewModel firstRun,
     SteamSettingsViewModel steam,
+    SteamFamilyViewModel steamFamily,
     EpicAccountViewModel epic,
     GogAccountViewModel gog,
     ArtworkSettingsViewModel artwork,
@@ -33,6 +34,8 @@ public sealed partial class SettingsViewModel(
 
     public SteamSettingsViewModel Steam { get; } = steam;
 
+    public SteamFamilyViewModel SteamFamily { get; } = steamFamily;
+
 
     public EpicAccountViewModel Epic { get; } = epic;
 
@@ -45,6 +48,7 @@ public sealed partial class SettingsViewModel(
     public async Task InitializeAsync(CancellationToken ct)
     {
         await Steam.InitializeAsync(ct);
+        await SteamFamily.InitializeAsync(ct);
         await Epic.InitializeAsync(ct);
         await Gog.InitializeAsync(ct);
         await Artwork.InitializeAsync(ct);
