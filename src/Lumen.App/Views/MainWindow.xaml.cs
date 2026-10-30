@@ -42,12 +42,25 @@ public partial class MainWindow : Window
         _images.Scale = VisualTreeHelper.GetDpi(this).DpiScaleX; // decode tiles at their real pixel size
         _backdrop = new MicaBackdrop(this);
         _backdrop.Start();
+
+        // The sidebar monitor only reads the system while someone can see it.
+        IsVisibleChanged += (_, _) => UpdateFooter();
+        StateChanged += (_, _) => UpdateFooter();
+        UpdateFooter();
     }
 
     protected override void OnClosed(EventArgs e)
     {
         _backdrop?.Dispose();
         base.OnClosed(e);
+    }
+
+    private void UpdateFooter()
+    {
+        if (DataContext is ShellViewModel shell)
+        {
+            shell.Footer.SetActive(IsVisible && WindowState != WindowState.Minimized);
+        }
     }
 
     // View concern: Ctrl+K or Ctrl+F jumps to the top bar search; Esc in it clears it.

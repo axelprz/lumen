@@ -7,6 +7,7 @@
         xmlns:vm="clr-namespace:Lumen.App.ViewModels"
         xmlns:views="clr-namespace:Lumen.App.Views"
         xmlns:services="clr-namespace:Lumen.App.Services"
+        xmlns:conv="clr-namespace:Lumen.App.Converters"
         Title="{l:Loc App_Title}"
         Icon="/Assets/Lumen.ico"
         Width="1280"
@@ -21,6 +22,7 @@
         PreviewKeyDown="OnPreviewKeyDown">
   <Window.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    <conv:ImagePathConverter x:Key="ImagePath" />
   </Window.Resources>
   <Grid>
     <Grid.ColumnDefinitions>
@@ -66,6 +68,71 @@
                          Foreground="{DynamicResource Lumen.Brush.BrandText}"
                          Opacity="0.8" />
             </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <!-- Footer: CPU/RAM monitor (read locally, only while the window is shown) and the Steam account from Steam's own files -->
+        <Border DockPanel.Dock="Bottom" DataContext="{Binding Footer}" Padding="16,14,16,16"
+                BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="0,1,0,0">
+          <StackPanel>
+            <Border Background="{DynamicResource Lumen.Brush.Glass}" BorderBrush="{DynamicResource Lumen.Brush.GlassBorder}" BorderThickness="1"
+                    CornerRadius="12" Padding="12,10">
+              <StackPanel>
+                <DockPanel Visibility="{Binding HasCpu, Converter={StaticResource BoolToVisibility}}">
+                  <TextBlock DockPanel.Dock="Right" Text="{Binding CpuText}" FontSize="{StaticResource Lumen.FontSize.Caption}" FontWeight="SemiBold" />
+                  <TextBlock Text="&#xE950;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Caption}"
+                             Foreground="{DynamicResource Lumen.Brush.BrandText}" Margin="0,0,7,0" />
+                  <TextBlock Text="{l:Loc Footer_Cpu}" FontSize="{StaticResource Lumen.FontSize.Caption}" FontWeight="Medium"
+                             Foreground="{DynamicResource Lumen.Brush.TextMuted}" VerticalAlignment="Center" />
+                </DockPanel>
+                <Border Height="5" CornerRadius="2.5" Background="{DynamicResource Lumen.Brush.FillHover}" Margin="0,7,0,0" ClipToBounds="True"
+                        Visibility="{Binding HasCpu, Converter={StaticResource BoolToVisibility}}">
+                  <Border CornerRadius="2.5" Background="{DynamicResource Lumen.Brush.BrandGradient}" RenderTransformOrigin="0,0.5">
+                    <Border.RenderTransform>
+                      <ScaleTransform ScaleX="{Binding CpuFraction}" />
+                    </Border.RenderTransform>
+                  </Border>
+                </Border>
+
+                <DockPanel Margin="0,10,0,0" Visibility="{Binding HasRam, Converter={StaticResource BoolToVisibility}}">
+                  <TextBlock DockPanel.Dock="Right" Text="{Binding RamText}" FontSize="{StaticResource Lumen.FontSize.Caption}" FontWeight="SemiBold" />
+                  <TextBlock Text="&#xEDA2;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Caption}"
+                             Foreground="#FFA78BFA" Margin="0,0,7,0" />
+                  <TextBlock Text="{l:Loc Footer_Ram}" FontSize="{StaticResource Lumen.FontSize.Caption}" FontWeight="Medium"
+                             Foreground="{DynamicResource Lumen.Brush.TextMuted}" VerticalAlignment="Center" />
+                </DockPanel>
+                <Border Height="5" CornerRadius="2.5" Background="{DynamicResource Lumen.Brush.FillHover}" Margin="0,7,0,0" ClipToBounds="True"
+                        Visibility="{Binding HasRam, Converter={StaticResource BoolToVisibility}}">
+                  <Border CornerRadius="2.5" Background="{DynamicResource Lumen.Brush.RamGradient}" RenderTransformOrigin="0,0.5">
+                    <Border.RenderTransform>
+                      <ScaleTransform ScaleX="{Binding RamFraction}" />
+                    </Border.RenderTransform>
+                  </Border>
+                </Border>
+              </StackPanel>
+            </Border>
+
+            <DockPanel Margin="2,14,0,0" Visibility="{Binding HasProfile, Converter={StaticResource BoolToVisibility}}"
+                       ToolTip="{l:Loc Footer_SteamAccount}">
+              <Grid Width="36" Height="36">
+                <Border CornerRadius="10" Background="{DynamicResource Lumen.Brush.Surface}">
+                  <TextBlock Text="&#xE77B;" Style="{StaticResource Lumen.Text.Icon}" Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                             HorizontalAlignment="Center" />
+                </Border>
+                <Border CornerRadius="10">
+                  <Border.Background>
+                    <ImageBrush ImageSource="{Binding Profile.AvatarPath, Converter={StaticResource ImagePath}, ConverterParameter=72}" Stretch="UniformToFill" />
+                  </Border.Background>
+                </Border>
+                <Border CornerRadius="10" BorderThickness="2" BorderBrush="{DynamicResource Lumen.Brush.BrandBorder}" />
+              </Grid>
+              <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Profile.PersonaName}" FontSize="{StaticResource Lumen.FontSize.Small}" FontWeight="SemiBold"
+                           TextTrimming="CharacterEllipsis" />
+                <TextBlock Text="{l:Loc Footer_SteamAccount}" FontSize="{StaticResource Lumen.FontSize.Label}"
+                           Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+              </StackPanel>
+            </DockPanel>
           </StackPanel>
         </Border>
 

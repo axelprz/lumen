@@ -1440,4 +1440,19 @@
   <data name="Toast_RoutineDone" xml:space="preserve">
     <value>{0}: {1}</value>
   </data>
+  <data name="Footer_Cpu" xml:space="preserve">
+    <value>CPU</value>
+  </data>
+  <data name="Footer_Ram" xml:space="preserve">
+    <value>RAM</value>
+  </data>
+  <data name="Footer_CpuValue" xml:space="preserve">
+    <value>{0}%</value>
+  </data>
+  <data name="Footer_RamValue" xml:space="preserve">
+    <value>{0:0.0} / {1:0} GB</value>
+  </data>
+  <data name="Footer_SteamAccount" xml:space="preserve">
+    <value>Cuenta de Steam</value>
+  </data>
 </root>

@@ -49,6 +49,29 @@ public sealed class SteamProvider(
             .ToList();
     }
 
+    /// <summary>
+    /// The Steam account to show in the sidebar, read from Steam's own files (no network). Prefers the SteamID64 set in
+    /// Settings. Null when Steam or a signed-in account isn't there; never throws.
+    /// </summary>
+    public async Task<SteamProfile?> ReadProfileAsync(CancellationToken ct)
+    {
+        try
+        {
+            var steamPath = FindSteamPath();
+            if (steamPath is null)
+            {
+                return null;
+            }
+
+            var preferred = await settings.GetAsync(LocalSettingKeys.SteamId64, ct).ConfigureAwait(false);
+            return await SteamLocalProfile.ReadAsync(fileSystem, steamPath, preferred, ct).ConfigureAwait(false);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return null;
+        }
+    }
+
     // VERIFY: confirmed on one Windows 11 machine (2026-10): SteamPath is lowercase with forward slashes.
     internal const string RegistryKey = @"Software\Valve\Steam";
     internal const string RegistryValue = "SteamPath";

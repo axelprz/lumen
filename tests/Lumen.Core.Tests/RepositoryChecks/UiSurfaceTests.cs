@@ -85,6 +85,13 @@ public sealed class UiSurfaceTests
     }
 
     [Fact]
+    public void SidebarMonitor_OnlyRunsWhileTheWindowIsShown()
+    {
+        File.ReadAllText(Path.Combine(_appDir, "Views", "MainWindow.xaml.cs"))
+            .ShouldContain("shell.Footer.SetActive(IsVisible && WindowState != WindowState.Minimized)");
+    }
+
+    [Fact]
     public void MainWindow_AmbientLightsBreatheThroughMotion()
     {
         var xaml = File.ReadAllText(Path.Combine(_appDir, "Views", "MainWindow.xaml"));
