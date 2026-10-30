@@ -117,7 +117,7 @@
                       Background="#B30F1115"
                       IsHitTestVisible="False"
                       Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibility}}">
-                <TextBlock Text="&#xE735;" Style="{StaticResource Lumen.Text.Icon}" FontSize="12" Foreground="{DynamicResource Lumen.Brush.Warning}" />
+                <TextBlock Text="&#xE735;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Caption}" Foreground="{DynamicResource Lumen.Brush.Warning}" />
               </Border>
               <Border HorizontalAlignment="Left"
                       VerticalAlignment="Top"
@@ -126,7 +126,7 @@
                       CornerRadius="4"
                       Background="#B30F1115"
                       IsHitTestVisible="False">
-                <TextBlock Text="{Binding StoreName}" FontSize="11" Foreground="{DynamicResource Lumen.Brush.Text}" />
+                <TextBlock Text="{Binding StoreName}" FontSize="{StaticResource Lumen.FontSize.Label}" Foreground="{DynamicResource Lumen.Brush.Text}" />
               </Border>
               <Button VerticalAlignment="Bottom"
                       Margin="10"
@@ -138,7 +138,7 @@
           </Grid>
           <TextBlock Text="{Binding Title}"
                      Margin="2,10,2,0"
-                     FontSize="14"
+                     FontSize="{StaticResource Lumen.FontSize.Body}"
                      TextTrimming="CharacterEllipsis"
                      TextWrapping="Wrap"
                      Height="40" />
@@ -146,7 +146,7 @@
           <TextBlock Text="{Binding StateText}"
                      Margin="2,2,2,0"
                      Height="16"
-                     FontSize="12"
+                     FontSize="{StaticResource Lumen.FontSize.Caption}"
                      Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
         </StackPanel>
       </Border>
@@ -217,7 +217,7 @@
               AutomationProperties.Name="{l:Loc Library_Add}"
               Style="{StaticResource Lumen.Button}">
         <StackPanel Orientation="Horizontal">
-          <TextBlock Text="&#xE710;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+          <TextBlock Text="&#xE710;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
           <TextBlock Text="{l:Loc Library_Add}" />
         </StackPanel>
       </Button>
@@ -228,7 +228,7 @@
               AutomationProperties.Name="{Binding Discover.ButtonText}"
               Style="{StaticResource Lumen.Button}">
         <StackPanel Orientation="Horizontal">
-          <TextBlock Text="&#xE71D;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+          <TextBlock Text="&#xE71D;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
           <TextBlock Text="{Binding Discover.ButtonText}" />
         </StackPanel>
       </Button>
@@ -238,7 +238,7 @@
               AutomationProperties.Name="{l:Loc Library_Rescan}"
               Style="{StaticResource Lumen.Button}">
         <StackPanel Orientation="Horizontal">
-          <TextBlock Text="&#xE72C;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+          <TextBlock Text="&#xE72C;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
           <TextBlock>
             <TextBlock.Style>
               <Style TargetType="TextBlock">
@@ -255,7 +255,7 @@
       </Button>
       <StackPanel>
         <TextBlock Text="{l:Loc Nav_Library}" Style="{StaticResource Lumen.Text.PageTitle}" />
-        <TextBlock Text="{Binding CountText}" Foreground="{DynamicResource Lumen.Brush.TextMuted}" FontSize="14" Margin="0,4,0,0" />
+        <TextBlock Text="{Binding CountText}" Foreground="{DynamicResource Lumen.Brush.TextMuted}" FontSize="{StaticResource Lumen.FontSize.Body}" Margin="0,4,0,0" />
       </StackPanel>
     </DockPanel>
 
@@ -269,14 +269,14 @@
                  AutomationProperties.Name="{l:Loc Library_Search}" />
         <TextBlock Text="&#xE721;"
                    Style="{StaticResource Lumen.Text.Icon}"
-                   FontSize="14"
+                   FontSize="{StaticResource Lumen.FontSize.Body}"
                    Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                    HorizontalAlignment="Left"
                    Margin="12,0,0,0"
                    IsHitTestVisible="False" />
         <TextBlock Text="{l:Loc Library_Search}"
                    Foreground="{DynamicResource Lumen.Brush.TextMuted}"
-                   FontSize="14"
+                   FontSize="{StaticResource Lumen.FontSize.Body}"
                    VerticalAlignment="Center"
                    Margin="34,0,0,0"
                    IsHitTestVisible="False">
@@ -311,7 +311,7 @@
               AutomationProperties.Name="{Binding HiddenToggleText}"
               Visibility="{Binding HasHiddenToggle, Converter={StaticResource BoolToVisibility}}">
         <StackPanel Orientation="Horizontal">
-          <TextBlock Text="&#xED1A;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+          <TextBlock Text="&#xED1A;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
           <TextBlock Text="{Binding HiddenToggleText}" />
         </StackPanel>
       </Button>
@@ -328,7 +328,7 @@
             Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}">
       <DockPanel>
         <TextBlock DockPanel.Dock="Left" Text="&#xE7BA;" Style="{StaticResource Lumen.Text.Icon}" Foreground="#FFE0B44C" Margin="0,0,10,0" />
-        <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="14" />
+        <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" />
       </DockPanel>
     </Border>
 
@@ -338,7 +338,7 @@
                Panel.ZIndex="1"
                Text="{l:Loc Library_Empty}"
                Foreground="{DynamicResource Lumen.Brush.TextMuted}"
-               FontSize="15"
+               FontSize="{StaticResource Lumen.FontSize.Lead}"
                TextWrapping="Wrap"
                MaxWidth="520"
                HorizontalAlignment="Left"
@@ -348,7 +348,7 @@
                Panel.ZIndex="1"
                Text="{l:Loc Library_NoMatches}"
                Foreground="{DynamicResource Lumen.Brush.TextMuted}"
-               FontSize="15"
+               FontSize="{StaticResource Lumen.FontSize.Lead}"
                HorizontalAlignment="Left"
                Visibility="{Binding HasNoMatches, Converter={StaticResource BoolToVisibility}}" />
 

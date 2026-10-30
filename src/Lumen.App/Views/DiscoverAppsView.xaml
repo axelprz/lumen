@@ -20,13 +20,13 @@
               AutomationProperties.Name="{l:Loc Detail_Back}"
               Visibility="{Binding IsOpen, Converter={StaticResource BoolToVisibility}}">
         <StackPanel Orientation="Horizontal">
-          <TextBlock Text="&#xE72B;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+          <TextBlock Text="&#xE72B;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
           <TextBlock Text="{l:Loc Detail_Back}" />
         </StackPanel>
       </Button>
       <StackPanel>
         <TextBlock Text="{l:Loc Discover_Title}" FontSize="30" FontWeight="SemiBold" />
-        <TextBlock Text="{l:Loc Discover_Body}" FontSize="15" TextWrapping="Wrap" Margin="0,10,0,20" MaxWidth="720" HorizontalAlignment="Left"
+        <TextBlock Text="{l:Loc Discover_Body}" FontSize="{StaticResource Lumen.FontSize.Lead}" TextWrapping="Wrap" Margin="0,10,0,20" MaxWidth="720" HorizontalAlignment="Left"
                    Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
       </StackPanel>
     </DockPanel>
@@ -47,10 +47,10 @@
     <Border DockPanel.Dock="Top" Margin="0,0,0,12" Padding="14,10" CornerRadius="6" HorizontalAlignment="Left"
             Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
             Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}">
-      <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="14" />
+      <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" />
     </Border>
 
-    <TextBlock DockPanel.Dock="Top" Text="{Binding EmptyText}" FontSize="15" Margin="0,8,0,0"
+    <TextBlock DockPanel.Dock="Top" Text="{Binding EmptyText}" FontSize="{StaticResource Lumen.FontSize.Lead}" Margin="0,8,0,0"
                Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}" />
 
@@ -106,8 +106,8 @@
                         Visibility="Collapsed" />
               </StackPanel>
               <StackPanel VerticalAlignment="Center">
-                <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                <TextBlock FontSize="12" Margin="0,3,0,0" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
+                <TextBlock Text="{Binding Title}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                <TextBlock FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,3,0,0" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
                   <Run Text="{Binding Source, Mode=OneWay}" /><Run x:Name="Separator" Text=" · " /><Run Text="{Binding Location, Mode=OneWay}" />
                 </TextBlock>
               </StackPanel>

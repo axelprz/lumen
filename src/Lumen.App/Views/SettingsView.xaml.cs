@@ -2,8 +2,10 @@
 // Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)
 
 using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Lumen.App.Services;
 using Lumen.App.ViewModels;
 using Lumen.Core.Shell;
 
@@ -15,6 +17,9 @@ public partial class SettingsView : UserControl
     {
         InitializeComponent();
     }
+
+    // The page's blocks (title, then each card) arrive one after the other.
+    private void OnLoaded(object sender, RoutedEventArgs e) => Motion.Stagger(PageBlocks);
 
     // While "Change" is recording, the next key combination becomes the quick search shortcut (Esc cancels).
     protected override void OnPreviewKeyDown(KeyEventArgs e)

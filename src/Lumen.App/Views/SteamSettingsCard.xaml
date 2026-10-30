@@ -10,11 +10,11 @@
   </UserControl.Resources>
   <Border Style="{StaticResource Lumen.Card}">
     <StackPanel>
-      <TextBlock Text="{l:Loc Settings_Steam_Title}" FontSize="18" FontWeight="SemiBold" />
+      <TextBlock Text="{l:Loc Settings_Steam_Title}" FontSize="{StaticResource Lumen.FontSize.Subtitle}" FontWeight="SemiBold" />
       <TextBlock Text="{l:Loc Settings_Steam_Description}"
                  Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                  TextWrapping="Wrap"
-                 FontSize="14"
+                 FontSize="{StaticResource Lumen.FontSize.Body}"
                  Margin="0,6,0,20" />
 
       <TextBlock Text="{l:Loc Settings_Steam_SteamIdLabel}" Style="{StaticResource Lumen.Text.Label}" />
@@ -22,7 +22,7 @@
       <TextBlock Text="{l:Loc Settings_Steam_SteamIdHint}"
                  Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                  TextWrapping="Wrap"
-                 FontSize="12"
+                 FontSize="{StaticResource Lumen.FontSize.Caption}"
                  Margin="0,6,0,16" />
 
       <DockPanel Margin="0,0,0,6">
@@ -35,7 +35,7 @@
                 Foreground="{DynamicResource Lumen.Brush.Accent}">
           <Button.Template>
             <ControlTemplate TargetType="Button">
-              <TextBlock Text="{l:Loc Settings_Steam_GetKey}" FontSize="13" TextDecorations="Underline" Foreground="{TemplateBinding Foreground}" />
+              <TextBlock Text="{l:Loc Settings_Steam_GetKey}" FontSize="{StaticResource Lumen.FontSize.Small}" TextDecorations="Underline" Foreground="{TemplateBinding Foreground}" />
             </ControlTemplate>
           </Button.Template>
         </Button>
@@ -45,11 +45,11 @@
       <TextBlock Text="{l:Loc Settings_Steam_KeyHint}"
                  Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                  TextWrapping="Wrap"
-                 FontSize="12"
+                 FontSize="{StaticResource Lumen.FontSize.Caption}"
                  Margin="0,6,0,0" />
       <TextBlock Text="{l:Loc Settings_Steam_KeySavedHint}"
                  Foreground="{DynamicResource Lumen.Brush.TextMuted}"
-                 FontSize="12"
+                 FontSize="{StaticResource Lumen.FontSize.Caption}"
                  Margin="0,6,0,0"
                  Visibility="{Binding IsKeySaved, Converter={StaticResource BoolToVisibility}}" />
 
@@ -72,7 +72,7 @@
 
       <TextBlock Text="{Binding Status}"
                  TextWrapping="Wrap"
-                 FontSize="14"
+                 FontSize="{StaticResource Lumen.FontSize.Body}"
                  Margin="0,16,0,0"
                  Visibility="{Binding HasStatus, Converter={StaticResource BoolToVisibility}}">
         <TextBlock.Style>

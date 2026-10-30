@@ -18,7 +18,7 @@
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     <Style x:Key="KindRadio" TargetType="RadioButton">
       <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
-      <Setter Property="FontSize" Value="14" />
+      <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Body}" />
       <Setter Property="Margin" Value="0,0,20,0" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
@@ -45,7 +45,7 @@
     <TextBlock Text="{Binding Error}"
                Foreground="{DynamicResource Lumen.Brush.Error}"
                TextWrapping="Wrap"
-               FontSize="14"
+               FontSize="{StaticResource Lumen.FontSize.Body}"
                Margin="0,16,0,0"
                Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}" />
 

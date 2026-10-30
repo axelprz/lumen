@@ -4,19 +4,20 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:l="clr-namespace:Lumen.App.Localization"
-             xmlns:views="clr-namespace:Lumen.App.Views">
+             xmlns:views="clr-namespace:Lumen.App.Views"
+             Loaded="OnLoaded">
   <UserControl.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
   </UserControl.Resources>
 
   <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
-    <StackPanel Margin="40,32,40,40" MaxWidth="720" HorizontalAlignment="Left">
+    <StackPanel x:Name="PageBlocks" Margin="40,32,40,40" MaxWidth="720" HorizontalAlignment="Left">
       <TextBlock Text="{l:Loc Nav_Settings}" Style="{StaticResource Lumen.Text.PageTitle}" Margin="0,0,0,24" />
 
       <!-- General -->
       <Border Style="{StaticResource Lumen.Card}" Margin="0,0,0,20">
         <StackPanel>
-          <TextBlock Text="{l:Loc Settings_General_Title}" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,16" />
+          <TextBlock Text="{l:Loc Settings_General_Title}" FontSize="{StaticResource Lumen.FontSize.Subtitle}" FontWeight="SemiBold" Margin="0,0,0,16" />
           <TextBlock Text="{l:Loc Settings_Language}" Style="{StaticResource Lumen.Text.Label}" />
           <ComboBox DataContext="{Binding Language}"
                     ItemsSource="{Binding Options}"
@@ -28,18 +29,18 @@
           <CheckBox Content="{l:Loc Settings_CloseToTray}"
                     IsChecked="{Binding Window.CloseToTray}"
                     Foreground="{DynamicResource Lumen.Brush.Text}"
-                    FontSize="14"
+                    FontSize="{StaticResource Lumen.FontSize.Body}"
                     Margin="0,20,0,0" />
           <CheckBox Content="{l:Loc Settings_StartWithWindows}"
                     IsChecked="{Binding Window.StartWithWindows}"
                     Foreground="{DynamicResource Lumen.Brush.Text}"
-                    FontSize="14"
+                    FontSize="{StaticResource Lumen.FontSize.Body}"
                     Margin="0,10,0,0" />
           <TextBlock Text="{l:Loc Settings_Hotkey}" Style="{StaticResource Lumen.Text.Label}" Margin="0,20,0,0" />
           <TextBlock Text="{l:Loc Settings_Hotkey_Description}"
                      Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                      TextWrapping="Wrap"
-                     FontSize="13"
+                     FontSize="{StaticResource Lumen.FontSize.Small}"
                      Margin="0,0,0,8" />
           <StackPanel Orientation="Horizontal">
             <Border Background="{DynamicResource Lumen.Brush.Surface}"
@@ -49,7 +50,7 @@
                     Padding="12,6"
                     MinWidth="180"
                     VerticalAlignment="Center">
-              <TextBlock Text="{Binding Window.HotkeyText}" FontSize="14" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding Window.HotkeyText}" FontSize="{StaticResource Lumen.FontSize.Body}" FontWeight="SemiBold" />
             </Border>
             <Button Content="{l:Loc Settings_Hotkey_Change}"
                     Command="{Binding Window.RecordHotkeyCommand}"
@@ -63,7 +64,7 @@
           <TextBlock Text="{Binding Window.HotkeyStatus}"
                      Foreground="{DynamicResource Lumen.Brush.Warning}"
                      TextWrapping="Wrap"
-                     FontSize="13"
+                     FontSize="{StaticResource Lumen.FontSize.Small}"
                      Margin="0,8,0,0"
                      Visibility="{Binding Window.HasHotkeyStatus, Converter={StaticResource BoolToVisibility}}" />
           <Button Content="{l:Loc Settings_ShowWelcome}"
@@ -87,11 +88,11 @@
       <!-- Library -->
       <Border Style="{StaticResource Lumen.Card}" Margin="0,20,0,0">
         <StackPanel>
-          <TextBlock Text="{l:Loc Settings_Library_Title}" FontSize="18" FontWeight="SemiBold" />
+          <TextBlock Text="{l:Loc Settings_Library_Title}" FontSize="{StaticResource Lumen.FontSize.Subtitle}" FontWeight="SemiBold" />
           <TextBlock Text="{l:Loc Settings_Library_MergeDescription}"
                      Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                      TextWrapping="Wrap"
-                     FontSize="14"
+                     FontSize="{StaticResource Lumen.FontSize.Body}"
                      Margin="0,6,0,16" />
           <Button Content="{l:Loc Settings_Library_ResetMerges}"
                   Command="{Binding ResetMergesCommand}"
@@ -99,7 +100,7 @@
                   HorizontalAlignment="Left" />
           <TextBlock Text="{Binding LibraryStatus}"
                      Foreground="{DynamicResource Lumen.Brush.Success}"
-                     FontSize="14"
+                     FontSize="{StaticResource Lumen.FontSize.Body}"
                      Margin="0,12,0,0"
                      Visibility="{Binding HasLibraryStatus, Converter={StaticResource BoolToVisibility}}" />
         </StackPanel>
