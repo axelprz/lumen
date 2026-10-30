@@ -103,4 +103,10 @@ public static class LocalSettingKeys
 
     /// <summary>"1" once Lumen explained that closing the window leaves it in the tray (shown once).</summary>
     public const string TrayHintShown = "ui.trayHintShown";
+
+    /// <summary>The sync folder this PC uses (a path, so it never syncs); missing = sync is off.</summary>
+    public const string SyncFolder = "sync.folder";
+
+    /// <summary>What was last in step with the sync folder: a JSON map of document → hash (never synced).</summary>
+    public const string SyncBaseline = "sync.baseline";
 }
