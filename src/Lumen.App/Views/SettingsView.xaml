@@ -80,6 +80,8 @@
       <views:GogAccountCard DataContext="{Binding Gog}" Margin="0,20,0,0" />
       <views:ArtworkSettingsCard DataContext="{Binding Artwork}" Margin="0,20,0,0" />
 
+      <views:SyncSettingsCard DataContext="{Binding Sync}" Margin="0,20,0,0" />
+
       <!-- Library -->
       <Border Style="{StaticResource Lumen.Card}" Margin="0,20,0,0">
         <StackPanel>

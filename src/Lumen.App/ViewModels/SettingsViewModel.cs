@@ -8,7 +8,7 @@ using Lumen.Core.Localization;
 
 namespace Lumen.App.ViewModels;
 
-/// <summary>Settings page. Grows section by section (language, stores, artwork, sync...) in later milestones.</summary>
+/// <summary>Settings page: general, stores and accounts, artwork and the sync folder.</summary>
 public sealed partial class SettingsViewModel(
     LanguageSettingsViewModel language,
     WindowSettingsViewModel window,
@@ -18,6 +18,7 @@ public sealed partial class SettingsViewModel(
     EpicAccountViewModel epic,
     GogAccountViewModel gog,
     ArtworkSettingsViewModel artwork,
+    SyncSettingsViewModel sync,
     IMergeRuleStore mergeRules,
     LibraryService library,
     ILocalizer localizer) : ObservableObject
@@ -42,6 +43,8 @@ public sealed partial class SettingsViewModel(
     public GogAccountViewModel Gog { get; } = gog;
 
     public ArtworkSettingsViewModel Artwork { get; } = artwork;
+
+    public SyncSettingsViewModel Sync { get; } = sync;
 
     public bool HasLibraryStatus => !string.IsNullOrEmpty(LibraryStatus);
 

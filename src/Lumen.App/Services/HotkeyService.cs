@@ -90,6 +90,27 @@ public sealed partial class HotkeyService(ILocalSettings settings, ILogger<Hotke
         return true;
     }
 
+    /// <summary>Picks up a shortcut changed from outside (the sync folder). If Windows refuses it, the current one stays.</summary>
+    public async Task ReloadAsync(CancellationToken ct)
+    {
+        if (_window is null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (Hotkey.TryParse(await settings.GetAsync(LocalSettingKeys.Hotkey, ct), out var saved) && saved != Current)
+            {
+                await ChangeAsync(saved, ct);
+            }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            LogLoadFailed(ex);
+        }
+    }
+
     public void Dispose()
     {
         if (_window is not null)
