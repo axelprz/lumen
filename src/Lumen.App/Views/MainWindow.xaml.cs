@@ -13,6 +13,7 @@ namespace Lumen.App.Views;
 public partial class MainWindow : Window
 {
     private readonly ImageCache _images;
+    private MicaBackdrop? _backdrop;
 
     public MainWindow(ShellViewModel viewModel, ImageCache images)
     {
@@ -29,6 +30,14 @@ public partial class MainWindow : Window
         base.OnSourceInitialized(e);
         DarkTitleBar.TryApply(new WindowInteropHelper(this).Handle);
         _images.Scale = VisualTreeHelper.GetDpi(this).DpiScaleX; // decode tiles at their real pixel size
+        _backdrop = new MicaBackdrop(this);
+        _backdrop.Start();
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        _backdrop?.Dispose();
+        base.OnClosed(e);
     }
 
     protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
