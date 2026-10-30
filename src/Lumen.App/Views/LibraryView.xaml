@@ -39,7 +39,7 @@
     </ContextMenu>
     <DataTemplate x:Key="TileTemplate" DataType="{x:Type vm:LibraryTileViewModel}">
       <!-- The menu is built when it opens (OnTileContextMenuOpening), not for every tile that scrolls into view -->
-      <Border x:Name="Tile" Width="168" Margin="0,0,20,24" Background="Transparent" ToolTip="{Binding Title}"
+      <Border x:Name="Tile" Width="168" Margin="0,0,20,4" Background="Transparent" ToolTip="{Binding Title}"
               Loaded="OnTileLoaded" ContextMenuOpening="OnTileContextMenuOpening"
               MouseEnter="OnTileInteract" GotKeyboardFocus="OnTileInteract">
         <StackPanel>
@@ -354,7 +354,7 @@
          screen and their images exist in memory. The view sets ColumnCount from its width. -->
     <ItemsControl x:Name="RowsHost"
                   Grid.Row="3"
-                  Margin="-16,-16,0,0"
+                  Margin="-20,-20,0,0"
                   ItemsSource="{Binding Rows}"
                   SizeChanged="OnGridSizeChanged"
                   Focusable="False"
@@ -365,8 +365,7 @@
       <ItemsControl.Template>
         <ControlTemplate TargetType="ItemsControl">
           <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
-            <!-- Room above and to the left for a pointed-at cover (scaled up, with its glow); the control's negative margin cancels it -->
-            <ItemsPresenter Margin="16,16,0,24" />
+            <ItemsPresenter Margin="0,0,0,24" />
           </ScrollViewer>
         </ControlTemplate>
       </ItemsControl.Template>
@@ -377,7 +376,10 @@
       </ItemsControl.ItemsPanel>
       <ItemsControl.ItemTemplate>
         <DataTemplate DataType="{x:Type vm:TileRow}">
-          <ItemsControl ItemsSource="{Binding Tiles}" ItemTemplate="{StaticResource TileTemplate}" Focusable="False">
+          <!-- The virtualizing panel clips to its own bounds, so the room a pointed-at cover needs (scaled up, with its glow)
+               is inside the row: 20 px above and to the left. The grid's negative margin and the tiles' smaller bottom
+               margin cancel it, so the layout is unchanged. -->
+          <ItemsControl ItemsSource="{Binding Tiles}" ItemTemplate="{StaticResource TileTemplate}" Focusable="False" Margin="20,20,0,0">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <StackPanel Orientation="Horizontal" />
