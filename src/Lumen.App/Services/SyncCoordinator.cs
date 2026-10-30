@@ -91,8 +91,13 @@ public sealed partial class SyncCoordinator
 
     public SyncFolderService Service => _sync;
 
+    // What arrived, kept as numbers and titles so the notice is written in the current language each time it is read.
+    private (int Count, string Titles)? _received;
+
     /// <summary>"3 items came from the sync folder: …", until the next sync that brings something.</summary>
-    public string? Notice { get; private set; }
+    public string? Notice => _received is { } r
+        ? string.Format(CultureInfo.CurrentCulture, _localizer["Sync_ManualItemsReceived"], r.Count, r.Titles)
+        : null;
 
     /// <summary>Status, last sync time or notice changed (UI thread).</summary>
     public event EventHandler? Changed;
@@ -176,7 +181,7 @@ public sealed partial class SyncCoordinator
         await _sync.DetachAsync(ct);
         await UpdateRoutinesFolderAsync(ct);
         _files.ForgetFolder(folder);
-        Notice = null;
+        _received = null;
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
@@ -257,8 +262,8 @@ public sealed partial class SyncCoordinator
             {
                 var titles = string.Join(", ", e.ManualItemsReceived.Take(MaxTitlesShown))
                     + (e.ManualItemsReceived.Count > MaxTitlesShown ? "…" : string.Empty);
-                Notice = string.Format(CultureInfo.CurrentCulture, _localizer["Sync_ManualItemsReceived"], e.ManualItemsReceived.Count, titles);
-                Notify?.Invoke(_localizer["Sync_NoticeTitle"], Notice);
+                _received = (e.ManualItemsReceived.Count, titles);
+                Notify?.Invoke(_localizer["Sync_NoticeTitle"], Notice!);
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
