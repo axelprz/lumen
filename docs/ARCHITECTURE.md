@@ -194,7 +194,7 @@ Rules: providers only **read** store files; never write into a store's folder or
 | `AccentService` | Extracts a dominant, saturated color from hero/cover art (quantize + score by chroma and population), ensures WCAG contrast vs. the dark background. Implemented in M3: pure logic in `Lumen.Core.Theming.AccentPicker`, WPF side in `Lumen.App.Services.AccentService` |
 | `SecretStore` | DPAPI with CurrentUser scope (`ISecretProtector`; `DpapiProtector` calls `CryptProtectData` directly, with app-specific entropy, so no extra package) protected values in the SQLite `secrets` table (`ISecretStore` / `SqliteSecretStore`). A value that no longer decrypts (other user or machine) reads as not set. Never logged, never synced. Machine-local non-secret values (e.g. SteamID64) go to `settings_local` via `ILocalSettings`. |
 | `RoutineEngine` | Loads/validates routines, trust checks, executes actions sequentially with cancellation, tracks started processes for undo |
-| `SyncFolderService` | Watches the sync folder (`FileSystemWatcher` + debounce + periodic rescan fallback), loads routines/collections/config, writes changes back atomically (write temp → rename) |
+| `SyncFolderService` | **Core engine implemented (M8, 2026-10-30); Settings UI and routines folder come next.** Keeps `config.json` and `collections/*.json` in step with this PC both ways and announces changes in `routines/`. Details in *Sync folder* below. |
 | `UpdateService` | Velopack: check, download, apply on restart; channel selection |
 
 Steam CDN artwork (**verified 2026-10**): `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{appid}/…` (current) and `https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/…` (fallback) both serve `library_600x900.jpg`, `library_hero.jpg`, `logo.png`, `header.jpg`. Cover falls back to `header.jpg` for old games.
@@ -248,6 +248,40 @@ What never syncs: secrets, tokens, playtime sessions, caches, absolute paths tha
 Portable files always reference items by `ItemRef` string (`"steam:570"`), never by local Guid or absolute path. Missing refs on another machine are shown as "not available here", never deleted.
 
 Every portable file has `"schema": <int>`; loaders migrate older versions and refuse newer ones with a clear message.
+
+### Sync folder (M8)
+
+`Lumen.Core/Sync`: `PortableConfigJson` / `PortableCollectionJson` (read, write, hash), `LocalPortableState` (this PC's side), `SyncMerge`, `SyncFolderService`, `PhysicalFolderWatcher`.
+
+- **What is synced:**
+  - `config.json`: `language`, `ui.minimizeToTray`, `quickSearch.hotkey`, `manualItems`, `overrides` (title, hidden) and `ignoredApps`.
+  - `collections/{id}.json`: every collection, and Favorites as the reserved id `favorites`.
+  - No schema change was needed (`ignoredApps` was already there and Favorites is a collection).
+  - Never synced: secrets, tokens, playtime, caches, routine approvals, and the sync folder path itself (`settings_local` `sync.folder`).
+  - Added apps stay per PC (a detected app only exists on the PC that found it).
+- **Keys Lumen doesn't manage** (`stores`, `ui.dynamicAccent`, `updates`, artwork choices, `icon`/`sort` of a collection) are kept when it rewrites a file. Reading ignores them, writing copies them.
+- **Same content, same text:** files are written with sorted keys, so Lumen only writes when the text really changes, and a hash of the managed content (`Hash`) decides whether two sides differ, whatever the file's formatting.
+- **One pass (`ReconcileAsync`)**, per document (`config`, `collection:{id}`). `baseline` is the hash last seen in step, kept in `settings_local` `sync.baseline`, with no migration:
+
+  | Folder | This PC | Result |
+  |---|---|---|
+  | = this PC | | in step; baseline updated |
+  | changed | unchanged | applied here |
+  | unchanged | changed | written to the folder (or the file deleted) |
+  | changed | changed | **the folder wins**; a deletion in the folder never beats an edit here |
+
+- **What protects the user's data:**
+  - A folder that is missing (`FolderUnavailable`) is not touched.
+  - A folder with no config and no collections "looks wiped": nothing is deleted here, and this PC restores it. Deleting `config.json` doesn't wipe the PC either.
+  - A file that can't be read (half written by a cloud client, bad JSON, id different from the file name) or comes from a newer schema is left alone and listed in `Problems`.
+  - Only `config.json` and `collections/{id}.json` are written, atomically (temp then rename), through `IUserFiles` limited to the chosen folder.
+- **First start (`InspectAsync` / `AttachAsync`):**
+  - If only one side has data, it is used automatically.
+  - If both do, the caller must pass a `SyncStart`: *UseFolder* (this PC takes the folder's data; what only this PC had is removed), *UseThisPc* (the folder takes this PC's data; Lumen's keys in `config.json` are emptied, other keys stay) or *Merge* (everything joined, the folder wins on the same thing; collections keep the folder's name and order, then what only this PC had).
+  - The three are the normal pass with a prepared baseline, so there is no separate code path.
+- **Watching:** a `FileSystemWatcher` (ignores `.tmp`), a 1 s debounce, and a rescan every 60 s because cloud clients don't always raise events. `NotifyLocalChanged()` wakes the loop when something local changes. `Applied` tells the pages what to reload; `RoutinesChanged` fires when something in `routines/` changes.
+- **Manual items from the folder (owner decision, 2026-10-30):** imported only if they pass the same rules as the "add item" dialog (`ManualItemValidator`: `.exe`/`.lnk`/`.url`, absolute path, no dangerous URL schemes). Anything refused is skipped and listed. `SyncAppliedEventArgs.ManualItemsReceived` gives the titles so the UI can say "N items came from the sync folder". They never run on their own, only on the user's click.
+- **Routines** (Settings and migration PR): the routines folder moves into `<sync>/routines`. Trust is unchanged: approvals are per PC (`routine_trust`), so a routine that arrives or changes from another PC needs review here. When both sides have a routine with the same id, both are kept (the local one gets a new id) rather than letting one overwrite the other.
 
 ## 7. Routine execution & trust
 
