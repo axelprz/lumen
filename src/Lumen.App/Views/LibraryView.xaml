@@ -188,9 +188,9 @@
           services:GamepadLayer.Priority="2"
           Background="{DynamicResource Lumen.Brush.Background}"
           Padding="40,32,24,16"
-          services:Motion.ShowIn="True"
+          Visibility="Collapsed"
           DataContext="{Binding Discover}"
-          Visibility="{Binding IsOpen, Converter={StaticResource BoolToVisibility}}">
+          services:Motion.Shown="{Binding IsOpen}">
     <views:DiscoverAppsView />
   </Border>
 
@@ -199,7 +199,8 @@
                   services:GamepadLayer.Priority="1"
                   Content="{Binding Detail}"
                   Focusable="False"
-                  Visibility="{Binding HasDetail, Converter={StaticResource BoolToVisibility}}">
+                  Visibility="Collapsed"
+                  services:Motion.Shown="{Binding HasDetail}">
     <ContentControl.ContentTemplate>
       <DataTemplate DataType="{x:Type vm:GameDetailViewModel}">
         <views:GameDetailView />

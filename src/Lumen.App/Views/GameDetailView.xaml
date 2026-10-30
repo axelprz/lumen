@@ -15,318 +15,345 @@
       <Setter Property="Margin" Value="0,0,0,6" />
     </Style>
     <Style x:Key="InfoValue" TargetType="TextBlock">
-      <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Lead}" />
+      <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Section}" />
+      <Setter Property="FontWeight" Value="Bold" />
       <Setter Property="TextWrapping" Value="Wrap" />
       <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
     </Style>
   </UserControl.Resources>
 
-  <Grid Background="{DynamicResource Lumen.Brush.Background}" services:Motion.ShowIn="True">
+  <!-- Opaque: it covers the library. The host animates it in and out (Motion.Shown in LibraryView). -->
+  <Grid Background="{DynamicResource Lumen.Brush.Background}">
     <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
-      <StackPanel>
-        <!-- Hero: background art fading into the page, with the logo (or the title) over it -->
-        <Grid Height="380" ClipToBounds="True">
-          <Border>
-            <Border.Background>
-              <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#FF232836" Offset="0" />
-                <GradientStop Color="#FF0A0D14" Offset="1" />
-              </LinearGradientBrush>
-            </Border.Background>
-          </Border>
-          <Border>
-            <Border.Background>
-              <ImageBrush ImageSource="{Binding HeroPath, Converter={StaticResource ImagePath}, ConverterParameter=1920}" Stretch="UniformToFill" AlignmentY="Top" />
-            </Border.Background>
-          </Border>
-          <Border>
-            <Border.Background>
-              <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                <GradientStop Color="#330A0D14" Offset="0" />
-                <GradientStop Color="#660A0D14" Offset="0.55" />
-                <GradientStop Color="#FF0A0D14" Offset="1" />
-              </LinearGradientBrush>
-            </Border.Background>
-          </Border>
+      <StackPanel Margin="40,24,40,48">
+        <Button Command="{Binding CloseCommand}"
+                Style="{StaticResource Lumen.Button}"
+                HorizontalAlignment="Left"
+                Margin="0,0,0,16"
+                AutomationProperties.Name="{l:Loc Detail_Back}">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="&#xE72B;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+            <TextBlock Text="{l:Loc Detail_Back}" FontWeight="SemiBold" />
+          </StackPanel>
+        </Button>
 
-          <Button Command="{Binding CloseCommand}"
-                  Style="{StaticResource Lumen.Button}"
-                  Background="#990A0D14"
-                  HorizontalAlignment="Left"
-                  VerticalAlignment="Top"
-                  Margin="32,28,0,0"
-                  AutomationProperties.Name="{l:Loc Detail_Back}">
+        <!-- Hero card: the game's art, its stores and kind, logo (or title), Play, favorite and "Play with" -->
+        <Border MinHeight="330" CornerRadius="24" BorderThickness="1" BorderBrush="{DynamicResource Lumen.Brush.GlassBorder}"
+                Background="{DynamicResource Lumen.Brush.Surface}">
+          <Grid>
+            <Border CornerRadius="23">
+              <Border.Background>
+                <ImageBrush ImageSource="{Binding HeroPath, Converter={StaticResource ImagePath}, ConverterParameter=1920}" Stretch="UniformToFill" AlignmentY="Top" />
+              </Border.Background>
+            </Border>
+            <Border CornerRadius="23" IsHitTestVisible="False">
+              <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                  <GradientStop Color="#000A0D14" Offset="0" />
+                  <GradientStop Color="#B30A0D14" Offset="0.6" />
+                  <GradientStop Color="#FA0A0D14" Offset="1" />
+                </LinearGradientBrush>
+              </Border.Background>
+            </Border>
+            <Border CornerRadius="23" IsHitTestVisible="False">
+              <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                  <GradientStop Color="#D90A0D14" Offset="0" />
+                  <GradientStop Color="#800A0D14" Offset="0.45" />
+                  <GradientStop Color="#000A0D14" Offset="0.85" />
+                </LinearGradientBrush>
+              </Border.Background>
+            </Border>
+
+            <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Left" MaxWidth="820" Margin="36,40,36,28">
+              <Border Style="{StaticResource Lumen.Pill}" HorizontalAlignment="Left">
+                <TextBlock Text="{Binding TagText}" Style="{StaticResource Lumen.Text.Badge}" />
+              </Border>
+              <Image Source="{Binding LogoPath, Converter={StaticResource ImagePath}, ConverterParameter=920}"
+                     MaxHeight="120"
+                     MaxWidth="440"
+                     Margin="0,16,0,0"
+                     HorizontalAlignment="Left"
+                     Stretch="Uniform"
+                     Visibility="{Binding HasLogo, Converter={StaticResource BoolToVisibility}}"
+                     AutomationProperties.Name="{Binding Title}" />
+              <TextBlock Text="{Binding Title}" FontSize="{StaticResource Lumen.FontSize.Display}" FontWeight="Bold" TextWrapping="Wrap" Margin="0,12,0,0">
+                <TextBlock.Style>
+                  <Style TargetType="TextBlock">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding HasLogo}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </TextBlock.Style>
+              </TextBlock>
+
+              <WrapPanel Margin="0,22,0,-12">
+                <Button Command="{Binding PlayCommand}"
+                        IsEnabled="{Binding CanRun}"
+                        Style="{StaticResource Lumen.Button.Primary}"
+                        FontSize="{StaticResource Lumen.FontSize.BodyLarge}"
+                        Padding="30,12"
+                        Margin="0,0,12,12"
+                        AutomationProperties.Name="{Binding ActionText}">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE768;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Body}" Margin="0,0,10,0" />
+                    <TextBlock Text="{Binding ActionText}" />
+                  </StackPanel>
+                </Button>
+                <!-- Favorite: a star button (filled and amber when it is a favorite) -->
+                <Button Command="{Binding ToggleFavoriteCommand}"
+                        Style="{StaticResource Lumen.Button.Icon}"
+                        Background="#1AFFFFFF"
+                        Padding="14,12"
+                        Margin="0,0,12,12"
+                        ToolTip="{Binding FavoriteText}"
+                        AutomationProperties.Name="{Binding FavoriteText}">
+                  <TextBlock>
+                    <TextBlock.Style>
+                      <Style TargetType="TextBlock">
+                        <Setter Property="Text" Value="&#xE734;" />
+                        <Style.Triggers>
+                          <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                            <Setter Property="Text" Value="&#xE735;" />
+                            <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Warning}" />
+                          </DataTrigger>
+                        </Style.Triggers>
+                      </Style>
+                    </TextBlock.Style>
+                  </TextBlock>
+                </Button>
+                <StackPanel Orientation="Horizontal" Margin="0,0,12,12" VerticalAlignment="Center"
+                            Visibility="{Binding HasStoreChoice, Converter={StaticResource BoolToVisibility}}">
+                  <TextBlock Text="{l:Loc Detail_PlayWithLabel}" VerticalAlignment="Center" Foreground="{DynamicResource Lumen.Brush.TextMuted}" Margin="0,0,8,0" />
+                  <ComboBox ItemsSource="{Binding StoreChoices}" SelectedItem="{Binding SelectedStore}" DisplayMemberPath="Label" MinWidth="200"
+                            AutomationProperties.Name="{l:Loc Detail_PlayWithLabel}" />
+                </StackPanel>
+              </WrapPanel>
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <!-- More actions -->
+        <WrapPanel Margin="0,16,0,0">
+          <Button Command="{Binding OpenFolderCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
+                  AutomationProperties.Name="{l:Loc Detail_OpenFolder}"
+                  Visibility="{Binding CanOpenFolder, Converter={StaticResource BoolToVisibility}}">
             <StackPanel Orientation="Horizontal">
-              <TextBlock Text="&#xE72B;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
-              <TextBlock Text="{l:Loc Detail_Back}" />
+              <TextBlock Text="&#xE838;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+              <TextBlock Text="{l:Loc Detail_OpenFolder}" />
             </StackPanel>
           </Button>
+          <Button Command="{Binding OpenStorePageCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
+                  AutomationProperties.Name="{l:Loc Detail_StorePage}"
+                  Visibility="{Binding CanOpenStorePage, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xE719;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+              <TextBlock Text="{l:Loc Detail_StorePage}" />
+            </StackPanel>
+          </Button>
+          <Button Command="{Binding UninstallCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
+                  AutomationProperties.Name="{l:Loc Detail_Uninstall}"
+                  Visibility="{Binding CanUninstall, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xE74D;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+              <TextBlock Text="{l:Loc Detail_Uninstall}" />
+            </StackPanel>
+          </Button>
+          <Button x:Name="MoreButton" Click="OnMoreClick" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
+                  AutomationProperties.Name="{l:Loc Detail_More}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xE712;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+              <TextBlock Text="{l:Loc Detail_More}" />
+            </StackPanel>
+            <Button.ContextMenu>
+              <ContextMenu>
+                <MenuItem Header="{l:Loc Detail_Collections}" Command="{Binding StartCollectionsCommand}" />
+                <Separator />
+                <MenuItem Header="{l:Loc Detail_Rename}" Command="{Binding StartRenameCommand}" />
+                <MenuItem Header="{l:Loc Detail_RestoreTitle}" Command="{Binding RestoreTitleCommand}"
+                          Visibility="{Binding HasCustomTitle, Converter={StaticResource BoolToVisibility}}" />
+                <MenuItem Header="{Binding HideText}" Command="{Binding ToggleHiddenCommand}" />
+                <Separator />
+                <MenuItem Header="{l:Loc Tile_ChangeCover}" Command="{Binding ChangeCoverCommand}" />
+                <MenuItem Header="{l:Loc Detail_ChangeBackground}" Command="{Binding ChangeBackgroundCommand}" />
+                <MenuItem Header="{l:Loc Detail_ChangeLogo}" Command="{Binding ChangeLogoCommand}" />
+                <MenuItem Header="{l:Loc Detail_RestoreArtwork}" Command="{Binding RestoreArtworkCommand}" />
+                <Separator />
+                <MenuItem Header="{l:Loc Detail_MergeWith}" Command="{Binding StartMergeCommand}" />
+                <MenuItem Header="{l:Loc Tile_Separate}" Command="{Binding SeparateCommand}"
+                          Visibility="{Binding IsMerged, Converter={StaticResource BoolToVisibility}}" />
+              </ContextMenu>
+            </Button.ContextMenu>
+          </Button>
+        </WrapPanel>
 
-          <Grid VerticalAlignment="Bottom" Margin="48,0,48,20">
-            <Image Source="{Binding LogoPath, Converter={StaticResource ImagePath}, ConverterParameter=920}"
-                   MaxHeight="130"
-                   MaxWidth="460"
-                   HorizontalAlignment="Left"
-                   Stretch="Uniform"
-                   Visibility="{Binding HasLogo, Converter={StaticResource BoolToVisibility}}"
-                   AutomationProperties.Name="{Binding Title}" />
-            <TextBlock Text="{Binding Title}" FontSize="40" FontWeight="SemiBold" TextWrapping="Wrap">
+        <Border Margin="0,4,0,12" Padding="14,10" CornerRadius="12"
+                Background="{DynamicResource Lumen.Brush.Glass}" BorderBrush="{DynamicResource Lumen.Brush.GlassBorder}" BorderThickness="1"
+                HorizontalAlignment="Left"
+                Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}">
+          <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" />
+        </Border>
+
+        <!-- Hidden: say so, with a one-click way back -->
+        <Border Margin="0,4,0,12" Padding="14,10" CornerRadius="12"
+                Background="{DynamicResource Lumen.Brush.Glass}" BorderBrush="{DynamicResource Lumen.Brush.GlassBorder}" BorderThickness="1"
+                HorizontalAlignment="Left"
+                Visibility="{Binding IsHidden, Converter={StaticResource BoolToVisibility}}">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Left" Text="&#xED1A;" Style="{StaticResource Lumen.Text.Icon}" VerticalAlignment="Center" Margin="0,0,10,0" />
+            <Button DockPanel.Dock="Right" Command="{Binding ToggleHiddenCommand}" Content="{Binding HideText}"
+                    Style="{StaticResource Lumen.Button}" Margin="16,0,0,0" />
+            <TextBlock Text="{l:Loc Detail_HiddenBanner}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" VerticalAlignment="Center" />
+          </DockPanel>
+        </Border>
+
+        <!-- Collections: one checkbox per collection, plus "new collection" -->
+        <Border Margin="0,4,0,12" Padding="16" CornerRadius="12" MaxWidth="640" HorizontalAlignment="Left"
+                Background="{DynamicResource Lumen.Brush.Glass}" BorderBrush="{DynamicResource Lumen.Brush.GlassBorder}" BorderThickness="1"
+                Visibility="{Binding IsChoosingCollections, Converter={StaticResource BoolToVisibility}}">
+          <StackPanel>
+            <TextBlock Text="{l:Loc Detail_Collections}" FontSize="{StaticResource Lumen.FontSize.BodyLarge}" FontWeight="SemiBold" Margin="0,0,0,10" />
+            <TextBlock Text="{l:Loc Detail_NoCollections}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,0,10" TextWrapping="Wrap"
+                       Foreground="{DynamicResource Lumen.Brush.TextMuted}">
               <TextBlock.Style>
                 <Style TargetType="TextBlock">
-                  <Setter Property="Visibility" Value="Visible" />
                   <Style.Triggers>
-                    <DataTrigger Binding="{Binding HasLogo}" Value="True">
+                    <DataTrigger Binding="{Binding HasCollections}" Value="True">
                       <Setter Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
                   </Style.Triggers>
                 </Style>
               </TextBlock.Style>
             </TextBlock>
-          </Grid>
-        </Grid>
-
-        <StackPanel Margin="48,8,48,48">
-          <!-- Actions -->
-          <WrapPanel>
-            <Button Command="{Binding PlayCommand}"
-                    Content="{Binding ActionText}"
-                    IsEnabled="{Binding CanRun}"
-                    Style="{StaticResource Lumen.Button.Primary}"
-                    FontSize="{StaticResource Lumen.FontSize.BodyLarge}"
-                    FontWeight="SemiBold"
-                    Padding="36,10"
-                    Margin="0,0,12,12" />
-            <StackPanel Orientation="Horizontal" Margin="0,0,12,12" VerticalAlignment="Center"
-                        Visibility="{Binding HasStoreChoice, Converter={StaticResource BoolToVisibility}}">
-              <TextBlock Text="{l:Loc Detail_PlayWithLabel}" VerticalAlignment="Center" Foreground="{DynamicResource Lumen.Brush.TextMuted}" Margin="0,0,8,0" />
-              <ComboBox ItemsSource="{Binding StoreChoices}" SelectedItem="{Binding SelectedStore}" DisplayMemberPath="Label" MinWidth="200"
-                        AutomationProperties.Name="{l:Loc Detail_PlayWithLabel}" />
-            </StackPanel>
-            <Button Command="{Binding ToggleFavoriteCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
-                    AutomationProperties.Name="{Binding FavoriteText}">
-              <StackPanel Orientation="Horizontal">
-                <TextBlock x:Name="FavoriteStar" Text="&#xE734;" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0">
-                  <TextBlock.Style>
-                    <Style TargetType="TextBlock" BasedOn="{StaticResource Lumen.Text.Icon}">
-                      <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsFavorite}" Value="True">
-                          <Setter Property="Text" Value="&#xE735;" />
-                          <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Warning}" />
-                        </DataTrigger>
-                      </Style.Triggers>
-                    </Style>
-                  </TextBlock.Style>
-                </TextBlock>
-                <TextBlock Text="{Binding FavoriteText}" />
-              </StackPanel>
-            </Button>
-            <Button Command="{Binding OpenFolderCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
-                    AutomationProperties.Name="{l:Loc Detail_OpenFolder}"
-                    Visibility="{Binding CanOpenFolder, Converter={StaticResource BoolToVisibility}}">
-              <StackPanel Orientation="Horizontal">
-                <TextBlock Text="&#xE838;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
-                <TextBlock Text="{l:Loc Detail_OpenFolder}" />
-              </StackPanel>
-            </Button>
-            <Button Command="{Binding OpenStorePageCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
-                    AutomationProperties.Name="{l:Loc Detail_StorePage}"
-                    Visibility="{Binding CanOpenStorePage, Converter={StaticResource BoolToVisibility}}">
-              <StackPanel Orientation="Horizontal">
-                <TextBlock Text="&#xE719;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
-                <TextBlock Text="{l:Loc Detail_StorePage}" />
-              </StackPanel>
-            </Button>
-            <Button Command="{Binding UninstallCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
-                    AutomationProperties.Name="{l:Loc Detail_Uninstall}"
-                    Visibility="{Binding CanUninstall, Converter={StaticResource BoolToVisibility}}">
-              <StackPanel Orientation="Horizontal">
-                <TextBlock Text="&#xE74D;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
-                <TextBlock Text="{l:Loc Detail_Uninstall}" />
-              </StackPanel>
-            </Button>
-            <Button x:Name="MoreButton" Click="OnMoreClick" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
-                    AutomationProperties.Name="{l:Loc Detail_More}">
-              <StackPanel Orientation="Horizontal">
-                <TextBlock Text="&#xE712;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
-                <TextBlock Text="{l:Loc Detail_More}" />
-              </StackPanel>
-              <Button.ContextMenu>
-                <ContextMenu>
-                  <MenuItem Header="{l:Loc Detail_Collections}" Command="{Binding StartCollectionsCommand}" />
-                  <Separator />
-                  <MenuItem Header="{l:Loc Detail_Rename}" Command="{Binding StartRenameCommand}" />
-                  <MenuItem Header="{l:Loc Detail_RestoreTitle}" Command="{Binding RestoreTitleCommand}"
-                            Visibility="{Binding HasCustomTitle, Converter={StaticResource BoolToVisibility}}" />
-                  <MenuItem Header="{Binding HideText}" Command="{Binding ToggleHiddenCommand}" />
-                  <Separator />
-                  <MenuItem Header="{l:Loc Tile_ChangeCover}" Command="{Binding ChangeCoverCommand}" />
-                  <MenuItem Header="{l:Loc Detail_ChangeBackground}" Command="{Binding ChangeBackgroundCommand}" />
-                  <MenuItem Header="{l:Loc Detail_ChangeLogo}" Command="{Binding ChangeLogoCommand}" />
-                  <MenuItem Header="{l:Loc Detail_RestoreArtwork}" Command="{Binding RestoreArtworkCommand}" />
-                  <Separator />
-                  <MenuItem Header="{l:Loc Detail_MergeWith}" Command="{Binding StartMergeCommand}" />
-                  <MenuItem Header="{l:Loc Tile_Separate}" Command="{Binding SeparateCommand}"
-                            Visibility="{Binding IsMerged, Converter={StaticResource BoolToVisibility}}" />
-                </ContextMenu>
-              </Button.ContextMenu>
-            </Button>
-          </WrapPanel>
-
-          <Border Margin="0,4,0,12" Padding="14,10" CornerRadius="6"
-                  Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
-                  HorizontalAlignment="Left"
-                  Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}">
-            <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" />
-          </Border>
-
-          <!-- Hidden: say so, with a one-click way back -->
-          <Border Margin="0,4,0,12" Padding="14,10" CornerRadius="6"
-                  Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
-                  HorizontalAlignment="Left"
-                  Visibility="{Binding IsHidden, Converter={StaticResource BoolToVisibility}}">
-            <DockPanel>
-              <TextBlock DockPanel.Dock="Left" Text="&#xED1A;" Style="{StaticResource Lumen.Text.Icon}" VerticalAlignment="Center" Margin="0,0,10,0" />
-              <Button DockPanel.Dock="Right" Command="{Binding ToggleHiddenCommand}" Content="{Binding HideText}"
-                      Style="{StaticResource Lumen.Button}" Margin="16,0,0,0" />
-              <TextBlock Text="{l:Loc Detail_HiddenBanner}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" VerticalAlignment="Center" />
+            <ItemsControl ItemsSource="{Binding CollectionChoices}" Focusable="False">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <CheckBox IsChecked="{Binding IsIn}" Content="{Binding Name}" Margin="0,0,0,8" FontSize="{StaticResource Lumen.FontSize.Body}"
+                            Foreground="{DynamicResource Lumen.Brush.Text}" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <DockPanel Margin="0,8,0,0">
+              <Button DockPanel.Dock="Right" Command="{Binding CreateCollectionCommand}" Content="{l:Loc Detail_CreateCollection}"
+                      Style="{StaticResource Lumen.Button}" Margin="8,0,0,0" />
+              <TextBox Text="{Binding NewCollectionName, UpdateSourceTrigger=PropertyChanged}"
+                       MaxLength="80" Height="36" Padding="8,0" VerticalContentAlignment="Center"
+                       AutomationProperties.Name="{l:Loc Collections_NewName}">
+                <TextBox.InputBindings>
+                  <KeyBinding Key="Return" Command="{Binding CreateCollectionCommand}" />
+                  <KeyBinding Key="Escape" Command="{Binding CloseCollectionsCommand}" />
+                </TextBox.InputBindings>
+              </TextBox>
             </DockPanel>
-          </Border>
+            <Button Command="{Binding CloseCollectionsCommand}" Content="{l:Loc Detail_Done}" Style="{StaticResource Lumen.Button}"
+                    HorizontalAlignment="Left" Margin="0,12,0,0" />
+          </StackPanel>
+        </Border>
 
-          <!-- Collections: one checkbox per collection, plus "new collection" -->
-          <Border Margin="0,4,0,12" Padding="16" CornerRadius="6" MaxWidth="640" HorizontalAlignment="Left"
-                  Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
-                  Visibility="{Binding IsChoosingCollections, Converter={StaticResource BoolToVisibility}}">
+        <!-- Rename -->
+        <Border Margin="0,4,0,12" Padding="16" CornerRadius="12" MaxWidth="640" HorizontalAlignment="Left"
+                Background="{DynamicResource Lumen.Brush.Glass}" BorderBrush="{DynamicResource Lumen.Brush.GlassBorder}" BorderThickness="1"
+                Visibility="{Binding IsRenaming, Converter={StaticResource BoolToVisibility}}">
+          <StackPanel>
+            <TextBlock Text="{l:Loc Detail_RenameLabel}" Style="{StaticResource InfoLabel}" />
+            <TextBox Text="{Binding RenameText, UpdateSourceTrigger=PropertyChanged}"
+                     MaxLength="120" Height="36" VerticalContentAlignment="Center" Padding="8,0"
+                     IsVisibleChanged="OnEditorVisibleChanged"
+                     AutomationProperties.Name="{l:Loc Detail_RenameLabel}">
+              <TextBox.InputBindings>
+                <KeyBinding Key="Return" Command="{Binding SaveRenameCommand}" />
+                <KeyBinding Key="Escape" Command="{Binding CancelRenameCommand}" />
+              </TextBox.InputBindings>
+            </TextBox>
+            <TextBlock Text="{Binding RenameHint}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,8,0,12"
+                       Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+            <StackPanel Orientation="Horizontal">
+              <Button Command="{Binding SaveRenameCommand}" Content="{l:Loc Detail_Save}" Style="{StaticResource Lumen.Button.Primary}"
+                      Margin="0,0,8,0" />
+              <Button Command="{Binding CancelRenameCommand}" Content="{l:Loc Detail_Cancel}" Style="{StaticResource Lumen.Button}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <!-- Merge with another item: search, then pick -->
+        <Border Margin="0,4,0,12" Padding="16" CornerRadius="12" MaxWidth="640" HorizontalAlignment="Left"
+                Background="{DynamicResource Lumen.Brush.Glass}" BorderBrush="{DynamicResource Lumen.Brush.GlassBorder}" BorderThickness="1"
+                Visibility="{Binding IsMerging, Converter={StaticResource BoolToVisibility}}">
+          <StackPanel>
+            <TextBlock Text="{l:Loc Detail_MergeTitle}" FontSize="{StaticResource Lumen.FontSize.BodyLarge}" FontWeight="SemiBold" Margin="0,0,0,6" />
+            <TextBlock Text="{l:Loc Detail_MergeHint}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,0,0,12"
+                       Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+            <TextBox Text="{Binding MergeSearch, UpdateSourceTrigger=PropertyChanged}"
+                     Height="36" VerticalContentAlignment="Center" Padding="8,0"
+                     IsVisibleChanged="OnEditorVisibleChanged"
+                     AutomationProperties.Name="{l:Loc Detail_MergeSearch}">
+              <TextBox.InputBindings>
+                <KeyBinding Key="Escape" Command="{Binding CancelMergeCommand}" />
+              </TextBox.InputBindings>
+            </TextBox>
+            <TextBlock Text="{Binding MergeStatus}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,8,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
+              <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding MergeStatus}" Value="{x:Null}">
+                      <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </TextBlock.Style>
+            </TextBlock>
+            <ItemsControl ItemsSource="{Binding MergeCandidates}" Margin="0,8,0,0" Focusable="False">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Button Content="{Binding Label}"
+                          Command="{Binding DataContext.MergeWithCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                          CommandParameter="{Binding}"
+                          Style="{StaticResource Lumen.Button}"
+                          HorizontalContentAlignment="Left"
+                          Margin="0,0,0,6"
+                          AutomationProperties.Name="{Binding Label}" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <Button Command="{Binding CancelMergeCommand}" Content="{l:Loc Detail_Cancel}" Style="{StaticResource Lumen.Button}"
+                    HorizontalAlignment="Left" Margin="0,6,0,0" />
+          </StackPanel>
+        </Border>
+
+        <!-- What Lumen knows: glass cards -->
+        <UniformGrid Columns="4" Margin="0,8,-16,0">
+          <Border Style="{StaticResource Lumen.Card}" Padding="20,18" Margin="0,0,16,16">
             <StackPanel>
-              <TextBlock Text="{l:Loc Detail_Collections}" FontSize="{StaticResource Lumen.FontSize.BodyLarge}" FontWeight="SemiBold" Margin="0,0,0,10" />
-              <TextBlock Text="{l:Loc Detail_NoCollections}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,0,10" TextWrapping="Wrap"
-                         Foreground="{DynamicResource Lumen.Brush.TextMuted}">
-                <TextBlock.Style>
-                  <Style TargetType="TextBlock">
-                    <Style.Triggers>
-                      <DataTrigger Binding="{Binding HasCollections}" Value="True">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                      </DataTrigger>
-                    </Style.Triggers>
-                  </Style>
-                </TextBlock.Style>
-              </TextBlock>
-              <ItemsControl ItemsSource="{Binding CollectionChoices}" Focusable="False">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate>
-                    <CheckBox IsChecked="{Binding IsIn}" Content="{Binding Name}" Margin="0,0,0,8" FontSize="{StaticResource Lumen.FontSize.Body}"
-                              Foreground="{DynamicResource Lumen.Brush.Text}" />
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-              <DockPanel Margin="0,8,0,0">
-                <Button DockPanel.Dock="Right" Command="{Binding CreateCollectionCommand}" Content="{l:Loc Detail_CreateCollection}"
-                        Style="{StaticResource Lumen.Button}" Margin="8,0,0,0" />
-                <TextBox Text="{Binding NewCollectionName, UpdateSourceTrigger=PropertyChanged}"
-                         MaxLength="80" Height="36" Padding="8,0" VerticalContentAlignment="Center"
-                         AutomationProperties.Name="{l:Loc Collections_NewName}">
-                  <TextBox.InputBindings>
-                    <KeyBinding Key="Return" Command="{Binding CreateCollectionCommand}" />
-                    <KeyBinding Key="Escape" Command="{Binding CloseCollectionsCommand}" />
-                  </TextBox.InputBindings>
-                </TextBox>
-              </DockPanel>
-              <Button Command="{Binding CloseCollectionsCommand}" Content="{l:Loc Detail_Done}" Style="{StaticResource Lumen.Button}"
-                      HorizontalAlignment="Left" Margin="0,12,0,0" />
-            </StackPanel>
-          </Border>
-
-          <!-- Rename -->
-          <Border Margin="0,4,0,12" Padding="16" CornerRadius="6" MaxWidth="640" HorizontalAlignment="Left"
-                  Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
-                  Visibility="{Binding IsRenaming, Converter={StaticResource BoolToVisibility}}">
-            <StackPanel>
-              <TextBlock Text="{l:Loc Detail_RenameLabel}" Style="{StaticResource InfoLabel}" />
-              <TextBox Text="{Binding RenameText, UpdateSourceTrigger=PropertyChanged}"
-                       MaxLength="120" Height="36" VerticalContentAlignment="Center" Padding="8,0"
-                       IsVisibleChanged="OnEditorVisibleChanged"
-                       AutomationProperties.Name="{l:Loc Detail_RenameLabel}">
-                <TextBox.InputBindings>
-                  <KeyBinding Key="Return" Command="{Binding SaveRenameCommand}" />
-                  <KeyBinding Key="Escape" Command="{Binding CancelRenameCommand}" />
-                </TextBox.InputBindings>
-              </TextBox>
-              <TextBlock Text="{Binding RenameHint}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,8,0,12"
-                         Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
-              <StackPanel Orientation="Horizontal">
-                <Button Command="{Binding SaveRenameCommand}" Content="{l:Loc Detail_Save}" Style="{StaticResource Lumen.Button.Primary}"
-                        Margin="0,0,8,0" />
-                <Button Command="{Binding CancelRenameCommand}" Content="{l:Loc Detail_Cancel}" Style="{StaticResource Lumen.Button}" />
-              </StackPanel>
-            </StackPanel>
-          </Border>
-
-          <!-- Merge with another item: search, then pick -->
-          <Border Margin="0,4,0,12" Padding="16" CornerRadius="6" MaxWidth="640" HorizontalAlignment="Left"
-                  Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
-                  Visibility="{Binding IsMerging, Converter={StaticResource BoolToVisibility}}">
-            <StackPanel>
-              <TextBlock Text="{l:Loc Detail_MergeTitle}" FontSize="{StaticResource Lumen.FontSize.BodyLarge}" FontWeight="SemiBold" Margin="0,0,0,6" />
-              <TextBlock Text="{l:Loc Detail_MergeHint}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,0,0,12"
-                         Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
-              <TextBox Text="{Binding MergeSearch, UpdateSourceTrigger=PropertyChanged}"
-                       Height="36" VerticalContentAlignment="Center" Padding="8,0"
-                       IsVisibleChanged="OnEditorVisibleChanged"
-                       AutomationProperties.Name="{l:Loc Detail_MergeSearch}">
-                <TextBox.InputBindings>
-                  <KeyBinding Key="Escape" Command="{Binding CancelMergeCommand}" />
-                </TextBox.InputBindings>
-              </TextBox>
-              <TextBlock Text="{Binding MergeStatus}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,8,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
-                <TextBlock.Style>
-                  <Style TargetType="TextBlock">
-                    <Style.Triggers>
-                      <DataTrigger Binding="{Binding MergeStatus}" Value="{x:Null}">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                      </DataTrigger>
-                    </Style.Triggers>
-                  </Style>
-                </TextBlock.Style>
-              </TextBlock>
-              <ItemsControl ItemsSource="{Binding MergeCandidates}" Margin="0,8,0,0" Focusable="False">
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate>
-                    <Button Content="{Binding Label}"
-                            Command="{Binding DataContext.MergeWithCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                            CommandParameter="{Binding}"
-                            Style="{StaticResource Lumen.Button}"
-                            HorizontalContentAlignment="Left"
-                            Margin="0,0,0,6"
-                            AutomationProperties.Name="{Binding Label}" />
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-              <Button Command="{Binding CancelMergeCommand}" Content="{l:Loc Detail_Cancel}" Style="{StaticResource Lumen.Button}"
-                      HorizontalAlignment="Left" Margin="0,6,0,0" />
-            </StackPanel>
-          </Border>
-
-          <!-- What Lumen knows -->
-          <UniformGrid Columns="4" Margin="0,16,0,0">
-            <StackPanel Margin="0,0,24,16">
-              <TextBlock Text="{l:Loc Detail_Stores}" Style="{StaticResource InfoLabel}" />
-              <TextBlock Text="{Binding StoresText}" Style="{StaticResource InfoValue}" />
-            </StackPanel>
-            <StackPanel Margin="0,0,24,16">
               <TextBlock Text="{l:Loc Detail_Playtime}" Style="{StaticResource InfoLabel}" />
               <TextBlock Text="{Binding PlaytimeText}" Style="{StaticResource InfoValue}" />
-              <TextBlock Text="{Binding PlaytimeSourceText}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,2,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+              <TextBlock Text="{Binding PlaytimeSourceText}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,4,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                         TextWrapping="Wrap"
                          Visibility="{Binding HasPlaytimeSource, Converter={StaticResource BoolToVisibility}}" />
             </StackPanel>
-            <StackPanel Margin="0,0,24,16">
+          </Border>
+          <Border Style="{StaticResource Lumen.Card}" Padding="20,18" Margin="0,0,16,16">
+            <StackPanel>
               <TextBlock Text="{l:Loc Detail_LastPlayed}" Style="{StaticResource InfoLabel}" />
               <TextBlock Text="{Binding LastPlayedText}" Style="{StaticResource InfoValue}" />
             </StackPanel>
-            <StackPanel Margin="0,0,24,16">
-              <TextBlock Text="{l:Loc Detail_Location}" Style="{StaticResource InfoLabel}" />
-              <TextBlock Text="{Binding InstallPath}" Style="{StaticResource InfoValue}" FontSize="{StaticResource Lumen.FontSize.Small}" />
+          </Border>
+          <Border Style="{StaticResource Lumen.Card}" Padding="20,18" Margin="0,0,16,16">
+            <StackPanel>
+              <TextBlock Text="{l:Loc Detail_Stores}" Style="{StaticResource InfoLabel}" />
+              <TextBlock Text="{Binding StoresText}" Style="{StaticResource InfoValue}" />
             </StackPanel>
-          </UniformGrid>
-        </StackPanel>
+          </Border>
+          <Border Style="{StaticResource Lumen.Card}" Padding="20,18" Margin="0,0,16,16">
+            <StackPanel>
+              <TextBlock Text="{l:Loc Detail_Location}" Style="{StaticResource InfoLabel}" />
+              <TextBlock Text="{Binding InstallPath}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap"
+                         Foreground="{DynamicResource Lumen.Brush.Text}" />
+            </StackPanel>
+          </Border>
+        </UniformGrid>
       </StackPanel>
     </ScrollViewer>
   </Grid>

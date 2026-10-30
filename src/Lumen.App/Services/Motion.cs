@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace Lumen.App.Services;
@@ -331,6 +332,93 @@ public static class Motion
         };
         Timeline.SetDesiredFrameRate(breath, AmbientFrameRate);
         element.BeginAnimation(UIElement.OpacityProperty, breath);
+    }
+
+    /// <summary>
+    /// Bind to the "is open" state of a covering panel (a game's detail, Discover apps, the routine editor) instead of
+    /// binding its Visibility; start it Collapsed in XAML. Opening shows it and plays <see cref="PanelIn"/>. Closing
+    /// hides it at once (focus, gamepad layers and everything else behave as before) and leaves a still picture of it
+    /// that fades and slides away (Fast). Nothing animates when "Animation effects" is off.
+    /// </summary>
+    public static readonly DependencyProperty ShownProperty =
+        DependencyProperty.RegisterAttached("Shown", typeof(bool), typeof(Motion), new PropertyMetadata(false, OnShownChanged));
+
+    public static bool GetShown(DependencyObject element) => (bool)element.GetValue(ShownProperty);
+
+    public static void SetShown(DependencyObject element, bool value) => element.SetValue(ShownProperty, value);
+
+    private const double OutSlide = 12;
+
+    private static void OnShownChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (sender is not FrameworkElement element)
+        {
+            return;
+        }
+
+        if ((bool)e.NewValue)
+        {
+            element.Visibility = Visibility.Visible;
+            PanelIn(element);
+            return;
+        }
+
+        if (Enabled && element.IsVisible && element.ActualWidth >= 1 && element.ActualHeight >= 1 && VisualTreeHelper.GetParent(element) is Panel parent)
+        {
+            LeaveGhost(element, parent);
+        }
+
+        element.Visibility = Visibility.Collapsed;
+    }
+
+    // A still picture of the closing panel, in the same place, that fades out and is then removed. It can't be
+    // focused or clicked. Rendered at 96 DPI: it only lives for a fraction of a second.
+    private static void LeaveGhost(FrameworkElement element, Panel parent)
+    {
+        var width = element.ActualWidth;
+        var height = element.ActualHeight;
+        var drawing = new DrawingVisual();
+        using (var context = drawing.RenderOpen())
+        {
+            var brush = new VisualBrush(element)
+            {
+                ViewboxUnits = BrushMappingMode.Absolute,
+                Viewbox = new Rect(0, 0, width, height),
+                Stretch = Stretch.Fill,
+            };
+            context.DrawRectangle(brush, null, new Rect(0, 0, width, height));
+        }
+
+        var bitmap = new RenderTargetBitmap((int)Math.Ceiling(width), (int)Math.Ceiling(height), 96, 96, PixelFormats.Pbgra32);
+        bitmap.Render(drawing);
+        bitmap.Freeze();
+
+        var slide = new TranslateTransform();
+        var ghost = new Image
+        {
+            Source = bitmap,
+            Stretch = Stretch.Fill,
+            Width = width,
+            Height = height,
+            Margin = element.Margin,
+            HorizontalAlignment = element.HorizontalAlignment == HorizontalAlignment.Stretch ? HorizontalAlignment.Left : element.HorizontalAlignment,
+            VerticalAlignment = element.VerticalAlignment == VerticalAlignment.Stretch ? VerticalAlignment.Top : element.VerticalAlignment,
+            IsHitTestVisible = false,
+            Focusable = false,
+            RenderTransform = slide,
+        };
+        Grid.SetRow(ghost, Grid.GetRow(element));
+        Grid.SetColumn(ghost, Grid.GetColumn(element));
+        Grid.SetRowSpan(ghost, Grid.GetRowSpan(element));
+        Grid.SetColumnSpan(ghost, Grid.GetColumnSpan(element));
+        Panel.SetZIndex(ghost, Panel.GetZIndex(element));
+        parent.Children.Add(ghost);
+
+        var ease = new CubicEase { EasingMode = EasingMode.EaseIn };
+        var fade = new DoubleAnimation(0, Fast) { EasingFunction = ease };
+        fade.Completed += (_, _) => parent.Children.Remove(ghost);
+        slide.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(OutSlide, Fast) { EasingFunction = ease });
+        ghost.BeginAnimation(UIElement.OpacityProperty, fade);
     }
 
     /// <summary>Hover/focus scale for an element (say, a tile's cover). 1 or less means "off".</summary>
