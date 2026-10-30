@@ -21,13 +21,13 @@
     <Setter Property="Padding" Value="7,2" />
   </Style>
 
-  <!-- Rounded brand tag ("Featured", counts). -->
+  <!-- Brand tag ("Featured"): a small square-cornered tag like the store badges (owner, 2026-10-30: no oval). -->
   <Style x:Key="Lumen.Pill" TargetType="Border">
     <Setter Property="Background" Value="{DynamicResource Lumen.Brush.BrandSoft}" />
     <Setter Property="BorderBrush" Value="{DynamicResource Lumen.Brush.BrandBorder}" />
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="999" />
-    <Setter Property="Padding" Value="10,3" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="Padding" Value="8,3" />
   </Style>
 
   <Style x:Key="Lumen.Text.Badge" TargetType="TextBlock">
