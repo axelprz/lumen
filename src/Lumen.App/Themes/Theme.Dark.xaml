@@ -2,7 +2,8 @@
 <!-- Copyright (C) 2026 Axel Ismael Perez (AxelPRZ) -->
 <!-- Palette tokens. Always reference brushes with DynamicResource: the accent is replaced at runtime (AccentService, M3). -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
   <Color x:Key="Lumen.Color.Background">#FF0F1115</Color>
   <Color x:Key="Lumen.Color.Sidebar">#FF15181E</Color>
   <Color x:Key="Lumen.Color.Surface">#FF1C2028</Color>
@@ -24,19 +25,58 @@
   <SolidColorBrush x:Key="Lumen.Brush.Warning" Color="#FFE0B44C" />
   <SolidColorBrush x:Key="Lumen.Brush.Error" Color="#FFF2766B" />
 
+  <!-- UI font: Exo 2 (SIL OFL, M10). Four static weights ship in Assets/Fonts; the family is looked up by name inside that folder. -->
+  <FontFamily x:Key="Lumen.Font.Ui">/Lumen;component/Assets/Fonts/#Exo 2</FontFamily>
   <FontFamily x:Key="Lumen.Font.Icons">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
 
+  <!-- Type scale. New and reworked screens use these tokens instead of literal sizes. -->
+  <sys:Double x:Key="Lumen.FontSize.Caption">12</sys:Double>
+  <sys:Double x:Key="Lumen.FontSize.Small">13</sys:Double>
+  <sys:Double x:Key="Lumen.FontSize.Body">14</sys:Double>
+  <sys:Double x:Key="Lumen.FontSize.BodyLarge">16</sys:Double>
+  <sys:Double x:Key="Lumen.FontSize.Subtitle">18</sys:Double>
+  <sys:Double x:Key="Lumen.FontSize.Title">24</sys:Double>
+  <sys:Double x:Key="Lumen.FontSize.Headline">32</sys:Double>
+  <sys:Double x:Key="Lumen.FontSize.Display">44</sys:Double>
+
+  <!-- Every window, tooltip and menu starts from the UI font; icon glyphs keep their own family. -->
+  <Style TargetType="Window">
+    <Setter Property="FontFamily" Value="{StaticResource Lumen.Font.Ui}" />
+  </Style>
+  <Style TargetType="ToolTip">
+    <Setter Property="FontFamily" Value="{StaticResource Lumen.Font.Ui}" />
+  </Style>
+  <Style TargetType="ContextMenu">
+    <Setter Property="FontFamily" Value="{StaticResource Lumen.Font.Ui}" />
+  </Style>
+
   <Style x:Key="Lumen.Text.Brand" TargetType="TextBlock">
-    <Setter Property="FontSize" Value="22" />
-    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Title}" />
+    <Setter Property="FontWeight" Value="Bold" />
     <Setter Property="Margin" Value="24,28,24,24" />
     <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
   </Style>
 
   <Style x:Key="Lumen.Text.PageTitle" TargetType="TextBlock">
-    <Setter Property="FontSize" Value="32" />
+    <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Headline}" />
+    <Setter Property="FontWeight" Value="Bold" />
+    <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
+  </Style>
+
+  <Style x:Key="Lumen.Text.Subtitle" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Subtitle}" />
     <Setter Property="FontWeight" Value="SemiBold" />
     <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
+  </Style>
+
+  <Style x:Key="Lumen.Text.Body" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Body}" />
+    <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
+  </Style>
+
+  <Style x:Key="Lumen.Text.Caption" TargetType="TextBlock">
+    <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Caption}" />
+    <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.TextMuted}" />
   </Style>
 
   <Style x:Key="Lumen.Text.Icon" TargetType="TextBlock">
