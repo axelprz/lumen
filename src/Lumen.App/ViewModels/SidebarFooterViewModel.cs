@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)
 
-using System.Globalization;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Lumen.Core.Library;
@@ -79,12 +78,13 @@ public sealed partial class SidebarFooterViewModel : ObservableObject
     /// <summary>Busy share, 0 to 1 (bar length).</summary>
     public double CpuFraction => Cpu ?? 0;
 
-    public string CpuText => Cpu is { } cpu ? string.Format(CultureInfo.CurrentCulture, _loc["Footer_CpuValue"], Math.Round(cpu * 100)) : string.Empty;
+    public string CpuText => Cpu is { } cpu ? string.Format(_loc.Culture, _loc["Footer_CpuValue"], Math.Round(cpu * 100)) : string.Empty;
 
     public double RamFraction => Ram?.UsedFraction ?? 0;
 
+    // Numbers follow Lumen's language (not Windows' regional format), so switching to English shows "7.2".
     public string RamText => Ram is { } ram
-        ? string.Format(CultureInfo.CurrentCulture, _loc["Footer_RamValue"], ram.UsedBytes / BytesPerGb, Math.Round(ram.TotalBytes / BytesPerGb))
+        ? string.Format(_loc.Culture, _loc["Footer_RamValue"], ram.UsedBytes / BytesPerGb, Math.Round(ram.TotalBytes / BytesPerGb))
         : string.Empty;
 
     public Task InitializeAsync() => RefreshProfileAsync();
