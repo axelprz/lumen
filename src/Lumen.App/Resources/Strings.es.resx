@@ -1247,4 +1247,13 @@
   <data name="Routine_ForceFailed" xml:space="preserve">
     <value>Windows no dejó que Lumen lo cierre. Cerralo desde el propio programa o el Administrador de tareas.</value>
   </data>
+  <data name="Tray_Routines" xml:space="preserve">
+    <value>Rutinas</value>
+  </data>
+  <data name="Home_PinnedRoutines" xml:space="preserve">
+    <value>Rutinas fijadas</value>
+  </data>
+  <data name="QuickSearch_Routine" xml:space="preserve">
+    <value>Rutina</value>
+  </data>
 </root>

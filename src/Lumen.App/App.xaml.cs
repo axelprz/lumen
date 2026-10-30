@@ -88,6 +88,9 @@ public partial class App : Application
             _hotkeys = _host.Services.GetRequiredService<HotkeyService>();
             _hotkeys.Pressed += (_, _) => _quickSearch.Open();
             _tray.OpenQuickSearch = _quickSearch.Open;
+
+            // A routine chosen from the tray or the search that needs its preview brings the window forward.
+            _host.Services.GetRequiredService<RoutinesViewModel>().ReviewRequested += (_, _) => _tray.ShowWindow();
             await _hotkeys.StartAsync(CancellationToken.None).ConfigureAwait(true);
 
             // Gamepad: works while a Lumen window is in front.

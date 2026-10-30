@@ -9,6 +9,7 @@ using Lumen.App.Services;
 using Lumen.Core.Artwork;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
+using Lumen.Core.Routines;
 
 namespace Lumen.App.ViewModels;
 
@@ -93,6 +94,20 @@ public sealed partial class HomeTileViewModel(LibraryItem item, Func<LibraryItem
     }
 }
 
+/// <summary>A pinned routine on Home: a card that runs it (or opens its preview when it needs review).</summary>
+public sealed class PinnedRoutineViewModel(RoutineEntry entry, ILocalizer loc)
+{
+    public string Id { get; } = entry.Id;
+
+    public string Name { get; } = RoutineLookup.NameOf(entry, CultureInfo.CurrentUICulture);
+
+    public bool NeedsReview { get; } = entry.State == RoutineTrustState.NeedsReview;
+
+    public string Caption { get; } = loc[entry.State == RoutineTrustState.NeedsReview ? "Routine_State_NeedsReview" : "Routine_Run"];
+
+    public override string ToString() => Name;
+}
+
 /// <summary>An app in Home's "Quick apps" dock: its icon; a click opens it.</summary>
 public sealed partial class QuickAppViewModel(LibraryItem item, ArtworkService artwork) : ObservableObject
 {
@@ -135,7 +150,7 @@ public sealed partial class QuickAppViewModel(LibraryItem item, ArtworkService a
 /// <summary>
 /// Home (PLAN-v1 §4.3): a hero with the featured game over its blurred background art (logo, Play, playtime, last
 /// played), the "Continue playing" and "Favorites" rows and the "Quick apps" dock. Pointing at a game in a row
-/// features it; the accent follows the featured game. Pinned routines join in M8.
+/// features it; the accent follows the featured game. Pinned routines show as cards that run them.
 /// </summary>
 public sealed partial class HomeViewModel : ObservableObject
 {
@@ -148,6 +163,8 @@ public sealed partial class HomeViewModel : ObservableObject
     private readonly CollectionService _collections;
     private readonly ImageCache _images;
     private readonly ILocalizer _localizer;
+    private readonly RoutineService _routineService;
+    private readonly RoutinesViewModel _routines;
     private readonly SynchronizationContext _ui;
     private LibraryItem? _defaultFeatured;
     private int _featureVersion;
@@ -168,8 +185,10 @@ public sealed partial class HomeViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(HasNotice))]
     private string? _notice;
 
-    public HomeViewModel(LibraryService library, LaunchService launcher, ArtworkService artwork, AccentService accent, CollectionService collections, ImageCache images, ILocalizer localizer)
+    public HomeViewModel(LibraryService library, LaunchService launcher, ArtworkService artwork, AccentService accent, CollectionService collections, ImageCache images, ILocalizer localizer, RoutineService routineService, RoutinesViewModel routines)
     {
+        _routineService = routineService;
+        _routines = routines;
         _images = images;
         _library = library;
         _launcher = launcher;
@@ -180,7 +199,12 @@ public sealed partial class HomeViewModel : ObservableObject
         _ui = SynchronizationContext.Current ?? new SynchronizationContext();
         _library.Changed += (_, _) => _ui.Post(_ => Rebuild(), null);
         _collections.Changed += (_, _) => _ui.Post(_ => Rebuild(), null);
-        _localizer.CultureChanged += (_, _) => RaiseFeaturedTexts();
+        _routineService.Changed += (_, _) => _ui.Post(_ => RebuildRoutines(), null);
+        _localizer.CultureChanged += (_, _) =>
+        {
+            RaiseFeaturedTexts();
+            RebuildRoutines();
+        };
     }
 
     /// <summary>Raised when the user asks for a game's detail view (the shell shows it in the library).</summary>
@@ -191,6 +215,10 @@ public sealed partial class HomeViewModel : ObservableObject
     public IReadOnlyList<HomeTileViewModel> Favorites { get; private set; } = [];
 
     public bool HasFavorites => Favorites.Count > 0;
+
+    public IReadOnlyList<PinnedRoutineViewModel> PinnedRoutines { get; private set; } = [];
+
+    public bool HasPinnedRoutines => PinnedRoutines.Count > 0;
 
     public IReadOnlyList<QuickAppViewModel> QuickApps { get; private set; } = [];
 
@@ -298,8 +326,28 @@ public sealed partial class HomeViewModel : ObservableObject
         }
     }
 
+    /// <summary>Runs a pinned routine; one that needs review opens the Routines page with its preview.</summary>
+    [RelayCommand]
+    private async Task RunRoutineAsync(PinnedRoutineViewModel? routine)
+    {
+        if (routine is not null)
+        {
+            await _routines.StartFromShortcutAsync(routine.Id);
+        }
+    }
+
+    private void RebuildRoutines()
+    {
+        PinnedRoutines = RoutineLookup.Pinned(_routineService.Entries, CultureInfo.CurrentUICulture)
+            .Select(e => new PinnedRoutineViewModel(e, _localizer))
+            .ToList();
+        OnPropertyChanged(nameof(PinnedRoutines));
+        OnPropertyChanged(nameof(HasPinnedRoutines));
+    }
+
     private void Rebuild()
     {
+        RebuildRoutines();
         var feed = HomeFeed.Build(_library.Items, _library.FirstSeen, _collections.Favorites);
 
         // Reuse tiles of unchanged items so their covers stay loaded.

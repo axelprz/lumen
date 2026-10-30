@@ -11,6 +11,7 @@ using H.NotifyIcon.Core;
 using Lumen.App.ViewModels;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
+using Lumen.Core.Routines;
 using Lumen.Core.Settings;
 using Microsoft.Extensions.Logging;
 
@@ -18,13 +19,15 @@ namespace Lumen.App.Services;
 
 /// <summary>
 /// The notification-area icon (PLAN-v1 §4.3): a click opens Lumen; the menu has Open, Quick search, the most recently played games
-/// (launched straight from the menu) and Exit. Closing the main window hides it here when "minimize to tray" is on,
+/// (launched straight from the menu), the routines and Exit. Closing the main window hides it here when "minimize to tray" is on,
 /// with a one-time notice so Lumen never seems to vanish. Lives on the UI thread.
 /// </summary>
 public sealed partial class TrayService(
     HotkeyService hotkeys,
     LibraryService library,
     CollectionService collections,
+    RoutineService routineService,
+    RoutinesViewModel routines,
     LaunchService launcher,
     WindowSettingsViewModel windowSettings,
     ILocalSettings settings,
@@ -65,6 +68,7 @@ public sealed partial class TrayService(
         _icon = icon;
 
         window.Closing += OnWindowClosing;
+        routines.FinishedOutsidePage += (_, e) => icon.ShowNotification(e.Name, e.Result, NotificationIcon.Info);
     }
 
     /// <summary>Brings the main window back (tray click, menu, or Lumen opened again).</summary>
@@ -160,6 +164,22 @@ public sealed partial class TrayService(
             {
                 menu.Items.Add(Item(item.Title, () => _ = LaunchAsync(item)));
             }
+        }
+
+        var usable = RoutineLookup.Usable(routineService.Entries, CultureInfo.CurrentUICulture).Take(RoutineLookup.MaxInMenu).ToList();
+        if (usable.Count > 0)
+        {
+            menu.Items.Add(new Separator());
+            var submenu = new MenuItem { Header = new TextBlock { Text = localizer["Tray_Routines"] } };
+            foreach (var entry in usable)
+            {
+                var name = RoutineLookup.NameOf(entry, CultureInfo.CurrentUICulture);
+                var text = entry.State == RoutineTrustState.NeedsReview ? $"{name} · {localizer["Routine_State_NeedsReview"]}" : name;
+                var id = entry.Id;
+                submenu.Items.Add(Item(text, () => _ = routines.StartFromShortcutAsync(id)));
+            }
+
+            menu.Items.Add(submenu);
         }
 
         menu.Items.Add(new Separator());
