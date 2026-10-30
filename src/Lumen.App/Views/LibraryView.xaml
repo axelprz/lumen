@@ -354,6 +354,7 @@
          screen and their images exist in memory. The view sets ColumnCount from its width. -->
     <ItemsControl x:Name="RowsHost"
                   Grid.Row="3"
+                  Margin="-16,-16,0,0"
                   ItemsSource="{Binding Rows}"
                   SizeChanged="OnGridSizeChanged"
                   Focusable="False"
@@ -364,7 +365,8 @@
       <ItemsControl.Template>
         <ControlTemplate TargetType="ItemsControl">
           <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
-            <ItemsPresenter Margin="0,0,0,24" />
+            <!-- Room above and to the left for a pointed-at cover (scaled up, with its glow); the control's negative margin cancels it -->
+            <ItemsPresenter Margin="16,16,0,24" />
           </ScrollViewer>
         </ControlTemplate>
       </ItemsControl.Template>
