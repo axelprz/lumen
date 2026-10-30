@@ -28,6 +28,19 @@ public sealed partial class RoutineCardViewModel : ObservableObject
 
     public bool CanForceClose => StillOpen.Count > 0;
 
+    /// <summary>
+    /// How to write the current result. Kept instead of the text so the result follows a language change
+    /// (the page rebuilds its cards on one) rather than staying in the language it was written in.
+    /// </summary>
+    public Func<string>? ResultSource { get; private set; }
+
+    /// <summary>Shows a result; <paramref name="source"/> is called now and again whenever the cards are rebuilt.</summary>
+    public void SetResult(Func<string>? source)
+    {
+        ResultSource = source;
+        ResultText = source?.Invoke();
+    }
+
     public RoutineCardViewModel(RoutineEntry entry, ILocalizer loc)
     {
         Entry = entry;

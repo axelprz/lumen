@@ -131,7 +131,8 @@ public sealed partial class RoutinesViewModel : ObservableObject
         }
 
         await RunAsync(card);
-        FinishedOutsidePage?.Invoke(this, new RoutineFinishedEventArgs(card.Name, card.ResultText ?? string.Empty));
+        var shown = Current(card);
+        FinishedOutsidePage?.Invoke(this, new RoutineFinishedEventArgs(shown.Name, shown.ResultText ?? string.Empty));
     }
 
     [RelayCommand]
@@ -170,37 +171,45 @@ public sealed partial class RoutinesViewModel : ObservableObject
         }
 
         card.IsRunning = true;
-        card.ResultText = _loc["Routine_Running"];
+        card.SetResult(() => _loc["Routine_Running"]);
         try
         {
             var (outcome, run) = await _routines.RunAsync(card.Entry.Id, null, CancellationToken.None);
+
+            // The cards are rebuilt while a routine runs (a library or routine change), so the result goes to the card on screen now.
+            var shown = Current(card);
             switch (outcome)
             {
                 case RoutineRunOutcome.Ran when run is not null:
                     var ok = run.Steps.Count(s => s.Outcome is StepOutcome.Done or StepOutcome.Skipped);
-                    card.ResultText = run.Succeeded
+                    shown.SetResult(() => run.Succeeded
                         ? _loc["Routine_Result_AllOk"]
-                        : string.Format(CultureInfo.CurrentCulture, _loc["Routine_Result_Some"], ok, run.Steps.Count, FirstProblem(run));
-                    card.CanUndo = run.CanUndo;
+                        : string.Format(CultureInfo.CurrentCulture, _loc["Routine_Result_Some"], ok, run.Steps.Count, FirstProblem(run)));
+                    shown.CanUndo = run.CanUndo;
                     break;
                 case RoutineRunOutcome.NeedsReview:
-                    card.ResultText = _loc["Routine_Result_Changed"];
+                    shown.SetResult(() => _loc["Routine_Result_Changed"]);
                     break;
                 default:
-                    card.ResultText = _loc["Routine_Result_Failed"];
+                    shown.SetResult(() => _loc["Routine_Result_Failed"]);
                     break;
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             LogRunFailed(ex, card.Entry.Id);
-            card.ResultText = _loc["Routine_Result_Failed"];
+            Current(card).SetResult(() => _loc["Routine_Result_Failed"]);
         }
         finally
         {
             card.IsRunning = false;
+            Current(card).IsRunning = false;
         }
     }
+
+    // The card now showing this routine (the one passed in may have been replaced by a rebuild).
+    private RoutineCardViewModel Current(RoutineCardViewModel card) =>
+        Routines.FirstOrDefault(r => r.Entry.Id == card.Entry.Id) ?? card;
 
     [RelayCommand]
     private async Task UndoAsync(RoutineCardViewModel? card)
@@ -213,9 +222,9 @@ public sealed partial class RoutinesViewModel : ObservableObject
         var result = await _routines.UndoAsync(card.Entry.Id, CancellationToken.None);
         card.CanUndo = false;
         card.StillOpen = result.StillRunning;
-        card.ResultText = result.StillRunning.Count == 0
+        card.SetResult(() => result.StillRunning.Count == 0
             ? string.Format(CultureInfo.CurrentCulture, _loc["Routine_Undone"], result.Asked)
-            : string.Format(CultureInfo.CurrentCulture, _loc["Routine_UndoStillOpen"], result.StillRunning.Count, string.Join(", ", result.StillRunning.Select(p => p.Name).Distinct()));
+            : string.Format(CultureInfo.CurrentCulture, _loc["Routine_UndoStillOpen"], result.StillRunning.Count, string.Join(", ", result.StillRunning.Select(p => p.Name).Distinct())));
     }
 
     /// <summary>Ends what ignored Undo, after a confirmation that unsaved progress is lost.</summary>
@@ -235,7 +244,7 @@ public sealed partial class RoutinesViewModel : ObservableObject
 
         var left = await _routines.ForceCloseAsync(card.StillOpen, CancellationToken.None);
         card.StillOpen = [];
-        card.ResultText = left == 0 ? _loc["Routine_Forced"] : _loc["Routine_ForceFailed"];
+        card.SetResult(() => left == 0 ? _loc["Routine_Forced"] : _loc["Routine_ForceFailed"]);
     }
 
     [RelayCommand]
@@ -343,19 +352,22 @@ public sealed partial class RoutinesViewModel : ObservableObject
     private void Rebuild()
     {
         var undoable = Routines.Where(r => r.CanUndo).Select(r => r.Entry.Id).ToHashSet(StringComparer.Ordinal);
-        var results = Routines.Where(r => r.HasResult).ToDictionary(r => r.Entry.Id, r => r.ResultText, StringComparer.Ordinal);
+        var results = Routines.Where(r => r.ResultSource is not null).ToDictionary(r => r.Entry.Id, r => r.ResultSource, StringComparer.Ordinal);
+        var running = Routines.Where(r => r.IsRunning).Select(r => r.Entry.Id).ToHashSet(StringComparer.Ordinal);
 
         // Cards are rebuilt whenever the library changes (playtime, installs): keep what the user was looking at.
         var stillOpen = Routines.Where(r => r.CanForceClose).ToDictionary(r => r.Entry.Id, r => r.StillOpen, StringComparer.Ordinal);
         Routines.Clear();
         foreach (var entry in _routines.Entries.OrderBy(e => e.Routine?.Name.For(CultureInfo.CurrentUICulture) ?? e.FileId, StringComparer.CurrentCultureIgnoreCase))
         {
-            Routines.Add(new RoutineCardViewModel(entry, _loc)
+            var card = new RoutineCardViewModel(entry, _loc)
             {
                 CanUndo = undoable.Contains(entry.Id) && _routines.LastRun(entry.Id) is not null,
-                ResultText = results.GetValueOrDefault(entry.Id),
+                IsRunning = running.Contains(entry.Id),
                 StillOpen = stillOpen.GetValueOrDefault(entry.Id) ?? [],
-            });
+            };
+            card.SetResult(results.GetValueOrDefault(entry.Id)); // written again in the current language
+            Routines.Add(card);
         }
 
         OnPropertyChanged(nameof(HasRoutines));
