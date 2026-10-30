@@ -68,7 +68,14 @@ public sealed partial class TrayService(
         _icon = icon;
 
         window.Closing += OnWindowClosing;
-        routines.FinishedOutsidePage += (_, e) => icon.ShowNotification(e.Name, e.Result, NotificationIcon.Info);
+        // With the window on screen the result shows as a toast there (ToastService); the balloon is for when Lumen is in the tray.
+        routines.FinishedOutsidePage += (_, e) =>
+        {
+            if (!window.IsVisible || window.WindowState == WindowState.Minimized)
+            {
+                icon.ShowNotification(e.Name, e.Result, NotificationIcon.Info);
+            }
+        };
     }
 
     /// <summary>Shows a balloon notice (nothing happens if the icon isn't there yet).</summary>

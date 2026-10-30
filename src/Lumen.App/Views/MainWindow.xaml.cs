@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)
 
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using Lumen.App.Services;
@@ -47,6 +48,27 @@ public partial class MainWindow : Window
     {
         _backdrop?.Dispose();
         base.OnClosed(e);
+    }
+
+    // View concern: Ctrl+K or Ctrl+F jumps to the top bar search; Esc in it clears it.
+    private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (DataContext is ShellViewModel { FirstRun.IsOpen: true })
+        {
+            return;
+        }
+
+        if ((e.Key == Key.K || e.Key == Key.F) && Keyboard.Modifiers == ModifierKeys.Control)
+        {
+            TopSearch.Focus();
+            TopSearch.SelectAll();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape && TopSearch.IsKeyboardFocusWithin && TopSearch.Text.Length > 0)
+        {
+            TopSearch.Clear();
+            e.Handled = true;
+        }
     }
 
     protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)

@@ -19,27 +19,13 @@ public partial class LibraryView : UserControl
     // The header, the filters and the grid arrive one after the other (the covers inside the grid stay still: it scrolls).
     private void OnLoaded(object sender, RoutedEventArgs e) => Motion.Stagger(PageBlocks);
 
-    // View concern: Ctrl+F jumps to the search box; Esc in the search box clears it.
+    // View concern: Esc (or Backspace outside a text box) closes the detail view.
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
-        // Esc (or Backspace outside a text box) closes the detail view.
         if (DataContext is LibraryViewModel { Detail: { } detail }
             && (e.Key == Key.Escape || (e.Key == Key.Back && e.OriginalSource is not TextBox)))
         {
             detail.CloseCommand.Execute(null);
-            e.Handled = true;
-            return;
-        }
-
-        if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control)
-        {
-            SearchBox.Focus();
-            SearchBox.SelectAll();
-            e.Handled = true;
-        }
-        else if (e.Key == Key.Escape && SearchBox.IsKeyboardFocusWithin && SearchBox.Text.Length > 0)
-        {
-            SearchBox.Clear();
             e.Handled = true;
         }
     }

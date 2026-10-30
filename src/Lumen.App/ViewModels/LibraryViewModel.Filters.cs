@@ -67,6 +67,9 @@ public sealed partial class LibraryViewModel
     /// <summary>How many items the user hid.</summary>
     public int HiddenCount => _allTiles.Count(t => t.Item.IsHidden);
 
+    /// <summary>Items in the library that are not hidden (the sidebar count).</summary>
+    public int LibraryCount => _allTiles.Count(t => !t.Item.IsHidden);
+
     /// <summary>The "Hidden (n)" button only appears once something is hidden (or while viewing them).</summary>
     public bool HasHiddenToggle => ShowHidden || HiddenCount > 0;
 
@@ -228,6 +231,7 @@ public sealed partial class LibraryViewModel
 
         RebuildRows();
         OnPropertyChanged(nameof(CountText));
+        OnPropertyChanged(nameof(LibraryCount));
         OnPropertyChanged(nameof(IsEmpty));
         OnPropertyChanged(nameof(IsFiltering));
         OnPropertyChanged(nameof(HasNoMatches));

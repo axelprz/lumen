@@ -259,39 +259,8 @@
       </StackPanel>
     </DockPanel>
 
-    <!-- Search, filters and sort. Ctrl+F focuses the search box; Esc clears it. -->
+    <!-- Filters and sort. The search box is in the window's top bar (Ctrl+K / Ctrl+F). -->
     <WrapPanel Grid.Row="1" Margin="0,0,24,16">
-      <Grid Width="240" Height="36" Margin="0,0,12,8">
-        <TextBox x:Name="SearchBox"
-                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                 Padding="30,0,8,0"
-                 VerticalContentAlignment="Center"
-                 AutomationProperties.Name="{l:Loc Library_Search}" />
-        <TextBlock Text="&#xE721;"
-                   Style="{StaticResource Lumen.Text.Icon}"
-                   FontSize="{StaticResource Lumen.FontSize.Body}"
-                   Foreground="{DynamicResource Lumen.Brush.TextMuted}"
-                   HorizontalAlignment="Left"
-                   Margin="12,0,0,0"
-                   IsHitTestVisible="False" />
-        <TextBlock Text="{l:Loc Library_Search}"
-                   Foreground="{DynamicResource Lumen.Brush.TextMuted}"
-                   FontSize="{StaticResource Lumen.FontSize.Body}"
-                   VerticalAlignment="Center"
-                   Margin="34,0,0,0"
-                   IsHitTestVisible="False">
-          <TextBlock.Style>
-            <Style TargetType="TextBlock">
-              <Setter Property="Visibility" Value="Collapsed" />
-              <Style.Triggers>
-                <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
-                  <Setter Property="Visibility" Value="Visible" />
-                </DataTrigger>
-              </Style.Triggers>
-            </Style>
-          </TextBlock.Style>
-        </TextBlock>
-      </Grid>
       <ComboBox ItemsSource="{Binding KindOptions}" SelectedItem="{Binding SelectedKind}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_TypeLabel}" />
       <ComboBox ItemsSource="{Binding StoreOptions}" SelectedItem="{Binding SelectedStore}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_StoreLabel}" />
       <ComboBox ItemsSource="{Binding InstallOptions}" SelectedItem="{Binding SelectedInstall}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_StateLabel}" />

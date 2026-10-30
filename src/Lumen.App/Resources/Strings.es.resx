@@ -1425,4 +1425,19 @@
   <data name="Update_NoticeMessage" xml:space="preserve">
     <value>Está disponible la versión {0}. Abrí Ajustes → Actualizaciones para descargarla.</value>
   </data>
+  <data name="App_Brand" xml:space="preserve">
+    <value>LUMEN</value>
+  </data>
+  <data name="TopBar_SearchKey" xml:space="preserve">
+    <value>Ctrl+K</value>
+  </data>
+  <data name="Toast_Launching" xml:space="preserve">
+    <value>Iniciando {0}…</value>
+  </data>
+  <data name="Toast_Installing" xml:space="preserve">
+    <value>Abriendo la instalación de {0}…</value>
+  </data>
+  <data name="Toast_RoutineDone" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
 </root>
