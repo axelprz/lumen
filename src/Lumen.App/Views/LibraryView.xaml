@@ -46,7 +46,7 @@
         <StackPanel>
           <Grid services:Motion.HoverScale="1.04">
           <!-- Hover/focus glow: the accent fading out around the cover. Plain brushes and a mask, no bitmap effects (those cost scroll frames); collapsed (free) until needed. -->
-          <Border x:Name="Glow" Margin="-8" CornerRadius="18" Visibility="Collapsed" IsHitTestVisible="False"
+          <Border x:Name="Glow" Margin="-8" CornerRadius="22" Visibility="Collapsed" IsHitTestVisible="False"
                   Background="{Binding GlowBrush}" Opacity="0.45">
             <Border.OpacityMask>
               <RadialGradientBrush>
@@ -55,12 +55,12 @@
               </RadialGradientBrush>
             </Border.OpacityMask>
           </Border>
-          <Border x:Name="Cover" Height="252" CornerRadius="8" ClipToBounds="True"
+          <Border x:Name="Cover" Height="252" CornerRadius="14" ClipToBounds="True"
                   BorderThickness="1" BorderBrush="{DynamicResource Lumen.Brush.CoverEdge}">
             <Border.Background>
               <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#FF232836" Offset="0" />
-                <GradientStop Color="#FF171A22" Offset="1" />
+                <GradientStop Color="#FF1F2A40" Offset="0" />
+                <GradientStop Color="#FF121723" Offset="1" />
               </LinearGradientBrush>
             </Border.Background>
             <Grid>
@@ -71,7 +71,7 @@
                       AutomationProperties.Name="{Binding Title}">
                 <Button.Template>
                   <ControlTemplate TargetType="Button">
-                    <Border x:Name="Focus" Background="Transparent" CornerRadius="8" BorderThickness="2" BorderBrush="Transparent">
+                    <Border x:Name="Focus" Background="Transparent" CornerRadius="13" BorderThickness="2" BorderBrush="Transparent">
                       <ContentPresenter />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -83,7 +83,7 @@
                 </Button.Template>
                 <Grid>
                   <!-- Cover art (rounded through the border); the initial shows until it loads or when there is none. -->
-                  <Border CornerRadius="8">
+                  <Border CornerRadius="13">
                     <Border.Background>
                       <ImageBrush ImageSource="{Binding CoverImage}" Stretch="UniformToFill" />
                     </Border.Background>
@@ -108,13 +108,21 @@
                              Margin="0,0,0,40" />
                 </Grid>
               </Button>
+              <!-- Bottom shade: the Play button and the cover's lower edge read on any art (one plain brush, no effect) -->
+              <Border CornerRadius="13" IsHitTestVisible="False">
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#000A0D14" Offset="0.5" />
+                    <GradientStop Color="#D90A0D14" Offset="1" />
+                  </LinearGradientBrush>
+                </Border.Background>
+              </Border>
               <!-- Favorite star -->
               <Border HorizontalAlignment="Right"
                       VerticalAlignment="Top"
                       Margin="8"
-                      Padding="5,4"
-                      CornerRadius="4"
-                      Background="#B30A0D14"
+                      Padding="5,3"
+                      Style="{StaticResource Lumen.Badge}"
                       IsHitTestVisible="False"
                       Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibility}}">
                 <TextBlock Text="&#xE735;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Caption}" Foreground="{DynamicResource Lumen.Brush.Warning}" />
@@ -122,11 +130,9 @@
               <Border HorizontalAlignment="Left"
                       VerticalAlignment="Top"
                       Margin="8"
-                      Padding="8,3"
-                      CornerRadius="4"
-                      Background="#B30A0D14"
+                      Style="{StaticResource Lumen.Badge}"
                       IsHitTestVisible="False">
-                <TextBlock Text="{Binding StoreName}" FontSize="{StaticResource Lumen.FontSize.Label}" Foreground="{DynamicResource Lumen.Brush.Text}" />
+                <TextBlock Text="{Binding StoreName}" Style="{StaticResource Lumen.Text.Badge}" />
               </Border>
               <Button VerticalAlignment="Bottom"
                       Margin="10"
@@ -139,6 +145,7 @@
           <TextBlock Text="{Binding Title}"
                      Margin="2,10,2,0"
                      FontSize="{StaticResource Lumen.FontSize.Body}"
+                     FontWeight="SemiBold"
                      TextTrimming="CharacterEllipsis"
                      TextWrapping="Wrap"
                      Height="40" />
@@ -200,7 +207,7 @@
     </ContentControl.ContentTemplate>
   </ContentControl>
 
-  <Grid x:Name="PageBlocks" Margin="40,32,16,0">
+  <Grid x:Name="PageBlocks" Margin="40,28,16,0">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
@@ -208,95 +215,98 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Header -->
-    <DockPanel Grid.Row="0" Margin="0,0,24,20" LastChildFill="True">
-      <Button DockPanel.Dock="Right"
-              VerticalAlignment="Center"
-              Margin="12,0,0,0"
-              Command="{Binding AddManualItemCommand}"
-              AutomationProperties.Name="{l:Loc Library_Add}"
-              Style="{StaticResource Lumen.Button}">
-        <StackPanel Orientation="Horizontal">
-          <TextBlock Text="&#xE710;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
-          <TextBlock Text="{l:Loc Library_Add}" />
-        </StackPanel>
-      </Button>
-      <Button DockPanel.Dock="Right"
-              VerticalAlignment="Center"
-              Margin="12,0,0,0"
-              Command="{Binding Discover.OpenCommand}"
-              AutomationProperties.Name="{Binding Discover.ButtonText}"
-              Style="{StaticResource Lumen.Button}">
-        <StackPanel Orientation="Horizontal">
-          <TextBlock Text="&#xE71D;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
-          <TextBlock Text="{Binding Discover.ButtonText}" />
-        </StackPanel>
-      </Button>
-      <Button DockPanel.Dock="Right"
-              VerticalAlignment="Center"
-              Command="{Binding RescanCommand}"
-              AutomationProperties.Name="{l:Loc Library_Rescan}"
-              Style="{StaticResource Lumen.Button}">
-        <StackPanel Orientation="Horizontal">
-          <TextBlock Text="&#xE72C;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
-          <TextBlock>
-            <TextBlock.Style>
-              <Style TargetType="TextBlock">
-                <Setter Property="Text" Value="{l:Loc Library_Rescan}" />
-                <Style.Triggers>
-                  <DataTrigger Binding="{Binding IsScanning}" Value="True">
-                    <Setter Property="Text" Value="{l:Loc Library_Scanning}" />
-                  </DataTrigger>
-                </Style.Triggers>
-              </Style>
-            </TextBlock.Style>
-          </TextBlock>
-        </StackPanel>
-      </Button>
+    <!-- Header card: title and count, Rescan / Discover apps / Add, then filters and sort.
+         The search box is in the window's top bar (Ctrl+K / Ctrl+F). -->
+    <Border Grid.Row="0" Style="{StaticResource Lumen.Card}" Padding="20,18" Margin="0,0,24,18">
       <StackPanel>
-        <TextBlock Text="{l:Loc Nav_Library}" Style="{StaticResource Lumen.Text.PageTitle}" />
-        <TextBlock Text="{Binding CountText}" Foreground="{DynamicResource Lumen.Brush.TextMuted}" FontSize="{StaticResource Lumen.FontSize.Body}" Margin="0,4,0,0" />
+        <DockPanel LastChildFill="True">
+          <Button DockPanel.Dock="Right"
+                  VerticalAlignment="Center"
+                  Margin="12,0,0,0"
+                  Command="{Binding AddManualItemCommand}"
+                  AutomationProperties.Name="{l:Loc Library_Add}"
+                  Style="{StaticResource Lumen.Button.Primary}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xE710;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+              <TextBlock Text="{l:Loc Library_Add}" />
+            </StackPanel>
+          </Button>
+          <Button DockPanel.Dock="Right"
+                  VerticalAlignment="Center"
+                  Margin="12,0,0,0"
+                  Command="{Binding Discover.OpenCommand}"
+                  AutomationProperties.Name="{Binding Discover.ButtonText}"
+                  Style="{StaticResource Lumen.Button}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xE71D;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+              <TextBlock Text="{Binding Discover.ButtonText}" />
+            </StackPanel>
+          </Button>
+          <Button DockPanel.Dock="Right"
+                  VerticalAlignment="Center"
+                  Command="{Binding RescanCommand}"
+                  AutomationProperties.Name="{l:Loc Library_Rescan}"
+                  Style="{StaticResource Lumen.Button}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xE72C;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+              <TextBlock>
+                <TextBlock.Style>
+                  <Style TargetType="TextBlock">
+                    <Setter Property="Text" Value="{l:Loc Library_Rescan}" />
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding IsScanning}" Value="True">
+                        <Setter Property="Text" Value="{l:Loc Library_Scanning}" />
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </TextBlock.Style>
+              </TextBlock>
+            </StackPanel>
+          </Button>
+          <StackPanel>
+            <TextBlock Text="{l:Loc Nav_Library}" FontSize="{StaticResource Lumen.FontSize.Title}" FontWeight="Bold" />
+            <TextBlock Text="{Binding CountText}" Foreground="{DynamicResource Lumen.Brush.TextMuted}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,2,0,0" />
+          </StackPanel>
+        </DockPanel>
+        <WrapPanel Margin="0,16,0,-8">
+          <ComboBox ItemsSource="{Binding KindOptions}" SelectedItem="{Binding SelectedKind}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_TypeLabel}" />
+          <ComboBox ItemsSource="{Binding StoreOptions}" SelectedItem="{Binding SelectedStore}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_StoreLabel}" />
+          <ComboBox ItemsSource="{Binding InstallOptions}" SelectedItem="{Binding SelectedInstall}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_StateLabel}" />
+          <ComboBox ItemsSource="{Binding CollectionOptions}" SelectedItem="{Binding SelectedCollection}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_CollectionLabel}" />
+          <ComboBox ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SelectedSort}" DisplayMemberPath="Label" MinWidth="180" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Sort_Label}" />
+          <Button Command="{Binding ClearFiltersCommand}"
+                  Content="{l:Loc Filter_Clear}"
+                  Style="{StaticResource Lumen.Button}"
+                  Height="36"
+                  Margin="0,0,12,8"
+                  Visibility="{Binding IsFiltering, Converter={StaticResource BoolToVisibility}}" />
+          <!-- Switches between the library and the items the user hid; only there once something is hidden. -->
+          <Button Command="{Binding ToggleHiddenCommand}"
+                  Style="{StaticResource Lumen.Button}"
+                  Height="36"
+                  Margin="0,0,12,8"
+                  AutomationProperties.Name="{Binding HiddenToggleText}"
+                  Visibility="{Binding HasHiddenToggle, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xED1A;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+              <TextBlock Text="{Binding HiddenToggleText}" />
+            </StackPanel>
+          </Button>
+        </WrapPanel>
       </StackPanel>
-    </DockPanel>
-
-    <!-- Filters and sort. The search box is in the window's top bar (Ctrl+K / Ctrl+F). -->
-    <WrapPanel Grid.Row="1" Margin="0,0,24,16">
-      <ComboBox ItemsSource="{Binding KindOptions}" SelectedItem="{Binding SelectedKind}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_TypeLabel}" />
-      <ComboBox ItemsSource="{Binding StoreOptions}" SelectedItem="{Binding SelectedStore}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_StoreLabel}" />
-      <ComboBox ItemsSource="{Binding InstallOptions}" SelectedItem="{Binding SelectedInstall}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_StateLabel}" />
-      <ComboBox ItemsSource="{Binding CollectionOptions}" SelectedItem="{Binding SelectedCollection}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_CollectionLabel}" />
-      <ComboBox ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SelectedSort}" DisplayMemberPath="Label" MinWidth="180" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Sort_Label}" />
-      <Button Command="{Binding ClearFiltersCommand}"
-              Content="{l:Loc Filter_Clear}"
-              Style="{StaticResource Lumen.Button}"
-              Height="36"
-              Margin="0,0,12,8"
-              Visibility="{Binding IsFiltering, Converter={StaticResource BoolToVisibility}}" />
-      <!-- Switches between the library and the items the user hid; only there once something is hidden. -->
-      <Button Command="{Binding ToggleHiddenCommand}"
-              Style="{StaticResource Lumen.Button}"
-              Height="36"
-              Margin="0,0,12,8"
-              AutomationProperties.Name="{Binding HiddenToggleText}"
-              Visibility="{Binding HasHiddenToggle, Converter={StaticResource BoolToVisibility}}">
-        <StackPanel Orientation="Horizontal">
-          <TextBlock Text="&#xED1A;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
-          <TextBlock Text="{Binding HiddenToggleText}" />
-        </StackPanel>
-      </Button>
-    </WrapPanel>
+    </Border>
 
     <!-- Non-blocking notice (scan problems, launch failures) -->
     <Border Grid.Row="2"
             Margin="0,0,24,16"
             Padding="14,10"
-            CornerRadius="6"
-            Background="{DynamicResource Lumen.Brush.Surface}"
-            BorderBrush="{DynamicResource Lumen.Brush.Divider}"
+            CornerRadius="10"
+            Background="{DynamicResource Lumen.Brush.Glass}"
+            BorderBrush="{DynamicResource Lumen.Brush.GlassBorder}"
             BorderThickness="1"
             Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}">
       <DockPanel>
-        <TextBlock DockPanel.Dock="Left" Text="&#xE7BA;" Style="{StaticResource Lumen.Text.Icon}" Foreground="#FFE0B44C" Margin="0,0,10,0" />
+        <TextBlock DockPanel.Dock="Left" Text="&#xE7BA;" Style="{StaticResource Lumen.Text.Icon}" Foreground="{DynamicResource Lumen.Brush.Warning}" Margin="0,0,10,0" />
         <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" />
       </DockPanel>
     </Border>

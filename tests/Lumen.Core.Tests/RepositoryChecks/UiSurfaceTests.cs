@@ -103,6 +103,18 @@ public sealed class UiSurfaceTests
     }
 
     [Fact]
+    public void Library_HeaderIsACard_AndTilesUseTheSharedBadges_WithoutBitmapEffects()
+    {
+        var xaml = File.ReadAllText(Path.Combine(_appDir, "Views", "LibraryView.xaml"));
+
+        xaml.ShouldContain("<Border Grid.Row=\"0\" Style=\"{StaticResource Lumen.Card}\"");
+        xaml.ShouldContain("<TextBlock Text=\"{Binding StoreName}\" Style=\"{StaticResource Lumen.Text.Badge}\" />");
+        // Scroll performance (M5): no per-tile bitmap effects in the grid.
+        xaml.ShouldNotContain("DropShadowEffect");
+        xaml.ShouldNotContain("BlurEffect");
+    }
+
+    [Fact]
     public void LanguageSwitch_AlsoSetsTheFormatCulture()
     {
         File.ReadAllText(Path.Combine(_appDir, "Localization", "LocalizationService.cs"))
