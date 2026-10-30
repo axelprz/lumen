@@ -47,6 +47,7 @@ public sealed partial class ShellViewModel : ObservableObject
 
         routines.ReviewRequested += (_, _) => SelectedSection = Sections.First(s => s.Section == ShellSection.Routines);
         home.DetailRequested += (_, item) => _ = ShowDetailFromHomeAsync(item);
+        home.RoutinesRequested += (_, _) => SelectedSection = Sections.First(s => s.Section == ShellSection.Routines);
         library.DetailClosed += (_, _) => OnDetailClosed();
         collections.OpenRequested += (_, id) =>
         {

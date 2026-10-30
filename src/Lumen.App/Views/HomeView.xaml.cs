@@ -13,7 +13,7 @@ using Lumen.App.ViewModels;
 
 namespace Lumen.App.Views;
 
-/// <summary>View concerns only: crossfading the blurred background, lazy covers, pointing at a tile, wheel scrolling.</summary>
+/// <summary>View concerns only: crossfading the blurred background and the hero art, lazy covers, pointing at a tile, wheel scrolling.</summary>
 public partial class HomeView : UserControl
 {
     private static readonly ImagePathConverter Images = new();
@@ -48,6 +48,7 @@ public partial class HomeView : UserControl
         if (e.PropertyName == nameof(HomeViewModel.BackgroundPath))
         {
             ShowBackground(_vm?.BackgroundPath);
+            Motion.FadeIn(HeroArt); // the hero card's sharp art arrives with the blurred page art
         }
         else if (e.PropertyName == nameof(HomeViewModel.FeaturedTitle))
         {
