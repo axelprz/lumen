@@ -4,23 +4,24 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:l="clr-namespace:Lumen.App.Localization"
-             xmlns:conv="clr-namespace:Lumen.App.Converters">
+             xmlns:conv="clr-namespace:Lumen.App.Converters"
+             xmlns:services="clr-namespace:Lumen.App.Services">
   <UserControl.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     <conv:ImagePathConverter x:Key="ImagePath" />
     <Style x:Key="InfoLabel" TargetType="TextBlock">
-      <Setter Property="FontSize" Value="12" />
+      <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Caption}" />
       <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.TextMuted}" />
       <Setter Property="Margin" Value="0,0,0,6" />
     </Style>
     <Style x:Key="InfoValue" TargetType="TextBlock">
-      <Setter Property="FontSize" Value="15" />
+      <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Lead}" />
       <Setter Property="TextWrapping" Value="Wrap" />
       <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
     </Style>
   </UserControl.Resources>
 
-  <Grid Background="{DynamicResource Lumen.Brush.Background}">
+  <Grid Background="{DynamicResource Lumen.Brush.Background}" services:Motion.ShowIn="True">
     <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
       <StackPanel>
         <!-- Hero: background art fading into the page, with the logo (or the title) over it -->
@@ -56,7 +57,7 @@
                   Margin="32,28,0,0"
                   AutomationProperties.Name="{l:Loc Detail_Back}">
             <StackPanel Orientation="Horizontal">
-              <TextBlock Text="&#xE72B;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+              <TextBlock Text="&#xE72B;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
               <TextBlock Text="{l:Loc Detail_Back}" />
             </StackPanel>
           </Button>
@@ -94,7 +95,7 @@
                     Background="{DynamicResource Lumen.Brush.Accent}"
                     BorderBrush="{DynamicResource Lumen.Brush.Accent}"
                     Foreground="White"
-                    FontSize="16"
+                    FontSize="{StaticResource Lumen.FontSize.BodyLarge}"
                     FontWeight="SemiBold"
                     Padding="36,10"
                     Margin="0,0,12,12" />
@@ -107,7 +108,7 @@
             <Button Command="{Binding ToggleFavoriteCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
                     AutomationProperties.Name="{Binding FavoriteText}">
               <StackPanel Orientation="Horizontal">
-                <TextBlock x:Name="FavoriteStar" Text="&#xE734;" FontSize="13" Margin="0,0,8,0">
+                <TextBlock x:Name="FavoriteStar" Text="&#xE734;" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0">
                   <TextBlock.Style>
                     <Style TargetType="TextBlock" BasedOn="{StaticResource Lumen.Text.Icon}">
                       <Style.Triggers>
@@ -126,7 +127,7 @@
                     AutomationProperties.Name="{l:Loc Detail_OpenFolder}"
                     Visibility="{Binding CanOpenFolder, Converter={StaticResource BoolToVisibility}}">
               <StackPanel Orientation="Horizontal">
-                <TextBlock Text="&#xE838;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+                <TextBlock Text="&#xE838;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
                 <TextBlock Text="{l:Loc Detail_OpenFolder}" />
               </StackPanel>
             </Button>
@@ -134,7 +135,7 @@
                     AutomationProperties.Name="{l:Loc Detail_StorePage}"
                     Visibility="{Binding CanOpenStorePage, Converter={StaticResource BoolToVisibility}}">
               <StackPanel Orientation="Horizontal">
-                <TextBlock Text="&#xE719;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+                <TextBlock Text="&#xE719;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
                 <TextBlock Text="{l:Loc Detail_StorePage}" />
               </StackPanel>
             </Button>
@@ -142,14 +143,14 @@
                     AutomationProperties.Name="{l:Loc Detail_Uninstall}"
                     Visibility="{Binding CanUninstall, Converter={StaticResource BoolToVisibility}}">
               <StackPanel Orientation="Horizontal">
-                <TextBlock Text="&#xE74D;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+                <TextBlock Text="&#xE74D;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
                 <TextBlock Text="{l:Loc Detail_Uninstall}" />
               </StackPanel>
             </Button>
             <Button x:Name="MoreButton" Click="OnMoreClick" Style="{StaticResource Lumen.Button}" Margin="0,0,12,12" VerticalAlignment="Center"
                     AutomationProperties.Name="{l:Loc Detail_More}">
               <StackPanel Orientation="Horizontal">
-                <TextBlock Text="&#xE712;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+                <TextBlock Text="&#xE712;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
                 <TextBlock Text="{l:Loc Detail_More}" />
               </StackPanel>
               <Button.ContextMenu>
@@ -178,7 +179,7 @@
                   Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
                   HorizontalAlignment="Left"
                   Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}">
-            <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="14" />
+            <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" />
           </Border>
 
           <!-- Hidden: say so, with a one-click way back -->
@@ -190,7 +191,7 @@
               <TextBlock DockPanel.Dock="Left" Text="&#xED1A;" Style="{StaticResource Lumen.Text.Icon}" VerticalAlignment="Center" Margin="0,0,10,0" />
               <Button DockPanel.Dock="Right" Command="{Binding ToggleHiddenCommand}" Content="{Binding HideText}"
                       Style="{StaticResource Lumen.Button}" Margin="16,0,0,0" />
-              <TextBlock Text="{l:Loc Detail_HiddenBanner}" TextWrapping="Wrap" FontSize="14" VerticalAlignment="Center" />
+              <TextBlock Text="{l:Loc Detail_HiddenBanner}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" VerticalAlignment="Center" />
             </DockPanel>
           </Border>
 
@@ -199,8 +200,8 @@
                   Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
                   Visibility="{Binding IsChoosingCollections, Converter={StaticResource BoolToVisibility}}">
             <StackPanel>
-              <TextBlock Text="{l:Loc Detail_Collections}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10" />
-              <TextBlock Text="{l:Loc Detail_NoCollections}" FontSize="13" Margin="0,0,0,10" TextWrapping="Wrap"
+              <TextBlock Text="{l:Loc Detail_Collections}" FontSize="{StaticResource Lumen.FontSize.BodyLarge}" FontWeight="SemiBold" Margin="0,0,0,10" />
+              <TextBlock Text="{l:Loc Detail_NoCollections}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,0,10" TextWrapping="Wrap"
                          Foreground="{DynamicResource Lumen.Brush.TextMuted}">
                 <TextBlock.Style>
                   <Style TargetType="TextBlock">
@@ -215,7 +216,7 @@
               <ItemsControl ItemsSource="{Binding CollectionChoices}" Focusable="False">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate>
-                    <CheckBox IsChecked="{Binding IsIn}" Content="{Binding Name}" Margin="0,0,0,8" FontSize="14"
+                    <CheckBox IsChecked="{Binding IsIn}" Content="{Binding Name}" Margin="0,0,0,8" FontSize="{StaticResource Lumen.FontSize.Body}"
                               Foreground="{DynamicResource Lumen.Brush.Text}" />
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
@@ -252,7 +253,7 @@
                   <KeyBinding Key="Escape" Command="{Binding CancelRenameCommand}" />
                 </TextBox.InputBindings>
               </TextBox>
-              <TextBlock Text="{Binding RenameHint}" TextWrapping="Wrap" FontSize="12" Margin="0,8,0,12"
+              <TextBlock Text="{Binding RenameHint}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,8,0,12"
                          Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
               <StackPanel Orientation="Horizontal">
                 <Button Command="{Binding SaveRenameCommand}" Content="{l:Loc Detail_Save}" Style="{StaticResource Lumen.Button}"
@@ -268,8 +269,8 @@
                   Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
                   Visibility="{Binding IsMerging, Converter={StaticResource BoolToVisibility}}">
             <StackPanel>
-              <TextBlock Text="{l:Loc Detail_MergeTitle}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,6" />
-              <TextBlock Text="{l:Loc Detail_MergeHint}" TextWrapping="Wrap" FontSize="12" Margin="0,0,0,12"
+              <TextBlock Text="{l:Loc Detail_MergeTitle}" FontSize="{StaticResource Lumen.FontSize.BodyLarge}" FontWeight="SemiBold" Margin="0,0,0,6" />
+              <TextBlock Text="{l:Loc Detail_MergeHint}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,0,0,12"
                          Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
               <TextBox Text="{Binding MergeSearch, UpdateSourceTrigger=PropertyChanged}"
                        Height="36" VerticalContentAlignment="Center" Padding="8,0"
@@ -279,7 +280,7 @@
                   <KeyBinding Key="Escape" Command="{Binding CancelMergeCommand}" />
                 </TextBox.InputBindings>
               </TextBox>
-              <TextBlock Text="{Binding MergeStatus}" FontSize="13" Margin="0,8,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
+              <TextBlock Text="{Binding MergeStatus}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,8,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
                 <TextBlock.Style>
                   <Style TargetType="TextBlock">
                     <Style.Triggers>
@@ -317,7 +318,7 @@
             <StackPanel Margin="0,0,24,16">
               <TextBlock Text="{l:Loc Detail_Playtime}" Style="{StaticResource InfoLabel}" />
               <TextBlock Text="{Binding PlaytimeText}" Style="{StaticResource InfoValue}" />
-              <TextBlock Text="{Binding PlaytimeSourceText}" FontSize="12" Margin="0,2,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+              <TextBlock Text="{Binding PlaytimeSourceText}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,2,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                          Visibility="{Binding HasPlaytimeSource, Converter={StaticResource BoolToVisibility}}" />
             </StackPanel>
             <StackPanel Margin="0,0,24,16">
@@ -326,7 +327,7 @@
             </StackPanel>
             <StackPanel Margin="0,0,24,16">
               <TextBlock Text="{l:Loc Detail_Location}" Style="{StaticResource InfoLabel}" />
-              <TextBlock Text="{Binding InstallPath}" Style="{StaticResource InfoValue}" FontSize="13" />
+              <TextBlock Text="{Binding InstallPath}" Style="{StaticResource InfoValue}" FontSize="{StaticResource Lumen.FontSize.Small}" />
             </StackPanel>
           </UniformGrid>
         </StackPanel>

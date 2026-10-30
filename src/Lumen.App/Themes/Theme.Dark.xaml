@@ -34,11 +34,14 @@
   <FontFamily x:Key="Lumen.Font.Icons">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
 
   <!-- Type scale. New and reworked screens use these tokens instead of literal sizes. -->
+  <sys:Double x:Key="Lumen.FontSize.Label">11</sys:Double>
   <sys:Double x:Key="Lumen.FontSize.Caption">12</sys:Double>
   <sys:Double x:Key="Lumen.FontSize.Small">13</sys:Double>
   <sys:Double x:Key="Lumen.FontSize.Body">14</sys:Double>
+  <sys:Double x:Key="Lumen.FontSize.Lead">15</sys:Double>
   <sys:Double x:Key="Lumen.FontSize.BodyLarge">16</sys:Double>
   <sys:Double x:Key="Lumen.FontSize.Subtitle">18</sys:Double>
+  <sys:Double x:Key="Lumen.FontSize.Section">20</sys:Double>
   <sys:Double x:Key="Lumen.FontSize.Title">24</sys:Double>
   <sys:Double x:Key="Lumen.FontSize.Headline">32</sys:Double>
   <sys:Double x:Key="Lumen.FontSize.Display">44</sys:Double>
