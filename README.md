@@ -59,4 +59,6 @@ Copyright (C) 2026 Axel Ismael Perez (AxelPRZ).
 
 Lumen is free software released under the [GNU General Public License v3.0 or later](LICENSE). See [COPYRIGHT](COPYRIGHT).
 
+The interface font is Exo 2, © The Exo 2 Project Authors, under the [SIL Open Font License 1.1](src/Lumen.App/Assets/Fonts/OFL.txt).
+
 Lumen is not affiliated with Valve, Epic Games, CD PROJEKT, Microsoft, Ubisoft, Electronic Arts, Blizzard or SteamGridDB. All trademarks belong to their owners.

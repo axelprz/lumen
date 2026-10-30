@@ -141,7 +141,7 @@ Owner requirement: nobody outside the person using Lumen may be able to get at t
 
 Owner request (2026-10-28): before 1.0, a modern, futuristic look that makes people want to use Lumen. It should be friendly and striking, at home next to Steam and other launchers. Same screens and features; this is the look, motion and type.
 
-- **Type:** a new UI font in the spirit of game launchers. Steam's Motiva Sans is commercial, so it can't ship. Candidates with an open license (SIL OFL): Inter, Outfit, Exo 2, Rajdhani. The owner picks from a sample; the font file ships inside the app (it is not code, so security rule 6 is unaffected).
+- **Type:** a new UI font in the spirit of game launchers. Steam's Motiva Sans is commercial, so it can't ship. The owner picked **Exo 2** (SIL OFL) from a sample of Inter, Outfit, Exo 2 and Rajdhani on 2026-10-30. The font files ship inside the app (they are not code, so security rule 6 is unaffected).
 - **Motion:**
   - page transitions
   - tile hover/focus (scale, glow)
@@ -176,6 +176,7 @@ Owner decisions and the incidents behind them, newest last. Add a line (with the
 - **2026-10-30 · First sync with data on both sides:** ask each time (combine, recommended / use the folder / use this PC); the two that remove data ask for confirmation.
 - **2026-10-30 · Manual items from the folder:** imported if they pass the add-item dialog rules, with a notice ("N items came from the sync folder"); they never run on their own.
 - **2026-10-30 · Same routine id on both sides:** keep both (the copy gets a new id and needs review); nothing is overwritten. No "the newest wins".
+- **2026-10-30 · UI font: Exo 2** (SIL OFL), chosen by the owner from a sample. Four static weights (400/500/600/700) cut from Google Fonts' official variable font with fontTools, because WPF does not handle variable axes. Shipped as resources under `Lumen.App/Assets/Fonts` with `OFL.txt`.
 - **2026-10-30 · Updates:** Velopack 1.2.161. Default channel beta until 1.0. Notice = Settings card + one tray balloon per version (no banner in the window). The user presses Download and chooses when to restart. Builds are unsigned in v1 (SmartScreen warning documented in the README).
 
 ## v1.1 — Deals (owner request, 2026-10-28)

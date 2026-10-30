@@ -18,6 +18,8 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\Lumen.ico" />
+    <!-- Exo 2 (SIL OFL), static weights cut from the official variable font; WPF does not handle variable axes. -->
+    <Resource Include="Assets\Fonts\*.ttf" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lumen.Core\Lumen.Core.csproj" />
