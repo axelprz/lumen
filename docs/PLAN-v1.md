@@ -139,6 +139,8 @@ Owner requirement: nobody outside the person using Lumen may be able to get at t
 
 ### 4.9 UI rework (M10, before 1.0)
 
+**Status (2026-10-30):** implemented in #46–#51 (font, Mica and glow, motion, entrance, detail/collections/routines, Settings and overlays); the owner's approval on real use is still to come. Details and rules: ARCHITECTURE §8 "Look and motion".
+
 Owner request (2026-10-28): before 1.0, a modern, futuristic look that makes people want to use Lumen. It should be friendly and striking, at home next to Steam and other launchers. Same screens and features; this is the look, motion and type.
 
 - **Type:** a new UI font in the spirit of game launchers. Steam's Motiva Sans is commercial, so it can't ship. The owner picked **Exo 2** (SIL OFL) from a sample of Inter, Outfit, Exo 2 and Rajdhani on 2026-10-30. The font files ship inside the app (they are not code, so security rule 6 is unaffected).
