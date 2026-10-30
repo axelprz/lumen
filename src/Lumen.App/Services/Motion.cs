@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace Lumen.App.Services;
 
@@ -62,11 +63,24 @@ public static class Motion
             return;
         }
 
+        // Hidden now, animated once the new page has been built and laid out: a heavy page (the Library) would
+        // otherwise eat the whole animation while it loads, and appear all at once.
         page.Opacity = 0;
         slide.Y = 12;
-        To(page, UIElement.OpacityProperty, 1, Normal);
-        To(slide, TranslateTransform.YProperty, 0, Normal);
+        var version = ++_pageVersion;
+        _ = page.Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
+        {
+            if (version != _pageVersion)
+            {
+                return; // another page change took over
+            }
+
+            To(page, UIElement.OpacityProperty, 1, Normal);
+            To(slide, TranslateTransform.YProperty, 0, Normal);
+        });
     }
+
+    private static int _pageVersion;
 
     /// <summary>Gap between one block and the next in <see cref="Stagger"/>.</summary>
     private static readonly TimeSpan StaggerStep = TimeSpan.FromMilliseconds(50);
@@ -85,7 +99,8 @@ public static class Motion
             return;
         }
 
-        var index = 0;
+        // The blocks are hidden at once and start moving when the page has finished loading (see PageIn).
+        var blocks = new List<(UIElement Child, TranslateTransform Slide)>();
         foreach (UIElement child in panel.Children)
         {
             if (child.Visibility != Visibility.Visible || child.RenderTransform != Transform.Identity)
@@ -93,13 +108,24 @@ public static class Motion
                 continue;
             }
 
-            if (index >= StaggerMaxBlocks)
+            if (blocks.Count >= StaggerMaxBlocks)
             {
                 break;
             }
 
-            EnterIn(child, TimeSpan.FromTicks(StaggerStep.Ticks * index++));
+            var slide = new TranslateTransform(0, StaggerSlide);
+            child.RenderTransform = slide;
+            child.Opacity = 0;
+            blocks.Add((child, slide));
         }
+
+        _ = panel.Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
+        {
+            for (var i = 0; i < blocks.Count; i++)
+            {
+                EnterIn(blocks[i].Child, blocks[i].Slide, TimeSpan.FromTicks(StaggerStep.Ticks * i));
+            }
+        });
     }
 
     /// <summary>A block whose content just changed (the Home hero): its new content fades in. Nothing happens when animations are off.</summary>
@@ -116,12 +142,8 @@ public static class Motion
         To(element, UIElement.OpacityProperty, 1, Normal);
     }
 
-    private static void EnterIn(UIElement child, TimeSpan delay)
+    private static void EnterIn(UIElement child, TranslateTransform slide, TimeSpan delay)
     {
-        var slide = new TranslateTransform(0, StaggerSlide);
-        child.RenderTransform = slide;
-        child.Opacity = 0;
-
         var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
         var fade = new DoubleAnimation(1, Normal) { BeginTime = delay, EasingFunction = ease };
         fade.Completed += (_, _) =>
