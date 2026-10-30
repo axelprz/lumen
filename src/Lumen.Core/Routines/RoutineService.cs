@@ -47,11 +47,22 @@ public sealed partial class RoutineService(
     ILogger<RoutineService> logger)
 {
     private readonly Dictionary<string, RoutineRun> _lastRuns = new(StringComparer.Ordinal);
+    private string _folder = folder;
 
     /// <summary>Raised (on the caller's thread) after routines were loaded, saved, approved or deleted.</summary>
     public event EventHandler? Changed;
 
-    public string Folder => folder;
+    public string Folder => _folder;
+
+    /// <summary>
+    /// Points the service at another folder (the sync folder, or back to the local one). Call <see cref="LoadAsync"/>
+    /// afterwards. Nothing is copied or deleted here, and approvals stay as they are (they are per routine id and hash).
+    /// </summary>
+    public void SetFolder(string newFolder)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(newFolder);
+        _folder = newFolder;
+    }
 
     public IReadOnlyList<RoutineEntry> Entries { get; private set; } = [];
 
@@ -59,7 +70,7 @@ public sealed partial class RoutineService(
     {
         var approved = await trust.LoadAsync(ct).ConfigureAwait(false);
         var entries = new List<RoutineEntry>();
-        foreach (var path in fileSystem.GetFiles(folder, "*.json").Order(StringComparer.OrdinalIgnoreCase))
+        foreach (var path in fileSystem.GetFiles(_folder, "*.json").Order(StringComparer.OrdinalIgnoreCase))
         {
             entries.Add(await ReadAsync(path, approved, ct).ConfigureAwait(false));
         }
@@ -206,7 +217,7 @@ public sealed partial class RoutineService(
         library.Items.FirstOrDefault(i => i.Entries.Any(e => e.Ref == itemRef));
 
     private string PathFor(string id) =>
-        Routine.IsValidId(id) ? Path.Combine(folder, id + ".json") : throw new ArgumentException("Not a routine id.", nameof(id));
+        Routine.IsValidId(id) ? Path.Combine(_folder, id + ".json") : throw new ArgumentException("Not a routine id.", nameof(id));
 
     private async Task<RoutineEntry> ReadAsync(string path, IReadOnlyDictionary<string, string> approved, CancellationToken ct)
     {

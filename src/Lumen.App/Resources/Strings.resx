@@ -1256,4 +1256,110 @@
   <data name="QuickSearch_Routine" xml:space="preserve">
     <value>Routine</value>
   </data>
+  <data name="Settings_Sync_Title" xml:space="preserve">
+    <value>Sync folder</value>
+  </data>
+  <data name="Settings_Sync_Description" xml:space="preserve">
+    <value>Keep your collections, favorites, routines and preferences in a folder (OneDrive, Google Drive, a Git repo…) so every PC you use has the same. Passwords, tokens and playtime are never copied.</value>
+  </data>
+  <data name="Settings_Sync_NoFolder" xml:space="preserve">
+    <value>No folder chosen yet</value>
+  </data>
+  <data name="Settings_Sync_Active" xml:space="preserve">
+    <value>Up to date · last sync {0}</value>
+  </data>
+  <data name="Settings_Sync_ActiveNow" xml:space="preserve">
+    <value>Up to date</value>
+  </data>
+  <data name="Settings_Sync_Unavailable" xml:space="preserve">
+    <value>The folder isn't available right now (a disconnected drive, or a cloud folder that isn't ready). Nothing was changed; Lumen will try again by itself.</value>
+  </data>
+  <data name="Settings_Sync_Failed" xml:space="preserve">
+    <value>The last sync failed. See the details below, or try again.</value>
+  </data>
+  <data name="Settings_Sync_Off" xml:space="preserve">
+    <value>Sync is off</value>
+  </data>
+  <data name="Settings_Sync_Problem_NotAbsolute" xml:space="preserve">
+    <value>Pick a folder with its full path.</value>
+  </data>
+  <data name="Settings_Sync_Problem_DriveRoot" xml:space="preserve">
+    <value>Pick a folder inside the drive, not the whole drive.</value>
+  </data>
+  <data name="Settings_Sync_Problem_SystemFolder" xml:space="preserve">
+    <value>Lumen doesn't write in the Windows or Program Files folders. Pick another one.</value>
+  </data>
+  <data name="Settings_Sync_Started" xml:space="preserve">
+    <value>Sync is on.</value>
+  </data>
+  <data name="Settings_Sync_Stopped" xml:space="preserve">
+    <value>Sync is off. Your data stays here and in the folder as it was.</value>
+  </data>
+  <data name="Settings_Sync_Stop" xml:space="preserve">
+    <value>Stop syncing</value>
+  </data>
+  <data name="Settings_Sync_Stop_Confirm" xml:space="preserve">
+    <value>Lumen will stop syncing. Nothing is deleted: your data stays on this PC and in the folder. The routines from the folder are copied back to this PC.</value>
+  </data>
+  <data name="Settings_Sync_Error" xml:space="preserve">
+    <value>Something went wrong. The log has the details.</value>
+  </data>
+  <data name="Settings_Sync_Summary" xml:space="preserve">
+    <value>{0} collections · {1} manual items · {2} renamed or hidden · {3} ignored apps</value>
+  </data>
+  <data name="Settings_Sync_Choice_Title" xml:space="preserve">
+    <value>This folder and this PC both already have data</value>
+  </data>
+  <data name="Settings_Sync_Choice_Description" xml:space="preserve">
+    <value>Choose what to do. Nothing is written until you pick.</value>
+  </data>
+  <data name="Settings_Sync_Choice_Folder" xml:space="preserve">
+    <value>In the folder</value>
+  </data>
+  <data name="Settings_Sync_Choice_ThisPc" xml:space="preserve">
+    <value>On this PC</value>
+  </data>
+  <data name="Settings_Sync_Merge" xml:space="preserve">
+    <value>Combine both (recommended)</value>
+  </data>
+  <data name="Settings_Sync_UseFolder" xml:space="preserve">
+    <value>Use the folder's data</value>
+  </data>
+  <data name="Settings_Sync_UseThisPc" xml:space="preserve">
+    <value>Use this PC's data</value>
+  </data>
+  <data name="Settings_Sync_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Settings_Sync_Merge_Hint" xml:space="preserve">
+    <value>Combine keeps everything from both; for the same thing, the folder's version wins. The other two replace the data of the side you don't pick.</value>
+  </data>
+  <data name="Settings_Sync_Choose" xml:space="preserve">
+    <value>Choose folder…</value>
+  </data>
+  <data name="Settings_Sync_Now" xml:space="preserve">
+    <value>Sync now</value>
+  </data>
+  <data name="Settings_Sync_Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="Settings_Sync_Confirm_Title" xml:space="preserve">
+    <value>Replace data?</value>
+  </data>
+  <data name="Settings_Sync_UseFolder_Confirm" xml:space="preserve">
+    <value>This PC will take the folder's data. What only this PC has will be removed from it: {0}.
+
+Continue?</value>
+  </data>
+  <data name="Settings_Sync_UseThisPc_Confirm" xml:space="preserve">
+    <value>The folder will take this PC's data. What only the folder has will be removed from it: {0}.
+
+Continue?</value>
+  </data>
+  <data name="Sync_ManualItemsReceived" xml:space="preserve">
+    <value>{0} manual item(s) came from the sync folder: {1}. They only open when you click them.</value>
+  </data>
+  <data name="Sync_NoticeTitle" xml:space="preserve">
+    <value>Sync folder</value>
+  </data>
 </root>

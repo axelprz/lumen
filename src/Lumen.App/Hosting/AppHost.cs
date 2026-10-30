@@ -13,6 +13,7 @@ using Lumen.Core.Platform;
 using Lumen.Data;
 using Lumen.Data.Migrations;
 using Lumen.Core.Settings;
+using Lumen.Core.Sync;
 using Lumen.Platform.Windows;
 using Lumen.Platform.Windows.Security;
 using Lumen.Providers;
@@ -241,7 +242,10 @@ public static class AppHost
         builder.Services.AddSingleton<CollectionsViewModel>();
 
         // Routines (M8): files in Lumen's portable folder; approvals per machine; programs start without a shell.
-        builder.Services.AddSingleton<IUserFiles>(new PhysicalUserFiles(paths.DefaultPortableDirectory));
+        // The same instance serves the routines and the sync folder; SyncCoordinator adds or removes the sync folder as an allowed root.
+        var userFiles = new PhysicalUserFiles(paths.DefaultPortableDirectory);
+        builder.Services.AddSingleton(userFiles);
+        builder.Services.AddSingleton<IUserFiles>(userFiles);
         builder.Services.AddSingleton<Lumen.Core.Routines.IRoutineTrustStore>(sp => new SqliteRoutineTrustStore(sp.GetRequiredService<ISqliteConnectionFactory>()));
         builder.Services.AddSingleton<IProcessControl, WindowsProcessControl>();
         builder.Services.AddSingleton(sp => new Lumen.Core.Routines.RoutineRunner(
@@ -259,6 +263,19 @@ public static class AppHost
             sp.GetRequiredService<LibraryService>(),
             sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Lumen.Core.Routines.RoutineService>>()));
         builder.Services.AddSingleton<RoutinesViewModel>();
+
+        // Sync folder (M8): config.json + collections both ways, routines in <folder>/routines.
+        builder.Services.AddSingleton<IFolderWatcher, PhysicalFolderWatcher>();
+        builder.Services.AddSingleton<LocalPortableState>();
+        builder.Services.AddSingleton(sp => new SyncFolderService(
+            sp.GetRequiredService<IFileSystem>(),
+            _ => sp.GetRequiredService<PhysicalUserFiles>(),
+            sp.GetRequiredService<LocalPortableState>(),
+            sp.GetRequiredService<ILocalSettings>(),
+            sp.GetRequiredService<IFolderWatcher>(),
+            sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<SyncFolderService>>()));
+        builder.Services.AddSingleton<SyncCoordinator>();
+        builder.Services.AddSingleton<SyncSettingsViewModel>();
         builder.Services.AddSingleton<LibraryViewModel>();
         builder.Services.AddSingleton<SteamSettingsViewModel>();
         builder.Services.AddSingleton<SteamFamilyViewModel>();

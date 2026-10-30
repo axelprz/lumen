@@ -71,6 +71,9 @@ public sealed partial class TrayService(
         routines.FinishedOutsidePage += (_, e) => icon.ShowNotification(e.Name, e.Result, NotificationIcon.Info);
     }
 
+    /// <summary>Shows a balloon notice (nothing happens if the icon isn't there yet).</summary>
+    public void Notify(string title, string message) => _icon?.ShowNotification(title, message, NotificationIcon.Info);
+
     /// <summary>Brings the main window back (tray click, menu, or Lumen opened again).</summary>
     public void ShowWindow()
     {

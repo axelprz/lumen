@@ -23,7 +23,36 @@ public interface IUserFiles
 /// <summary>The real disk, limited to <paramref name="allowedRoots"/>.</summary>
 public sealed class PhysicalUserFiles(params string[] allowedRoots) : IUserFiles
 {
-    private readonly string[] _roots = allowedRoots.Select(r => Path.GetFullPath(r).TrimEnd('\\', '/') + Path.DirectorySeparatorChar).ToArray();
+    private readonly object _lock = new();
+    private volatile string[] _roots = allowedRoots.Select(Root).ToArray();
+
+    /// <summary>
+    /// Also allows writing inside <paramref name="folder"/>: the sync folder the user chose. Never called for anything
+    /// the user didn't pick, and the callers only write the files Lumen owns there.
+    /// </summary>
+    public void AllowFolder(string folder)
+    {
+        lock (_lock)
+        {
+            var root = Root(folder);
+            if (!_roots.Contains(root, StringComparer.OrdinalIgnoreCase))
+            {
+                _roots = [.. _roots, root];
+            }
+        }
+    }
+
+    /// <summary>Stops allowing a folder added with <see cref="AllowFolder"/>.</summary>
+    public void ForgetFolder(string folder)
+    {
+        lock (_lock)
+        {
+            var root = Root(folder);
+            _roots = _roots.Where(r => !string.Equals(r, root, StringComparison.OrdinalIgnoreCase)).ToArray();
+        }
+    }
+
+    private static string Root(string folder) => Path.GetFullPath(folder).TrimEnd('\\', '/') + Path.DirectorySeparatorChar;
 
     public Task WriteTextAsync(string path, string text, CancellationToken ct) => WriteAsync(Allowed(path), text, ct);
 

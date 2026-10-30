@@ -149,6 +149,9 @@ public sealed partial class SyncFolderService : IDisposable
 
     public event EventHandler? StatusChanged;
 
+    /// <summary>A pass finished (whether or not anything changed): the "last synced" time moved.</summary>
+    public event EventHandler? PassCompleted;
+
     /// <summary>Counts what the folder and this PC have, to decide how to start.</summary>
     public async Task<SyncPairing> InspectAsync(string folder, CancellationToken ct)
     {
@@ -240,6 +243,7 @@ public sealed partial class SyncFolderService : IDisposable
     public async Task SyncNowAsync(CancellationToken ct)
     {
         SyncAppliedEventArgs? applied = null;
+        var passed = false;
         await _gate.WaitAsync(ct).ConfigureAwait(false);
         try
         {
@@ -255,6 +259,7 @@ public sealed partial class SyncFolderService : IDisposable
             }
 
             applied = await ReconcileAsync(folder, ct).ConfigureAwait(false);
+            passed = true;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -268,6 +273,10 @@ public sealed partial class SyncFolderService : IDisposable
         }
 
         Raise(applied);
+        if (passed)
+        {
+            PassCompleted?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     /// <summary>Call when something that syncs changed on this PC; the pass runs after a short pause.</summary>

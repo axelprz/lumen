@@ -89,6 +89,10 @@ public partial class App : Application
             _hotkeys.Pressed += (_, _) => _quickSearch.Open();
             _tray.OpenQuickSearch = _quickSearch.Open;
 
+            // Sync folder: pick up the one chosen before, and show a balloon when manual items arrive from it.
+            var syncCoordinator = _host.Services.GetRequiredService<SyncCoordinator>();
+            syncCoordinator.Notify += _tray.Notify;
+
             // A routine chosen from the tray or the search that needs its preview brings the window forward.
             _host.Services.GetRequiredService<RoutinesViewModel>().ReviewRequested += (_, _) => _tray.ShowWindow();
             await _hotkeys.StartAsync(CancellationToken.None).ConfigureAwait(true);
@@ -119,6 +123,7 @@ public partial class App : Application
         await _host.Services.GetRequiredService<SettingsViewModel>().InitializeAsync(CancellationToken.None).ConfigureAwait(true);
         await _host.Services.GetRequiredService<LibraryViewModel>().InitializeAsync(CancellationToken.None).ConfigureAwait(true);
         await _host.Services.GetRequiredService<RoutinesViewModel>().InitializeAsync(CancellationToken.None).ConfigureAwait(true);
+        await _host.Services.GetRequiredService<SyncCoordinator>().StartAsync(CancellationToken.None).ConfigureAwait(true);
 
         // From now on, notice installs/uninstalls by themselves (store folders + coming back to the window).
         var autoRefresh = _host.Services.GetRequiredService<LibraryAutoRefresh>();

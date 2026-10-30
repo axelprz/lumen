@@ -1256,4 +1256,110 @@
   <data name="QuickSearch_Routine" xml:space="preserve">
     <value>Rutina</value>
   </data>
+  <data name="Settings_Sync_Title" xml:space="preserve">
+    <value>Carpeta de sincronización</value>
+  </data>
+  <data name="Settings_Sync_Description" xml:space="preserve">
+    <value>Guardá tus colecciones, favoritos, rutinas y preferencias en una carpeta (OneDrive, Google Drive, un repo de Git…) para que todas tus PCs tengan lo mismo. Las contraseñas, los tokens y el tiempo de juego nunca se copian.</value>
+  </data>
+  <data name="Settings_Sync_NoFolder" xml:space="preserve">
+    <value>Todavía no elegiste una carpeta</value>
+  </data>
+  <data name="Settings_Sync_Active" xml:space="preserve">
+    <value>Al día · última sincronización {0}</value>
+  </data>
+  <data name="Settings_Sync_ActiveNow" xml:space="preserve">
+    <value>Al día</value>
+  </data>
+  <data name="Settings_Sync_Unavailable" xml:space="preserve">
+    <value>La carpeta no está disponible ahora (un disco desconectado, o una carpeta de la nube que no está lista). No se cambió nada; Lumen vuelve a intentar solo.</value>
+  </data>
+  <data name="Settings_Sync_Failed" xml:space="preserve">
+    <value>La última sincronización falló. Mirá los detalles abajo o probá de nuevo.</value>
+  </data>
+  <data name="Settings_Sync_Off" xml:space="preserve">
+    <value>La sincronización está apagada</value>
+  </data>
+  <data name="Settings_Sync_Problem_NotAbsolute" xml:space="preserve">
+    <value>Elegí una carpeta con su ruta completa.</value>
+  </data>
+  <data name="Settings_Sync_Problem_DriveRoot" xml:space="preserve">
+    <value>Elegí una carpeta dentro del disco, no el disco entero.</value>
+  </data>
+  <data name="Settings_Sync_Problem_SystemFolder" xml:space="preserve">
+    <value>Lumen no escribe en las carpetas de Windows ni de Archivos de programa. Elegí otra.</value>
+  </data>
+  <data name="Settings_Sync_Started" xml:space="preserve">
+    <value>Sincronización activada.</value>
+  </data>
+  <data name="Settings_Sync_Stopped" xml:space="preserve">
+    <value>Sincronización apagada. Tus datos quedan acá y en la carpeta como estaban.</value>
+  </data>
+  <data name="Settings_Sync_Stop" xml:space="preserve">
+    <value>Dejar de sincronizar</value>
+  </data>
+  <data name="Settings_Sync_Stop_Confirm" xml:space="preserve">
+    <value>Lumen deja de sincronizar. No se borra nada: tus datos quedan en esta PC y en la carpeta. Las rutinas de la carpeta se copian de vuelta a esta PC.</value>
+  </data>
+  <data name="Settings_Sync_Error" xml:space="preserve">
+    <value>Algo salió mal. El registro tiene los detalles.</value>
+  </data>
+  <data name="Settings_Sync_Summary" xml:space="preserve">
+    <value>{0} colecciones · {1} items manuales · {2} renombrados u ocultos · {3} apps ignoradas</value>
+  </data>
+  <data name="Settings_Sync_Choice_Title" xml:space="preserve">
+    <value>Esta carpeta y esta PC ya tienen datos</value>
+  </data>
+  <data name="Settings_Sync_Choice_Description" xml:space="preserve">
+    <value>Elegí qué hacer. No se escribe nada hasta que elijas.</value>
+  </data>
+  <data name="Settings_Sync_Choice_Folder" xml:space="preserve">
+    <value>En la carpeta</value>
+  </data>
+  <data name="Settings_Sync_Choice_ThisPc" xml:space="preserve">
+    <value>En esta PC</value>
+  </data>
+  <data name="Settings_Sync_Merge" xml:space="preserve">
+    <value>Combinar las dos (recomendado)</value>
+  </data>
+  <data name="Settings_Sync_UseFolder" xml:space="preserve">
+    <value>Usar lo de la carpeta</value>
+  </data>
+  <data name="Settings_Sync_UseThisPc" xml:space="preserve">
+    <value>Usar lo de esta PC</value>
+  </data>
+  <data name="Settings_Sync_Cancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="Settings_Sync_Merge_Hint" xml:space="preserve">
+    <value>Combinar conserva todo lo de las dos; si hay lo mismo en las dos, gana la versión de la carpeta. Las otras dos reemplazan los datos del lado que no elijas.</value>
+  </data>
+  <data name="Settings_Sync_Choose" xml:space="preserve">
+    <value>Elegir carpeta…</value>
+  </data>
+  <data name="Settings_Sync_Now" xml:space="preserve">
+    <value>Sincronizar ahora</value>
+  </data>
+  <data name="Settings_Sync_Details" xml:space="preserve">
+    <value>Detalles</value>
+  </data>
+  <data name="Settings_Sync_Confirm_Title" xml:space="preserve">
+    <value>¿Reemplazar datos?</value>
+  </data>
+  <data name="Settings_Sync_UseFolder_Confirm" xml:space="preserve">
+    <value>Esta PC va a tomar los datos de la carpeta. Lo que solo está en esta PC se va a borrar de acá: {0}.
+
+¿Seguimos?</value>
+  </data>
+  <data name="Settings_Sync_UseThisPc_Confirm" xml:space="preserve">
+    <value>La carpeta va a tomar los datos de esta PC. Lo que solo está en la carpeta se va a borrar de ella: {0}.
+
+¿Seguimos?</value>
+  </data>
+  <data name="Sync_ManualItemsReceived" xml:space="preserve">
+    <value>Llegaron {0} item(s) manual(es) desde la carpeta de sincronización: {1}. Solo se abren cuando vos los clickeás.</value>
+  </data>
+  <data name="Sync_NoticeTitle" xml:space="preserve">
+    <value>Carpeta de sincronización</value>
+  </data>
 </root>
