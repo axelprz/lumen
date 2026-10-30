@@ -25,9 +25,8 @@ public sealed partial class SyncSettingsViewModel : ObservableObject
     private SyncPairing? _pending;
     private string? _pendingFolder;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasMessage))]
-    private string? _message;
+    // Kept as a recipe, not as text, so a message follows a language change instead of staying in the old language.
+    private Func<string>? _message;
 
     [ObservableProperty]
     private bool _isBusy;
@@ -76,7 +75,16 @@ public sealed partial class SyncSettingsViewModel : ObservableObject
 
     public bool HasProblems => _coordinator.Service.Problems.Count > 0;
 
+    public string? Message => _message?.Invoke();
+
     public bool HasMessage => !string.IsNullOrEmpty(Message);
+
+    private void SetMessage(Func<string>? message)
+    {
+        _message = message;
+        OnPropertyChanged(nameof(Message));
+        OnPropertyChanged(nameof(HasMessage));
+    }
 
     public bool HasChoice => _pending is not null;
 
@@ -94,7 +102,7 @@ public sealed partial class SyncSettingsViewModel : ObservableObject
             return;
         }
 
-        Message = null;
+        SetMessage(null);
         var folder = _dialogs.PickFolder();
         if (folder is null)
         {
@@ -104,7 +112,7 @@ public sealed partial class SyncSettingsViewModel : ObservableObject
         var problem = SyncFolderRules.Check(folder);
         if (problem != SyncFolderProblem.None)
         {
-            Message = _loc["Settings_Sync_Problem_" + problem];
+            SetMessage(() => _loc["Settings_Sync_Problem_" + problem]);
             return;
         }
 
@@ -119,7 +127,7 @@ public sealed partial class SyncSettingsViewModel : ObservableObject
             }
 
             await _coordinator.AttachAsync(folder, null, CancellationToken.None);
-            Message = _loc["Settings_Sync_Started"];
+            SetMessage(() => _loc["Settings_Sync_Started"]);
         });
     }
 
@@ -154,7 +162,7 @@ public sealed partial class SyncSettingsViewModel : ObservableObject
         await RunAsync(async () =>
         {
             await _coordinator.DetachAsync(CancellationToken.None);
-            Message = _loc["Settings_Sync_Stopped"];
+            SetMessage(() => _loc["Settings_Sync_Stopped"]);
         });
     }
 
@@ -175,7 +183,7 @@ public sealed partial class SyncSettingsViewModel : ObservableObject
             await _coordinator.AttachAsync(folder, start, CancellationToken.None);
             _pending = null;
             _pendingFolder = null;
-            Message = _loc["Settings_Sync_Started"];
+            SetMessage(() => _loc["Settings_Sync_Started"]);
         });
     }
 
@@ -194,7 +202,7 @@ public sealed partial class SyncSettingsViewModel : ObservableObject
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             LogFailed(ex);
-            Message = _loc["Settings_Sync_Error"];
+            SetMessage(() => _loc["Settings_Sync_Error"]);
         }
         finally
         {
