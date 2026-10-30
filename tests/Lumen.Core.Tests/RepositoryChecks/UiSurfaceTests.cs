@@ -74,6 +74,17 @@ public sealed class UiSurfaceTests
     }
 
     [Fact]
+    public void MainWindow_HasTheTopBarSearchAndTheToasts()
+    {
+        var xaml = File.ReadAllText(Path.Combine(_appDir, "Views", "MainWindow.xaml"));
+
+        xaml.ShouldContain("x:Name=\"TopSearch\"");
+        xaml.ShouldContain("Text=\"{Binding SearchText, UpdateSourceTrigger=PropertyChanged}\"");
+        xaml.ShouldContain("ItemsSource=\"{Binding Toasts.Items}\"");
+        File.ReadAllText(Path.Combine(_appDir, "Views", "MainWindow.xaml.cs")).ShouldContain("TopSearch.Focus()");
+    }
+
+    [Fact]
     public void MainWindow_AmbientLightsBreatheThroughMotion()
     {
         var xaml = File.ReadAllText(Path.Combine(_appDir, "Views", "MainWindow.xaml"));

@@ -60,6 +60,12 @@ public sealed partial class RoutinesViewModel : ObservableObject
 
     public bool HasRoutines => Routines.Count > 0;
 
+    /// <summary>A routine is running right now (sidebar dot).</summary>
+    public bool IsBusy => Routines.Any(r => r.IsRunning);
+
+    /// <summary>A routine is new, changed or broken and waits for the user (sidebar dot).</summary>
+    public bool NeedsAttention => Routines.Any(r => r.NeedsReview || r.IsInvalid);
+
     public bool HasPanel => Panel is not null;
 
     public bool HasNotice => !string.IsNullOrEmpty(Notice);
@@ -171,6 +177,7 @@ public sealed partial class RoutinesViewModel : ObservableObject
         }
 
         card.IsRunning = true;
+        OnPropertyChanged(nameof(IsBusy));
         card.SetResult(() => _loc["Routine_Running"]);
         try
         {
@@ -204,6 +211,7 @@ public sealed partial class RoutinesViewModel : ObservableObject
         {
             card.IsRunning = false;
             Current(card).IsRunning = false;
+            OnPropertyChanged(nameof(IsBusy));
         }
     }
 
@@ -371,6 +379,8 @@ public sealed partial class RoutinesViewModel : ObservableObject
         }
 
         OnPropertyChanged(nameof(HasRoutines));
+        OnPropertyChanged(nameof(IsBusy));
+        OnPropertyChanged(nameof(NeedsAttention));
     }
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Could not load routines")]

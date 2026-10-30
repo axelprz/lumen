@@ -67,6 +67,9 @@
   <SolidColorBrush x:Key="Lumen.Brush.FillHover" Color="#1CFFFFFF" />
   <SolidColorBrush x:Key="Lumen.Brush.FillBorder" Color="#1AFFFFFF" />
   <SolidColorBrush x:Key="Lumen.Brush.Input" Color="#CC0F1520" />
+  <!-- Top bar over the pages (translucent: the ambient light shows through) and toasts (near opaque, readable over anything) -->
+  <SolidColorBrush x:Key="Lumen.Brush.TopBar" Color="#8C0E121B" />
+  <SolidColorBrush x:Key="Lumen.Brush.Toast" Color="#F2121723" />
 
   <!-- Ambient lights behind the pages (MainWindow). Alpha 0x26 = 15%; raise it to make the light stronger. -->
   <RadialGradientBrush x:Key="Lumen.Brush.AmbientBlue">

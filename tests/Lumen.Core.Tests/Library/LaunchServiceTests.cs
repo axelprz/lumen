@@ -49,6 +49,27 @@ public sealed class LaunchServiceTests
         (await Service().RunPrimaryActionAsync(Game("steam", "1", "A"), CancellationToken.None)).ShouldBe(LaunchOutcome.Failed);
     }
 
+    [Fact]
+    public async Task Launched_ReportsStartsAndFailures_NotEntriesWithNothingToLaunch()
+    {
+        var service = Service();
+        var seen = new List<LaunchEventArgs>();
+        service.Launched += (_, e) => seen.Add(e);
+
+        await service.RunPrimaryActionAsync(Game("steam", "1", "A"), CancellationToken.None);
+        await service.RunPrimaryActionAsync(Game("steam", "2", "B", installed: false), CancellationToken.None);
+        await service.RunPrimaryActionAsync(Game("steam", "3", "C") with { Launch = null }, CancellationToken.None);
+        _launcher.Throw = true;
+        await service.RunPrimaryActionAsync(Game("steam", "4", "D"), CancellationToken.None);
+
+        seen.Select(e => (e.Entry.Title, e.Installing, e.Outcome)).ShouldBe(
+        [
+            ("A", false, LaunchOutcome.Started),
+            ("B", true, LaunchOutcome.Started),
+            ("D", false, LaunchOutcome.Failed),
+        ]);
+    }
+
     private LaunchService Service() => new(_launcher, NullLogger<LaunchService>.Instance);
 
     private sealed class RecordingLauncher : ILauncher

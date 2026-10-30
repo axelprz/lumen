@@ -15,6 +15,17 @@ public enum LaunchOutcome
     Failed,
 }
 
+/// <summary>What the primary action of an entry did (for a short on-screen notice).</summary>
+public sealed class LaunchEventArgs(LibraryEntry entry, bool installing, LaunchOutcome outcome) : EventArgs
+{
+    public LibraryEntry Entry { get; } = entry;
+
+    /// <summary>True when the action handed the entry to its store's installer instead of playing it.</summary>
+    public bool Installing { get; } = installing;
+
+    public LaunchOutcome Outcome { get; } = outcome;
+}
+
 /// <summary>
 /// Plays installed entries and hands not-installed ones to their store's installer. Games it plays are handed to the
 /// <see cref="PlaytimeTracker"/> (PLAN-v1 §4.4: Lumen tracks what it launches).
@@ -27,6 +38,9 @@ public sealed partial class LaunchService(ILauncher launcher, ILogger<LaunchServ
         ArgumentNullException.ThrowIfNull(entry);
         return entry.IsInstalled ? entry.Launch : entry.Install;
     }
+
+    /// <summary>Raised after a start or a failed start (not for entries with nothing to launch). May come from any thread.</summary>
+    public event EventHandler<LaunchEventArgs>? Launched;
 
     public async Task<LaunchOutcome> RunPrimaryActionAsync(LibraryEntry entry, CancellationToken ct)
     {
@@ -45,11 +59,13 @@ public sealed partial class LaunchService(ILauncher launcher, ILogger<LaunchServ
                 tracker?.Track(entry);
             }
 
+            Launched?.Invoke(this, new LaunchEventArgs(entry, !entry.IsInstalled, LaunchOutcome.Started));
             return LaunchOutcome.Started;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             LogFailed(ex, entry.Ref.ToString());
+            Launched?.Invoke(this, new LaunchEventArgs(entry, !entry.IsInstalled, LaunchOutcome.Failed));
             return LaunchOutcome.Failed;
         }
     }

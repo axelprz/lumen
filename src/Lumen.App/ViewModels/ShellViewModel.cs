@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)
 
+using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Lumen.App.Services;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
@@ -12,12 +14,13 @@ namespace Lumen.App.ViewModels;
 public sealed partial class ShellViewModel : ObservableObject
 {
     private readonly AccentService _accent;
+    private readonly RoutinesViewModel _routines;
     private bool _returnToHome;
 
     [ObservableProperty]
     private SectionViewModel? _selectedSection;
 
-    public ShellViewModel(ILocalizer localizer, HomeViewModel home, LibraryViewModel library, SettingsViewModel settings, AccentService accent, FirstRunViewModel firstRun, CollectionsViewModel collections, RoutinesViewModel routines)
+    public ShellViewModel(ILocalizer localizer, HomeViewModel home, LibraryViewModel library, SettingsViewModel settings, AccentService accent, FirstRunViewModel firstRun, CollectionsViewModel collections, RoutinesViewModel routines, ToastService toasts)
     {
         ArgumentNullException.ThrowIfNull(localizer);
         ArgumentNullException.ThrowIfNull(home);
@@ -26,6 +29,8 @@ public sealed partial class ShellViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(accent);
 
         _accent = accent;
+        _routines = routines;
+        Toasts = toasts;
         FirstRun = firstRun;
         Home = home;
         Library = library;
@@ -48,9 +53,90 @@ public sealed partial class ShellViewModel : ObservableObject
             Library.ShowCollection(id);
         };
         SelectedSection = Sections[0];
+
+        // Sidebar status: the library's size and whether a routine is running or waits for review.
+        library.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(LibraryViewModel.LibraryCount))
+            {
+                Section(ShellSection.Library).Count = library.LibraryCount;
+            }
+            else if (e.PropertyName == nameof(LibraryViewModel.SearchText))
+            {
+                OnPropertyChanged(nameof(SearchText));
+            }
+        };
+        routines.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(RoutinesViewModel.IsBusy) or nameof(RoutinesViewModel.NeedsAttention))
+            {
+                UpdateRoutinesDot();
+            }
+        };
+        Section(ShellSection.Library).Count = library.LibraryCount;
+        UpdateRoutinesDot();
+    }
+
+    /// <summary>"v0.1.0-beta.3" for releases, "dev" for development builds (shown under the brand).</summary>
+    public static string VersionText { get; } = ReadVersion();
+
+    /// <summary>
+    /// The top bar's search. It searches the library: typing switches to the Library page (closing an open detail) and
+    /// filters it; it is the same text as the library's own filter.
+    /// </summary>
+    public string SearchText
+    {
+        get => Library.SearchText;
+        set
+        {
+            value ??= string.Empty;
+            if (value == Library.SearchText)
+            {
+                return;
+            }
+
+            if (value.Length > 0)
+            {
+                if (SelectedSection?.Section != ShellSection.Library)
+                {
+                    SelectedSection = Section(ShellSection.Library);
+                }
+
+                if (Library.HasDetail)
+                {
+                    _returnToHome = false;
+                    Library.Detail = null;
+                }
+            }
+
+            Library.SearchText = value;
+        }
+    }
+
+    /// <summary>Runs a pinned routine from the top bar (one that needs review opens its preview).</summary>
+    [RelayCommand]
+    private Task RunRoutineAsync(PinnedRoutineViewModel? routine) =>
+        routine is null ? Task.CompletedTask : _routines.StartFromShortcutAsync(routine.Id);
+
+    private SectionViewModel Section(ShellSection section) => Sections.First(s => s.Section == section);
+
+    private void UpdateRoutinesDot() =>
+        Section(ShellSection.Routines).Dot = _routines.IsBusy ? SectionDot.Active
+            : _routines.NeedsAttention ? SectionDot.Attention
+            : SectionDot.None;
+
+    private static string ReadVersion()
+    {
+        var version = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? string.Empty;
+        var plus = version.IndexOf('+', StringComparison.Ordinal); // build metadata (the commit) is not for people
+        version = plus < 0 ? version : version[..plus];
+        return version.Length == 0 || version.StartsWith("0.0.0", StringComparison.Ordinal) ? "dev" : "v" + version;
     }
 
     public IReadOnlyList<SectionViewModel> Sections { get; }
+
+    /// <summary>Short notices in the bottom-right corner.</summary>
+    public ToastService Toasts { get; }
 
     public HomeViewModel Home { get; }
 

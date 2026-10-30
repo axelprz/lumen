@@ -17,13 +17,14 @@
         Background="{DynamicResource Lumen.Brush.Backdrop}"
         Foreground="{DynamicResource Lumen.Brush.Text}"
         UseLayoutRounding="True"
-        TextOptions.TextFormattingMode="Display">
+        TextOptions.TextFormattingMode="Display"
+        PreviewKeyDown="OnPreviewKeyDown">
   <Window.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
   </Window.Resources>
   <Grid>
     <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="232" />
+      <ColumnDefinition Width="256" />
       <ColumnDefinition Width="*" />
     </Grid.ColumnDefinitions>
 
@@ -42,62 +43,239 @@
             BorderBrush="{DynamicResource Lumen.Brush.Divider}"
             BorderThickness="0,0,1,0">
       <DockPanel>
-        <TextBlock DockPanel.Dock="Top"
-                   Text="{l:Loc App_Title}"
-                   Style="{StaticResource Lumen.Text.Brand}" />
+        <!-- Brand: gradient badge, name and version -->
+        <Border DockPanel.Dock="Top" Padding="20,22,20,20" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="0,0,0,1">
+          <StackPanel Orientation="Horizontal">
+            <Border Width="38" Height="38" CornerRadius="12" Background="{DynamicResource Lumen.Brush.BrandGradient}">
+              <TextBlock Text="&#xE706;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.BodyLarge}"
+                         Foreground="White" HorizontalAlignment="Center" />
+            </Border>
+            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+              <TextBlock Text="{l:Loc App_Brand}" FontSize="{StaticResource Lumen.FontSize.Section}" FontWeight="Bold">
+                <TextBlock.Foreground>
+                  <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#FFFFFFFF" Offset="0" />
+                    <GradientStop Color="#FFE2E8F0" Offset="0.5" />
+                    <GradientStop Color="#FF60A5FA" Offset="1" />
+                  </LinearGradientBrush>
+                </TextBlock.Foreground>
+              </TextBlock>
+              <TextBlock Text="{x:Static vm:ShellViewModel.VersionText}"
+                         FontSize="{StaticResource Lumen.FontSize.Label}"
+                         FontWeight="SemiBold"
+                         Foreground="{DynamicResource Lumen.Brush.BrandText}"
+                         Opacity="0.8" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
         <ListBox ItemsSource="{Binding Sections}"
                  SelectedItem="{Binding SelectedSection}"
+                 Margin="0,14,0,0"
                  Style="{StaticResource Lumen.Sidebar.List}"
                  ItemContainerStyle="{StaticResource Lumen.Sidebar.Item}">
           <ListBox.ItemTemplate>
             <DataTemplate DataType="{x:Type vm:SectionViewModel}">
-              <StackPanel Orientation="Horizontal">
+              <DockPanel LastChildFill="True">
+                <!-- Library: how many items; Routines: green while one runs, amber when one waits for review -->
+                <Border DockPanel.Dock="Right"
+                        Background="{DynamicResource Lumen.Brush.FillHover}"
+                        CornerRadius="999"
+                        Padding="8,1"
+                        VerticalAlignment="Center"
+                        Visibility="{Binding HasCount, Converter={StaticResource BoolToVisibility}}">
+                  <TextBlock Text="{Binding Count}" FontSize="{StaticResource Lumen.FontSize.Label}" FontWeight="SemiBold"
+                             Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+                </Border>
+                <Ellipse x:Name="Dot" DockPanel.Dock="Right" Width="8" Height="8" VerticalAlignment="Center" Visibility="Collapsed" />
                 <TextBlock Text="{Binding IconGlyph}"
                            Style="{StaticResource Lumen.Text.Icon}"
                            Margin="0,0,14,0" />
                 <TextBlock Text="{Binding Title}"
                            VerticalAlignment="Center"
-                           FontSize="{StaticResource Lumen.FontSize.Lead}" />
-              </StackPanel>
+                           FontSize="{StaticResource Lumen.FontSize.Lead}"
+                           FontWeight="Medium" />
+              </DockPanel>
+              <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Dot}" Value="{x:Static vm:SectionDot.Active}">
+                  <Setter TargetName="Dot" Property="Visibility" Value="Visible" />
+                  <Setter TargetName="Dot" Property="Fill" Value="{DynamicResource Lumen.Brush.Success}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Dot}" Value="{x:Static vm:SectionDot.Attention}">
+                  <Setter TargetName="Dot" Property="Visibility" Value="Visible" />
+                  <Setter TargetName="Dot" Property="Fill" Value="{DynamicResource Lumen.Brush.Warning}" />
+                </DataTrigger>
+              </DataTemplate.Triggers>
             </DataTemplate>
           </ListBox.ItemTemplate>
         </ListBox>
       </DockPanel>
     </Border>
 
-    <!-- Content: the selected section's page, picked by view-model type -->
-    <ContentControl x:Name="PageHost"
-                    Grid.Column="1"
-                    Content="{Binding SelectedSection.Page}"
-                    Focusable="False">
-      <ContentControl.Resources>
-        <DataTemplate DataType="{x:Type vm:HomeViewModel}">
-          <views:HomeView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:LibraryViewModel}">
-          <views:LibraryView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:RoutinesViewModel}">
-          <views:RoutinesView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:CollectionsViewModel}">
-          <views:CollectionsView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
-          <views:SettingsView />
-        </DataTemplate>
-        <DataTemplate DataType="{x:Type vm:PlaceholderPageViewModel}">
-          <StackPanel Margin="40,32">
-            <TextBlock Text="{Binding Section.Title}"
-                       Style="{StaticResource Lumen.Text.PageTitle}" />
-            <TextBlock Text="{l:Loc Placeholder_ComingSoon}"
+    <Grid Grid.Column="1">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+      </Grid.RowDefinitions>
+
+      <!-- Top bar: library search (Ctrl+K or Ctrl+F; Esc clears) and the first pinned routines -->
+      <Border Grid.Row="0"
+              Background="{DynamicResource Lumen.Brush.TopBar}"
+              BorderBrush="{DynamicResource Lumen.Brush.Divider}"
+              BorderThickness="0,0,0,1"
+              Padding="32,12">
+        <DockPanel>
+          <ItemsControl DockPanel.Dock="Right" ItemsSource="{Binding Home.TopBarRoutines}" Focusable="False" VerticalAlignment="Center">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel Orientation="Horizontal" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="{x:Type vm:PinnedRoutineViewModel}">
+                <Button Command="{Binding DataContext.RunRoutineCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                        CommandParameter="{Binding}"
+                        Style="{StaticResource Lumen.Button}"
+                        Background="{DynamicResource Lumen.Brush.BrandSoft}"
+                        BorderBrush="{DynamicResource Lumen.Brush.BrandBorder}"
+                        Foreground="{DynamicResource Lumen.Brush.BrandText}"
+                        FontSize="{StaticResource Lumen.FontSize.Small}"
+                        FontWeight="SemiBold"
+                        Padding="14,8"
+                        Margin="12,0,0,0"
+                        ToolTip="{Binding Caption}"
+                        AutomationProperties.Name="{Binding Name}">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE768;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,0,8,0" />
+                    <TextBlock Text="{Binding Name}" MaxWidth="180" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                  </StackPanel>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <Grid MaxWidth="440" HorizontalAlignment="Left" Height="38">
+            <TextBox x:Name="TopSearch"
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     Padding="36,0,70,0"
+                     VerticalContentAlignment="Center"
+                     AutomationProperties.Name="{l:Loc Library_Search}" />
+            <TextBlock Text="&#xE721;"
+                       Style="{StaticResource Lumen.Text.Icon}"
+                       FontSize="{StaticResource Lumen.FontSize.Body}"
                        Foreground="{DynamicResource Lumen.Brush.TextMuted}"
-                       FontSize="{StaticResource Lumen.FontSize.Lead}"
-                       Margin="0,12,0,0" />
-          </StackPanel>
+                       HorizontalAlignment="Left"
+                       Margin="13,0,0,0"
+                       IsHitTestVisible="False" />
+            <TextBlock Text="{l:Loc Library_Search}"
+                       Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                       FontSize="{StaticResource Lumen.FontSize.Body}"
+                       VerticalAlignment="Center"
+                       Margin="37,0,0,0"
+                       IsHitTestVisible="False">
+              <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                  <Setter Property="Visibility" Value="Collapsed" />
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding Text, ElementName=TopSearch}" Value="">
+                      <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </TextBlock.Style>
+            </TextBlock>
+            <Border HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Margin="0,0,10,0"
+                    Padding="6,1"
+                    CornerRadius="5"
+                    Background="{DynamicResource Lumen.Brush.Fill}"
+                    BorderBrush="{DynamicResource Lumen.Brush.FillBorder}"
+                    BorderThickness="1"
+                    IsHitTestVisible="False">
+              <TextBlock Text="{l:Loc TopBar_SearchKey}" FontSize="{StaticResource Lumen.FontSize.Label}" FontWeight="SemiBold"
+                         Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+            </Border>
+          </Grid>
+        </DockPanel>
+      </Border>
+
+      <!-- Content: the selected section's page, picked by view-model type -->
+      <ContentControl x:Name="PageHost"
+                      Grid.Row="1"
+                      Content="{Binding SelectedSection.Page}"
+                      Focusable="False">
+        <ContentControl.Resources>
+          <DataTemplate DataType="{x:Type vm:HomeViewModel}">
+            <views:HomeView />
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type vm:LibraryViewModel}">
+            <views:LibraryView />
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type vm:RoutinesViewModel}">
+            <views:RoutinesView />
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type vm:CollectionsViewModel}">
+            <views:CollectionsView />
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsView />
+          </DataTemplate>
+          <DataTemplate DataType="{x:Type vm:PlaceholderPageViewModel}">
+            <StackPanel Margin="40,32">
+              <TextBlock Text="{Binding Section.Title}"
+                         Style="{StaticResource Lumen.Text.PageTitle}" />
+              <TextBlock Text="{l:Loc Placeholder_ComingSoon}"
+                         Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                         FontSize="{StaticResource Lumen.FontSize.Lead}"
+                         Margin="0,12,0,0" />
+            </StackPanel>
+          </DataTemplate>
+        </ContentControl.Resources>
+      </ContentControl>
+    </Grid>
+
+    <!-- Toasts: short notices in the bottom-right corner (a game starting, a routine finishing). Not clickable. -->
+    <ItemsControl Grid.Column="1"
+                  ItemsSource="{Binding Toasts.Items}"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Bottom"
+                  Margin="0,0,24,24"
+                  Panel.ZIndex="5"
+                  IsHitTestVisible="False"
+                  Focusable="False">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate DataType="{x:Type services:ToastViewModel}">
+          <Border x:Name="Card"
+                  services:Motion.ShowIn="True"
+                  Background="{DynamicResource Lumen.Brush.Toast}"
+                  BorderBrush="{DynamicResource Lumen.Brush.BrandBorder}"
+                  BorderThickness="1"
+                  CornerRadius="14"
+                  Padding="16,11"
+                  Margin="0,10,0,0"
+                  MaxWidth="380"
+                  HorizontalAlignment="Right">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock x:Name="Glyph" Text="{Binding Glyph}" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Body}"
+                         Foreground="{DynamicResource Lumen.Brush.BrandText}" Margin="0,0,10,0" />
+              <TextBlock Text="{Binding Text}" FontSize="{StaticResource Lumen.FontSize.Small}" FontWeight="SemiBold"
+                         TextWrapping="Wrap" MaxWidth="320" VerticalAlignment="Center" />
+            </StackPanel>
+          </Border>
+          <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding Kind}" Value="{x:Static services:ToastKind.Success}">
+              <Setter TargetName="Card" Property="BorderBrush" Value="#8034D399" />
+              <Setter TargetName="Glyph" Property="Foreground" Value="{DynamicResource Lumen.Brush.Success}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Kind}" Value="{x:Static services:ToastKind.Error}">
+              <Setter TargetName="Card" Property="BorderBrush" Value="#80F2766B" />
+              <Setter TargetName="Glyph" Property="Foreground" Value="{DynamicResource Lumen.Brush.Error}" />
+            </DataTrigger>
+          </DataTemplate.Triggers>
         </DataTemplate>
-      </ContentControl.Resources>
-    </ContentControl>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
 
     <!-- First-run wizard: covers sidebar and page until finished or skipped -->
     <views:FirstRunView Grid.ColumnSpan="2"

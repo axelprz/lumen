@@ -220,6 +220,11 @@ public sealed partial class HomeViewModel : ObservableObject
 
     public bool HasPinnedRoutines => PinnedRoutines.Count > 0;
 
+    /// <summary>The first pinned routines, as quick buttons in the window's top bar.</summary>
+    public IReadOnlyList<PinnedRoutineViewModel> TopBarRoutines => PinnedRoutines.Take(TopBarRoutineCount).ToList();
+
+    private const int TopBarRoutineCount = 2;
+
     public IReadOnlyList<QuickAppViewModel> QuickApps { get; private set; } = [];
 
     public bool HasQuickApps => QuickApps.Count > 0;
@@ -343,6 +348,7 @@ public sealed partial class HomeViewModel : ObservableObject
             .ToList();
         OnPropertyChanged(nameof(PinnedRoutines));
         OnPropertyChanged(nameof(HasPinnedRoutines));
+        OnPropertyChanged(nameof(TopBarRoutines));
     }
 
     private void Rebuild()
