@@ -1,0 +1,23 @@
+"users"
+{
+	"76561190000000001"
+	{
+		"AccountName"		"testaccount1"
+		"PersonaName"		"Player One"
+		"RememberPassword"		"1"
+		"timestamp"		"1761000000"
+	}
+	"76561190000000002"
+	{
+		"AccountName"		"testaccount2"
+		"PersonaName"		"Player Two"
+		"RememberPassword"		"1"
+		"timestamp"		"1761800000"
+	}
+	"76561190000000003"
+	{
+		"AccountName"		"testaccount3"
+		"PersonaName"		""
+		"timestamp"		"1761900000"
+	}
+}

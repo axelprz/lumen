@@ -1,0 +1,15 @@
+"users"
+{
+	"76561190000000001"
+	{
+		"PersonaName"		"Player One"
+		"MostRecent"		"1"
+		"timestamp"		"1"
+	}
+	"76561190000000002"
+	{
+		"PersonaName"		"Player Two"
+		"MostRecent"		"0"
+		"timestamp"		"9"
+	}
+}

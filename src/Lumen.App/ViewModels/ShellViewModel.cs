@@ -20,7 +20,7 @@ public sealed partial class ShellViewModel : ObservableObject
     [ObservableProperty]
     private SectionViewModel? _selectedSection;
 
-    public ShellViewModel(ILocalizer localizer, HomeViewModel home, LibraryViewModel library, SettingsViewModel settings, AccentService accent, FirstRunViewModel firstRun, CollectionsViewModel collections, RoutinesViewModel routines, ToastService toasts)
+    public ShellViewModel(ILocalizer localizer, HomeViewModel home, LibraryViewModel library, SettingsViewModel settings, AccentService accent, FirstRunViewModel firstRun, CollectionsViewModel collections, RoutinesViewModel routines, ToastService toasts, SidebarFooterViewModel footer)
     {
         ArgumentNullException.ThrowIfNull(localizer);
         ArgumentNullException.ThrowIfNull(home);
@@ -31,6 +31,7 @@ public sealed partial class ShellViewModel : ObservableObject
         _accent = accent;
         _routines = routines;
         Toasts = toasts;
+        Footer = footer;
         FirstRun = firstRun;
         Home = home;
         Library = library;
@@ -137,6 +138,9 @@ public sealed partial class ShellViewModel : ObservableObject
 
     /// <summary>Short notices in the bottom-right corner.</summary>
     public ToastService Toasts { get; }
+
+    /// <summary>Steam account and CPU/RAM monitor at the bottom of the sidebar.</summary>
+    public SidebarFooterViewModel Footer { get; }
 
     public HomeViewModel Home { get; }
 
