@@ -8,103 +8,227 @@
              Loaded="OnLoaded">
   <UserControl.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+
+    <!-- One option per row: a quiet panel with the label on the left and the control on the right -->
+    <Style x:Key="Settings.Row" TargetType="Border">
+      <Setter Property="Background" Value="{DynamicResource Lumen.Brush.Fill}" />
+      <Setter Property="CornerRadius" Value="12" />
+      <Setter Property="Padding" Value="16,12" />
+      <Setter Property="Margin" Value="0,0,0,10" />
+    </Style>
+    <Style x:Key="Settings.RowLabel" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Body}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
+    </Style>
+    <Style x:Key="Settings.SectionTitle" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Small}" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.BrandText}" />
+      <Setter Property="Margin" Value="0,0,0,14" />
+    </Style>
+
+    <!-- Tabs: a row of soft pills; the selected one gets the brand tint -->
+    <Style x:Key="Settings.Tabs" TargetType="TabControl">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="TabControl">
+            <StackPanel>
+              <Border BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="0,0,0,1" Padding="0,0,0,12" Margin="0,0,0,20">
+                <TabPanel IsItemsHost="True" KeyboardNavigation.TabIndex="1" />
+              </Border>
+              <ContentPresenter ContentSource="SelectedContent" />
+            </StackPanel>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style TargetType="TabItem">
+      <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.TextMuted}" />
+      <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Small}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="TabItem">
+            <Grid Margin="0,0,8,0">
+              <Border x:Name="Bd" CornerRadius="10" Padding="16,8" BorderThickness="1" BorderBrush="Transparent" Background="Transparent">
+                <ContentPresenter ContentSource="Header" />
+              </Border>
+              <Border x:Name="FocusRing" Margin="-3" CornerRadius="13" BorderThickness="2" BorderBrush="{DynamicResource Lumen.Brush.BrandText}"
+                      Visibility="Collapsed" IsHitTestVisible="False" />
+            </Grid>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Lumen.Brush.Fill}" />
+                <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
+              </Trigger>
+              <Trigger Property="IsSelected" Value="True">
+                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Lumen.Brush.BrandSoft}" />
+                <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.BrandBorder}" />
+                <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.BrandText}" />
+              </Trigger>
+              <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter TargetName="FocusRing" Property="Visibility" Value="Visible" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
   </UserControl.Resources>
 
   <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
-    <StackPanel x:Name="PageBlocks" Margin="40,32,40,40" MaxWidth="720" HorizontalAlignment="Left">
-      <TextBlock Text="{l:Loc Nav_Settings}" Style="{StaticResource Lumen.Text.PageTitle}" Margin="0,0,0,24" />
+    <StackPanel x:Name="PageBlocks" Margin="40,28,40,40" MaxWidth="820" HorizontalAlignment="Left">
+      <StackPanel Margin="0,0,0,22">
+        <TextBlock Text="{l:Loc Nav_Settings}" FontSize="{StaticResource Lumen.FontSize.Title}" FontWeight="Bold" />
+        <TextBlock Text="{l:Loc Settings_Subtitle}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" Margin="0,4,0,0"
+                   Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+      </StackPanel>
 
-      <!-- General -->
-      <Border Style="{StaticResource Lumen.Card}" Margin="0,0,0,20">
-        <StackPanel>
-          <TextBlock Text="{l:Loc Settings_General_Title}" FontSize="{StaticResource Lumen.FontSize.Subtitle}" FontWeight="SemiBold" Margin="0,0,0,16" />
-          <TextBlock Text="{l:Loc Settings_Language}" Style="{StaticResource Lumen.Text.Label}" />
-          <ComboBox DataContext="{Binding Language}"
-                    ItemsSource="{Binding Options}"
-                    SelectedItem="{Binding Selected}"
-                    DisplayMemberPath="Label"
-                    MinWidth="240"
-                    HorizontalAlignment="Left"
-                    AutomationProperties.Name="{l:Loc Settings_Language}" />
-          <CheckBox Content="{l:Loc Settings_CloseToTray}"
-                    IsChecked="{Binding Window.CloseToTray}"
-                    Foreground="{DynamicResource Lumen.Brush.Text}"
-                    FontSize="{StaticResource Lumen.FontSize.Body}"
-                    Margin="0,20,0,0" />
-          <CheckBox Content="{l:Loc Settings_StartWithWindows}"
-                    IsChecked="{Binding Window.StartWithWindows}"
-                    Foreground="{DynamicResource Lumen.Brush.Text}"
-                    FontSize="{StaticResource Lumen.FontSize.Body}"
-                    Margin="0,10,0,0" />
-          <TextBlock Text="{l:Loc Settings_Hotkey}" Style="{StaticResource Lumen.Text.Label}" Margin="0,20,0,0" />
-          <TextBlock Text="{l:Loc Settings_Hotkey_Description}"
-                     Foreground="{DynamicResource Lumen.Brush.TextMuted}"
-                     TextWrapping="Wrap"
-                     FontSize="{StaticResource Lumen.FontSize.Small}"
-                     Margin="0,0,0,8" />
-          <StackPanel Orientation="Horizontal">
-            <Border Background="{DynamicResource Lumen.Brush.Surface}"
-                    BorderBrush="{DynamicResource Lumen.Brush.Divider}"
-                    BorderThickness="1"
-                    CornerRadius="6"
-                    Padding="12,6"
-                    MinWidth="180"
-                    VerticalAlignment="Center">
-              <TextBlock Text="{Binding Window.HotkeyText}" FontSize="{StaticResource Lumen.FontSize.Body}" FontWeight="SemiBold" />
+      <TabControl Style="{StaticResource Settings.Tabs}">
+        <!-- General: language, window, shortcut, welcome, library merges -->
+        <TabItem Header="{l:Loc Settings_Tab_General}">
+          <StackPanel>
+            <Border Style="{StaticResource Lumen.Card}">
+              <StackPanel>
+                <TextBlock Text="{l:Loc Settings_General_Title}" Style="{StaticResource Settings.SectionTitle}" />
+
+                <Border Style="{StaticResource Settings.Row}">
+                  <DockPanel>
+                    <ComboBox DockPanel.Dock="Right"
+                              DataContext="{Binding Language}"
+                              ItemsSource="{Binding Options}"
+                              SelectedItem="{Binding Selected}"
+                              DisplayMemberPath="Label"
+                              MinWidth="220"
+                              AutomationProperties.Name="{l:Loc Settings_Language}" />
+                    <TextBlock Text="{l:Loc Settings_Language}" Style="{StaticResource Settings.RowLabel}" Margin="0,0,16,0" />
+                  </DockPanel>
+                </Border>
+
+                <Border Style="{StaticResource Settings.Row}">
+                  <DockPanel>
+                    <CheckBox DockPanel.Dock="Right"
+                              IsChecked="{Binding Window.CloseToTray}"
+                              Style="{StaticResource Lumen.Switch}"
+                              VerticalAlignment="Center"
+                              AutomationProperties.Name="{l:Loc Settings_CloseToTray}" />
+                    <TextBlock Text="{l:Loc Settings_CloseToTray}" Style="{StaticResource Settings.RowLabel}" Margin="0,0,16,0" />
+                  </DockPanel>
+                </Border>
+
+                <Border Style="{StaticResource Settings.Row}">
+                  <DockPanel>
+                    <CheckBox DockPanel.Dock="Right"
+                              IsChecked="{Binding Window.StartWithWindows}"
+                              Style="{StaticResource Lumen.Switch}"
+                              VerticalAlignment="Center"
+                              AutomationProperties.Name="{l:Loc Settings_StartWithWindows}" />
+                    <TextBlock Text="{l:Loc Settings_StartWithWindows}" Style="{StaticResource Settings.RowLabel}" Margin="0,0,16,0" />
+                  </DockPanel>
+                </Border>
+
+                <Border Style="{StaticResource Settings.Row}">
+                  <StackPanel>
+                    <DockPanel>
+                      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Background="{DynamicResource Lumen.Brush.Input}"
+                                BorderBrush="{DynamicResource Lumen.Brush.FillBorder}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12,6"
+                                MinWidth="150"
+                                VerticalAlignment="Center">
+                          <TextBlock Text="{Binding Window.HotkeyText}" FontSize="{StaticResource Lumen.FontSize.Body}" FontWeight="SemiBold" />
+                        </Border>
+                        <Button Content="{l:Loc Settings_Hotkey_Change}"
+                                Command="{Binding Window.RecordHotkeyCommand}"
+                                Style="{StaticResource Lumen.Button}"
+                                Margin="8,0,0,0" />
+                        <Button Content="{l:Loc Settings_Hotkey_Reset}"
+                                Command="{Binding Window.ResetHotkeyCommand}"
+                                Style="{StaticResource Lumen.Button}"
+                                Margin="8,0,0,0" />
+                      </StackPanel>
+                      <StackPanel Margin="0,0,16,0" VerticalAlignment="Center">
+                        <TextBlock Text="{l:Loc Settings_Hotkey}" Style="{StaticResource Settings.RowLabel}" />
+                        <TextBlock Text="{l:Loc Settings_Hotkey_Description}"
+                                   Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                                   TextWrapping="Wrap"
+                                   FontSize="{StaticResource Lumen.FontSize.Caption}"
+                                   Margin="0,2,0,0" />
+                      </StackPanel>
+                    </DockPanel>
+                    <TextBlock Text="{Binding Window.HotkeyStatus}"
+                               Foreground="{DynamicResource Lumen.Brush.Warning}"
+                               TextWrapping="Wrap"
+                               FontSize="{StaticResource Lumen.FontSize.Small}"
+                               Margin="0,8,0,0"
+                               Visibility="{Binding Window.HasHotkeyStatus, Converter={StaticResource BoolToVisibility}}" />
+                  </StackPanel>
+                </Border>
+
+                <Button Content="{l:Loc Settings_ShowWelcome}"
+                        Command="{Binding FirstRun.OpenCommand}"
+                        Style="{StaticResource Lumen.Button}"
+                        HorizontalAlignment="Left"
+                        Margin="0,6,0,0" />
+              </StackPanel>
             </Border>
-            <Button Content="{l:Loc Settings_Hotkey_Change}"
-                    Command="{Binding Window.RecordHotkeyCommand}"
-                    Style="{StaticResource Lumen.Button}"
-                    Margin="8,0,0,0" />
-            <Button Content="{l:Loc Settings_Hotkey_Reset}"
-                    Command="{Binding Window.ResetHotkeyCommand}"
-                    Style="{StaticResource Lumen.Button}"
-                    Margin="8,0,0,0" />
+
+            <!-- Library -->
+            <Border Style="{StaticResource Lumen.Card}" Margin="0,20,0,0">
+              <StackPanel>
+                <TextBlock Text="{l:Loc Settings_Library_Title}" Style="{StaticResource Settings.SectionTitle}" />
+                <TextBlock Text="{l:Loc Settings_Library_MergeDescription}"
+                           Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                           TextWrapping="Wrap"
+                           FontSize="{StaticResource Lumen.FontSize.Body}"
+                           Margin="0,0,0,16" />
+                <Button Content="{l:Loc Settings_Library_ResetMerges}"
+                        Command="{Binding ResetMergesCommand}"
+                        Style="{StaticResource Lumen.Button}"
+                        HorizontalAlignment="Left" />
+                <TextBlock Text="{Binding LibraryStatus}"
+                           Foreground="{DynamicResource Lumen.Brush.Success}"
+                           FontSize="{StaticResource Lumen.FontSize.Body}"
+                           Margin="0,12,0,0"
+                           Visibility="{Binding HasLibraryStatus, Converter={StaticResource BoolToVisibility}}" />
+              </StackPanel>
+            </Border>
           </StackPanel>
-          <TextBlock Text="{Binding Window.HotkeyStatus}"
-                     Foreground="{DynamicResource Lumen.Brush.Warning}"
-                     TextWrapping="Wrap"
-                     FontSize="{StaticResource Lumen.FontSize.Small}"
-                     Margin="0,8,0,0"
-                     Visibility="{Binding Window.HasHotkeyStatus, Converter={StaticResource BoolToVisibility}}" />
-          <Button Content="{l:Loc Settings_ShowWelcome}"
-                  Command="{Binding FirstRun.OpenCommand}"
-                  Style="{StaticResource Lumen.Button}"
-                  HorizontalAlignment="Left"
-                  Margin="0,20,0,0" />
-        </StackPanel>
-      </Border>
+        </TabItem>
 
-      <views:SteamSettingsCard DataContext="{Binding Steam}" />
-      <views:SteamFamilyCard DataContext="{Binding SteamFamily}" Margin="0,20,0,0" />
-      <views:EpicAccountCard DataContext="{Binding Epic}" Margin="0,20,0,0" />
-      <views:GogAccountCard DataContext="{Binding Gog}" Margin="0,20,0,0" />
-      <views:ArtworkSettingsCard DataContext="{Binding Artwork}" Margin="0,20,0,0" />
+        <!-- Accounts and stores: Steam (key and website sign-in), Epic, GOG -->
+        <TabItem Header="{l:Loc Settings_Tab_Accounts}">
+          <StackPanel>
+            <views:SteamSettingsCard DataContext="{Binding Steam}" />
+            <views:SteamFamilyCard DataContext="{Binding SteamFamily}" Margin="0,20,0,0" />
+            <views:EpicAccountCard DataContext="{Binding Epic}" Margin="0,20,0,0" />
+            <views:GogAccountCard DataContext="{Binding Gog}" Margin="0,20,0,0" />
+          </StackPanel>
+        </TabItem>
 
-      <views:SyncSettingsCard DataContext="{Binding Sync}" Margin="0,20,0,0" />
+        <!-- Artwork: SteamGridDB -->
+        <TabItem Header="{l:Loc Settings_Tab_Artwork}">
+          <views:ArtworkSettingsCard DataContext="{Binding Artwork}" />
+        </TabItem>
 
-      <views:UpdateSettingsCard DataContext="{Binding Updates}" Margin="0,20,0,0" />
-
-      <!-- Library -->
-      <Border Style="{StaticResource Lumen.Card}" Margin="0,20,0,0">
-        <StackPanel>
-          <TextBlock Text="{l:Loc Settings_Library_Title}" FontSize="{StaticResource Lumen.FontSize.Subtitle}" FontWeight="SemiBold" />
-          <TextBlock Text="{l:Loc Settings_Library_MergeDescription}"
-                     Foreground="{DynamicResource Lumen.Brush.TextMuted}"
-                     TextWrapping="Wrap"
-                     FontSize="{StaticResource Lumen.FontSize.Body}"
-                     Margin="0,6,0,16" />
-          <Button Content="{l:Loc Settings_Library_ResetMerges}"
-                  Command="{Binding ResetMergesCommand}"
-                  Style="{StaticResource Lumen.Button}"
-                  HorizontalAlignment="Left" />
-          <TextBlock Text="{Binding LibraryStatus}"
-                     Foreground="{DynamicResource Lumen.Brush.Success}"
-                     FontSize="{StaticResource Lumen.FontSize.Body}"
-                     Margin="0,12,0,0"
-                     Visibility="{Binding HasLibraryStatus, Converter={StaticResource BoolToVisibility}}" />
-        </StackPanel>
-      </Border>
+        <!-- Sync folder and updates -->
+        <TabItem Header="{l:Loc Settings_Tab_SyncUpdates}">
+          <StackPanel>
+            <views:SyncSettingsCard DataContext="{Binding Sync}" />
+            <views:UpdateSettingsCard DataContext="{Binding Updates}" Margin="0,20,0,0" />
+          </StackPanel>
+        </TabItem>
+      </TabControl>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

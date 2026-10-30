@@ -10,8 +10,8 @@
   <UserControl.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     <Style x:Key="StepTitle" TargetType="TextBlock">
-      <Setter Property="FontSize" Value="30" />
-      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Headline}" />
+      <Setter Property="FontWeight" Value="Bold" />
       <Setter Property="TextWrapping" Value="Wrap" />
       <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
     </Style>
@@ -23,27 +23,35 @@
     </Style>
   </UserControl.Resources>
 
-  <Grid Background="{DynamicResource Lumen.Brush.Background}">
+  <!-- A modal card over the dimmed window (95 %: the ambient light shows faintly, nothing behind can be read) -->
+  <Grid Background="{DynamicResource Lumen.Brush.Scrim}">
+  <Border MaxWidth="860" Margin="40,32" CornerRadius="24" BorderThickness="1"
+          Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="#26FFFFFF">
+  <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
       <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
 
-    <!-- Header: brand, progress, skip -->
-    <DockPanel Grid.Row="0" Margin="48,28,48,0">
+    <!-- Header: brand badge and name, progress, skip -->
+    <DockPanel Grid.Row="0" Margin="36,26,36,0">
       <Button DockPanel.Dock="Right"
               Command="{Binding SkipCommand}"
               Content="{l:Loc FirstRun_Skip}"
               Style="{StaticResource Lumen.Button}"
               VerticalAlignment="Center" />
-      <TextBlock DockPanel.Dock="Left" Text="{l:Loc App_Title}" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
-      <TextBlock Text="{Binding StepText}" Margin="20,0,0,0" FontSize="{StaticResource Lumen.FontSize.Body}" VerticalAlignment="Center"
-                 Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+      <Border DockPanel.Dock="Left" Width="40" Height="40" CornerRadius="12" Background="{DynamicResource Lumen.Brush.BrandGradient}">
+        <TextBlock Text="&#xE706;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.BodyLarge}" Foreground="White" HorizontalAlignment="Center" />
+      </Border>
+      <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+        <TextBlock Text="{l:Loc App_Brand}" FontSize="{StaticResource Lumen.FontSize.BodyLarge}" FontWeight="Bold" />
+        <TextBlock Text="{Binding StepText}" FontSize="{StaticResource Lumen.FontSize.Caption}" Foreground="{DynamicResource Lumen.Brush.BrandText}" />
+      </StackPanel>
     </DockPanel>
 
     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Focusable="False">
-      <Grid MaxWidth="720" Margin="48,40,48,24" HorizontalAlignment="Center">
+      <Grid MaxWidth="720" Margin="36,28,36,20" HorizontalAlignment="Center">
 
         <!-- 1. Language -->
         <StackPanel Visibility="{Binding IsLanguageStep, Converter={StaticResource BoolToVisibility}}">
@@ -112,7 +120,7 @@
     </ScrollViewer>
 
     <!-- Footer: back / next -->
-    <Border Grid.Row="2" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="0,1,0,0" Padding="48,16">
+    <Border Grid.Row="2" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="0,1,0,0" Padding="36,16">
       <DockPanel MaxWidth="720">
         <Button DockPanel.Dock="Right"
                 Command="{Binding NextCommand}"
@@ -136,5 +144,7 @@
         </Button>
       </DockPanel>
     </Border>
+  </Grid>
+  </Border>
   </Grid>
 </UserControl>

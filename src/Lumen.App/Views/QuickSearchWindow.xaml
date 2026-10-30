@@ -26,10 +26,10 @@
   <Border x:Name="Card"
           Margin="16"
           Background="{DynamicResource Lumen.Brush.Sidebar}"
-          BorderBrush="{DynamicResource Lumen.Brush.Divider}"
+          BorderBrush="#26FFFFFF"
           BorderThickness="1"
-          CornerRadius="12"
-          Padding="12">
+          CornerRadius="18"
+          Padding="14">
     <Border.Effect>
       <DropShadowEffect BlurRadius="24" ShadowDepth="4" Opacity="0.5" Color="Black" />
     </Border.Effect>
@@ -69,7 +69,7 @@
             <Setter Property="Template">
               <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
-                  <Border x:Name="Row" Background="Transparent" CornerRadius="8" Padding="12,8">
+                  <Border x:Name="Row" Background="Transparent" CornerRadius="12" Padding="12,9">
                     <ContentPresenter />
                   </Border>
                   <ControlTemplate.Triggers>
@@ -77,7 +77,8 @@
                       <Setter TargetName="Row" Property="Background" Value="{DynamicResource Lumen.Brush.SurfaceHover}" />
                     </Trigger>
                     <Trigger Property="IsSelected" Value="True">
-                      <Setter TargetName="Row" Property="Background" Value="{DynamicResource Lumen.Brush.Brand}" />
+                      <Setter TargetName="Row" Property="Background" Value="{DynamicResource Lumen.Brush.BrandGradient}" />
+                      <Setter Property="Foreground" Value="White" />
                     </Trigger>
                   </ControlTemplate.Triggers>
                 </ControlTemplate>
