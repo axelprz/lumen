@@ -92,6 +92,24 @@ public sealed class UiSurfaceTests
     }
 
     [Fact]
+    public void Home_HeroIsACardWithItsArtFadingIn_AndTilesShowStoreAndPlay()
+    {
+        var xaml = File.ReadAllText(Path.Combine(_appDir, "Views", "HomeView.xaml"));
+
+        xaml.ShouldContain("x:Name=\"HeroArt\"");
+        xaml.ShouldContain("Text=\"{Binding StoreName}\"");
+        xaml.ShouldContain("Command=\"{Binding DataContext.PlayTileCommand");
+        File.ReadAllText(Path.Combine(_appDir, "Views", "HomeView.xaml.cs")).ShouldContain("Motion.FadeIn(HeroArt)");
+    }
+
+    [Fact]
+    public void LanguageSwitch_AlsoSetsTheFormatCulture()
+    {
+        File.ReadAllText(Path.Combine(_appDir, "Localization", "LocalizationService.cs"))
+            .ShouldContain("CultureInfo.CurrentCulture = format;");
+    }
+
+    [Fact]
     public void MainWindow_AmbientLightsBreatheThroughMotion()
     {
         var xaml = File.ReadAllText(Path.Combine(_appDir, "Views", "MainWindow.xaml"));

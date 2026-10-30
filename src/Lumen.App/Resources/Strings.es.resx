@@ -1455,4 +1455,25 @@
   <data name="Footer_SteamAccount" xml:space="preserve">
     <value>Cuenta de Steam</value>
   </data>
+  <data name="Home_Featured" xml:space="preserve">
+    <value>Destacado</value>
+  </data>
+  <data name="Home_HoursShort" xml:space="preserve">
+    <value>{0:0.#} h</value>
+  </data>
+  <data name="Home_MinutesShort" xml:space="preserve">
+    <value>{0} min</value>
+  </data>
+  <data name="Home_PlayedLabelHours" xml:space="preserve">
+    <value>jugadas</value>
+  </data>
+  <data name="Home_PlayedLabelMinutes" xml:space="preserve">
+    <value>jugados</value>
+  </data>
+  <data name="Home_SeeAll" xml:space="preserve">
+    <value>Ver todas</value>
+  </data>
+  <data name="Home_PlayTile" xml:space="preserve">
+    <value>Jugar {0}</value>
+  </data>
 </root>

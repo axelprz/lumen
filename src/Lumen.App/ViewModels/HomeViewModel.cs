@@ -14,7 +14,7 @@ using Lumen.Core.Routines;
 namespace Lumen.App.ViewModels;
 
 /// <summary>A game in a Home row: its cover, and pointing at it features it in the hero.</summary>
-public sealed partial class HomeTileViewModel(LibraryItem item, Func<LibraryItem, Task<TileArt?>> coverLoader, ImageCache images) : ObservableObject
+public sealed partial class HomeTileViewModel(LibraryItem item, Func<LibraryItem, Task<TileArt?>> coverLoader, ImageCache images, string storeName, ILocalizer loc) : ObservableObject
 {
     public const double CoverWidth = 150;
 
@@ -42,6 +42,18 @@ public sealed partial class HomeTileViewModel(LibraryItem item, Func<LibraryItem
     public string Title => Item.Title;
 
     public bool HasCover => CoverPath is not null;
+
+    /// <summary>The store of the copy Play uses (a badge on the cover).</summary>
+    public string StoreName { get; } = storeName;
+
+    /// <summary>"1.5 h played" / "45 min played"; empty when Lumen doesn't know. Written on read (language changes).</summary>
+    public string PlaytimeText => HomeViewModel.PlaytimeText(Item, loc);
+
+    public bool HasPlaytime => LibraryFilter.PlaytimeMinutes(Item) > 0;
+
+    public bool CanRun => LaunchService.PrimaryAction(Item.Primary) is not null;
+
+    internal void RefreshTexts() => OnPropertyChanged(nameof(PlaytimeText));
 
     public string Initial => Item.Title.Length == 0 ? "?" : StringInfo.GetNextTextElement(Item.Title).ToUpper(CultureInfo.CurrentCulture);
 
@@ -166,6 +178,7 @@ public sealed partial class HomeViewModel : ObservableObject
     private readonly RoutineService _routineService;
     private readonly RoutinesViewModel _routines;
     private readonly SynchronizationContext _ui;
+    private readonly IReadOnlyDictionary<string, string> _storeNames;
     private LibraryItem? _defaultFeatured;
     private int _featureVersion;
     private bool _isActive;
@@ -185,8 +198,9 @@ public sealed partial class HomeViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(HasNotice))]
     private string? _notice;
 
-    public HomeViewModel(LibraryService library, LaunchService launcher, ArtworkService artwork, AccentService accent, CollectionService collections, ImageCache images, ILocalizer localizer, RoutineService routineService, RoutinesViewModel routines)
+    public HomeViewModel(LibraryService library, LaunchService launcher, ArtworkService artwork, AccentService accent, CollectionService collections, ImageCache images, ILocalizer localizer, RoutineService routineService, RoutinesViewModel routines, IEnumerable<ILibraryProvider> providers)
     {
+        _storeNames = providers.ToDictionary(p => p.Source, p => p.DisplayName, StringComparer.Ordinal);
         _routineService = routineService;
         _routines = routines;
         _images = images;
@@ -204,11 +218,18 @@ public sealed partial class HomeViewModel : ObservableObject
         {
             RaiseFeaturedTexts();
             RebuildRoutines();
+            foreach (var tile in ContinuePlaying.Concat(Favorites))
+            {
+                tile.RefreshTexts();
+            }
         };
     }
 
     /// <summary>Raised when the user asks for a game's detail view (the shell shows it in the library).</summary>
     public event EventHandler<LibraryItem>? DetailRequested;
+
+    /// <summary>Raised by "See all" next to the pinned routines (the shell opens the Routines page).</summary>
+    public event EventHandler? RoutinesRequested;
 
     public IReadOnlyList<HomeTileViewModel> ContinuePlaying { get; private set; } = [];
 
@@ -247,32 +268,39 @@ public sealed partial class HomeViewModel : ObservableObject
 
     public bool CanRun => Featured is not null && LaunchService.PrimaryAction(Featured.Primary) is not null;
 
-    /// <summary>"12.5 h played · Last played: Monday, 26 October 2026", leaving out what isn't known.</summary>
-    public string FeaturedFacts
+    /// <summary>"Last played: Monday, 26 October 2026"; empty when unknown.</summary>
+    public string FeaturedLastPlayed => Featured is not null && LibraryFilter.LastPlayed(Featured) is { } last
+        ? string.Format(CultureInfo.CurrentCulture, _localizer["Home_LastPlayed"], last.LocalDateTime.ToString("D", CultureInfo.CurrentCulture))
+        : string.Empty;
+
+    public bool HasFeaturedLastPlayed => FeaturedLastPlayed.Length > 0;
+
+    /// <summary>The hero's big number: "12.5 h" or "45 min"; empty when unknown.</summary>
+    public string FeaturedPlaytimeValue
     {
         get
         {
-            if (Featured is null)
-            {
-                return string.Empty;
-            }
-
-            var parts = new List<string>();
-            var minutes = LibraryFilter.PlaytimeMinutes(Featured);
-            if (minutes > 0)
-            {
-                parts.Add(minutes < 60
-                    ? string.Format(CultureInfo.CurrentCulture, _localizer["Home_PlayedMinutes"], minutes)
-                    : string.Format(CultureInfo.CurrentCulture, _localizer["Home_PlayedHours"], minutes / 60.0));
-            }
-
-            if (LibraryFilter.LastPlayed(Featured) is { } last)
-            {
-                parts.Add(string.Format(CultureInfo.CurrentCulture, _localizer["Home_LastPlayed"], last.LocalDateTime.ToString("D", CultureInfo.CurrentCulture)));
-            }
-
-            return string.Join(" · ", parts);
+            var minutes = Featured is null ? 0 : LibraryFilter.PlaytimeMinutes(Featured);
+            return minutes <= 0 ? string.Empty
+                : minutes < 60 ? string.Format(CultureInfo.CurrentCulture, _localizer["Home_MinutesShort"], minutes)
+                : string.Format(CultureInfo.CurrentCulture, _localizer["Home_HoursShort"], minutes / 60.0);
         }
+    }
+
+    /// <summary>The word under the big number ("played").</summary>
+    public string FeaturedPlaytimeLabel => Featured is not null && LibraryFilter.PlaytimeMinutes(Featured) is > 0 and < 60
+        ? _localizer["Home_PlayedLabelMinutes"]
+        : _localizer["Home_PlayedLabelHours"];
+
+    public bool HasFeaturedPlaytime => FeaturedPlaytimeValue.Length > 0;
+
+    /// <summary>"12.5 h played" / "45 min played" for a game; empty when unknown.</summary>
+    internal static string PlaytimeText(LibraryItem item, ILocalizer loc)
+    {
+        var minutes = LibraryFilter.PlaytimeMinutes(item);
+        return minutes <= 0 ? string.Empty
+            : minutes < 60 ? string.Format(CultureInfo.CurrentCulture, loc["Home_PlayedMinutes"], minutes)
+            : string.Format(CultureInfo.CurrentCulture, loc["Home_PlayedHours"], minutes / 60.0);
     }
 
     /// <summary>The shell calls this when Home becomes (or stops being) the visible page.</summary>
@@ -310,6 +338,20 @@ public sealed partial class HomeViewModel : ObservableObject
             Notice = string.Format(CultureInfo.CurrentCulture, _localizer["Library_LaunchFailed"], item.Title);
         }
     }
+
+    /// <summary>The round play button over a row's cover.</summary>
+    [RelayCommand]
+    private async Task PlayTileAsync(HomeTileViewModel? tile)
+    {
+        Notice = null;
+        if (tile is not null && await _launcher.RunPrimaryActionAsync(tile.Item.Primary, CancellationToken.None) != LaunchOutcome.Started)
+        {
+            Notice = string.Format(CultureInfo.CurrentCulture, _localizer["Library_LaunchFailed"], tile.Title);
+        }
+    }
+
+    [RelayCommand]
+    private void ShowRoutines() => RoutinesRequested?.Invoke(this, EventArgs.Empty);
 
     [RelayCommand]
     private void OpenDetail(LibraryItem? item)
@@ -364,7 +406,7 @@ public sealed partial class HomeViewModel : ObservableObject
         }
 
         HomeTileViewModel Tile(LibraryItem item) =>
-            previous.TryGetValue(item.Key, out var tile) && ReferenceEquals(tile.Item, item) ? tile : new HomeTileViewModel(item, LoadCoverAsync, _images);
+            previous.TryGetValue(item.Key, out var tile) && ReferenceEquals(tile.Item, item) ? tile : new HomeTileViewModel(item, LoadCoverAsync, _images, StoreNameOf(item), _localizer);
 
         ContinuePlaying = feed.ContinuePlaying.Select(Tile).ToList();
         Favorites = feed.Favorites.Select(Tile).ToList();
@@ -411,10 +453,23 @@ public sealed partial class HomeViewModel : ObservableObject
         }
     }
 
+    // Same names as the library's badges: the provider's name, "Steam family" for a shared copy.
+    private string StoreNameOf(LibraryItem item)
+    {
+        var entry = item.Primary;
+        return entry.Ref.Source == "steam" && entry.Extra.TryGetValue("family", out var family) && family == "true"
+            ? _localizer["Store_SteamFamily"]
+            : _storeNames.GetValueOrDefault(entry.Ref.Source, entry.Ref.Source);
+    }
+
     private void RaiseFeaturedTexts()
     {
         OnPropertyChanged(nameof(FeaturedTitle));
-        OnPropertyChanged(nameof(FeaturedFacts));
+        OnPropertyChanged(nameof(FeaturedLastPlayed));
+        OnPropertyChanged(nameof(HasFeaturedLastPlayed));
+        OnPropertyChanged(nameof(FeaturedPlaytimeValue));
+        OnPropertyChanged(nameof(FeaturedPlaytimeLabel));
+        OnPropertyChanged(nameof(HasFeaturedPlaytime));
         OnPropertyChanged(nameof(ActionText));
         OnPropertyChanged(nameof(CanRun));
     }
