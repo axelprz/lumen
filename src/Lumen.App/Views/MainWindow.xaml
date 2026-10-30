@@ -124,8 +124,14 @@
               BorderBrush="{DynamicResource Lumen.Brush.Divider}"
               BorderThickness="0,0,0,1"
               Padding="32,12">
-        <DockPanel>
-          <ItemsControl DockPanel.Dock="Right" ItemsSource="{Binding Home.TopBarRoutines}" Focusable="False" VerticalAlignment="Center">
+        <!-- Search takes up to 440 px (less in a narrow window, never under 220); routines sit at the right edge -->
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" MinWidth="220" MaxWidth="440" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <ItemsControl Grid.Column="2" ItemsSource="{Binding Home.TopBarRoutines}" Focusable="False" VerticalAlignment="Center">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <StackPanel Orientation="Horizontal" />
@@ -154,7 +160,7 @@
             </ItemsControl.ItemTemplate>
           </ItemsControl>
 
-          <Grid MaxWidth="440" HorizontalAlignment="Left" Height="38">
+          <Grid Grid.Column="0" Height="38">
             <TextBox x:Name="TopSearch"
                      Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                      Padding="36,0,70,0"
@@ -171,7 +177,8 @@
                        Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                        FontSize="{StaticResource Lumen.FontSize.Body}"
                        VerticalAlignment="Center"
-                       Margin="37,0,0,0"
+                       Margin="37,0,72,0"
+                       TextTrimming="CharacterEllipsis"
                        IsHitTestVisible="False">
               <TextBlock.Style>
                 <Style TargetType="TextBlock">
@@ -197,7 +204,7 @@
                          Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
             </Border>
           </Grid>
-        </DockPanel>
+        </Grid>
       </Border>
 
       <!-- Content: the selected section's page, picked by view-model type -->
