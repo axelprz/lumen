@@ -7,7 +7,8 @@
              xmlns:vm="clr-namespace:Lumen.App.ViewModels"
              xmlns:conv="clr-namespace:Lumen.App.Converters"
              xmlns:services="clr-namespace:Lumen.App.Services"
-             DataContextChanged="OnDataContextChanged">
+             DataContextChanged="OnDataContextChanged"
+             Loaded="OnLoaded">
   <UserControl.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     <conv:ImagePathConverter x:Key="ImagePath" />
@@ -117,10 +118,10 @@
     </Border>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
-      <StackPanel Margin="48,0,48,40">
+      <StackPanel x:Name="Sections" Margin="48,0,48,40">
         <!-- Hero: logo (or title), what Lumen knows, Play and Details -->
         <Grid MinHeight="400" Visibility="{Binding HasFeatured, Converter={StaticResource BoolToVisibility}}">
-          <StackPanel VerticalAlignment="Bottom" Margin="0,48,0,8">
+          <StackPanel x:Name="HeroInfo" VerticalAlignment="Bottom" Margin="0,48,0,8">
             <Image Source="{Binding LogoPath, Converter={StaticResource ImagePath}, ConverterParameter=960}"
                    MaxHeight="150"
                    MaxWidth="480"

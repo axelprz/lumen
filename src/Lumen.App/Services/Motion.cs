@@ -2,6 +2,7 @@
 // Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)
 
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -65,6 +66,73 @@ public static class Motion
         slide.Y = 12;
         To(page, UIElement.OpacityProperty, 1, Normal);
         To(slide, TranslateTransform.YProperty, 0, Normal);
+    }
+
+    /// <summary>Gap between one block and the next in <see cref="Stagger"/>.</summary>
+    private static readonly TimeSpan StaggerStep = TimeSpan.FromMilliseconds(50);
+
+    private const int StaggerMaxBlocks = 5;
+    private const double StaggerSlide = 14;
+
+    /// <summary>
+    /// A page's blocks arriving one after the other: each visible child of <paramref name="panel"/> (the first few) fades
+    /// in while sliding up, 50 ms apart. A handful of big blocks, never the items of a long list. Nothing happens when animations are off.
+    /// </summary>
+    public static void Stagger(Panel panel)
+    {
+        if (!Enabled)
+        {
+            return;
+        }
+
+        var index = 0;
+        foreach (UIElement child in panel.Children)
+        {
+            if (child.Visibility != Visibility.Visible || child.RenderTransform != Transform.Identity)
+            {
+                continue;
+            }
+
+            if (index >= StaggerMaxBlocks)
+            {
+                break;
+            }
+
+            EnterIn(child, TimeSpan.FromTicks(StaggerStep.Ticks * index++));
+        }
+    }
+
+    /// <summary>A block whose content just changed (the Home hero): its new content fades in. Nothing happens when animations are off.</summary>
+    public static void FadeIn(UIElement element)
+    {
+        element.BeginAnimation(UIElement.OpacityProperty, null);
+        if (!Enabled)
+        {
+            element.Opacity = 1;
+            return;
+        }
+
+        element.Opacity = 0;
+        To(element, UIElement.OpacityProperty, 1, Normal);
+    }
+
+    private static void EnterIn(UIElement child, TimeSpan delay)
+    {
+        var slide = new TranslateTransform(0, StaggerSlide);
+        child.RenderTransform = slide;
+        child.Opacity = 0;
+
+        var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
+        var fade = new DoubleAnimation(1, Normal) { BeginTime = delay, EasingFunction = ease };
+        fade.Completed += (_, _) =>
+        {
+            // Back to a plain element: no leftover transform or animation on a block that may be scrolled a lot.
+            child.BeginAnimation(UIElement.OpacityProperty, null);
+            child.Opacity = 1;
+            child.RenderTransform = Transform.Identity;
+        };
+        slide.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(0, Normal) { BeginTime = delay, EasingFunction = ease });
+        child.BeginAnimation(UIElement.OpacityProperty, fade);
     }
 
     /// <summary>Hover/focus scale for an element (say, a tile's cover). 1 or less means "off".</summary>

@@ -25,6 +25,9 @@ public partial class HomeView : UserControl
         InitializeComponent();
     }
 
+    // The page's blocks (hero, rows) arrive one after the other.
+    private void OnLoaded(object sender, RoutedEventArgs e) => Motion.Stagger(Sections);
+
     private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
         if (_vm is not null)
@@ -45,6 +48,10 @@ public partial class HomeView : UserControl
         if (e.PropertyName == nameof(HomeViewModel.BackgroundPath))
         {
             ShowBackground(_vm?.BackgroundPath);
+        }
+        else if (e.PropertyName == nameof(HomeViewModel.FeaturedTitle))
+        {
+            Motion.FadeIn(HeroInfo); // the hero text follows the background crossfade
         }
     }
 

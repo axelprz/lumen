@@ -47,6 +47,14 @@ public sealed partial class UiMotionTests
         File.ReadAllText(Path.Combine(_appDir, "Services", "AccentService.cs")).ShouldContain("Motion.Enabled");
     }
 
+    [Theory]
+    [InlineData("HomeView.xaml.cs", "Motion.Stagger(Sections)")]
+    [InlineData("LibraryView.xaml.cs", "Motion.Stagger(PageBlocks)")]
+    public void HomeAndLibrary_StaggerTheirBlocksOnLoad(string file, string call)
+    {
+        File.ReadAllText(Path.Combine(_appDir, "Views", file)).ShouldContain(call);
+    }
+
     [GeneratedRegex(@"new\s+(Double|Color|Thickness)Animation\s*\(")]
     private static partial Regex Animation();
 }

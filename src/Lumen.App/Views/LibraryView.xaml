@@ -9,6 +9,7 @@
              xmlns:views="clr-namespace:Lumen.App.Views"
              xmlns:services="clr-namespace:Lumen.App.Services"
              AllowDrop="True"
+             Loaded="OnLoaded"
              PreviewKeyDown="OnPreviewKeyDown"
              DragOver="OnDragOver"
              Drop="OnDrop">
@@ -197,7 +198,7 @@
     </ContentControl.ContentTemplate>
   </ContentControl>
 
-  <Grid Margin="40,32,16,0">
+  <Grid x:Name="PageBlocks" Margin="40,32,16,0">
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
