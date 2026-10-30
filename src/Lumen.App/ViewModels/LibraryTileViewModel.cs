@@ -31,6 +31,7 @@ public sealed partial class LibraryTileViewModel : ObservableObject
     private readonly Func<LibraryItem, Task<TileArt?>> _coverLoader;
     private readonly ImageCache _images;
     private bool _coverRequested;
+    private bool _glowRequested;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasCover), nameof(CoverImage))]
@@ -66,6 +67,10 @@ public sealed partial class LibraryTileViewModel : ObservableObject
             : StringInfo.GetNextTextElement(item.Title).ToUpper(CultureInfo.CurrentCulture);
     }
 
+    /// <summary>The glow around the cover while it is pointed at or focused: the cover's own accent (the default blue until known).</summary>
+    [ObservableProperty]
+    private Brush _glowBrush = CoverColor.DefaultBrush;
+
     public LibraryItem Item { get; }
 
     /// <summary>The entry Play/Install uses.</summary>
@@ -100,6 +105,22 @@ public sealed partial class LibraryTileViewModel : ObservableObject
         else
         {
             CoverPath = art?.Path;
+        }
+    }
+
+    /// <summary>Called when the tile is pointed at or focused: works out the cover's accent once, off the UI thread. Safe to call repeatedly.</summary>
+    public async Task EnsureGlowAsync()
+    {
+        if (_glowRequested || CoverPath is not { } path)
+        {
+            return;
+        }
+
+        _glowRequested = true;
+        var picked = await Task.Run(() => CoverColor.Pick(path));
+        if (picked is { } rgb)
+        {
+            GlowBrush = CoverColor.Frozen(Color.FromRgb(rgb.R, rgb.G, rgb.B));
         }
     }
 
