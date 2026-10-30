@@ -12,16 +12,14 @@ Lumen is a game-first launcher for Windows (C# + WPF, .NET 10) that unifies ever
 - **Done:** M0–M9. M5 Steam family uses the website sign-in (2026-10-29). M8: routine engine, Routines page, shortcuts from tray/quick search/Home, sync folder engine and its Settings card (#36–#43). M9: Velopack updates + release workflow (#44); the first pre-releases (`v0.1.0-beta.*`) are tagged and the release/update flow works.
 - **M10 UI rework (PLAN §4.9):** first pass done (#46–#51). **Second pass in progress** from the owner's HTML template (PLAN §4.9 lists the steps A–G; A = design base #53, B = shell #54, B2 = sidebar footer #55, C = Home #56, D = Library #57, E = detail #58, F = Collections and Routines #59, G = Settings and overlays). The owner approves each step on real use: fix what he reports in the same PR before moving on.
 - **Next, in order:**
-  1. Owner feedback on M10 and the small leftovers below.
-  2. **1.0 hardening:** bug bash on real machines with every store installed, screenshots of the reworked UI, tag `v1.0.0` (the default update channel flips to stable by itself at 1.0).
-  3. **v1.1 Deals** (PLAN): opt-in, new network hosts, needs the owner's decisions first; no card/bank advice.
+  1. **1.0 hardening** (scope decided 2026-10-30, PLAN §7): About and licenses (done in its PR); the owner verifies the `VERIFY` items on his PC (GOG Galaxy, Xbox app, EA, Ubisoft, Battle.net installed); README screenshots (he takes them, we wire them in English and Spanish); fix the small leftovers below; then he tags `v1.0.0` (the default update channel flips to stable by itself at 1.0).
+  2. **v1.1 Deals** (PLAN): opt-in, new network hosts, needs the owner's decisions first; no card/bank advice.
 - **Small leftovers:**
-  - "theme accents on/off" setting (§4.7) and a launch-arguments override
   - GOG Galaxy install URI is still `// VERIFY`; Xbox GDK games unverified
   - Hollow Knight shows no Steam data (owner report, never investigated)
   - the update channel and "check automatically" are not synced yet (the schema has `updates` keys; the sync keeps them untouched)
   - `LibraryAutoRefreshTests.ScansAreSpacedOut` is timing-sensitive and can fail on a loaded CPU
-  - M10 loose ends: the Library is the heaviest page to open (a small stutter on entering; measure before fixing); Home tiles glow with the global accent, which is not softened like the Library glow (`AccentPicker.Soften`); the Mica tint strength (alphas in `MicaBackdrop.cs`) was never confirmed by the owner
+  - M10 loose ends: the Library is the heaviest page to open (the owner said the stutter felt better after #57; measure before touching it again); Home tiles glow with the global accent, which is not softened like the Library glow (`AccentPicker.Soften`)
 - **Owner test notes:** a Steam game ignored Undo and Force close (the tracked process ended, a window stayed); the owner accepted this, and apps close fine.
 
 ## How to work

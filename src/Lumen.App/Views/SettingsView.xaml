@@ -228,6 +228,68 @@
             <views:UpdateSettingsCard DataContext="{Binding Updates}" Margin="0,20,0,0" />
           </StackPanel>
         </TabItem>
+        <!-- About: version, license, repository, what Lumen is built with -->
+        <TabItem Header="{l:Loc Settings_Tab_About}">
+          <StackPanel DataContext="{Binding About}">
+            <Border Style="{StaticResource Lumen.Card}">
+              <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                  <Border Width="52" Height="52" CornerRadius="16" Background="{DynamicResource Lumen.Brush.BrandGradient}">
+                    <TextBlock Text="&#xE706;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Title}" Foreground="White" HorizontalAlignment="Center" />
+                  </Border>
+                  <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="{l:Loc App_Brand}" FontSize="{StaticResource Lumen.FontSize.Title}" FontWeight="Bold" />
+                    <TextBlock Text="{Binding VersionText, Mode=OneTime}" FontSize="{StaticResource Lumen.FontSize.Caption}" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Lumen.Brush.BrandText}" />
+                  </StackPanel>
+                </StackPanel>
+                <TextBlock Text="{l:Loc About_Tagline}" FontSize="{StaticResource Lumen.FontSize.Body}" TextWrapping="Wrap" Margin="0,16,0,0" />
+                <TextBlock Text="{l:Loc About_Copyright}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" Margin="0,6,0,0"
+                           Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+                <TextBlock Text="{l:Loc About_Privacy}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" Margin="0,6,0,0"
+                           Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+                <WrapPanel Margin="0,18,0,-8">
+                  <Button Command="{Binding OpenRepositoryCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,10,8"
+                          AutomationProperties.Name="{l:Loc About_Repository}">
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Text="&#xE8A7;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+                      <TextBlock Text="{l:Loc About_Repository}" />
+                    </StackPanel>
+                  </Button>
+                  <Button Command="{Binding OpenNoticesCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,10,8"
+                          AutomationProperties.Name="{l:Loc About_Notices}">
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Text="&#xE8A5;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+                      <TextBlock Text="{l:Loc About_Notices}" />
+                    </StackPanel>
+                  </Button>
+                </WrapPanel>
+              </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource Lumen.Card}" Margin="0,20,0,0">
+              <StackPanel>
+                <TextBlock Text="{l:Loc About_BuiltWith}" Style="{StaticResource Settings.SectionTitle}" />
+                <ItemsControl ItemsSource="{Binding Components, Mode=OneTime}" Focusable="False">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <UniformGrid Columns="2" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <DockPanel Margin="0,0,24,10">
+                        <TextBlock DockPanel.Dock="Right" Text="{Binding License}" FontSize="{StaticResource Lumen.FontSize.Caption}"
+                                   Foreground="{DynamicResource Lumen.Brush.TextMuted}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding Name}" FontSize="{StaticResource Lumen.FontSize.Small}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                      </DockPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </TabItem>
       </TabControl>
     </StackPanel>
   </ScrollViewer>

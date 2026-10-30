@@ -1503,4 +1503,25 @@
   <data name="Settings_Tab_SyncUpdates" xml:space="preserve">
     <value>Sync y actualizaciones</value>
   </data>
+  <data name="Settings_Tab_About" xml:space="preserve">
+    <value>Acerca de</value>
+  </data>
+  <data name="About_Tagline" xml:space="preserve">
+    <value>Un lanzador de juegos para Windows que junta todas tus tiendas y tus apps.</value>
+  </data>
+  <data name="About_Copyright" xml:space="preserve">
+    <value>(c) 2026 Axel Ismael Perez. Software libre bajo la GNU GPL v3 o posterior.</value>
+  </data>
+  <data name="About_Privacy" xml:space="preserve">
+    <value>Sin telemetría ni analíticas: Lumen solo se conecta con las tiendas, las fuentes de arte y GitHub (para actualizarse).</value>
+  </data>
+  <data name="About_Repository" xml:space="preserve">
+    <value>Ver en GitHub</value>
+  </data>
+  <data name="About_Notices" xml:space="preserve">
+    <value>Licencias de terceros</value>
+  </data>
+  <data name="About_BuiltWith" xml:space="preserve">
+    <value>Hecho con</value>
+  </data>
 </root>
