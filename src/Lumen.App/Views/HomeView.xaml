@@ -157,6 +157,52 @@
           <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="14" />
         </Border>
 
+        <!-- Pinned routines: a click runs the routine (one that needs review opens its preview instead) -->
+        <StackPanel Margin="0,24,0,0" Visibility="{Binding HasPinnedRoutines, Converter={StaticResource BoolToVisibility}}">
+          <TextBlock Text="{l:Loc Home_PinnedRoutines}" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,14" />
+          <ItemsControl ItemsSource="{Binding PinnedRoutines}" Focusable="False">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate DataType="{x:Type vm:PinnedRoutineViewModel}">
+                <Button Command="{Binding DataContext.RunRoutineCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                        CommandParameter="{Binding}"
+                        Cursor="Hand"
+                        Margin="0,0,12,12"
+                        AutomationProperties.Name="{Binding Name}">
+                  <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                      <Border x:Name="Frame" MinWidth="200" Padding="16,12" CornerRadius="8" BorderThickness="2" BorderBrush="Transparent"
+                              Background="{DynamicResource Lumen.Brush.Surface}">
+                        <ContentPresenter />
+                      </Border>
+                      <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                          <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                          <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
+                        </Trigger>
+                      </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                  </Button.Template>
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE768;" Style="{StaticResource Lumen.Text.Icon}" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center"
+                               Foreground="{DynamicResource Lumen.Brush.Accent}" />
+                    <StackPanel VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource Lumen.Brush.Text}" />
+                      <TextBlock Text="{Binding Caption}" FontSize="12" Margin="0,2,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+                    </StackPanel>
+                  </StackPanel>
+                </Button>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
         <!-- Nothing to feature yet -->
         <StackPanel Margin="0,40,0,0" Visibility="{Binding HasNoGames, Converter={StaticResource BoolToVisibility}}">
           <TextBlock Text="{l:Loc Nav_Home}" Style="{StaticResource Lumen.Text.PageTitle}" />

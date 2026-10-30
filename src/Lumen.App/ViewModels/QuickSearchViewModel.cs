@@ -7,11 +7,12 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
+using Lumen.Core.Routines;
 
 namespace Lumen.App.ViewModels;
 
 /// <summary>One line in the quick search list.</summary>
-public sealed record QuickSearchResult(LibraryItem Item, string Title, string Detail, string ActionText)
+public sealed record QuickSearchResult(LibraryItem? Item, string Title, string Detail, string ActionText, string? RoutineId = null)
 {
     public override string ToString() => Title;
 }
@@ -27,6 +28,8 @@ public sealed partial class QuickSearchViewModel : ObservableObject
     private readonly QuickSearch _search;
     private readonly LibraryViewModel _libraryView;
     private readonly ILocalizer _localizer;
+    private readonly RoutineService _routineService;
+    private readonly RoutinesViewModel _routines;
 
     [ObservableProperty]
     private string _query = string.Empty;
@@ -38,8 +41,10 @@ public sealed partial class QuickSearchViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(HasNotice))]
     private string? _notice;
 
-    public QuickSearchViewModel(LibraryService library, LaunchService launcher, QuickSearch search, LibraryViewModel libraryView, ILocalizer localizer)
+    public QuickSearchViewModel(LibraryService library, LaunchService launcher, QuickSearch search, LibraryViewModel libraryView, ILocalizer localizer, RoutineService routineService, RoutinesViewModel routines)
     {
+        _routineService = routineService;
+        _routines = routines;
         _library = library;
         _launcher = launcher;
         _search = search;
@@ -91,7 +96,15 @@ public sealed partial class QuickSearchViewModel : ObservableObject
             return;
         }
 
-        if (await _launcher.RunPrimaryActionAsync(result.Item.Primary, CancellationToken.None) == LaunchOutcome.Started)
+        if (result.RoutineId is { } routineId)
+        {
+            // The box closes first: a routine can take a while, and one that needs review opens the Routines page.
+            Done?.Invoke(this, EventArgs.Empty);
+            await _routines.StartFromShortcutAsync(routineId);
+            return;
+        }
+
+        if (result.Item is { } item && await _launcher.RunPrimaryActionAsync(item.Primary, CancellationToken.None) == LaunchOutcome.Started)
         {
             Done?.Invoke(this, EventArgs.Empty);
         }
@@ -110,11 +123,25 @@ public sealed partial class QuickSearchViewModel : ObservableObject
             Results.Add(Result(item));
         }
 
+        foreach (var entry in RoutineLookup.Find(_routineService.Entries, Query, CultureInfo.CurrentUICulture))
+        {
+            Results.Add(RoutineResult(entry));
+        }
+
         Selected = Results.FirstOrDefault();
         if (Results.Count == 0)
         {
             Notice = _localizer[Query.Trim().Length > 0 ? "QuickSearch_NoMatches" : "QuickSearch_Hint"];
         }
+    }
+
+    private QuickSearchResult RoutineResult(RoutineEntry entry)
+    {
+        var needsReview = entry.State == RoutineTrustState.NeedsReview;
+        var detail = needsReview
+            ? $"{_localizer["QuickSearch_Routine"]} · {_localizer["Routine_State_NeedsReview"]}"
+            : _localizer["QuickSearch_Routine"];
+        return new QuickSearchResult(null, RoutineLookup.NameOf(entry, CultureInfo.CurrentUICulture), detail, _localizer[needsReview ? "Routine_Review" : "Routine_Run"], entry.Id);
     }
 
     private QuickSearchResult Result(LibraryItem item)

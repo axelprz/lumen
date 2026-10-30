@@ -93,13 +93,45 @@ public sealed partial class RoutinesViewModel : ObservableObject
         }
     }
 
-    /// <summary>Runs a routine by id (tray, quick search, Home). An unapproved one opens its preview instead.</summary>
+    /// <summary>Raised when a routine started from the tray, quick search or Home needs its preview, so the window can come forward.</summary>
+    public event EventHandler? ReviewRequested;
+
+    /// <summary>Raised when a routine started from the tray, quick search or Home finished: its name and a one-line result.</summary>
+    public event EventHandler<RoutineFinishedEventArgs>? FinishedOutsidePage;
+
+    /// <summary>Runs a routine by id (the preview's "Approve and run"). An unapproved one opens its preview instead.</summary>
     public async Task RunByIdAsync(string id)
     {
         if (Routines.FirstOrDefault(r => r.Entry.Id == id) is { } card)
         {
             await RunAsync(card);
         }
+    }
+
+    /// <summary>
+    /// Runs a routine chosen outside the Routines page (tray, quick search, Home). A new or changed routine never runs from
+    /// here: the Routines page opens with its preview. A preview or editor already open is left alone.
+    /// </summary>
+    public async Task StartFromShortcutAsync(string id)
+    {
+        if (Routines.FirstOrDefault(r => r.Entry.Id == id) is not { } card || card.IsRunning)
+        {
+            return;
+        }
+
+        if (!card.IsReady)
+        {
+            if (Panel is null)
+            {
+                Review(card);
+            }
+
+            ReviewRequested?.Invoke(this, EventArgs.Empty);
+            return;
+        }
+
+        await RunAsync(card);
+        FinishedOutsidePage?.Invoke(this, new RoutineFinishedEventArgs(card.Name, card.ResultText ?? string.Empty));
     }
 
     [RelayCommand]
@@ -340,4 +372,12 @@ public sealed partial class RoutinesViewModel : ObservableObject
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Could not export a routine")]
     private partial void LogExportFailed(Exception exception);
+}
+
+/// <summary>A routine started outside the Routines page finished.</summary>
+public sealed class RoutineFinishedEventArgs(string name, string result) : EventArgs
+{
+    public string Name { get; } = name;
+
+    public string Result { get; } = result;
 }

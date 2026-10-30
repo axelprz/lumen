@@ -39,6 +39,7 @@ public sealed partial class ShellViewModel : ObservableObject
             new SectionViewModel(ShellSection.Settings, "Nav_Settings", "", localizer, settings),
         ];
 
+        routines.ReviewRequested += (_, _) => SelectedSection = Sections.First(s => s.Section == ShellSection.Routines);
         home.DetailRequested += (_, item) => _ = ShowDetailFromHomeAsync(item);
         library.DetailClosed += (_, _) => OnDetailClosed();
         collections.OpenRequested += (_, id) =>

@@ -1247,4 +1247,13 @@
   <data name="Routine_ForceFailed" xml:space="preserve">
     <value>Windows didn't let Lumen close it. Close it from the program itself or Task Manager.</value>
   </data>
+  <data name="Tray_Routines" xml:space="preserve">
+    <value>Routines</value>
+  </data>
+  <data name="Home_PinnedRoutines" xml:space="preserve">
+    <value>Pinned routines</value>
+  </data>
+  <data name="QuickSearch_Routine" xml:space="preserve">
+    <value>Routine</value>
+  </data>
 </root>
