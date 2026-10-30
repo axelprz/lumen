@@ -37,6 +37,9 @@ public sealed partial class CollectionCard : ObservableObject
 
     public bool IsFavorites => Collection.IsFavorites;
 
+    /// <summary>Which soft tint the card uses (0-2, cycling down the page; Favorites is always amber).</summary>
+    public int Tint { get; init; }
+
     /// <summary>Favorites can't be renamed or deleted.</summary>
     public bool CanEdit => !Collection.IsFavorites;
 
@@ -165,11 +168,11 @@ public sealed partial class CollectionsViewModel : ObservableObject
     {
         var items = _library.Items;
         Cards = _collections.All
-            .Select(c =>
+            .Select((c, index) =>
             {
                 var count = items.Count(c.Contains);
                 var countText = count == 1 ? _localizer["Library_CountOne"] : string.Format(CultureInfo.CurrentCulture, _localizer["Library_Count"], count);
-                return new CollectionCard(c, DisplayName(c, _localizer), countText);
+                return new CollectionCard(c, DisplayName(c, _localizer), countText) { Tint = index % 3 };
             })
             .ToList();
         OnPropertyChanged(nameof(Cards));

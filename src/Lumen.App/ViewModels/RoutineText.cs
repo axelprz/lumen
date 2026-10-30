@@ -18,6 +18,34 @@ public static class RoutineText
     public static IReadOnlyList<StepLine> Lines(RoutineReview review, ILocalizer loc) =>
         review.Steps.Select(s => Line(s, loc)).ToList();
 
+    /// <summary>Most steps shown in a card's chain; more become "…".</summary>
+    public const int ChainLength = 5;
+
+    /// <summary>
+    /// A routine's steps in a few words for its card: "Discord → Spotify → Wait 2 s". A step's own label when it has
+    /// one, else what it acts on. The preview still shows every step in full before anything runs.
+    /// </summary>
+    public static string Chain(RoutineReview review, ILocalizer loc)
+    {
+        ArgumentNullException.ThrowIfNull(review);
+        ArgumentNullException.ThrowIfNull(loc);
+        var parts = review.Steps.Take(ChainLength).Select(s => Short(s, loc)).ToList();
+        if (review.Steps.Count > ChainLength)
+        {
+            parts.Add("…");
+        }
+
+        return string.Join(" → ", parts);
+    }
+
+    private static string Short(StepReview step, ILocalizer loc) => step.Action switch
+    {
+        { Label: { Length: > 0 } label } => label,
+        WaitAction wait => Format(loc, "Routine_Chain_Wait", (wait.Milliseconds / 1000.0).ToString("0.#", CultureInfo.CurrentCulture)),
+        CloseAction => Format(loc, "Routine_Chain_Close", step.Target),
+        _ => step.Target ?? step.Action.GetType().Name,
+    };
+
     public static StepLine Line(StepReview step, ILocalizer loc)
     {
         ArgumentNullException.ThrowIfNull(step);

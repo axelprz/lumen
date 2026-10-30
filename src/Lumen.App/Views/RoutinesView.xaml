@@ -220,19 +220,41 @@
             Visibility="{Binding HasPanel, Converter={StaticResource BoolToVisibility}}" />
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
-      <StackPanel x:Name="PageBlocks" Margin="40,32,40,40" MaxWidth="760" HorizontalAlignment="Left">
-        <DockPanel>
-          <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-            <Button Command="{Binding OpenFolderCommand}" Content="{l:Loc Routine_OpenFolder}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0" />
-            <Button Command="{Binding ImportCommand}" Content="{l:Loc Routine_Import}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0" />
-            <Button Command="{Binding NewCommand}" Content="{l:Loc Routine_New}" Style="{StaticResource Lumen.Button.Primary}" Margin="8,0,0,0" />
+      <StackPanel x:Name="PageBlocks" Margin="40,28,40,40" MaxWidth="1100" HorizontalAlignment="Left">
+        <!-- Title and explanation; the page's actions on the right -->
+        <DockPanel Margin="0,0,0,24">
+          <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="24,0,0,0">
+            <Button Command="{Binding OpenFolderCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,10,0"
+                    AutomationProperties.Name="{l:Loc Routine_OpenFolder}">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="&#xE838;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+                <TextBlock Text="{l:Loc Routine_OpenFolder}" />
+              </StackPanel>
+            </Button>
+            <Button Command="{Binding ImportCommand}" Style="{StaticResource Lumen.Button}" Margin="0,0,10,0"
+                    AutomationProperties.Name="{l:Loc Routine_Import}">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="&#xE8B5;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+                <TextBlock Text="{l:Loc Routine_Import}" />
+              </StackPanel>
+            </Button>
+            <Button Command="{Binding NewCommand}" Style="{StaticResource Lumen.Button.Primary}"
+                    AutomationProperties.Name="{l:Loc Routine_New}">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="&#xE710;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+                <TextBlock Text="{l:Loc Routine_New}" />
+              </StackPanel>
+            </Button>
           </StackPanel>
-          <TextBlock Text="{l:Loc Nav_Routines}" Style="{StaticResource Lumen.Text.PageTitle}" />
+          <StackPanel>
+            <TextBlock Text="{l:Loc Nav_Routines}" FontSize="{StaticResource Lumen.FontSize.Title}" FontWeight="Bold" />
+            <TextBlock Text="{l:Loc Routine_Body}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" Margin="0,4,0,0"
+                       Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+          </StackPanel>
         </DockPanel>
-        <TextBlock Text="{l:Loc Routine_Body}" FontSize="{StaticResource Lumen.FontSize.Lead}" TextWrapping="Wrap" Margin="0,10,0,24" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
 
-        <Border Margin="0,0,0,16" Padding="14,10" CornerRadius="6" HorizontalAlignment="Left"
-                Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
+        <Border Margin="0,0,0,16" Padding="14,10" CornerRadius="10" HorizontalAlignment="Left"
+                Background="{DynamicResource Lumen.Brush.Glass}" BorderBrush="{DynamicResource Lumen.Brush.GlassBorder}" BorderThickness="1"
                 Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}">
           <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" />
         </Border>
@@ -249,57 +271,76 @@
           </TextBlock.Style>
         </TextBlock>
 
+        <!-- One glass row per routine: icon, name, steps as a chain, state; Run (or Review) and the less used actions as icons -->
         <ItemsControl ItemsSource="{Binding Routines}" Focusable="False">
           <ItemsControl.ItemTemplate>
             <DataTemplate DataType="{x:Type vm:RoutineCardViewModel}">
-              <Border Style="{StaticResource Lumen.Card}" Padding="18,14" Margin="0,0,0,10">
-                <StackPanel>
-                  <DockPanel>
-                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                      <Button Content="{l:Loc Routine_Run}" Style="{StaticResource Lumen.Button.Primary}" Margin="8,0,0,0"
-                              Command="{Binding DataContext.RunCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
-                              Visibility="{Binding IsReady, Converter={StaticResource BoolToVisibility}}" />
-                      <Button Content="{l:Loc Routine_Review}" Style="{StaticResource Lumen.Button.Primary}" Margin="8,0,0,0"
-                              Command="{Binding DataContext.ReviewCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
-                              Visibility="{Binding NeedsReview, Converter={StaticResource BoolToVisibility}}" />
-                      <Button Content="{l:Loc Routine_Details}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0"
-                              Command="{Binding DataContext.ReviewCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
-                              Visibility="{Binding IsInvalid, Converter={StaticResource BoolToVisibility}}" />
-                      <Button Content="{l:Loc Routine_Undo}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0"
-                              Command="{Binding DataContext.UndoCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
-                              Visibility="{Binding CanUndo, Converter={StaticResource BoolToVisibility}}" />
-                      <Button Content="{l:Loc Routine_ForceClose}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0"
-                              Foreground="{DynamicResource Lumen.Brush.Warning}"
-                              Command="{Binding DataContext.ForceCloseCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
-                              Visibility="{Binding CanForceClose, Converter={StaticResource BoolToVisibility}}" />
-                      <Button Content="{l:Loc Routine_Edit}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0"
-                              Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
-                              Visibility="{Binding CanEdit, Converter={StaticResource BoolToVisibility}}" />
-                      <Button Content="{l:Loc Routine_Export}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0"
-                              Command="{Binding DataContext.ExportCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
-                              Visibility="{Binding CanEdit, Converter={StaticResource BoolToVisibility}}" />
-                      <Button Content="{l:Loc Routine_Delete}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0"
-                              Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
-                    </StackPanel>
-                    <StackPanel VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Name}" FontSize="{StaticResource Lumen.FontSize.Subtitle}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                      <TextBlock FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,2,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
-                        <Run Text="{Binding Summary, Mode=OneWay}" /><Run Text=" · " /><Run x:Name="State" Text="{Binding StateText, Mode=OneWay}" />
-                      </TextBlock>
-                    </StackPanel>
-                  </DockPanel>
-                  <TextBlock Text="{Binding Description}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}"
-                             Visibility="{Binding HasDescription, Converter={StaticResource BoolToVisibility}}" />
-                  <TextBlock Text="{Binding ResultText}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" Margin="0,8,0,0"
-                             Visibility="{Binding HasResult, Converter={StaticResource BoolToVisibility}}" />
-                </StackPanel>
+              <Border Style="{StaticResource Lumen.Card}" Padding="18,16" Margin="0,0,0,12">
+                <DockPanel>
+                  <Border x:Name="IconBox" DockPanel.Dock="Left" Width="48" Height="48" CornerRadius="14" VerticalAlignment="Top" Margin="0,0,16,0"
+                          Background="{DynamicResource Lumen.Brush.BrandSoft}" BorderBrush="{DynamicResource Lumen.Brush.BrandBorder}" BorderThickness="1">
+                    <TextBlock x:Name="IconGlyph" Text="&#xE945;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Section}"
+                               Foreground="{DynamicResource Lumen.Brush.BrandText}" HorizontalAlignment="Center" />
+                  </Border>
+
+                  <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Top" Margin="16,4,0,0">
+                    <Button Style="{StaticResource Lumen.Button.Primary}" Margin="0,0,8,0" AutomationProperties.Name="{l:Loc Routine_Run}"
+                            Command="{Binding DataContext.RunCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
+                            Visibility="{Binding IsReady, Converter={StaticResource BoolToVisibility}}">
+                      <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE768;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,0,8,0" />
+                        <TextBlock Text="{l:Loc Routine_Run}" />
+                      </StackPanel>
+                    </Button>
+                    <Button Content="{l:Loc Routine_Review}" Style="{StaticResource Lumen.Button.Primary}" Margin="0,0,8,0"
+                            Command="{Binding DataContext.ReviewCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
+                            Visibility="{Binding NeedsReview, Converter={StaticResource BoolToVisibility}}" />
+                    <Button Content="{l:Loc Routine_Details}" Style="{StaticResource Lumen.Button}" Margin="0,0,8,0"
+                            Command="{Binding DataContext.ReviewCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
+                            Visibility="{Binding IsInvalid, Converter={StaticResource BoolToVisibility}}" />
+                    <Button Content="{l:Loc Routine_Undo}" Style="{StaticResource Lumen.Button}" Margin="0,0,8,0"
+                            Command="{Binding DataContext.UndoCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
+                            Visibility="{Binding CanUndo, Converter={StaticResource BoolToVisibility}}" />
+                    <Button Content="{l:Loc Routine_ForceClose}" Style="{StaticResource Lumen.Button}" Margin="0,0,8,0"
+                            Foreground="{DynamicResource Lumen.Brush.Warning}"
+                            Command="{Binding DataContext.ForceCloseCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
+                            Visibility="{Binding CanForceClose, Converter={StaticResource BoolToVisibility}}" />
+                    <Button Content="&#xE70F;" Style="{StaticResource Lumen.Button.Icon}" Margin="0,0,8,0"
+                            ToolTip="{l:Loc Routine_Edit}" AutomationProperties.Name="{l:Loc Routine_Edit}"
+                            Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
+                            Visibility="{Binding CanEdit, Converter={StaticResource BoolToVisibility}}" />
+                    <Button Content="&#xE72D;" Style="{StaticResource Lumen.Button.Icon}" Margin="0,0,8,0"
+                            ToolTip="{l:Loc Routine_Export}" AutomationProperties.Name="{l:Loc Routine_Export}"
+                            Command="{Binding DataContext.ExportCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
+                            Visibility="{Binding CanEdit, Converter={StaticResource BoolToVisibility}}" />
+                    <Button Content="&#xE74D;" Style="{StaticResource Lumen.Button.Icon}"
+                            ToolTip="{l:Loc Routine_Delete}" AutomationProperties.Name="{l:Loc Routine_Delete}"
+                            Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+                  </StackPanel>
+
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Name}" FontSize="{StaticResource Lumen.FontSize.BodyLarge}" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding StepsText}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"
+                               Foreground="{DynamicResource Lumen.Brush.Text}" Opacity="0.85"
+                               Visibility="{Binding HasSteps, Converter={StaticResource BoolToVisibility}}" />
+                    <TextBlock FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,4,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
+                      <Run Text="{Binding Summary, Mode=OneWay}" /><Run Text=" · " /><Run x:Name="State" Text="{Binding StateText, Mode=OneWay}" />
+                    </TextBlock>
+                    <TextBlock Text="{Binding Description}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                               Visibility="{Binding HasDescription, Converter={StaticResource BoolToVisibility}}" />
+                    <TextBlock Text="{Binding ResultText}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" Margin="0,8,0,0"
+                               Visibility="{Binding HasResult, Converter={StaticResource BoolToVisibility}}" />
+                  </StackPanel>
+                </DockPanel>
               </Border>
               <DataTemplate.Triggers>
                 <DataTrigger Binding="{Binding NeedsReview}" Value="True">
                   <Setter TargetName="State" Property="Foreground" Value="{DynamicResource Lumen.Brush.Warning}" />
+                  <Setter TargetName="IconGlyph" Property="Foreground" Value="{DynamicResource Lumen.Brush.Warning}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding IsInvalid}" Value="True">
                   <Setter TargetName="State" Property="Foreground" Value="{DynamicResource Lumen.Brush.Error}" />
+                  <Setter TargetName="IconGlyph" Property="Foreground" Value="{DynamicResource Lumen.Brush.Error}" />
                 </DataTrigger>
               </DataTemplate.Triggers>
             </DataTemplate>
