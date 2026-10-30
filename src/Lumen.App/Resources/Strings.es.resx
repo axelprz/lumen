@@ -1476,4 +1476,10 @@
   <data name="Home_PlayTile" xml:space="preserve">
     <value>Jugar {0}</value>
   </data>
+  <data name="Detail_KindGame" xml:space="preserve">
+    <value>Juego</value>
+  </data>
+  <data name="Detail_KindApp" xml:space="preserve">
+    <value>App</value>
+  </data>
 </root>

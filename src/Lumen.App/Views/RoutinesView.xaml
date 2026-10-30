@@ -212,9 +212,10 @@
 
   <Grid Loaded="OnLoaded">
     <!-- Preview / editor cover the list while open -->
-    <ContentControl Panel.ZIndex="5" services:GamepadLayer.Priority="1" services:Motion.ShowIn="True" Content="{Binding Panel}" Focusable="False"
+    <ContentControl Panel.ZIndex="5" services:GamepadLayer.Priority="1" Content="{Binding Panel}" Focusable="False"
                     Background="{DynamicResource Lumen.Brush.Background}"
-                    Visibility="{Binding HasPanel, Converter={StaticResource BoolToVisibility}}" />
+                    Visibility="Collapsed"
+                    services:Motion.Shown="{Binding HasPanel}" />
     <Border Panel.ZIndex="4" Background="{DynamicResource Lumen.Brush.Background}"
             Visibility="{Binding HasPanel, Converter={StaticResource BoolToVisibility}}" />
 

@@ -71,12 +71,23 @@ public sealed partial class UiMotionTests
     }
 
     [Theory]
-    [InlineData("GameDetailView.xaml")]
-    [InlineData("RoutinesView.xaml")]
-    [InlineData("LibraryView.xaml")]
-    public void CoveringPanels_ComeInWithMotion(string file)
+    [InlineData("RoutinesView.xaml", "services:Motion.Shown=\"{Binding HasPanel}\"")]
+    [InlineData("LibraryView.xaml", "services:Motion.Shown=\"{Binding HasDetail}\"")]
+    [InlineData("LibraryView.xaml", "services:Motion.Shown=\"{Binding IsOpen}\"")]
+    public void CoveringPanels_ComeInAndGoOutWithMotion(string file, string binding)
     {
-        File.ReadAllText(Path.Combine(_appDir, "Views", file)).ShouldContain("Motion.ShowIn=\"True\"");
+        // Motion.Shown owns their Visibility: in with PanelIn, out with a fading picture (M10 leftover: closing was instant).
+        File.ReadAllText(Path.Combine(_appDir, "Views", file)).ShouldContain(binding);
+    }
+
+    [Fact]
+    public void ClosingPanels_FadeOutFast_AndOnlyWhenAnimationsAreOn()
+    {
+        var code = File.ReadAllText(Path.Combine(_appDir, "Services", "Motion.cs"));
+
+        code.ShouldContain("if (Enabled && element.IsVisible && element.ActualWidth >= 1");
+        code.ShouldContain("var fade = new DoubleAnimation(0, Fast)");
+        code.ShouldContain("IsHitTestVisible = false,");
     }
 
     [Fact]

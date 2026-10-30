@@ -161,6 +161,9 @@ public sealed partial class GameDetailViewModel : ObservableObject
 
     public string StoresText { get; }
 
+    /// <summary>The hero's tag: the stores and the kind ("Steam · Game").</summary>
+    public string TagText => StoresText + " · " + _s.Localizer[Item.Kind == ItemKind.App ? "Detail_KindApp" : "Detail_KindGame"];
+
     public string PlaytimeText { get; }
 
     /// <summary>Where the hours come from: the store (Steam), Lumen's own sessions, or both (merged games).</summary>
