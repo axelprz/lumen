@@ -4,6 +4,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Lumen.App.Services;
 using Lumen.App.ViewModels;
 
 namespace Lumen.App.Views;
@@ -14,6 +15,9 @@ public partial class LibraryView : UserControl
     {
         InitializeComponent();
     }
+
+    // The header, the filters and the grid arrive one after the other (the covers inside the grid stay still: it scrolls).
+    private void OnLoaded(object sender, RoutedEventArgs e) => Motion.Stagger(PageBlocks);
 
     // View concern: Ctrl+F jumps to the search box; Esc in the search box clears it.
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)

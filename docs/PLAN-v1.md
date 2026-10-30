@@ -179,6 +179,7 @@ Owner decisions and the incidents behind them, newest last. Add a line (with the
 - **2026-10-30 · UI font: Exo 2** (SIL OFL), chosen by the owner from a sample. Four static weights (400/500/600/700) cut from Google Fonts' official variable font with fontTools, because WPF does not handle variable axes. Shipped as resources under `Lumen.App/Assets/Fonts` with `OFL.txt`.
 - **2026-10-30 · Mica and glow (M10):** Mica where Windows 11 22H2+ has it and "Transparency effects" is on; otherwise the opaque palette, as before. Hover/focus glow on covers uses plain brushes and an opacity mask (no bitmap effects), to keep scroll frames.
 - **2026-10-30 · Motion (M10):** one helper (`Services/Motion.cs`) holds the durations (hover/focus 140 ms, pages 220 ms, never above 250 ms; hero and accent crossfades 450 ms) and checks Windows' "Animation effects"; with it off everything jumps to its end state. A repo test keeps animations going through it.
+- **2026-10-30 · Staggered entrance (M10):** Home and Library blocks (hero, rows; header, filters, grid) arrive 50 ms apart, at most five, never the covers inside a scrolling grid; the Home hero text fades in when the featured game changes. Same Motion rules and switch.
 - **2026-10-30 · Updates:** Velopack 1.2.161. Default channel beta until 1.0. Notice = Settings card + one tray balloon per version (no banner in the window). The user presses Download and chooses when to restart. Builds are unsigned in v1 (SmartScreen warning documented in the README).
 
 ## v1.1 — Deals (owner request, 2026-10-28)
