@@ -50,10 +50,36 @@ public sealed partial class UiMotionTests
     [Theory]
     [InlineData("HomeView.xaml.cs", "Motion.Stagger(Sections)")]
     [InlineData("LibraryView.xaml.cs", "Motion.Stagger(PageBlocks)")]
+    [InlineData("CollectionsView.xaml.cs", "Motion.Stagger(PageBlocks)")]
+    [InlineData("RoutinesView.xaml.cs", "Motion.Stagger(PageBlocks)")]
     public void HomeAndLibrary_StaggerTheirBlocksOnLoad(string file, string call)
     {
         File.ReadAllText(Path.Combine(_appDir, "Views", file)).ShouldContain(call);
     }
+
+    [Theory]
+    [InlineData("GameDetailView.xaml")]
+    [InlineData("RoutinesView.xaml")]
+    [InlineData("LibraryView.xaml")]
+    public void CoveringPanels_ComeInWithMotion(string file)
+    {
+        File.ReadAllText(Path.Combine(_appDir, "Views", file)).ShouldContain("Motion.ShowIn=\"True\"");
+    }
+
+    [Theory]
+    [InlineData("GameDetailView.xaml")]
+    [InlineData("CollectionsView.xaml")]
+    [InlineData("RoutinesView.xaml")]
+    public void ReworkedViews_UseTheTypeScale(string file)
+    {
+        // The listed sizes have a token (Label 11 … Display 44); a literal one is a view that skipped the scale.
+        var xaml = File.ReadAllText(Path.Combine(_appDir, "Views", file));
+
+        LiteralScaleSize().Matches(xaml).Select(m => m.Value).ShouldBeEmpty();
+    }
+
+    [GeneratedRegex("FontSize=\"(11|12|13|14|15|16|18|20|24|32|44)\"")]
+    private static partial Regex LiteralScaleSize();
 
     [GeneratedRegex(@"new\s+(Double|Color|Thickness)Animation\s*\(")]
     private static partial Regex Animation();

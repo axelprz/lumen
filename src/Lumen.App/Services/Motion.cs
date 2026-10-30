@@ -157,6 +157,64 @@ public static class Motion
         child.BeginAnimation(UIElement.OpacityProperty, fade);
     }
 
+    /// <summary>
+    /// A panel that covers the page (a game's detail, the routine editor, Discover apps) appearing: fades in while
+    /// sliding up a little, once it has been laid out. Nothing happens when animations are off.
+    /// </summary>
+    public static void PanelIn(UIElement panel)
+    {
+        if (!Enabled)
+        {
+            return;
+        }
+
+        if (panel.RenderTransform is not TranslateTransform { IsFrozen: false } slide)
+        {
+            slide = new TranslateTransform();
+            panel.RenderTransform = slide;
+        }
+
+        slide.BeginAnimation(TranslateTransform.YProperty, null);
+        panel.BeginAnimation(UIElement.OpacityProperty, null);
+        panel.Opacity = 0;
+        slide.Y = 16;
+        _ = panel.Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
+        {
+            To(panel, UIElement.OpacityProperty, 1, Normal);
+            To(slide, TranslateTransform.YProperty, 0, Normal);
+        });
+    }
+
+    /// <summary>Set to true on a covering panel: every time it becomes visible it comes in with <see cref="PanelIn"/>.</summary>
+    public static readonly DependencyProperty ShowInProperty =
+        DependencyProperty.RegisterAttached("ShowIn", typeof(bool), typeof(Motion), new PropertyMetadata(false, OnShowInChanged));
+
+    public static bool GetShowIn(DependencyObject element) => (bool)element.GetValue(ShowInProperty);
+
+    public static void SetShowIn(DependencyObject element, bool value) => element.SetValue(ShowInProperty, value);
+
+    private static void OnShowInChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (sender is not UIElement element)
+        {
+            return;
+        }
+
+        element.IsVisibleChanged -= OnShowInVisibleChanged;
+        if ((bool)e.NewValue)
+        {
+            element.IsVisibleChanged += OnShowInVisibleChanged;
+        }
+    }
+
+    private static void OnShowInVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (e.NewValue is true && sender is UIElement element)
+        {
+            PanelIn(element);
+        }
+    }
+
     /// <summary>Hover/focus scale for an element (say, a tile's cover). 1 or less means "off".</summary>
     public static readonly DependencyProperty HoverScaleProperty =
         DependencyProperty.RegisterAttached("HoverScale", typeof(double), typeof(Motion), new PropertyMetadata(1.0, OnHoverScaleChanged));

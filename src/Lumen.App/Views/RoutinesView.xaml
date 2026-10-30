@@ -13,11 +13,11 @@
     <!-- A step line: number, sentence, warnings. Highlighted steps get the warning color; blocked ones the error color. -->
     <DataTemplate x:Key="StepLineTemplate" DataType="{x:Type vm:StepLine}">
       <DockPanel Margin="0,0,0,10">
-        <TextBlock DockPanel.Dock="Left" Text="{Binding Number}" Width="26" FontSize="15" FontWeight="SemiBold"
+        <TextBlock DockPanel.Dock="Left" Text="{Binding Number}" Width="26" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold"
                    Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
         <StackPanel>
-          <TextBlock Text="{Binding Text}" FontSize="15" TextWrapping="Wrap" />
-          <TextBlock x:Name="Note" Text="{Binding Note}" FontSize="13" TextWrapping="Wrap" Margin="0,2,0,0"
+          <TextBlock Text="{Binding Text}" FontSize="{StaticResource Lumen.FontSize.Lead}" TextWrapping="Wrap" />
+          <TextBlock x:Name="Note" Text="{Binding Note}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" Margin="0,2,0,0"
                      Foreground="{DynamicResource Lumen.Brush.TextMuted}">
             <TextBlock.Style>
               <Style TargetType="TextBlock">
@@ -45,17 +45,17 @@
     <DataTemplate DataType="{x:Type vm:RoutineReviewViewModel}">
       <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
         <StackPanel Margin="40,32,40,40" MaxWidth="760" HorizontalAlignment="Left">
-          <TextBlock Text="{l:Loc Routine_Review_Title}" FontSize="14" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+          <TextBlock Text="{l:Loc Routine_Review_Title}" FontSize="{StaticResource Lumen.FontSize.Body}" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
           <TextBlock Text="{Binding Name}" Style="{StaticResource Lumen.Text.PageTitle}" Margin="0,4,0,8" />
-          <TextBlock Text="{Binding Hint}" FontSize="14" TextWrapping="Wrap" Margin="0,0,0,20" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+          <TextBlock Text="{Binding Hint}" FontSize="{StaticResource Lumen.FontSize.Body}" TextWrapping="Wrap" Margin="0,0,0,20" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
 
           <Border Style="{StaticResource Lumen.Card}" Visibility="{Binding HasErrors, Converter={StaticResource BoolToVisibility}}" Margin="0,0,0,16">
             <StackPanel>
-              <TextBlock Text="{l:Loc Routine_Review_Errors}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource Lumen.Brush.Error}" Margin="0,0,0,8" />
+              <TextBlock Text="{l:Loc Routine_Review_Errors}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold" Foreground="{DynamicResource Lumen.Brush.Error}" Margin="0,0,0,8" />
               <ItemsControl ItemsSource="{Binding Errors}" Focusable="False">
                 <ItemsControl.ItemTemplate>
                   <DataTemplate>
-                    <TextBlock Text="{Binding}" FontSize="13" TextWrapping="Wrap" Margin="0,0,0,4" FontFamily="Consolas" />
+                    <TextBlock Text="{Binding}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" Margin="0,0,0,4" FontFamily="Consolas" />
                   </DataTemplate>
                 </ItemsControl.ItemTemplate>
               </ItemsControl>
@@ -92,8 +92,8 @@
                    VerticalContentAlignment="Center" AutomationProperties.Name="{l:Loc Routine_Editor_Name}" />
 
           <!-- Steps -->
-          <TextBlock Text="{l:Loc Routine_Editor_Steps}" FontSize="17" FontWeight="SemiBold" Margin="0,24,0,8" />
-          <TextBlock Text="{l:Loc Routine_Editor_NoSteps}" FontSize="14" Foreground="{DynamicResource Lumen.Brush.TextMuted}" Margin="0,0,0,8">
+          <TextBlock Text="{l:Loc Routine_Editor_Steps}" FontSize="{StaticResource Lumen.FontSize.Subtitle}" FontWeight="SemiBold" Margin="0,24,0,8" />
+          <TextBlock Text="{l:Loc Routine_Editor_NoSteps}" FontSize="{StaticResource Lumen.FontSize.Body}" Foreground="{DynamicResource Lumen.Brush.TextMuted}" Margin="0,0,0,8">
             <TextBlock.Style>
               <Style TargetType="TextBlock">
                 <Style.Triggers>
@@ -137,7 +137,7 @@
               <StackPanel Margin="0,12,0,0" Visibility="{Binding IsItemKind, Converter={StaticResource BoolToVisibility}}">
                 <TextBox Text="{Binding ItemSearch, UpdateSourceTrigger=PropertyChanged}" Height="36" Padding="8,0" VerticalContentAlignment="Center"
                          AutomationProperties.Name="{l:Loc Routine_Editor_SearchLibrary}" />
-                <TextBlock Text="{l:Loc Routine_Editor_SearchLibrary}" FontSize="12" Margin="2,4,0,6" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+                <TextBlock Text="{l:Loc Routine_Editor_SearchLibrary}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="2,4,0,6" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
                 <ItemsControl ItemsSource="{Binding ItemResults}" Focusable="False">
                   <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -178,7 +178,7 @@
               <StackPanel Margin="0,12,0,0" Orientation="Horizontal" Visibility="{Binding IsWaitKind, Converter={StaticResource BoolToVisibility}}">
                 <TextBox Text="{Binding WaitSeconds, UpdateSourceTrigger=PropertyChanged}" Width="80" Height="36" Padding="8,0" VerticalContentAlignment="Center"
                          AutomationProperties.Name="{l:Loc Routine_Editor_Seconds}" />
-                <TextBlock Text="{l:Loc Routine_Editor_Seconds}" VerticalAlignment="Center" Margin="8,0,12,0" FontSize="14" />
+                <TextBlock Text="{l:Loc Routine_Editor_Seconds}" VerticalAlignment="Center" Margin="8,0,12,0" FontSize="{StaticResource Lumen.FontSize.Body}" />
                 <Button Command="{Binding AddWaitCommand}" Content="{l:Loc Routine_Editor_Add}" Style="{StaticResource Lumen.Button}" />
               </StackPanel>
 
@@ -186,21 +186,21 @@
               <StackPanel Margin="0,12,0,0" Visibility="{Binding IsCloseProgramKind, Converter={StaticResource BoolToVisibility}}">
                 <TextBox Text="{Binding ProcessName, UpdateSourceTrigger=PropertyChanged}" Height="36" Padding="8,0" VerticalContentAlignment="Center"
                          AutomationProperties.Name="{l:Loc Routine_Editor_ProcessName}" />
-                <TextBlock Text="{l:Loc Routine_Editor_ProcessName}" FontSize="12" Margin="2,4,0,6" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
-                <CheckBox IsChecked="{Binding ForceClose}" Content="{l:Loc Routine_Editor_Force}" FontSize="14" Foreground="{DynamicResource Lumen.Brush.Text}" />
+                <TextBlock Text="{l:Loc Routine_Editor_ProcessName}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="2,4,0,6" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+                <CheckBox IsChecked="{Binding ForceClose}" Content="{l:Loc Routine_Editor_Force}" FontSize="{StaticResource Lumen.FontSize.Body}" Foreground="{DynamicResource Lumen.Brush.Text}" />
                 <Button Command="{Binding AddCloseProgramCommand}" Content="{l:Loc Routine_Editor_Add}" Style="{StaticResource Lumen.Button}"
                         HorizontalAlignment="Left" Margin="0,10,0,0" />
               </StackPanel>
 
-              <TextBlock Text="{Binding Problem}" FontSize="14" TextWrapping="Wrap" Margin="0,12,0,0" Foreground="{DynamicResource Lumen.Brush.Warning}"
+              <TextBlock Text="{Binding Problem}" FontSize="{StaticResource Lumen.FontSize.Body}" TextWrapping="Wrap" Margin="0,12,0,0" Foreground="{DynamicResource Lumen.Brush.Warning}"
                          Visibility="{Binding HasProblem, Converter={StaticResource BoolToVisibility}}" />
             </StackPanel>
           </Border>
 
           <!-- Options and save -->
-          <CheckBox IsChecked="{Binding StopOnError}" Content="{l:Loc Routine_Editor_StopOnError}" FontSize="14" Margin="0,20,0,0"
+          <CheckBox IsChecked="{Binding StopOnError}" Content="{l:Loc Routine_Editor_StopOnError}" FontSize="{StaticResource Lumen.FontSize.Body}" Margin="0,20,0,0"
                     Foreground="{DynamicResource Lumen.Brush.Text}" />
-          <CheckBox IsChecked="{Binding Pinned}" Content="{l:Loc Routine_Editor_Pinned}" FontSize="14" Margin="0,8,0,0"
+          <CheckBox IsChecked="{Binding Pinned}" Content="{l:Loc Routine_Editor_Pinned}" FontSize="{StaticResource Lumen.FontSize.Body}" Margin="0,8,0,0"
                     Foreground="{DynamicResource Lumen.Brush.Text}" />
           <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
             <Button Command="{Binding SaveCommand}" Content="{l:Loc Routine_Editor_Save}" Style="{StaticResource Lumen.Button}"
@@ -212,16 +212,16 @@
     </DataTemplate>
   </UserControl.Resources>
 
-  <Grid>
+  <Grid Loaded="OnLoaded">
     <!-- Preview / editor cover the list while open -->
-    <ContentControl Panel.ZIndex="5" services:GamepadLayer.Priority="1" Content="{Binding Panel}" Focusable="False"
+    <ContentControl Panel.ZIndex="5" services:GamepadLayer.Priority="1" services:Motion.ShowIn="True" Content="{Binding Panel}" Focusable="False"
                     Background="{DynamicResource Lumen.Brush.Background}"
                     Visibility="{Binding HasPanel, Converter={StaticResource BoolToVisibility}}" />
     <Border Panel.ZIndex="4" Background="{DynamicResource Lumen.Brush.Background}"
             Visibility="{Binding HasPanel, Converter={StaticResource BoolToVisibility}}" />
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
-      <StackPanel Margin="40,32,40,40" MaxWidth="760" HorizontalAlignment="Left">
+      <StackPanel x:Name="PageBlocks" Margin="40,32,40,40" MaxWidth="760" HorizontalAlignment="Left">
         <DockPanel>
           <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
             <Button Command="{Binding OpenFolderCommand}" Content="{l:Loc Routine_OpenFolder}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0" />
@@ -231,15 +231,15 @@
           </StackPanel>
           <TextBlock Text="{l:Loc Nav_Routines}" Style="{StaticResource Lumen.Text.PageTitle}" />
         </DockPanel>
-        <TextBlock Text="{l:Loc Routine_Body}" FontSize="15" TextWrapping="Wrap" Margin="0,10,0,24" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+        <TextBlock Text="{l:Loc Routine_Body}" FontSize="{StaticResource Lumen.FontSize.Lead}" TextWrapping="Wrap" Margin="0,10,0,24" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
 
         <Border Margin="0,0,0,16" Padding="14,10" CornerRadius="6" HorizontalAlignment="Left"
                 Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
                 Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}">
-          <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="14" />
+          <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" />
         </Border>
 
-        <TextBlock Text="{l:Loc Routine_Empty}" FontSize="15" TextWrapping="Wrap" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
+        <TextBlock Text="{l:Loc Routine_Empty}" FontSize="{StaticResource Lumen.FontSize.Lead}" TextWrapping="Wrap" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
           <TextBlock.Style>
             <Style TargetType="TextBlock">
               <Style.Triggers>
@@ -286,15 +286,15 @@
                               Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
                     </StackPanel>
                     <StackPanel VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Name}" FontSize="17" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                      <TextBlock FontSize="13" Margin="0,2,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
+                      <TextBlock Text="{Binding Name}" FontSize="{StaticResource Lumen.FontSize.Subtitle}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                      <TextBlock FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,2,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
                         <Run Text="{Binding Summary, Mode=OneWay}" /><Run Text=" · " /><Run x:Name="State" Text="{Binding StateText, Mode=OneWay}" />
                       </TextBlock>
                     </StackPanel>
                   </DockPanel>
-                  <TextBlock Text="{Binding Description}" FontSize="13" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                  <TextBlock Text="{Binding Description}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                              Visibility="{Binding HasDescription, Converter={StaticResource BoolToVisibility}}" />
-                  <TextBlock Text="{Binding ResultText}" FontSize="13" TextWrapping="Wrap" Margin="0,8,0,0"
+                  <TextBlock Text="{Binding ResultText}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" Margin="0,8,0,0"
                              Visibility="{Binding HasResult, Converter={StaticResource BoolToVisibility}}" />
                 </StackPanel>
               </Border>

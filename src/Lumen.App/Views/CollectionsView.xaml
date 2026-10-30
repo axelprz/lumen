@@ -10,10 +10,10 @@
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
   </UserControl.Resources>
 
-  <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
-    <StackPanel Margin="40,32,40,40" MaxWidth="760" HorizontalAlignment="Left">
+  <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False" Loaded="OnLoaded">
+    <StackPanel x:Name="PageBlocks" Margin="40,32,40,40" MaxWidth="760" HorizontalAlignment="Left">
       <TextBlock Text="{l:Loc Nav_Collections}" Style="{StaticResource Lumen.Text.PageTitle}" />
-      <TextBlock Text="{l:Loc Collections_Body}" FontSize="15" TextWrapping="Wrap" Margin="0,10,0,24"
+      <TextBlock Text="{l:Loc Collections_Body}" FontSize="{StaticResource Lumen.FontSize.Lead}" TextWrapping="Wrap" Margin="0,10,0,24"
                  Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
 
       <!-- New collection -->
@@ -38,7 +38,7 @@
       <Border Margin="0,0,0,16" Padding="14,10" CornerRadius="6" HorizontalAlignment="Left"
               Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
               Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}">
-        <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="14" />
+        <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" />
       </Border>
 
       <ItemsControl ItemsSource="{Binding Cards}" Focusable="False">
@@ -67,10 +67,10 @@
                             Visibility="{Binding CanEdit, Converter={StaticResource BoolToVisibility}}" />
                   </StackPanel>
                   <TextBlock x:Name="Icon" DockPanel.Dock="Left" Text="&#xE8F1;" Style="{StaticResource Lumen.Text.Icon}"
-                             FontSize="20" Margin="0,0,14,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+                             FontSize="{StaticResource Lumen.FontSize.Section}" Margin="0,0,14,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
                   <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Name}" FontSize="17" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                    <TextBlock Text="{Binding CountText}" FontSize="13" Margin="0,2,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+                    <TextBlock Text="{Binding Name}" FontSize="{StaticResource Lumen.FontSize.Subtitle}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding CountText}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,2,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
                   </StackPanel>
                 </DockPanel>
 
