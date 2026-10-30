@@ -84,15 +84,15 @@ Every URI and file location must be verified on a real machine when implemented 
 ### 4.5 Routines (secondary)
 - A routine is a JSON file with an ordered list of actions. v1 action types: `launch` (library item or path, with args), `url`, `folder`, `wait`, `close`.
 - **No script/command execution in v1.** No elevation, ever, in v1.
-- Run from: Routines page, tray menu, quick search, pinned card on Home.
+- Run from: Routines page, tray menu, quick search, pinned card on Home (a routine that needs review never runs from the last three: its preview opens instead).
 - "Undo" a routine: close what it opened (only processes Lumen started during that run).
-- **Sync folder:** user picks a folder (e.g. inside OneDrive/Google Drive/a git repo). Lumen reads/writes `routines/`, `collections/` and `config.json` there and watches for changes.
+- **Sync folder (done, M8):** user picks a folder (e.g. inside OneDrive/Google Drive/a git repo). Lumen reads/writes `routines/`, `collections/` and `config.json` there and watches for changes. Synced: language, minimize to tray, hotkey, manual items, renames/hidden, ignored apps, collections, favorites, routines. Never: secrets, tokens, playtime, routine approvals, paths of folders. First sync with data on both sides asks: combine / use the folder / use this PC. See ARCHITECTURE "Sync folder".
 - **Import/export:** single routine as `.json`.
 - **Trust model:** each routine has a locally stored SHA-256 of its canonical JSON. A routine that is new or changed outside Lumen is "untrusted" until the user reviews a full preview (every action listed; `close` actions and unknown executables highlighted) and approves it.
 
 ### 4.6 Updates and distribution
-- Velopack checks GitHub Releases on startup (and daily) and offers the update; user chooses when to restart.
-- `stable` channel = normal releases; `beta` = pre-releases. Selectable in Settings.
+- Velopack checks GitHub Releases on startup (and daily, can be turned off) and offers the update; the user presses Download and chooses when to restart. One tray notice per version.
+- `stable` channel = normal releases; `beta` = pre-releases (and normal ones). Selectable in Settings. Default: beta until 1.0, stable from 1.0.
 - Release workflow publishes `Setup.exe`, the portable zip, and Velopack delta packages.
 - Unsigned builds in v1 (SmartScreen warning documented in the README). Code signing evaluated later.
 
@@ -100,26 +100,26 @@ Every URI and file location must be verified on a real machine when implemented 
 - Language, theme accents on/off, start with Windows, minimize to tray, hotkey.
 - Stores: enable/disable each, custom library paths, Steam key + SteamID64, Epic/GOG connect/disconnect.
 - Artwork: SteamGridDB key, clear cache.
-- Sync folder; update channel; about/licenses.
+- Sync folder; update channel (Settings → Updates); about/licenses (not done yet).
 
 ## 5. Milestones
 
 Each milestone ends with a working, tested build on `main`. Order matters; later milestones assume earlier ones.
 
-| # | Milestone | Done when |
-|---|---|---|
-| M0 | **Scaffold** — solution layout, Directory.Build.props, DI host, Serilog logging, SQLite + migrations, resx localization skeleton, CI (build + test on `windows-latest`), empty WPF shell with sidebar | `dotnet build` and `dotnet test` pass in CI; app opens an empty dark window |
-| M1 | **Library core + Steam + manual** — domain model, `ILibraryProvider`, scan service, Steam local detection (VDF/ACF), Steam Web API owned games, manual items, launch/install, basic grid | User sees all their Steam games (installed and not) and manual items in a grid and can launch/install them |
-| M2 | **Other stores (local)** — Epic, GOG, Xbox/MS Store, Ubisoft, EA, Battle.net installed detection + launch; title normalization and merging | All installed games from all stores appear once each and launch |
-| M3 | **Artwork + UI** — artwork service (Steam CDN, SteamGridDB, cache, overrides), Home, Library filters/search, Detail view, dynamic background/accent, first-run wizard | UI matches §4.3 for mouse/keyboard |
-| M4 | **Apps** — Start menu + AppsFolder providers, junk filter, Discover screen, collections & favorites | User can curate apps and organize mixed collections |
-| M5 | **Accounts** — Epic and GOG optional login, owned-not-installed games for both; optional Steam sign-in **on Steam's website in a built-in browser** (since 2026-10-29; the first QR-as-mobile-app version got the owner's account flagged and was removed) for Steam Family shared games and the owned list without a key; all per §4.8 (the DPAPI secret store itself landed in M1, needed for the Steam key) | Connected Epic/GOG libraries show non-installed games; with Steam signed in, family-shared games appear (not-installed ones greyed out) |
-| M6 | **Playtime** — session tracker, Steam playtime import, UI integration | Hours and last played are correct after playing |
-| M7 | **Tray, hotkey, gamepad** — tray icon/menu, global hotkey quick search, gamepad navigation | All three work as in §4.3 |
-| M8 | **Routines** — schema loader/validator, action executor, trust model, import preview, sync folder watcher, UI | §4.5 complete |
-| M9 | **Updates & release** — Velopack integration, release workflow, portable zip, update UI, channels | Tagging a version (pre-release tags until 1.0) publishes an installable, self-updating release |
-| M10 | **UI rework** (owner request, 2026-10-28) — see §4.9 | The owner approves the new look on real use; every screen and the gamepad still work |
-| — | **1.0 hardening** — bug bash on real machines with every store installed, docs, screenshots (of the reworked UI) | Tagging `v1.0.0` releases |
+| # | Milestone | Done when | Status |
+|---|---|---|---|
+| M0 | **Scaffold** — solution layout, Directory.Build.props, DI host, Serilog logging, SQLite + migrations, resx localization skeleton, CI (build + test on `windows-latest`), empty WPF shell with sidebar | `dotnet build` and `dotnet test` pass in CI; app opens an empty dark window | Done |
+| M1 | **Library core + Steam + manual** — domain model, `ILibraryProvider`, scan service, Steam local detection (VDF/ACF), Steam Web API owned games, manual items, launch/install, basic grid | User sees all their Steam games (installed and not) and manual items in a grid and can launch/install them | Done |
+| M2 | **Other stores (local)** — Epic, GOG, Xbox/MS Store, Ubisoft, EA, Battle.net installed detection + launch; title normalization and merging | All installed games from all stores appear once each and launch | Done |
+| M3 | **Artwork + UI** — artwork service (Steam CDN, SteamGridDB, cache, overrides), Home, Library filters/search, Detail view, dynamic background/accent, first-run wizard | UI matches §4.3 for mouse/keyboard | Done |
+| M4 | **Apps** — Start menu + AppsFolder providers, junk filter, Discover screen, collections & favorites | User can curate apps and organize mixed collections | Done |
+| M5 | **Accounts** — Epic and GOG optional login, owned-not-installed games for both; optional Steam sign-in **on Steam's website in a built-in browser** (since 2026-10-29; the first QR-as-mobile-app version got the owner's account flagged and was removed) for Steam Family shared games and the owned list without a key; all per §4.8 (the DPAPI secret store itself landed in M1, needed for the Steam key) | Connected Epic/GOG libraries show non-installed games; with Steam signed in, family-shared games appear (not-installed ones greyed out) | Done (Steam via website sign-in, 2026-10-29) |
+| M6 | **Playtime** — session tracker, Steam playtime import, UI integration | Hours and last played are correct after playing | Done |
+| M7 | **Tray, hotkey, gamepad** — tray icon/menu, global hotkey quick search, gamepad navigation | All three work as in §4.3 | Done |
+| M8 | **Routines** — schema loader/validator, action executor, trust model, import preview, sync folder watcher, UI | §4.5 complete | Done (2026-10-30) |
+| M9 | **Updates & release** — Velopack integration, release workflow, portable zip, update UI, channels | Tagging a version (pre-release tags until 1.0) publishes an installable, self-updating release | Done (2026-10-30; the owner tagged the first pre-releases and reported it ready) |
+| M10 | **UI rework** (owner request, 2026-10-28) — see §4.9 | The owner approves the new look on real use; every screen and the gamepad still work | **Next**; the owner picks the font from a sample first |
+| — | **1.0 hardening** — bug bash on real machines with every store installed, docs, screenshots (of the reworked UI) | Tagging `v1.0.0` releases | After M10 |
 
 ### 4.8 Account security (Steam, Epic, GOG sign-ins)
 
@@ -163,6 +163,20 @@ Owner request (2026-10-28): before 1.0, a modern, futuristic look that makes peo
 - No admin rights required for anything.
 - Logs in `%LOCALAPPDATA%\Lumen\logs`, rolling, no secrets or tokens ever logged.
 - All parsing code (VDF, manifests, registry snapshots, schemas) has unit tests with fixture files.
+
+## 7. Decision log
+
+Owner decisions and the incidents behind them, newest last. Add a line (with the date) when the owner decides something that shapes the product or the rules.
+
+- **2026-10-28 · Steam QR sign-in removed.** Signing in as the Steam *mobile app* got the owner's account flagged by Steam (lifted after contacting support). Turned off (#35); a stored token is revoked at start-up. Led to security rule 8.
+- **2026-10-28 · Requests:** UI rework before 1.0 (M10, §4.9) and a Deals section for 1.1.
+- **2026-10-29 · Steam signs in on its own website** inside Lumen's built-in browser (WebView2, as Playnite does). WebView2 approved as a dependency. Epic and GOG keep the pasted-code flow (public launcher client ids). Security rule 8 added.
+- **2026-10-30 · Working rules:** one PR per step; the owner tests on his PC and says "mergealo"; Spanish (voseo) in chat, English in code and docs.
+- **2026-10-30 · Sync folder is an allowed write root** (only `config.json`, `collections/`, `routines/`; not a drive root or system folder). Routines live in `<sync>/routines` while sync is on.
+- **2026-10-30 · First sync with data on both sides:** ask each time (combine, recommended / use the folder / use this PC); the two that remove data ask for confirmation.
+- **2026-10-30 · Manual items from the folder:** imported if they pass the add-item dialog rules, with a notice ("N items came from the sync folder"); they never run on their own.
+- **2026-10-30 · Same routine id on both sides:** keep both (the copy gets a new id and needs review); nothing is overwritten. No "the newest wins".
+- **2026-10-30 · Updates:** Velopack 1.2.161. Default channel beta until 1.0. Notice = Settings card + one tray balloon per version (no banner in the window). The user presses Download and chooses when to restart. Builds are unsigned in v1 (SmartScreen warning documented in the README).
 
 ## v1.1 — Deals (owner request, 2026-10-28)
 

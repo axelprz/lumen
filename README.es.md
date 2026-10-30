@@ -4,7 +4,7 @@
 
 Lumen es un launcher gratuito y de código abierto para Windows que reúne todos tus juegos y apps en un solo lugar. Steam, Epic, GOG, Xbox / Microsoft Store, Ubisoft Connect, EA app y Battle.net aparecen en una única biblioteca —instalados o no— junto a las apps que elijas. Lanzás cualquier cosa en dos segundos, con mouse, atajo de teclado o joystick.
 
-> **Estado:** desarrollo inicial; está por publicarse el primer pre-release. Ver [el plan de la v1](docs/PLAN-v1.md).
+> **Estado:** desarrollo inicial; hay pre-releases disponibles en la [página de Releases](https://github.com/axelprz/lumen/releases). Ver [el plan de la v1](docs/PLAN-v1.md).
 
 ## Instalación
 
