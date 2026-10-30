@@ -87,6 +87,37 @@ public sealed class AccentPickerTests
         }
     }
 
+    [Fact]
+    public void Soften_CapsSaturation_AndKeepsTheHue()
+    {
+        var red = new Rgb(0xE0, 0x10, 0x10);
+
+        var softened = AccentPicker.Soften(red);
+
+        var (hueBefore, _, _) = red.ToHsl();
+        var (hue, saturation, _) = softened.ToHsl();
+        saturation.ShouldBeLessThanOrEqualTo(AccentPicker.GlowMaxSaturation + 0.01);
+        Math.Abs(hue - hueBefore).ShouldBeLessThan(3);
+    }
+
+    [Theory]
+    [InlineData(0x08, 0x20, 0x60)] // very dark blue
+    [InlineData(0xF0, 0xE8, 0x90)] // pale yellow
+    public void Soften_KeepsLightnessInsideTheGlowRange(byte r, byte g, byte b)
+    {
+        var (_, _, l) = AccentPicker.Soften(new Rgb(r, g, b)).ToHsl();
+
+        l.ShouldBeInRange(AccentPicker.GlowMinLightness - 0.01, AccentPicker.GlowMaxLightness + 0.01);
+    }
+
+    [Fact]
+    public void Soften_LeavesAGentleColorAlone()
+    {
+        var gentle = Rgb.FromHsl(210, 0.35, 0.5);
+
+        AccentPicker.Soften(gentle).ShouldBe(gentle);
+    }
+
     private static byte[] Image(params (Rgb Color, int Pixels)[] parts)
     {
         var bytes = new List<byte>();

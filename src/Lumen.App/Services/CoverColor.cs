@@ -26,6 +26,9 @@ public static class CoverColor
     /// <summary>A frozen brush with the default accent.</summary>
     public static Brush DefaultBrush => _defaultBrush;
 
+    /// <summary>The calmer color used for glow and ring around art: the accent, softened (<see cref="AccentPicker.Soften"/>).</summary>
+    public static Rgb? PickGlow(string path) => Pick(path) is { } accent ? AccentPicker.Soften(accent) : null;
+
     /// <summary>The accent of the image at <paramref name="path"/>, or null. Safe to call off the UI thread; never throws for a bad file.</summary>
     public static Rgb? Pick(string path)
     {
