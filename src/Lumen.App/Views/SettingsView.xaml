@@ -82,6 +82,8 @@
 
       <views:SyncSettingsCard DataContext="{Binding Sync}" Margin="0,20,0,0" />
 
+      <views:UpdateSettingsCard DataContext="{Binding Updates}" Margin="0,20,0,0" />
+
       <!-- Library -->
       <Border Style="{StaticResource Lumen.Card}" Margin="0,20,0,0">
         <StackPanel>

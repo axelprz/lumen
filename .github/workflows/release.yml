@@ -1,0 +1,103 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)
+
+# Tagging a version publishes an installable, self-updating release (PLAN-v1 M9):
+#   git tag v0.2.0-beta.1 && git push origin v0.2.0-beta.1
+# A tag with a "-" (v0.2.0-beta.1) is a pre-release; v1.0.0 is a normal release. Lumen's "stable" channel only sees
+# normal releases, "beta" also sees pre-releases. Before 1.0 every release is a pre-release.
+# Produces: Lumen-win-Setup.exe, Lumen-win-Portable.zip, the full package and a delta from the previous release.
+# Builds are unsigned in v1 (Windows SmartScreen will warn).
+
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+  # Keep in step with the Velopack package version in Directory.Packages.props.
+  VPK_VERSION: "1.2.161"
+
+jobs:
+  release:
+    name: Build and publish release
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check the tag
+        id: version
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          if ($tag -notmatch '^v(\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?)$') {
+            throw "The tag '$tag' is not a version like v1.2.3 or v1.2.3-beta.1."
+          }
+          $version = $Matches[1]
+          # Only commits that are on main are released.
+          git fetch origin main
+          git merge-base --is-ancestor HEAD origin/main
+          if ($LASTEXITCODE -ne 0) { throw "The tag '$tag' is not on main." }
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "prerelease=$($version.Contains('-').ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build and test
+        run: |
+          dotnet restore
+          dotnet build --no-restore -c Release
+          dotnet test --no-build -c Release
+
+      - name: Publish (self-contained, win-x64)
+        run: dotnet publish src/Lumen.App -c Release -r win-x64 --self-contained -p:Version=${{ steps.version.outputs.version }} -o publish
+
+      - name: Install vpk
+        run: dotnet tool install --global vpk --version $env:VPK_VERSION
+
+      # The previous releases give vpk what it needs to make a small delta. The very first release has none.
+      - name: Download previous releases (for deltas)
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          vpk download github --repoUrl "${{ github.server_url }}/${{ github.repository }}" --token $env:GITHUB_TOKEN
+          vpk download github --repoUrl "${{ github.server_url }}/${{ github.repository }}" --token $env:GITHUB_TOKEN --pre
+          $global:LASTEXITCODE = 0
+        continue-on-error: true
+
+      - name: Pack
+        run: >
+          vpk pack
+          --packId Lumen
+          --packVersion ${{ steps.version.outputs.version }}
+          --packDir publish
+          --mainExe Lumen.exe
+          --runtime win-x64
+          --packTitle Lumen
+          --packAuthors "Axel Ismael Perez (AxelPRZ)"
+          --icon src/Lumen.App/Assets/Lumen.ico
+          --outputDir Releases
+
+      - name: Upload to GitHub Releases
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $pre = @()
+          if ("${{ steps.version.outputs.prerelease }}" -eq "true") { $pre = @("--pre") }
+          vpk upload github --repoUrl "${{ github.server_url }}/${{ github.repository }}" --token $env:GITHUB_TOKEN --outputDir Releases --publish --releaseName "Lumen ${{ steps.version.outputs.version }}" --tag "v${{ steps.version.outputs.version }}" @pre
+          if ($LASTEXITCODE -ne 0) { throw "vpk upload failed." }

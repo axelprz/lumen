@@ -11,6 +11,8 @@
     <!-- Lets the whole solution (including WPF) build on Linux/macOS (e.g. CI agents). WPF still only runs on Windows. -->
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <Deterministic>true</Deterministic>
+    <!-- Development builds say so; the release workflow passes the version of the tag (-p:Version=...). -->
+    <Version>0.0.0-dev</Version>
     <Authors>Axel Ismael Perez (AxelPRZ)</Authors>
     <Copyright>Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)</Copyright>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>

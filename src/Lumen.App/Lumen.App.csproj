@@ -9,7 +9,13 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\Lumen.ico</ApplicationIcon>
     <SatelliteResourceLanguages>en;es</SatelliteResourceLanguages>
+    <!-- Program.Main is the entry point (Velopack must run first), so App.xaml is a page, not the application definition. -->
+    <StartupObject>Lumen.App.Program</StartupObject>
   </PropertyGroup>
+  <ItemGroup>
+    <ApplicationDefinition Remove="App.xaml" />
+    <Page Include="App.xaml" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\Lumen.ico" />
   </ItemGroup>

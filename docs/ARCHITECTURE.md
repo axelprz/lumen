@@ -39,7 +39,7 @@ Dependency direction: `App → Platform.Windows → Providers → Data → Core`
 | JSON | System.Text.Json (+ JsonSchema.Net for validating routines/collections) |
 | Tray icon | H.NotifyIcon.Wpf |
 | Gamepad | Windows.Gaming.Input (via the Windows TFM) |
-| Updates | Velopack |
+| Updates | Velopack 1.2.161 (MIT, pinned 2026-10-30). Only `Lumen.Platform.Windows` and `Lumen.App` (the `Program.Main` hook) use it. |
 | Steam VDF | small in-house parser (KeyValues text format is simple; keep it dependency-free and tested) |
 | Built-in browser (Steam sign-in, M5) | Microsoft.Web.WebView2 (BSD-3-Clause; owner-approved 2026-10-29). Only `Lumen.App` references it. It uses the WebView2 runtime that ships with Windows 11. Replaced QRCoder when the QR sign-in was removed |
 | Tests | xUnit (v2) + Shouldly |
@@ -195,7 +195,7 @@ Rules: providers only **read** store files; never write into a store's folder or
 | `SecretStore` | DPAPI with CurrentUser scope (`ISecretProtector`; `DpapiProtector` calls `CryptProtectData` directly, with app-specific entropy, so no extra package) protected values in the SQLite `secrets` table (`ISecretStore` / `SqliteSecretStore`). A value that no longer decrypts (other user or machine) reads as not set. Never logged, never synced. Machine-local non-secret values (e.g. SteamID64) go to `settings_local` via `ILocalSettings`. |
 | `RoutineEngine` | Loads/validates routines, trust checks, executes actions sequentially with cancellation, tracks started processes for undo |
 | `SyncFolderService` | **Implemented (M8, 2026-10-30).** Keeps `config.json` and `collections/*.json` in step with this PC both ways and announces changes in `routines/`. Details in *Sync folder* below. |
-| `UpdateService` | Velopack: check, download, apply on restart; channel selection |
+| `UpdateService` | **Implemented (M9, 2026-10-30).** Checks GitHub Releases at start-up and daily, offers the update, downloads when the user asks, installs on the user's restart. Details in *Updates* under §9. |
 
 Steam CDN artwork (**verified 2026-10**): `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{appid}/…` (current) and `https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/…` (fallback) both serve `library_600x900.jpg`, `library_hero.jpg`, `logo.png`, `header.jpg`. Cover falls back to `header.jpg` for old games.
 
@@ -433,5 +433,24 @@ Implemented in M8 (engine: `Lumen.Core/Routines`).
 - CI (`.github/workflows/ci.yml`): on push/PR — `windows-latest`: restore, build, test.
 - Development needs Windows with the .NET 10 SDK (`global.json`); the user-level install from Microsoft's `dotnet-install` script needs no admin. Logic in Core/Data/Providers also builds and tests on Linux/macOS thanks to `EnableWindowsTargeting`, but the WPF app only runs on Windows.
 - Localization: `Lumen.App/Resources/Strings.resx` (en) + `Strings.es.resx` (es), read through `LocalizationService`; XAML uses `{l:Loc Key}`, which follows runtime language changes. `LanguageResolver` (Core) maps the `language` preference to a culture. A repository test fails if the two resx files have different keys or a XAML `{l:Loc}` key is missing.
-- Release (`.github/workflows/release.yml`): on tag `v*` — `dotnet publish` self-contained `win-x64`, `vpk pack`, `vpk upload github` (pre-release tags like `v1.1.0-beta.1` go to the `beta` channel). Produces `Setup.exe`, portable zip, delta packages.
-- Versioning: SemVer; `MinVer` or tag-based versioning.
+- Release (`.github/workflows/release.yml`, M9): on a tag `v*` it checks the tag (`vMAJOR.MINOR.PATCH[-suffix]`, on `main`), builds and tests, `dotnet publish` self-contained `win-x64`, `vpk pack`, and `vpk upload github --publish` (a tag with `-` is created as a GitHub **pre-release**). It produces `Lumen-win-Setup.exe`, `Lumen-win-Portable.zip`, the full package and a delta from the previous release (`vpk download github` first, so the first release simply has no delta).
+  - **Validated on Linux on 2026-10-30:** the same `dotnet publish` and `vpk pack` commands ran against this code (165 MB published folder, Setup.exe 82 MB, portable zip 74 MB; a delta between two builds was 125 KB). `vpk` checked that `VelopackApp.Run()` is in `Program.Main`. The upload and the Windows runner were not run until the first tag.
+  - Builds are **unsigned** in v1: SmartScreen warns on first run (documented in the README).
+- Versioning: SemVer from the tag. `Directory.Build.props` sets `Version` to `0.0.0-dev` for development builds; the workflow passes `-p:Version=<tag without the v>`. No version package (no MinVer).
+
+### Updates (M9)
+
+`Lumen.Core/Updates` (`UpdateService`, `IUpdateClient`, `UpdateChannel`), `Lumen.Platform.Windows/Updates/VelopackUpdateClient`, `Settings → Updates`.
+
+- **Entry point:** `Program.Main` runs `VelopackApp.Build().Run()` first (install, update and uninstall hooks run and exit; a normal start returns at once), then starts the WPF `App`. `App.xaml` is a `Page` and `StartupObject` is `Lumen.App.Program`.
+- **Owner decisions (2026-10-30):**
+  - **Default channel:** beta until 1.0 (every release before it is a pre-release), stable from 1.0 (`UpdateChannels.DefaultFor`, by the major number). The user can change it in Settings (`settings_local` `updates.channel`).
+  - **Notice:** a card in Settings → Updates plus one tray notice per version (`updates.notifiedVersion`). No banner inside the window.
+  - **Download:** only when the user presses *Download*. The user also decides when to restart. Nothing is installed by itself.
+- **Channels** use the GitHub release flag, not separate Velopack channels: stable = `GithubSource(prerelease: false)` (normal releases), beta = `prerelease: true` (pre-releases and normal ones, so a beta user also receives the stable release). One set of packages per release.
+- **When it checks:** 15 s after start-up and then every 24 h while Lumen runs, if "check automatically" is on (`updates.checkAutomatically`, default on). "Check now" works either way. A download left waiting from an earlier run shows as ready to restart.
+- **States:** not installed (a build run from source: nothing to update) · idle · checking · up to date · available · downloading (with %) · ready to restart · failed. A failure shows a generic message (offline, GitHub down) and the next try starts clean; details only go to the log.
+- **Security:** the repository URL is a constant in `AppHost` (no setting can point it elsewhere) and the repository is public, so no token is used. The only host is GitHub Releases (security rule 4). Velopack compares the SHA-256 of a download with the release manifest. There is no code signing in v1, so a compromised repository would be a compromised update; this is the accepted v1 trade-off. Nothing is sent about the user.
+- **Restart:** `UpdateService.RestartToUpdate` first releases the tray icon, the hotkey, the gamepad and the single-instance lock (`App.ReleaseForRestart`), then Velopack installs and starts Lumen again.
+- **Not synced:** the channel and the automatic-check switch stay on each PC for now (the schema's `updates` keys are kept in `config.json` untouched).
+

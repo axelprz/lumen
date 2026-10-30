@@ -1362,4 +1362,67 @@
   <data name="Sync_NoticeTitle" xml:space="preserve">
     <value>Carpeta de sincronización</value>
   </data>
+  <data name="Settings_Updates_Title" xml:space="preserve">
+    <value>Actualizaciones</value>
+  </data>
+  <data name="Settings_Updates_Version" xml:space="preserve">
+    <value>Lumen {0}</value>
+  </data>
+  <data name="Settings_Updates_NotInstalled" xml:space="preserve">
+    <value>Las actualizaciones solo funcionan en la versión instalada (el instalador o el zip portable), no en un build ejecutado desde el código fuente.</value>
+  </data>
+  <data name="Settings_Updates_Checking" xml:space="preserve">
+    <value>Buscando actualizaciones…</value>
+  </data>
+  <data name="Settings_Updates_UpToDate" xml:space="preserve">
+    <value>Lumen está al día.</value>
+  </data>
+  <data name="Settings_Updates_Available" xml:space="preserve">
+    <value>Hay una versión nueva: {0}{1}.</value>
+  </data>
+  <data name="Settings_Updates_Downloading" xml:space="preserve">
+    <value>Descargando {0}… {1}%</value>
+  </data>
+  <data name="Settings_Updates_Ready" xml:space="preserve">
+    <value>La versión {0} está lista. Reiniciá Lumen para instalarla.</value>
+  </data>
+  <data name="Settings_Updates_Failed" xml:space="preserve">
+    <value>No se pudo buscar o descargar la actualización. Revisá tu conexión y probá de nuevo.</value>
+  </data>
+  <data name="Settings_Updates_NotChecked" xml:space="preserve">
+    <value>Todavía no se buscó.</value>
+  </data>
+  <data name="Settings_Updates_Download" xml:space="preserve">
+    <value>Descargar {0}</value>
+  </data>
+  <data name="Settings_Updates_CheckNow" xml:space="preserve">
+    <value>Buscar ahora</value>
+  </data>
+  <data name="Settings_Updates_Restart" xml:space="preserve">
+    <value>Reiniciar para actualizar</value>
+  </data>
+  <data name="Settings_Updates_Channel" xml:space="preserve">
+    <value>Canal</value>
+  </data>
+  <data name="Settings_Updates_Channel_Stable" xml:space="preserve">
+    <value>Estable</value>
+  </data>
+  <data name="Settings_Updates_Channel_Beta" xml:space="preserve">
+    <value>Beta</value>
+  </data>
+  <data name="Settings_Updates_Channel_Hint" xml:space="preserve">
+    <value>Estable solo ofrece versiones terminadas. Beta también ofrece pre-releases (versiones anteriores, menos probadas). Hasta la versión 1.0 todos los releases son pre-releases, por eso Beta es el canal por defecto.</value>
+  </data>
+  <data name="Settings_Updates_Automatic" xml:space="preserve">
+    <value>Buscar actualizaciones automáticamente (al iniciar y una vez por día)</value>
+  </data>
+  <data name="Settings_Updates_Privacy" xml:space="preserve">
+    <value>Lumen solo se conecta a GitHub Releases (github.com/axelprz/lumen) para buscar y descargar. No se envía nada sobre vos. No se instala nada hasta que elijas reiniciar.</value>
+  </data>
+  <data name="Update_NoticeTitle" xml:space="preserve">
+    <value>Actualización de Lumen disponible</value>
+  </data>
+  <data name="Update_NoticeMessage" xml:space="preserve">
+    <value>Está disponible la versión {0}. Abrí Ajustes → Actualizaciones para descargarla.</value>
+  </data>
 </root>
