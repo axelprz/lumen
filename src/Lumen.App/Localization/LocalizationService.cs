@@ -25,6 +25,9 @@ public sealed class LocalizationService : ObservableObject, ILocalizer
     /// </summary>
     public static CultureInfo SystemUiCulture { get; } = CultureInfo.CurrentUICulture;
 
+    /// <summary>Windows' regional format (numbers, dates), captured at start-up like <see cref="SystemUiCulture"/>.</summary>
+    public static CultureInfo SystemFormatCulture { get; } = CultureInfo.CurrentCulture;
+
     private CultureInfo _culture = CultureInfo.GetCultureInfo(LanguageResolver.FallbackLanguage);
 
     private LocalizationService()
@@ -50,6 +53,10 @@ public sealed class LocalizationService : ObservableObject, ILocalizer
             _culture = value;
             CultureInfo.CurrentUICulture = value;
             CultureInfo.DefaultThreadCurrentUICulture = value;
+            // Numbers and dates follow the chosen language too (Lumen.Core FormatCulture).
+            var format = FormatCulture.For(value, SystemFormatCulture);
+            CultureInfo.CurrentCulture = format;
+            CultureInfo.DefaultThreadCurrentCulture = format;
             OnPropertyChanged();
             OnPropertyChanged(Binding.IndexerName);
             CultureChanged?.Invoke(this, EventArgs.Empty);
