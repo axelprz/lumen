@@ -603,13 +603,16 @@ public sealed partial class SyncFolderService : IDisposable
 
     private void OnFolderChanged(string path)
     {
-        if (Folder is { } folder && path.StartsWith(Path.Combine(folder, RoutinesFolder), StringComparison.OrdinalIgnoreCase))
+        if (Folder is { } folder && Normalize(path).StartsWith(Normalize(Path.Combine(folder, RoutinesFolder)) + "/", StringComparison.OrdinalIgnoreCase))
         {
             Interlocked.Exchange(ref _routinesDirty, 1);
         }
 
         Wake();
     }
+
+    // Paths from the watcher and from Path.Combine can mix slashes and backslashes; compare them the same way.
+    private static string Normalize(string path) => path.Replace('\\', '/').TrimEnd('/');
 
     private void Wake()
     {
