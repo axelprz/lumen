@@ -101,18 +101,18 @@
     <Border IsHitTestVisible="False">
       <Border.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-          <GradientStop Color="#590F1115" Offset="0" />
-          <GradientStop Color="#990F1115" Offset="0.45" />
-          <GradientStop Color="#F20F1115" Offset="0.8" />
-          <GradientStop Color="#FF0F1115" Offset="1" />
+          <GradientStop Color="#590A0D14" Offset="0" />
+          <GradientStop Color="#990A0D14" Offset="0.45" />
+          <GradientStop Color="#F20A0D14" Offset="0.8" />
+          <GradientStop Color="#FF0A0D14" Offset="1" />
         </LinearGradientBrush>
       </Border.Background>
     </Border>
     <Border IsHitTestVisible="False">
       <Border.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-          <GradientStop Color="#990F1115" Offset="0" />
-          <GradientStop Color="#000F1115" Offset="0.7" />
+          <GradientStop Color="#990A0D14" Offset="0" />
+          <GradientStop Color="#000A0D14" Offset="0.7" />
         </LinearGradientBrush>
       </Border.Background>
     </Border>
@@ -145,17 +145,14 @@
               <Button Command="{Binding PlayCommand}"
                       Content="{Binding ActionText}"
                       IsEnabled="{Binding CanRun}"
-                      Style="{StaticResource Lumen.Button}"
-                      Background="{DynamicResource Lumen.Brush.Accent}"
-                      BorderBrush="{DynamicResource Lumen.Brush.Accent}"
-                      Foreground="White"
+                      Style="{StaticResource Lumen.Button.Primary}"
                       FontSize="{StaticResource Lumen.FontSize.BodyLarge}"
                       FontWeight="SemiBold"
                       Padding="40,11"
                       Margin="0,0,12,0" />
               <Button Command="{Binding OpenDetailCommand}"
                       Style="{StaticResource Lumen.Button}"
-                      Background="#990F1115"
+                      Background="#990A0D14"
                       VerticalAlignment="Center"
                       AutomationProperties.Name="{l:Loc Home_Details}">
                 <StackPanel Orientation="Horizontal">

@@ -32,8 +32,8 @@ public sealed class MicaBackdrop : IDisposable
     {
         _window = window;
         var resources = Application.Current.Resources;
-        _backdrop = resources["Lumen.Color.Background"] is Color background ? background : Color.FromRgb(0x0F, 0x11, 0x15);
-        _sidebar = resources["Lumen.Color.Sidebar"] is Color sidebar ? sidebar : Color.FromRgb(0x15, 0x18, 0x1E);
+        _backdrop = resources["Lumen.Color.Background"] is Color background ? background : Color.FromRgb(0x0A, 0x0D, 0x14);
+        _sidebar = resources["Lumen.Color.Sidebar"] is Color sidebar ? sidebar : Color.FromRgb(0x0E, 0x12, 0x1B);
     }
 
     /// <summary>True while Mica is showing.</summary>

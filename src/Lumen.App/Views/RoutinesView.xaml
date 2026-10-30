@@ -68,8 +68,7 @@
 
           <StackPanel Orientation="Horizontal">
             <Button Command="{Binding DataContext.ApproveAndRunCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    CommandParameter="{Binding}" Content="{l:Loc Routine_ApproveAndRun}" Style="{StaticResource Lumen.Button}"
-                    Background="{DynamicResource Lumen.Brush.Accent}" BorderBrush="{DynamicResource Lumen.Brush.Accent}" Foreground="White"
+                    CommandParameter="{Binding}" Content="{l:Loc Routine_ApproveAndRun}" Style="{StaticResource Lumen.Button.Primary}"
                     Visibility="{Binding CanApprove, Converter={StaticResource BoolToVisibility}}" Margin="0,0,8,0" />
             <Button Command="{Binding DataContext.ApproveCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     CommandParameter="{Binding}" Content="{l:Loc Routine_Approve}" Style="{StaticResource Lumen.Button}"
@@ -203,8 +202,7 @@
           <CheckBox IsChecked="{Binding Pinned}" Content="{l:Loc Routine_Editor_Pinned}" FontSize="{StaticResource Lumen.FontSize.Body}" Margin="0,8,0,0"
                     Foreground="{DynamicResource Lumen.Brush.Text}" />
           <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
-            <Button Command="{Binding SaveCommand}" Content="{l:Loc Routine_Editor_Save}" Style="{StaticResource Lumen.Button}"
-                    Background="{DynamicResource Lumen.Brush.Accent}" BorderBrush="{DynamicResource Lumen.Brush.Accent}" Foreground="White" Margin="0,0,8,0" />
+            <Button Command="{Binding SaveCommand}" Content="{l:Loc Routine_Editor_Save}" Style="{StaticResource Lumen.Button.Primary}" Margin="0,0,8,0" />
             <Button Command="{Binding CancelCommand}" Content="{l:Loc Detail_Cancel}" Style="{StaticResource Lumen.Button}" />
           </StackPanel>
         </StackPanel>
@@ -226,8 +224,7 @@
           <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
             <Button Command="{Binding OpenFolderCommand}" Content="{l:Loc Routine_OpenFolder}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0" />
             <Button Command="{Binding ImportCommand}" Content="{l:Loc Routine_Import}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0" />
-            <Button Command="{Binding NewCommand}" Content="{l:Loc Routine_New}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0"
-                    Background="{DynamicResource Lumen.Brush.Accent}" BorderBrush="{DynamicResource Lumen.Brush.Accent}" Foreground="White" />
+            <Button Command="{Binding NewCommand}" Content="{l:Loc Routine_New}" Style="{StaticResource Lumen.Button.Primary}" Margin="8,0,0,0" />
           </StackPanel>
           <TextBlock Text="{l:Loc Nav_Routines}" Style="{StaticResource Lumen.Text.PageTitle}" />
         </DockPanel>
@@ -258,12 +255,10 @@
                 <StackPanel>
                   <DockPanel>
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                      <Button Content="{l:Loc Routine_Run}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0"
-                              Background="{DynamicResource Lumen.Brush.Accent}" BorderBrush="{DynamicResource Lumen.Brush.Accent}" Foreground="White"
+                      <Button Content="{l:Loc Routine_Run}" Style="{StaticResource Lumen.Button.Primary}" Margin="8,0,0,0"
                               Command="{Binding DataContext.RunCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
                               Visibility="{Binding IsReady, Converter={StaticResource BoolToVisibility}}" />
-                      <Button Content="{l:Loc Routine_Review}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0"
-                              Background="{DynamicResource Lumen.Brush.Accent}" BorderBrush="{DynamicResource Lumen.Brush.Accent}" Foreground="White"
+                      <Button Content="{l:Loc Routine_Review}" Style="{StaticResource Lumen.Button.Primary}" Margin="8,0,0,0"
                               Command="{Binding DataContext.ReviewCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}"
                               Visibility="{Binding NeedsReview, Converter={StaticResource BoolToVisibility}}" />
                       <Button Content="{l:Loc Routine_Details}" Style="{StaticResource Lumen.Button}" Margin="8,0,0,0"

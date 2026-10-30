@@ -9,6 +9,7 @@
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Themes/Theme.Dark.xaml" />
+        <ResourceDictionary Source="Themes/Controls/Surfaces.xaml" />
         <ResourceDictionary Source="Themes/Controls/Sidebar.xaml" />
         <ResourceDictionary Source="Themes/Controls/Buttons.xaml" />
         <ResourceDictionary Source="Themes/Controls/Inputs.xaml" />

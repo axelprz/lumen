@@ -28,7 +28,7 @@
         </TextBlock.Style>
       </TextBlock>
       <ProgressBar Minimum="0" Maximum="100" Value="{Binding Percent, Mode=OneWay}" Height="6" Margin="0,8,0,0"
-                   Foreground="{DynamicResource Lumen.Brush.Accent}"
+                   Foreground="{DynamicResource Lumen.Brush.BrandText}"
                    Visibility="{Binding IsDownloading, Converter={StaticResource BoolToVisibility}}" />
 
       <WrapPanel Margin="0,16,0,0">
@@ -39,19 +39,13 @@
                 IsEnabled="{Binding CanCheck}" />
         <Button Command="{Binding DownloadCommand}"
                 Content="{Binding DownloadText}"
-                Style="{StaticResource Lumen.Button}"
-                Background="{DynamicResource Lumen.Brush.Accent}"
-                BorderBrush="{DynamicResource Lumen.Brush.Accent}"
-                Foreground="White"
+                Style="{StaticResource Lumen.Button.Primary}"
                 FontWeight="SemiBold"
                 Margin="0,0,12,8"
                 Visibility="{Binding CanDownload, Converter={StaticResource BoolToVisibility}}" />
         <Button Command="{Binding RestartCommand}"
                 Content="{l:Loc Settings_Updates_Restart}"
-                Style="{StaticResource Lumen.Button}"
-                Background="{DynamicResource Lumen.Brush.Accent}"
-                BorderBrush="{DynamicResource Lumen.Brush.Accent}"
-                Foreground="White"
+                Style="{StaticResource Lumen.Button.Primary}"
                 FontWeight="SemiBold"
                 Margin="0,0,12,8"
                 Visibility="{Binding CanRestart, Converter={StaticResource BoolToVisibility}}" />

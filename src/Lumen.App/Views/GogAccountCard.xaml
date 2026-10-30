@@ -17,8 +17,7 @@
       <!-- Not connected -->
       <StackPanel Visibility="{Binding IsDisconnected, Converter={StaticResource BoolToVisibility}}">
         <Button Command="{Binding OpenSignInCommand}" Content="{l:Loc GogAccount_SignIn}" HorizontalAlignment="Left"
-                Style="{StaticResource Lumen.Button}" Background="{DynamicResource Lumen.Brush.Accent}"
-                BorderBrush="{DynamicResource Lumen.Brush.Accent}" Foreground="White" FontWeight="SemiBold" />
+                Style="{StaticResource Lumen.Button.Primary}" FontWeight="SemiBold" />
 
         <!-- After the browser opens: paste the code -->
         <StackPanel Margin="0,16,0,0" Visibility="{Binding IsEnteringCode, Converter={StaticResource BoolToVisibility}}">
@@ -28,8 +27,7 @@
             <Button DockPanel.Dock="Right" Command="{Binding CancelSignInCommand}" Content="{l:Loc Detail_Cancel}"
                     Style="{StaticResource Lumen.Button}" Margin="8,0,0,0" />
             <Button DockPanel.Dock="Right" Command="{Binding ConnectCommand}" Content="{l:Loc GogAccount_Connect}"
-                    Style="{StaticResource Lumen.Button}" Background="{DynamicResource Lumen.Brush.Accent}"
-                    BorderBrush="{DynamicResource Lumen.Brush.Accent}" Foreground="White" Margin="8,0,0,0"
+                    Style="{StaticResource Lumen.Button.Primary}" Margin="8,0,0,0"
                     IsEnabled="{Binding ConnectCommand.IsRunning, Converter={StaticResource InverseBool}}" />
             <TextBox Text="{Binding CodeInput, UpdateSourceTrigger=PropertyChanged}" Height="36" Padding="8,0"
                      VerticalContentAlignment="Center" AutomationProperties.Name="{l:Loc GogAccount_CodeLabel}">

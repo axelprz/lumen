@@ -5,7 +5,8 @@ namespace Lumen.Core.Tests.RepositoryChecks;
 
 /// <summary>
 /// Guards the Mica wiring (M10): the backdrop brushes the code swaps at run time must exist in the theme as opaque
-/// defaults, and the main window must paint with them. Reads files as plain text so it runs on any OS.
+/// defaults, and the main window must paint with them. Also guards the template look (brand chrome, glass cards,
+/// ambient lights). Reads files as plain text so it runs on any OS.
 /// </summary>
 public sealed class UiSurfaceTests
 {
@@ -37,5 +38,47 @@ public sealed class UiSurfaceTests
 
         code.ShouldContain("\"Lumen.Brush.Backdrop\"");
         code.ShouldContain("\"Lumen.Brush.SidebarBackdrop\"");
+    }
+
+    [Theory]
+    [InlineData("Lumen.Brush.Brand")]
+    [InlineData("Lumen.Brush.BrandGradient")]
+    [InlineData("Lumen.Brush.Glass")]
+    [InlineData("Lumen.Brush.GlassBorder")]
+    [InlineData("Lumen.Brush.AmbientBlue")]
+    [InlineData("Lumen.Brush.AmbientViolet")]
+    public void Theme_DefinesTheBrandGlassAndAmbientBrushes(string key)
+    {
+        var theme = File.ReadAllText(Path.Combine(_appDir, "Themes", "Theme.Dark.xaml"));
+
+        theme.ShouldContain($"x:Key=\"{key}\"");
+    }
+
+    [Theory]
+    [InlineData("Buttons.xaml")]
+    [InlineData("Sidebar.xaml")]
+    [InlineData("Inputs.xaml")]
+    [InlineData("ComboBox.xaml")]
+    public void Chrome_UsesTheBrand_NotTheGameAccent(string file)
+    {
+        // Mixed accent (2026-10-30): the game color tints art and background only; controls keep the fixed brand.
+        File.ReadAllText(Path.Combine(_appDir, "Themes", "Controls", file)).ShouldNotContain("Lumen.Brush.Accent");
+    }
+
+    [Fact]
+    public void Cards_AreGlass()
+    {
+        var surfaces = File.ReadAllText(Path.Combine(_appDir, "Themes", "Controls", "Surfaces.xaml"));
+
+        surfaces.ShouldContain("<Setter Property=\"Background\" Value=\"{DynamicResource Lumen.Brush.Glass}\" />");
+    }
+
+    [Fact]
+    public void MainWindow_AmbientLightsBreatheThroughMotion()
+    {
+        var xaml = File.ReadAllText(Path.Combine(_appDir, "Views", "MainWindow.xaml"));
+
+        xaml.ShouldContain("Fill=\"{DynamicResource Lumen.Brush.AmbientBlue}\" services:Motion.Breathe=");
+        xaml.ShouldContain("Fill=\"{DynamicResource Lumen.Brush.AmbientViolet}\" services:Motion.Breathe=");
     }
 }

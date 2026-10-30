@@ -23,7 +23,7 @@
           <Grid>
             <Border x:Name="Bg"
                     Background="Transparent"
-                    CornerRadius="6"
+                    CornerRadius="10"
                     BorderThickness="1"
                     BorderBrush="Transparent"
                     Padding="{TemplateBinding Padding}">
@@ -34,21 +34,21 @@
                     Height="18"
                     CornerRadius="1.5"
                     HorizontalAlignment="Left"
-                    Background="{DynamicResource Lumen.Brush.Accent}"
+                    Background="{DynamicResource Lumen.Brush.Brand}"
                     Visibility="Collapsed" />
           </Grid>
           <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-              <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Lumen.Brush.SurfaceHover}" />
+              <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Lumen.Brush.Fill}" />
               <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
-              <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Lumen.Brush.Surface}" />
+              <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Lumen.Brush.BrandFade}" />
               <Setter TargetName="Indicator" Property="Visibility" Value="Visible" />
-              <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
+              <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.BrandText}" />
             </Trigger>
             <Trigger Property="IsKeyboardFocused" Value="True">
-              <Setter TargetName="Bg" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
+              <Setter TargetName="Bg" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Brand}" />
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>

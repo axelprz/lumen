@@ -32,7 +32,7 @@
                 Background="Transparent"
                 BorderThickness="0"
                 Padding="0"
-                Foreground="{DynamicResource Lumen.Brush.Accent}">
+                Foreground="{DynamicResource Lumen.Brush.BrandText}">
           <Button.Template>
             <ControlTemplate TargetType="Button">
               <TextBlock Text="{l:Loc Settings_Steam_GetKey}" FontSize="{StaticResource Lumen.FontSize.Small}" TextDecorations="Underline" Foreground="{TemplateBinding Foreground}" />
@@ -57,10 +57,7 @@
         <Button x:Name="SaveButton"
                 Click="OnSaveClick"
                 Content="{l:Loc Settings_Steam_SaveTest}"
-                Style="{StaticResource Lumen.Button}"
-                Background="{DynamicResource Lumen.Brush.Accent}"
-                BorderBrush="{DynamicResource Lumen.Brush.Accent}"
-                Foreground="White"
+                Style="{StaticResource Lumen.Button.Primary}"
                 FontWeight="SemiBold"
                 IsEnabled="{Binding SaveAndTestCommand.IsRunning, Converter={StaticResource InverseBool}}" />
         <Button Command="{Binding RemoveCommand}"

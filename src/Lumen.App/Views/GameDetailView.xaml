@@ -30,7 +30,7 @@
             <Border.Background>
               <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                 <GradientStop Color="#FF232836" Offset="0" />
-                <GradientStop Color="#FF0F1115" Offset="1" />
+                <GradientStop Color="#FF0A0D14" Offset="1" />
               </LinearGradientBrush>
             </Border.Background>
           </Border>
@@ -42,16 +42,16 @@
           <Border>
             <Border.Background>
               <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                <GradientStop Color="#330F1115" Offset="0" />
-                <GradientStop Color="#660F1115" Offset="0.55" />
-                <GradientStop Color="#FF0F1115" Offset="1" />
+                <GradientStop Color="#330A0D14" Offset="0" />
+                <GradientStop Color="#660A0D14" Offset="0.55" />
+                <GradientStop Color="#FF0A0D14" Offset="1" />
               </LinearGradientBrush>
             </Border.Background>
           </Border>
 
           <Button Command="{Binding CloseCommand}"
                   Style="{StaticResource Lumen.Button}"
-                  Background="#990F1115"
+                  Background="#990A0D14"
                   HorizontalAlignment="Left"
                   VerticalAlignment="Top"
                   Margin="32,28,0,0"
@@ -91,10 +91,7 @@
             <Button Command="{Binding PlayCommand}"
                     Content="{Binding ActionText}"
                     IsEnabled="{Binding CanRun}"
-                    Style="{StaticResource Lumen.Button}"
-                    Background="{DynamicResource Lumen.Brush.Accent}"
-                    BorderBrush="{DynamicResource Lumen.Brush.Accent}"
-                    Foreground="White"
+                    Style="{StaticResource Lumen.Button.Primary}"
                     FontSize="{StaticResource Lumen.FontSize.BodyLarge}"
                     FontWeight="SemiBold"
                     Padding="36,10"
@@ -256,8 +253,7 @@
               <TextBlock Text="{Binding RenameHint}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,8,0,12"
                          Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
               <StackPanel Orientation="Horizontal">
-                <Button Command="{Binding SaveRenameCommand}" Content="{l:Loc Detail_Save}" Style="{StaticResource Lumen.Button}"
-                        Background="{DynamicResource Lumen.Brush.Accent}" BorderBrush="{DynamicResource Lumen.Brush.Accent}" Foreground="White"
+                <Button Command="{Binding SaveRenameCommand}" Content="{l:Loc Detail_Save}" Style="{StaticResource Lumen.Button.Primary}"
                         Margin="0,0,8,0" />
                 <Button Command="{Binding CancelRenameCommand}" Content="{l:Loc Detail_Cancel}" Style="{StaticResource Lumen.Button}" />
               </StackPanel>
