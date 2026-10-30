@@ -22,21 +22,35 @@
                 AutomationProperties.Name="{Binding Title}">
           <Button.Template>
             <ControlTemplate TargetType="Button">
-              <Border x:Name="Frame" Height="225" CornerRadius="8" BorderThickness="2" BorderBrush="Transparent" ClipToBounds="True">
-                <Border.Background>
-                  <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#FF232836" Offset="0" />
-                    <GradientStop Color="#FF171A22" Offset="1" />
-                  </LinearGradientBrush>
-                </Border.Background>
-                <ContentPresenter />
-              </Border>
+              <Grid>
+                <!-- Hover/focus glow, same recipe as the Library tiles: brush plus mask, collapsed until needed -->
+                <Border x:Name="Glow" Margin="-14" CornerRadius="22" Visibility="Collapsed" IsHitTestVisible="False"
+                        Background="{DynamicResource Lumen.Brush.Accent}" Opacity="0.55">
+                  <Border.OpacityMask>
+                    <RadialGradientBrush>
+                      <GradientStop Color="#FF000000" Offset="0.62" />
+                      <GradientStop Color="#00000000" Offset="1" />
+                    </RadialGradientBrush>
+                  </Border.OpacityMask>
+                </Border>
+                <Border x:Name="Frame" Height="225" CornerRadius="8" BorderThickness="2" BorderBrush="Transparent" ClipToBounds="True">
+                  <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                      <GradientStop Color="#FF232836" Offset="0" />
+                      <GradientStop Color="#FF171A22" Offset="1" />
+                    </LinearGradientBrush>
+                  </Border.Background>
+                  <ContentPresenter />
+                </Border>
+              </Grid>
               <ControlTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                   <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
+                  <Setter TargetName="Glow" Property="Visibility" Value="Visible" />
                 </Trigger>
                 <Trigger Property="IsKeyboardFocused" Value="True">
                   <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
+                  <Setter TargetName="Glow" Property="Visibility" Value="Visible" />
                 </Trigger>
               </ControlTemplate.Triggers>
             </ControlTemplate>
@@ -68,7 +82,7 @@
     </DataTemplate>
   </UserControl.Resources>
 
-  <Grid Background="{DynamicResource Lumen.Brush.Background}" ClipToBounds="True">
+  <Grid Background="Transparent" ClipToBounds="True">
     <!-- Background: the featured game's art, blurred. Two layers so a new game crossfades over the old one.
          Decoded small (it's blurred anyway), which keeps memory and the blur cheap. -->
     <Image x:Name="BackgroundA" Stretch="UniformToFill" Opacity="0" Margin="-60" IsHitTestVisible="False">

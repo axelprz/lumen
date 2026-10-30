@@ -20,6 +20,10 @@
   <SolidColorBrush x:Key="Lumen.Brush.Divider" Color="{StaticResource Lumen.Color.Divider}" />
   <SolidColorBrush x:Key="Lumen.Brush.Text" Color="{StaticResource Lumen.Color.Text}" />
   <SolidColorBrush x:Key="Lumen.Brush.TextMuted" Color="{StaticResource Lumen.Color.TextMuted}" />
+  <!-- The window and sidebar backdrops are opaque here; MicaBackdrop swaps them for translucent ones when Windows 11 shows Mica. -->
+  <SolidColorBrush x:Key="Lumen.Brush.Backdrop" Color="{StaticResource Lumen.Color.Background}" />
+  <SolidColorBrush x:Key="Lumen.Brush.SidebarBackdrop" Color="{StaticResource Lumen.Color.Sidebar}" />
+  <SolidColorBrush x:Key="Lumen.Brush.CoverEdge" Color="#24FFFFFF" />
   <SolidColorBrush x:Key="Lumen.Brush.Accent" Color="{StaticResource Lumen.Color.Accent}" />
   <SolidColorBrush x:Key="Lumen.Brush.Success" Color="#FF5CC98B" />
   <SolidColorBrush x:Key="Lumen.Brush.Warning" Color="#FFE0B44C" />

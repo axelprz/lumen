@@ -177,6 +177,7 @@ Owner decisions and the incidents behind them, newest last. Add a line (with the
 - **2026-10-30 · Manual items from the folder:** imported if they pass the add-item dialog rules, with a notice ("N items came from the sync folder"); they never run on their own.
 - **2026-10-30 · Same routine id on both sides:** keep both (the copy gets a new id and needs review); nothing is overwritten. No "the newest wins".
 - **2026-10-30 · UI font: Exo 2** (SIL OFL), chosen by the owner from a sample. Four static weights (400/500/600/700) cut from Google Fonts' official variable font with fontTools, because WPF does not handle variable axes. Shipped as resources under `Lumen.App/Assets/Fonts` with `OFL.txt`.
+- **2026-10-30 · Mica and glow (M10):** Mica where Windows 11 22H2+ has it and "Transparency effects" is on; otherwise the opaque palette, as before. Hover/focus glow on covers uses plain brushes and an opacity mask (no bitmap effects), to keep scroll frames.
 - **2026-10-30 · Updates:** Velopack 1.2.161. Default channel beta until 1.0. Notice = Settings card + one tray balloon per version (no banner in the window). The user presses Download and chooses when to restart. Builds are unsigned in v1 (SmartScreen warning documented in the README).
 
 ## v1.1 — Deals (owner request, 2026-10-28)

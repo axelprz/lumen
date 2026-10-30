@@ -14,7 +14,7 @@
         MinWidth="960"
         MinHeight="600"
         WindowStartupLocation="CenterScreen"
-        Background="{DynamicResource Lumen.Brush.Background}"
+        Background="{DynamicResource Lumen.Brush.Backdrop}"
         Foreground="{DynamicResource Lumen.Brush.Text}"
         UseLayoutRounding="True"
         TextOptions.TextFormattingMode="Display">
@@ -29,7 +29,7 @@
 
     <!-- Sidebar -->
     <Border Grid.Column="0"
-            Background="{DynamicResource Lumen.Brush.Sidebar}"
+            Background="{DynamicResource Lumen.Brush.SidebarBackdrop}"
             BorderBrush="{DynamicResource Lumen.Brush.Divider}"
             BorderThickness="0,0,1,0">
       <DockPanel>
