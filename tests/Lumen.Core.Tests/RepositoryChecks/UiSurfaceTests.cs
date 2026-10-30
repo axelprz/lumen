@@ -128,6 +128,17 @@ public sealed class UiSurfaceTests
     }
 
     [Fact]
+    public void Settings_HasTabs_AndSwitches_AndTheWizardIsAModalCard()
+    {
+        var settings = File.ReadAllText(Path.Combine(_appDir, "Views", "SettingsView.xaml"));
+        settings.ShouldContain("<TabControl Style=\"{StaticResource Settings.Tabs}\">");
+        settings.ShouldContain("Style=\"{StaticResource Lumen.Switch}\"");
+        File.ReadAllText(Path.Combine(_appDir, "Themes", "Controls", "Inputs.xaml")).ShouldContain("x:Key=\"Lumen.Switch\"");
+
+        File.ReadAllText(Path.Combine(_appDir, "Views", "FirstRunView.xaml")).ShouldContain("Background=\"{DynamicResource Lumen.Brush.Scrim}\"");
+    }
+
+    [Fact]
     public void LanguageSwitch_AlsoSetsTheFormatCulture()
     {
         File.ReadAllText(Path.Combine(_appDir, "Localization", "LocalizationService.cs"))

@@ -1488,4 +1488,19 @@ Continue?</value>
   <data name="Routine_Chain_Close" xml:space="preserve">
     <value>Close {0}</value>
   </data>
+  <data name="Settings_Subtitle" xml:space="preserve">
+    <value>Stores and accounts, artwork, sync and how Lumen behaves</value>
+  </data>
+  <data name="Settings_Tab_General" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="Settings_Tab_Accounts" xml:space="preserve">
+    <value>Accounts &amp; stores</value>
+  </data>
+  <data name="Settings_Tab_Artwork" xml:space="preserve">
+    <value>Artwork</value>
+  </data>
+  <data name="Settings_Tab_SyncUpdates" xml:space="preserve">
+    <value>Sync &amp; updates</value>
+  </data>
 </root>

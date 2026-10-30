@@ -70,6 +70,8 @@
   <!-- Top bar over the pages (translucent: the ambient light shows through) and toasts (near opaque, readable over anything) -->
   <SolidColorBrush x:Key="Lumen.Brush.TopBar" Color="#8C0E121B" />
   <SolidColorBrush x:Key="Lumen.Brush.Toast" Color="#F2121723" />
+  <!-- Behind modal cards (the first-run wizard): 95 %, so nothing behind can be read -->
+  <SolidColorBrush x:Key="Lumen.Brush.Scrim" Color="#F20A0D14" />
   <!-- RAM bar in the sidebar monitor (CPU uses the brand gradient) -->
   <LinearGradientBrush x:Key="Lumen.Brush.RamGradient" StartPoint="0,0" EndPoint="1,0">
     <GradientStop Color="#FF8B5CF6" Offset="0" />
