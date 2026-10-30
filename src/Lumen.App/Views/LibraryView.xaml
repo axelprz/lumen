@@ -215,59 +215,14 @@
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
-    <!-- Header card: title and count, Rescan / Discover apps / Add, then filters and sort.
-         The search box is in the window's top bar (Ctrl+K / Ctrl+F). -->
-    <Border Grid.Row="0" Style="{StaticResource Lumen.Card}" Padding="20,18" Margin="0,0,24,18">
+    <!-- Header card: title and count, then filters, sort and the actions together (they stay close at any width).
+         The view sizes it to the tiles below and centers both (OnGridSizeChanged). The search box is in the top bar. -->
+    <Border x:Name="HeaderCard" Grid.Row="0" Style="{StaticResource Lumen.Card}" Padding="20,18" Margin="0,0,24,18">
       <StackPanel>
-        <DockPanel LastChildFill="True">
-          <Button DockPanel.Dock="Right"
-                  VerticalAlignment="Center"
-                  Margin="12,0,0,0"
-                  Command="{Binding AddManualItemCommand}"
-                  AutomationProperties.Name="{l:Loc Library_Add}"
-                  Style="{StaticResource Lumen.Button.Primary}">
-            <StackPanel Orientation="Horizontal">
-              <TextBlock Text="&#xE710;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
-              <TextBlock Text="{l:Loc Library_Add}" />
-            </StackPanel>
-          </Button>
-          <Button DockPanel.Dock="Right"
-                  VerticalAlignment="Center"
-                  Margin="12,0,0,0"
-                  Command="{Binding Discover.OpenCommand}"
-                  AutomationProperties.Name="{Binding Discover.ButtonText}"
-                  Style="{StaticResource Lumen.Button}">
-            <StackPanel Orientation="Horizontal">
-              <TextBlock Text="&#xE71D;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
-              <TextBlock Text="{Binding Discover.ButtonText}" />
-            </StackPanel>
-          </Button>
-          <Button DockPanel.Dock="Right"
-                  VerticalAlignment="Center"
-                  Command="{Binding RescanCommand}"
-                  AutomationProperties.Name="{l:Loc Library_Rescan}"
-                  Style="{StaticResource Lumen.Button}">
-            <StackPanel Orientation="Horizontal">
-              <TextBlock Text="&#xE72C;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
-              <TextBlock>
-                <TextBlock.Style>
-                  <Style TargetType="TextBlock">
-                    <Setter Property="Text" Value="{l:Loc Library_Rescan}" />
-                    <Style.Triggers>
-                      <DataTrigger Binding="{Binding IsScanning}" Value="True">
-                        <Setter Property="Text" Value="{l:Loc Library_Scanning}" />
-                      </DataTrigger>
-                    </Style.Triggers>
-                  </Style>
-                </TextBlock.Style>
-              </TextBlock>
-            </StackPanel>
-          </Button>
-          <StackPanel>
-            <TextBlock Text="{l:Loc Nav_Library}" FontSize="{StaticResource Lumen.FontSize.Title}" FontWeight="Bold" />
-            <TextBlock Text="{Binding CountText}" Foreground="{DynamicResource Lumen.Brush.TextMuted}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,2,0,0" />
-          </StackPanel>
-        </DockPanel>
+        <StackPanel>
+          <TextBlock Text="{l:Loc Nav_Library}" FontSize="{StaticResource Lumen.FontSize.Title}" FontWeight="Bold" />
+          <TextBlock Text="{Binding CountText}" Foreground="{DynamicResource Lumen.Brush.TextMuted}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,2,0,0" />
+        </StackPanel>
         <WrapPanel Margin="0,16,0,-8">
           <ComboBox ItemsSource="{Binding KindOptions}" SelectedItem="{Binding SelectedKind}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_TypeLabel}" />
           <ComboBox ItemsSource="{Binding StoreOptions}" SelectedItem="{Binding SelectedStore}" DisplayMemberPath="Label" Margin="0,0,12,8" AutomationProperties.Name="{l:Loc Filter_StoreLabel}" />
@@ -292,12 +247,56 @@
               <TextBlock Text="{Binding HiddenToggleText}" />
             </StackPanel>
           </Button>
+          <!-- A thin divider between the filters and the actions -->
+          <Border Width="1" Height="24" Margin="2,6,12,14" Background="{DynamicResource Lumen.Brush.Divider}" />
+          <Button Margin="0,0,10,8"
+                  Height="36"
+                  Command="{Binding RescanCommand}"
+                  AutomationProperties.Name="{l:Loc Library_Rescan}"
+                  Style="{StaticResource Lumen.Button}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xE72C;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+              <TextBlock>
+                <TextBlock.Style>
+                  <Style TargetType="TextBlock">
+                    <Setter Property="Text" Value="{l:Loc Library_Rescan}" />
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding IsScanning}" Value="True">
+                        <Setter Property="Text" Value="{l:Loc Library_Scanning}" />
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </TextBlock.Style>
+              </TextBlock>
+            </StackPanel>
+          </Button>
+          <Button Margin="0,0,10,8"
+                  Height="36"
+                  Command="{Binding Discover.OpenCommand}"
+                  AutomationProperties.Name="{Binding Discover.ButtonText}"
+                  Style="{StaticResource Lumen.Button}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xE71D;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+              <TextBlock Text="{Binding Discover.ButtonText}" />
+            </StackPanel>
+          </Button>
+          <Button Margin="0,0,10,8"
+                  Height="36"
+                  Command="{Binding AddManualItemCommand}"
+                  AutomationProperties.Name="{l:Loc Library_Add}"
+                  Style="{StaticResource Lumen.Button.Primary}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="&#xE710;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
+              <TextBlock Text="{l:Loc Library_Add}" />
+            </StackPanel>
+          </Button>
         </WrapPanel>
       </StackPanel>
     </Border>
 
-    <!-- Non-blocking notice (scan problems, launch failures) -->
-    <Border Grid.Row="2"
+    <!-- Non-blocking notice (scan problems, launch failures); aligned with the header card -->
+    <Border x:Name="NoticeCard"
+            Grid.Row="2"
             Margin="0,0,24,16"
             Padding="14,10"
             CornerRadius="10"
@@ -360,7 +359,9 @@
           <!-- The virtualizing panel clips to its own bounds, so the room a pointed-at cover needs (scaled up, with its glow)
                is inside the row and the tile: 12 px above and to the left of the row, 8 px round every tile. The grid's negative margin and the tiles' smaller bottom
                margin cancel it, so the layout is unchanged. -->
-          <ItemsControl ItemsSource="{Binding Tiles}" ItemTemplate="{StaticResource TileTemplate}" Focusable="False" Margin="12,12,0,0">
+          <ItemsControl ItemsSource="{Binding Tiles}" ItemTemplate="{StaticResource TileTemplate}" Focusable="False" Margin="12,12,0,0"
+                        HorizontalAlignment="Center"
+                        Width="{Binding Tag, RelativeSource={RelativeSource AncestorType=ItemsControl}}">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <StackPanel Orientation="Horizontal" />

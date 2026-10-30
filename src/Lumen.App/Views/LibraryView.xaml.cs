@@ -33,12 +33,38 @@ public partial class LibraryView : UserControl
     // Tile width (168) + right margin (20).
     private const double TileSlot = 188;
 
-    // View concern: how many tiles fit in a row at the current width (scrollbar space reserved).
+    // Room the row keeps on its left for a pointed-at cover (see the row template's 12 px margin).
+    private const double RowInset = 12;
+
+    // How the grid's negative margin shifts the rows (RowsHost Margin="-20,...").
+    private const double GridOffset = 20;
+
+    // View concern: how many tiles fit in a row at the current width (scrollbar space reserved), then the rows are
+    // centered and the header card takes exactly the tiles' width, so the page has no empty band on the right.
     private void OnGridSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        if (DataContext is LibraryViewModel library && e.WidthChanged)
+        if (DataContext is not LibraryViewModel library || !e.WidthChanged)
         {
-            library.ColumnCount = (int)Math.Floor((e.NewSize.Width - SystemParameters.VerticalScrollBarWidth) / TileSlot);
+            return;
+        }
+
+        var available = e.NewSize.Width - SystemParameters.VerticalScrollBarWidth;
+        var columns = Math.Max(1, (int)Math.Floor((available - RowInset) / TileSlot));
+        library.ColumnCount = columns;
+
+        // The row's tiles (its 12 px left margin comes on top), centered in the grid.
+        var tilesWidth = columns * TileSlot;
+        RowsHost.Tag = tilesWidth;
+
+        // The covers' visible edges in page coordinates: the grid starts 20 px to the left, the row's margin and the
+        // tile's 8 px padding come before the first cover, and the last tile ends with 4 px of margin and 8 of padding.
+        var left = Math.Max(0, (available - RowInset - tilesWidth) / 2) - GridOffset + RowInset + 8;
+        var width = tilesWidth - 4 - 16;
+        foreach (var card in new FrameworkElement[] { HeaderCard, NoticeCard })
+        {
+            card.HorizontalAlignment = HorizontalAlignment.Left;
+            card.Width = Math.Max(0, width);
+            card.Margin = new Thickness(Math.Max(0, left), card.Margin.Top, 0, card.Margin.Bottom);
         }
     }
 
