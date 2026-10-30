@@ -28,6 +28,22 @@ Rule: **everything that can be pure stays out of the Windows projects** so it bu
 
 Dependency direction: `App → Platform.Windows → Providers → Data → Core` (each may depend only on things to its right; `App` composes everything).
 
+### Where to find things
+
+| Area | Code (all under `src/` unless noted) | Notes |
+|---|---|---|
+| Entry point, DI | `Lumen.App/Program.cs` (Velopack hook, then WPF), `App.xaml.cs`, `Hosting/AppHost.cs` | Everything is a singleton registered in `AppHost` |
+| Library, merging, search | `Lumen.Core/Library/*` | `LibraryService`, `LibraryMerger`, `QuickSearch`, `HomeFeed`, `Collections` |
+| Store parsing | `Lumen.Providers/*` (one folder per store) | Fixtures in `tests/fixtures/<area>` |
+| SQLite | `Lumen.Data/*`, migrations `Lumen.Data/Migrations/0001–0013` | DB version 13; a newer DB is refused |
+| Artwork | `Lumen.Core/Artwork/*`, `Lumen.Providers/SteamGridDb`, `Lumen.App/Services/ImageCache.cs` | |
+| Routines | `Lumen.Core/Routines/*`, `Lumen.App/ViewModels/Routine*.cs` | §7 |
+| Sync folder | `Lumen.Core/Sync/*`, `Lumen.App/Services/SyncCoordinator.cs`, `ViewModels/SyncSettingsViewModel.cs` | §6 "Sync folder" |
+| Updates, release | `Lumen.Core/Updates/*`, `Lumen.Platform.Windows/Updates`, `.github/workflows/release.yml` | §9 |
+| Windows access | `Lumen.Platform.Windows/*` (registry, processes, DPAPI, hotkeys, gamepad, window interop) | Keep thin |
+| UI | `Lumen.App/Views`, `ViewModels`, `Themes`, `Resources/Strings*.resx` | §8 |
+| Tests | `tests/Lumen.{Core,Data,Providers}.Tests` | Fakes for sync in `Core.Tests/Sync/SyncFakes.cs` |
+
 ## 2. Key libraries
 
 | Purpose | Library |
@@ -36,7 +52,7 @@ Dependency direction: `App → Platform.Windows → Providers → Data → Core`
 | DI / hosting | Microsoft.Extensions.Hosting (lower layers only take Microsoft.Extensions.Logging.Abstractions) |
 | Logging | Serilog (+ file sink, + Serilog.Extensions.Hosting to plug into the host) |
 | SQLite | Microsoft.Data.Sqlite + Dapper (hand-written SQL migrations) |
-| JSON | System.Text.Json (+ JsonSchema.Net for validating routines/collections) |
+| JSON | System.Text.Json. Routines, collections and `config.json` are validated by hand-written readers (no JsonSchema.Net), so no extra dependency |
 | Tray icon | H.NotifyIcon.Wpf |
 | Gamepad | Windows.Gaming.Input (via the Windows TFM) |
 | Updates | Velopack 1.2.161 (MIT, pinned 2026-10-30). Only `Lumen.Platform.Windows` and `Lumen.App` (the `Program.Main` hook) use it. |
@@ -193,7 +209,7 @@ Rules: providers only **read** store files; never write into a store's folder or
 | `ArtworkService` | Resolves cover/hero/logo/icon: override → local sources (package logos, program icons; M4) → Steam CDN (Steam items) → SteamGridDB (games only; search by title, cache the SGDB game id) → the tile's initial as placeholder. Disk cache in `%LOCALAPPDATA%\Lumen\cache\artwork`. |
 | `AccentService` | Extracts a dominant, saturated color from hero/cover art (quantize + score by chroma and population), ensures WCAG contrast vs. the dark background. Implemented in M3: pure logic in `Lumen.Core.Theming.AccentPicker`, WPF side in `Lumen.App.Services.AccentService` |
 | `SecretStore` | DPAPI with CurrentUser scope (`ISecretProtector`; `DpapiProtector` calls `CryptProtectData` directly, with app-specific entropy, so no extra package) protected values in the SQLite `secrets` table (`ISecretStore` / `SqliteSecretStore`). A value that no longer decrypts (other user or machine) reads as not set. Never logged, never synced. Machine-local non-secret values (e.g. SteamID64) go to `settings_local` via `ILocalSettings`. |
-| `RoutineEngine` | Loads/validates routines, trust checks, executes actions sequentially with cancellation, tracks started processes for undo |
+| Routines (`Lumen.Core/Routines`) | **Implemented (M8).** `RoutineParser` validates, `RoutineJson` hashes, `RoutineSafety`/`RoutineReview` decide what may run, `RoutineRunner` executes sequentially and tracks started processes for undo, `RoutineService` owns the folder, trust and runs, `RoutineLookup` picks what the tray/search/Home offer. See §7. |
 | `SyncFolderService` | **Implemented (M8, 2026-10-30).** Keeps `config.json` and `collections/*.json` in step with this PC both ways and announces changes in `routines/`. Details in *Sync folder* below. |
 | `UpdateService` | **Implemented (M9, 2026-10-30).** Checks GitHub Releases at start-up and daily, offers the update, downloads when the user asks, installs on the user's restart. Details in *Updates* under §9. |
 
@@ -430,12 +446,13 @@ Implemented in M8 (engine: `Lumen.Core/Routines`).
 ## 9. Build, CI and release
 
 - `Directory.Build.props`: `TargetFramework` defaults, `Nullable=enable`, `TreatWarningsAsErrors=true`, `EnableWindowsTargeting=true` (lets the full solution build on non-Windows agents; WPF still only runs on Windows).
-- CI (`.github/workflows/ci.yml`): on push/PR — `windows-latest`: restore, build, test.
+- CI (`.github/workflows/ci.yml`): on push/PR — `windows-latest`: restore, build, test. The required check is "Build & test (Windows)". On Linux the same build works but 26 `Lumen.Core.Tests` (routine tests with `C:\` paths) fail; they pass on Windows.
 - Development needs Windows with the .NET 10 SDK (`global.json`); the user-level install from Microsoft's `dotnet-install` script needs no admin. Logic in Core/Data/Providers also builds and tests on Linux/macOS thanks to `EnableWindowsTargeting`, but the WPF app only runs on Windows.
 - Localization: `Lumen.App/Resources/Strings.resx` (en) + `Strings.es.resx` (es), read through `LocalizationService`; XAML uses `{l:Loc Key}`, which follows runtime language changes. `LanguageResolver` (Core) maps the `language` preference to a culture. A repository test fails if the two resx files have different keys or a XAML `{l:Loc}` key is missing.
 - Release (`.github/workflows/release.yml`, M9): on a tag `v*` it checks the tag (`vMAJOR.MINOR.PATCH[-suffix]`, on `main`), builds and tests, `dotnet publish` self-contained `win-x64`, `vpk pack`, and `vpk upload github --publish` (a tag with `-` is created as a GitHub **pre-release**). It produces `Lumen-win-Setup.exe`, `Lumen-win-Portable.zip`, the full package and a delta from the previous release (`vpk download github` first, so the first release simply has no delta).
   - **Validated on Linux on 2026-10-30:** the same `dotnet publish` and `vpk pack` commands ran against this code (165 MB published folder, Setup.exe 82 MB, portable zip 74 MB; a delta between two builds was 125 KB). `vpk` checked that `VelopackApp.Run()` is in `Program.Main`. The upload and the Windows runner were not run until the first tag.
   - Builds are **unsigned** in v1: SmartScreen warns on first run (documented in the README).
+  - **Verified on the real runner (2026-10-30):** the owner tagged `v0.1.0-beta.*` and reported the release and the update flow ready ("todo listo"). Details of what was exercised (install, delta, restart) were not recorded; re-check them in the 1.0 bug bash.
 - Versioning: SemVer from the tag. `Directory.Build.props` sets `Version` to `0.0.0-dev` for development builds; the workflow passes `-p:Version=<tag without the v>`. No version package (no MinVer).
 
 ### Updates (M9)
