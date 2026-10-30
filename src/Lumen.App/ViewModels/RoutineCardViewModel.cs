@@ -49,6 +49,7 @@ public sealed partial class RoutineCardViewModel : ObservableObject
         Summary = entry.Routine is { } routine
             ? string.Format(CultureInfo.CurrentCulture, loc[routine.Actions.Count == 1 ? "Routine_OneStep" : "Routine_Steps"], routine.Actions.Count)
             : loc["Routine_HasErrors"];
+        StepsText = entry.Review is { } review && review.Steps.Count > 0 ? RoutineText.Chain(review, loc) : null;
         StateText = loc[entry.State switch
         {
             RoutineTrustState.Trusted => "Routine_State_Ready",
@@ -66,6 +67,11 @@ public sealed partial class RoutineCardViewModel : ObservableObject
     public bool HasDescription => !string.IsNullOrWhiteSpace(Description);
 
     public string Summary { get; }
+
+    /// <summary>"Discord → Spotify → Wait 2 s"; null when the routine couldn't be read.</summary>
+    public string? StepsText { get; }
+
+    public bool HasSteps => StepsText is not null;
 
     public string StateText { get; }
 

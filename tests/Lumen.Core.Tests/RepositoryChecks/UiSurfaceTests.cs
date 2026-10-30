@@ -116,6 +116,18 @@ public sealed class UiSurfaceTests
     }
 
     [Fact]
+    public void Collections_AreTintedCards_AndRoutinesShowTheirSteps()
+    {
+        var collections = File.ReadAllText(Path.Combine(_appDir, "Views", "CollectionsView.xaml"));
+        collections.ShouldContain("<UniformGrid Columns=\"3\" />");
+        collections.ShouldContain("<DataTrigger Binding=\"{Binding Tint}\" Value=\"1\">");
+
+        var routines = File.ReadAllText(Path.Combine(_appDir, "Views", "RoutinesView.xaml"));
+        routines.ShouldContain("Text=\"{Binding StepsText}\"");
+        File.ReadAllText(Path.Combine(_appDir, "ViewModels", "RoutineText.cs")).ShouldContain("string.Join(\" → \", parts)");
+    }
+
+    [Fact]
     public void LanguageSwitch_AlsoSetsTheFormatCulture()
     {
         File.ReadAllText(Path.Combine(_appDir, "Localization", "LocalizationService.cs"))

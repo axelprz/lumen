@@ -1482,4 +1482,10 @@ Continue?</value>
   <data name="Detail_KindApp" xml:space="preserve">
     <value>App</value>
   </data>
+  <data name="Routine_Chain_Wait" xml:space="preserve">
+    <value>Wait {0} s</value>
+  </data>
+  <data name="Routine_Chain_Close" xml:space="preserve">
+    <value>Close {0}</value>
+  </data>
 </root>
