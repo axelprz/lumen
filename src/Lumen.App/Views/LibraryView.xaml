@@ -39,13 +39,14 @@
     </ContextMenu>
     <DataTemplate x:Key="TileTemplate" DataType="{x:Type vm:LibraryTileViewModel}">
       <!-- The menu is built when it opens (OnTileContextMenuOpening), not for every tile that scrolls into view -->
-      <Border x:Name="Tile" Width="168" Margin="0,0,20,4" Background="Transparent" ToolTip="{Binding Title}"
+      <!-- 8 px of padding all round: a pointed-at cover (scaled up, ring and glow) stays inside its own tile, so nothing above it can clip it at any window size. Width and margins add up to the old 188 px slot. -->
+      <Border x:Name="Tile" Width="184" Padding="8" Margin="0,0,4,-4" Background="Transparent" ToolTip="{Binding Title}"
               Loaded="OnTileLoaded" ContextMenuOpening="OnTileContextMenuOpening"
               MouseEnter="OnTileInteract" GotKeyboardFocus="OnTileInteract">
         <StackPanel>
           <Grid services:Motion.HoverScale="1.04">
           <!-- Hover/focus glow: the accent fading out around the cover. Plain brushes and a mask, no bitmap effects (those cost scroll frames); collapsed (free) until needed. -->
-          <Border x:Name="Glow" Margin="-16" CornerRadius="24" Visibility="Collapsed" IsHitTestVisible="False"
+          <Border x:Name="Glow" Margin="-8" CornerRadius="18" Visibility="Collapsed" IsHitTestVisible="False"
                   Background="{Binding GlowBrush}" Opacity="0.45">
             <Border.OpacityMask>
               <RadialGradientBrush>
@@ -377,9 +378,9 @@
       <ItemsControl.ItemTemplate>
         <DataTemplate DataType="{x:Type vm:TileRow}">
           <!-- The virtualizing panel clips to its own bounds, so the room a pointed-at cover needs (scaled up, with its glow)
-               is inside the row: 20 px above and to the left. The grid's negative margin and the tiles' smaller bottom
+               is inside the row and the tile: 12 px above and to the left of the row, 8 px round every tile. The grid's negative margin and the tiles' smaller bottom
                margin cancel it, so the layout is unchanged. -->
-          <ItemsControl ItemsSource="{Binding Tiles}" ItemTemplate="{StaticResource TileTemplate}" Focusable="False" Margin="20,20,0,0">
+          <ItemsControl ItemsSource="{Binding Tiles}" ItemTemplate="{StaticResource TileTemplate}" Focusable="False" Margin="12,12,0,0">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
                 <StackPanel Orientation="Horizontal" />
