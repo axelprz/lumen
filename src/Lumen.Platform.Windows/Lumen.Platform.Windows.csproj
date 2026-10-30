@@ -9,4 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Lumen.Core\Lumen.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Velopack" />
+  </ItemGroup>
 </Project>

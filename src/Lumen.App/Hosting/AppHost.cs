@@ -14,7 +14,9 @@ using Lumen.Data;
 using Lumen.Data.Migrations;
 using Lumen.Core.Settings;
 using Lumen.Core.Sync;
+using Lumen.Core.Updates;
 using Lumen.Platform.Windows;
+using Lumen.Platform.Windows.Updates;
 using Lumen.Platform.Windows.Security;
 using Lumen.Providers;
 using Lumen.Providers.Apps;
@@ -37,6 +39,9 @@ namespace Lumen.App.Hosting;
 /// <summary>Composition root: every service, view model and view is registered here.</summary>
 public static class AppHost
 {
+    /// <summary>Where releases are published and updates come from (security rule 4: GitHub Releases).</summary>
+    public const string RepositoryUrl = "https://github.com/axelprz/lumen";
+
     public static IHost Build(LumenPaths paths, LocalizationService localizer)
     {
         ArgumentNullException.ThrowIfNull(paths);
@@ -275,6 +280,11 @@ public static class AppHost
             sp.GetRequiredService<IFolderWatcher>(),
             sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<SyncFolderService>>()));
         builder.Services.AddSingleton<SyncCoordinator>();
+
+        // Updates (M9): GitHub Releases of this repository only, through Velopack. Nothing can point it elsewhere.
+        builder.Services.AddSingleton<IUpdateClient>(_ => new VelopackUpdateClient(RepositoryUrl));
+        builder.Services.AddSingleton<UpdateService>();
+        builder.Services.AddSingleton<UpdateSettingsViewModel>();
         builder.Services.AddSingleton<SyncSettingsViewModel>();
         builder.Services.AddSingleton<LibraryViewModel>();
         builder.Services.AddSingleton<SteamSettingsViewModel>();

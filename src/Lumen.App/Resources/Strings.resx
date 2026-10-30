@@ -1362,4 +1362,67 @@ Continue?</value>
   <data name="Sync_NoticeTitle" xml:space="preserve">
     <value>Sync folder</value>
   </data>
+  <data name="Settings_Updates_Title" xml:space="preserve">
+    <value>Updates</value>
+  </data>
+  <data name="Settings_Updates_Version" xml:space="preserve">
+    <value>Lumen {0}</value>
+  </data>
+  <data name="Settings_Updates_NotInstalled" xml:space="preserve">
+    <value>Updates only work in the installed version (the installer or the portable zip), not in a build run from the source code.</value>
+  </data>
+  <data name="Settings_Updates_Checking" xml:space="preserve">
+    <value>Checking for updates…</value>
+  </data>
+  <data name="Settings_Updates_UpToDate" xml:space="preserve">
+    <value>Lumen is up to date.</value>
+  </data>
+  <data name="Settings_Updates_Available" xml:space="preserve">
+    <value>Version {0} is available{1}.</value>
+  </data>
+  <data name="Settings_Updates_Downloading" xml:space="preserve">
+    <value>Downloading {0}… {1}%</value>
+  </data>
+  <data name="Settings_Updates_Ready" xml:space="preserve">
+    <value>Version {0} is ready. Restart Lumen to install it.</value>
+  </data>
+  <data name="Settings_Updates_Failed" xml:space="preserve">
+    <value>Couldn't check or download the update. Check your connection and try again.</value>
+  </data>
+  <data name="Settings_Updates_NotChecked" xml:space="preserve">
+    <value>Not checked yet.</value>
+  </data>
+  <data name="Settings_Updates_Download" xml:space="preserve">
+    <value>Download {0}</value>
+  </data>
+  <data name="Settings_Updates_CheckNow" xml:space="preserve">
+    <value>Check now</value>
+  </data>
+  <data name="Settings_Updates_Restart" xml:space="preserve">
+    <value>Restart to update</value>
+  </data>
+  <data name="Settings_Updates_Channel" xml:space="preserve">
+    <value>Channel</value>
+  </data>
+  <data name="Settings_Updates_Channel_Stable" xml:space="preserve">
+    <value>Stable</value>
+  </data>
+  <data name="Settings_Updates_Channel_Beta" xml:space="preserve">
+    <value>Beta</value>
+  </data>
+  <data name="Settings_Updates_Channel_Hint" xml:space="preserve">
+    <value>Stable only offers finished releases. Beta also offers pre-releases (earlier, less tested versions). Until version 1.0 every release is a pre-release, so Beta is the default.</value>
+  </data>
+  <data name="Settings_Updates_Automatic" xml:space="preserve">
+    <value>Check for updates automatically (at start-up and once a day)</value>
+  </data>
+  <data name="Settings_Updates_Privacy" xml:space="preserve">
+    <value>Lumen only talks to GitHub Releases (github.com/axelprz/lumen) to check and download. Nothing is sent about you. Nothing is installed until you choose to restart.</value>
+  </data>
+  <data name="Update_NoticeTitle" xml:space="preserve">
+    <value>Lumen update available</value>
+  </data>
+  <data name="Update_NoticeMessage" xml:space="preserve">
+    <value>Version {0} is available. Open Settings → Updates to download it.</value>
+  </data>
 </root>

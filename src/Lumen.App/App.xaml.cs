@@ -17,6 +17,7 @@ using Lumen.Providers.Steam;
 using Lumen.Platform.Windows.Windowing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Lumen.Core.Updates;
 using Serilog;
 
 namespace Lumen.App;
@@ -125,6 +126,21 @@ public partial class App : Application
         await _host.Services.GetRequiredService<RoutinesViewModel>().InitializeAsync(CancellationToken.None).ConfigureAwait(true);
         await _host.Services.GetRequiredService<SyncCoordinator>().StartAsync(CancellationToken.None).ConfigureAwait(true);
 
+        // Updates: look for a new version at start-up and daily (if on); the user is told once per version and decides
+        // when to download and when to restart.
+        var updates = _host.Services.GetRequiredService<UpdateService>();
+        updates.BeforeRestart = ReleaseForRestart;
+        updates.Announce += (_, offer) => Dispatcher.BeginInvoke(() =>
+        {
+            var localizer = _host?.Services.GetRequiredService<ILocalizer>();
+            if (localizer is not null)
+            {
+                _tray?.Notify(localizer["Update_NoticeTitle"], string.Format(CultureInfo.CurrentCulture, localizer["Update_NoticeMessage"], offer.Version));
+            }
+        });
+        await updates.InitializeAsync(CancellationToken.None).ConfigureAwait(true);
+        updates.StartAutomaticChecks();
+
         // From now on, notice installs/uninstalls by themselves (store folders + coming back to the window).
         var autoRefresh = _host.Services.GetRequiredService<LibraryAutoRefresh>();
         await autoRefresh.StartAsync(CancellationToken.None).ConfigureAwait(true);
@@ -172,6 +188,18 @@ public partial class App : Application
         }
 
         _tray.ShowWindow();
+    }
+
+    // Just before Velopack installs an update and starts Lumen again: let go of what the new copy needs (tray icon, shortcut,
+    // the "one Lumen per folder" lock), as a normal exit would.
+    private void ReleaseForRestart()
+    {
+        _tray?.Dispose();
+        _hotkeys?.Dispose();
+        _gamepad?.Dispose();
+        _instance?.Dispose();
+        Log.Information("Lumen restarting to install an update");
+        Log.CloseAndFlush();
     }
 
     private async Task ShutdownAsync(int exitCode)

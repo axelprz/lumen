@@ -19,6 +19,7 @@ public sealed partial class SettingsViewModel(
     GogAccountViewModel gog,
     ArtworkSettingsViewModel artwork,
     SyncSettingsViewModel sync,
+    UpdateSettingsViewModel updates,
     IMergeRuleStore mergeRules,
     LibraryService library,
     ILocalizer localizer) : ObservableObject
@@ -45,6 +46,8 @@ public sealed partial class SettingsViewModel(
     public ArtworkSettingsViewModel Artwork { get; } = artwork;
 
     public SyncSettingsViewModel Sync { get; } = sync;
+
+    public UpdateSettingsViewModel Updates { get; } = updates;
 
     public bool HasLibraryStatus => !string.IsNullOrEmpty(LibraryStatus);
 

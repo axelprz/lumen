@@ -104,6 +104,15 @@ public static class LocalSettingKeys
     /// <summary>"1" once Lumen explained that closing the window leaves it in the tray (shown once).</summary>
     public const string TrayHintShown = "ui.trayHintShown";
 
+    /// <summary>Update channel: "stable" or "beta". Missing = the default for this version (<c>UpdateChannels.DefaultFor</c>).</summary>
+    public const string UpdateChannel = "updates.channel";
+
+    /// <summary>"0" turns the automatic check off; anything else (default) checks at start-up and daily.</summary>
+    public const string UpdateCheckAutomatically = "updates.checkAutomatically";
+
+    /// <summary>The newest version the user was already told about with a tray notice, so each version is announced once.</summary>
+    public const string UpdateNotifiedVersion = "updates.notifiedVersion";
+
     /// <summary>The sync folder this PC uses (a path, so it never syncs); missing = sync is off.</summary>
     public const string SyncFolder = "sync.folder";
 
