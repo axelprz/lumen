@@ -4,14 +4,20 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime">
-  <Color x:Key="Lumen.Color.Background">#FF0F1115</Color>
-  <Color x:Key="Lumen.Color.Sidebar">#FF15181E</Color>
-  <Color x:Key="Lumen.Color.Surface">#FF1C2028</Color>
-  <Color x:Key="Lumen.Color.SurfaceHover">#FF242936</Color>
-  <Color x:Key="Lumen.Color.Divider">#FF262B35</Color>
-  <Color x:Key="Lumen.Color.Text">#FFE8EAED</Color>
-  <Color x:Key="Lumen.Color.TextMuted">#FF8B93A1</Color>
-  <Color x:Key="Lumen.Color.Accent">#FF4C8DFF</Color>
+  <!-- Deep blue-black base (M10 template, 2026-10-30). -->
+  <Color x:Key="Lumen.Color.Background">#FF0A0D14</Color>
+  <Color x:Key="Lumen.Color.Sidebar">#FF0E121B</Color>
+  <Color x:Key="Lumen.Color.Surface">#FF182030</Color>
+  <Color x:Key="Lumen.Color.SurfaceHover">#FF1F2A40</Color>
+  <Color x:Key="Lumen.Color.Divider">#17FFFFFF</Color>
+  <Color x:Key="Lumen.Color.Text">#FFF1F5F9</Color>
+  <Color x:Key="Lumen.Color.TextMuted">#FF94A3B8</Color>
+  <!-- The game accent: AccentService replaces it with the featured game's color (hero, page background, cover glow). -->
+  <Color x:Key="Lumen.Color.Accent">#FF3B82F6</Color>
+  <!-- The brand: fixed blue to violet. Chrome (sidebar, buttons, top bar, focus rings) uses it, never the game accent. -->
+  <Color x:Key="Lumen.Color.Brand">#FF3B82F6</Color>
+  <Color x:Key="Lumen.Color.BrandMid">#FF6366F1</Color>
+  <Color x:Key="Lumen.Color.BrandAlt">#FF8B5CF6</Color>
 
   <SolidColorBrush x:Key="Lumen.Brush.Background" Color="{StaticResource Lumen.Color.Background}" />
   <SolidColorBrush x:Key="Lumen.Brush.Sidebar" Color="{StaticResource Lumen.Color.Sidebar}" />
@@ -25,9 +31,54 @@
   <SolidColorBrush x:Key="Lumen.Brush.SidebarBackdrop" Color="{StaticResource Lumen.Color.Sidebar}" />
   <SolidColorBrush x:Key="Lumen.Brush.CoverEdge" Color="#24FFFFFF" />
   <SolidColorBrush x:Key="Lumen.Brush.Accent" Color="{StaticResource Lumen.Color.Accent}" />
-  <SolidColorBrush x:Key="Lumen.Brush.Success" Color="#FF5CC98B" />
-  <SolidColorBrush x:Key="Lumen.Brush.Warning" Color="#FFE0B44C" />
+  <SolidColorBrush x:Key="Lumen.Brush.Success" Color="#FF34D399" />
+  <SolidColorBrush x:Key="Lumen.Brush.Warning" Color="#FFFBBF24" />
   <SolidColorBrush x:Key="Lumen.Brush.Error" Color="#FFF2766B" />
+
+  <!-- Brand brushes -->
+  <SolidColorBrush x:Key="Lumen.Brush.Brand" Color="{StaticResource Lumen.Color.Brand}" />
+  <SolidColorBrush x:Key="Lumen.Brush.BrandText" Color="#FF60A5FA" />
+  <SolidColorBrush x:Key="Lumen.Brush.BrandSoft" Color="#333B82F6" />
+  <SolidColorBrush x:Key="Lumen.Brush.BrandBorder" Color="#663B82F6" />
+  <LinearGradientBrush x:Key="Lumen.Brush.BrandGradient" StartPoint="0,0" EndPoint="1,0">
+    <GradientStop Color="{StaticResource Lumen.Color.Brand}" Offset="0" />
+    <GradientStop Color="{StaticResource Lumen.Color.BrandMid}" Offset="0.55" />
+    <GradientStop Color="{StaticResource Lumen.Color.BrandAlt}" Offset="1" />
+  </LinearGradientBrush>
+  <!-- Hover: the same gradient a step lighter -->
+  <LinearGradientBrush x:Key="Lumen.Brush.BrandGradientHover" StartPoint="0,0" EndPoint="1,0">
+    <GradientStop Color="#FF5B96F8" Offset="0" />
+    <GradientStop Color="#FF7C7FF4" Offset="0.55" />
+    <GradientStop Color="#FFA07CF9" Offset="1" />
+  </LinearGradientBrush>
+  <!-- Selected sidebar item: brand tint fading to the right -->
+  <LinearGradientBrush x:Key="Lumen.Brush.BrandFade" StartPoint="0,0" EndPoint="1,0">
+    <GradientStop Color="#2E3B82F6" Offset="0" />
+    <GradientStop Color="#053B82F6" Offset="1" />
+  </LinearGradientBrush>
+
+  <!-- Glass (M10 template): cards are about 85% opaque so the ambient light shows through a little; text stays readable.
+       Raise the alpha (D9 = 85%) toward FF to make them more solid. -->
+  <SolidColorBrush x:Key="Lumen.Brush.Glass" Color="#D9182030" />
+  <SolidColorBrush x:Key="Lumen.Brush.GlassHover" Color="#E61E2940" />
+  <SolidColorBrush x:Key="Lumen.Brush.GlassBorder" Color="#14FFFFFF" />
+  <!-- Quiet fills for secondary buttons, chips and inputs -->
+  <SolidColorBrush x:Key="Lumen.Brush.Fill" Color="#0FFFFFFF" />
+  <SolidColorBrush x:Key="Lumen.Brush.FillHover" Color="#1CFFFFFF" />
+  <SolidColorBrush x:Key="Lumen.Brush.FillBorder" Color="#1AFFFFFF" />
+  <SolidColorBrush x:Key="Lumen.Brush.Input" Color="#CC0F1520" />
+
+  <!-- Ambient lights behind the pages (MainWindow). Alpha 0x26 = 15%; raise it to make the light stronger. -->
+  <RadialGradientBrush x:Key="Lumen.Brush.AmbientBlue">
+    <GradientStop Color="#262563EB" Offset="0" />
+    <GradientStop Color="#0D2563EB" Offset="0.55" />
+    <GradientStop Color="#002563EB" Offset="1" />
+  </RadialGradientBrush>
+  <RadialGradientBrush x:Key="Lumen.Brush.AmbientViolet">
+    <GradientStop Color="#267C3AED" Offset="0" />
+    <GradientStop Color="#0D7C3AED" Offset="0.55" />
+    <GradientStop Color="#007C3AED" Offset="1" />
+  </RadialGradientBrush>
 
   <!-- UI font: Exo 2 (SIL OFL, M10). Four static weights ship in Assets/Fonts; the family is looked up by name inside that folder. -->
   <FontFamily x:Key="Lumen.Font.Ui">/Lumen;component/Assets/Fonts/#Exo 2</FontFamily>

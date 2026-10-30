@@ -27,6 +27,15 @@
       <ColumnDefinition Width="*" />
     </Grid.ColumnDefinitions>
 
+    <!-- Ambient lights: two soft brand glows behind sidebar and pages, breathing slowly (Motion.Breathe).
+         Plain radial brushes, no blur effect. Strength: the alphas of Lumen.Brush.Ambient* in the theme. -->
+    <Grid Grid.ColumnSpan="2" IsHitTestVisible="False" ClipToBounds="True">
+      <Ellipse Width="980" Height="980" Margin="-320,-360,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"
+               Fill="{DynamicResource Lumen.Brush.AmbientBlue}" services:Motion.Breathe="0" />
+      <Ellipse Width="900" Height="900" Margin="0,0,-300,-340" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+               Fill="{DynamicResource Lumen.Brush.AmbientViolet}" services:Motion.Breathe="4" />
+    </Grid>
+
     <!-- Sidebar -->
     <Border Grid.Column="0"
             Background="{DynamicResource Lumen.Brush.SidebarBackdrop}"

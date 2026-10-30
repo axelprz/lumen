@@ -114,7 +114,7 @@
                       Margin="8"
                       Padding="5,4"
                       CornerRadius="4"
-                      Background="#B30F1115"
+                      Background="#B30A0D14"
                       IsHitTestVisible="False"
                       Visibility="{Binding IsFavorite, Converter={StaticResource BoolToVisibility}}">
                 <TextBlock Text="&#xE735;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Caption}" Foreground="{DynamicResource Lumen.Brush.Warning}" />
@@ -124,7 +124,7 @@
                       Margin="8"
                       Padding="8,3"
                       CornerRadius="4"
-                      Background="#B30F1115"
+                      Background="#B30A0D14"
                       IsHitTestVisible="False">
                 <TextBlock Text="{Binding StoreName}" FontSize="{StaticResource Lumen.FontSize.Label}" Foreground="{DynamicResource Lumen.Brush.Text}" />
               </Border>

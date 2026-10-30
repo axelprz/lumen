@@ -139,7 +139,7 @@ Owner requirement: nobody outside the person using Lumen may be able to get at t
 
 ### 4.9 UI rework (M10, before 1.0)
 
-**Status (2026-10-30):** implemented in #46–#51 (font, Mica and glow, motion, entrance, detail/collections/routines, Settings and overlays); the owner's approval on real use is still to come. Details and rules: ARCHITECTURE §8 "Look and motion".
+**Status (2026-10-30):** first pass in #46–#51 (font, Mica and glow, motion, entrance, detail/collections/routines, Settings and overlays). **Second pass** from the owner's HTML template (same day), one PR per step: A design base (palette, brand, glass, buttons, ambient lights) → B shell (sidebar, top bar with Ctrl+K search and a pinned routine, toasts) → B2 sidebar footer (Steam profile, CPU/RAM monitor) → C Home → D Library → E detail (animated close too) → F Collections and Routines → G Settings tabs, wizard and quick search. Details and rules: ARCHITECTURE §8 "Look and motion".
 
 Owner request (2026-10-28): before 1.0, a modern, futuristic look that makes people want to use Lumen. It should be friendly and striking, at home next to Steam and other launchers. Same screens and features; this is the look, motion and type.
 
@@ -184,6 +184,7 @@ Owner decisions and the incidents behind them, newest last. Add a line (with the
 - **2026-10-30 · Staggered entrance (M10):** Home and Library blocks (hero, rows; header, filters, grid) arrive 50 ms apart, at most five, never the covers inside a scrolling grid; the Home hero text fades in when the featured game changes. Same Motion rules and switch.
 - **2026-10-30 · Detail, Collections, Routines (M10):** covering panels (a game's detail, Discover apps, the routine preview/editor) fade and slide in (`Motion.ShowIn`); closing is still instant. Collections and Routines blocks arrive staggered. Their font sizes use the type scale tokens (Label 11 … Display 44); a repo test keeps literal scale sizes out of reworked views.
 - **2026-10-30 · Settings and overlays (M10):** Settings blocks arrive staggered; the quick search card comes in fast (140 ms) when opened, and the first-run wizard fades in. Every view now uses the type scale tokens; a repo test covers all of them.
+- **2026-10-30 · UI second pass from the owner's template (M10):** the owner shared an HTML mock-up (sidebar with brand, top bar with search, hero card, pinned routines, posters with store badges, glass cards, ambient lights) as the look to match, within WPF's limits. Exo 2 stays (the mock-up's Inter was in the font sample the owner already judged). Decisions: **mixed accent** (fixed blue → violet brand for chrome; the game's color still tints hero, background and cover glow); **ambient lights breathing slowly** (≈ 8 s cycle, paused when hidden or minimized, still with "Animation effects" off); **subtle glass cards** (≈ 85 % opaque, light edge; replaces "cards stay opaque"); extras now: **Steam profile** (avatar and name in the sidebar) and a **CPU/RAM monitor** (read locally). Achievements in the detail and a notification center go to "Possible next features".
 - **2026-10-30 · Updates:** Velopack 1.2.161. Default channel beta until 1.0. Notice = Settings card + one tray balloon per version (no banner in the window). The user presses Download and chooses when to restart. Builds are unsigned in v1 (SmartScreen warning documented in the README).
 
 ## v1.1 — Deals (owner request, 2026-10-28)
@@ -202,6 +203,14 @@ A "Deals" section so players stay on top of offers and what's new. Planned for 1
 - A search sends only the game's name. No account, token, library or ID ever goes to these services.
 - Responses are cached. Requests carry no identifiers.
 - Each service's terms are respected (e.g. links back to the deal).
+
+## Possible next features (owner, 2026-10-30)
+
+Ideas the owner wants to keep in sight; none is planned yet. Each needs the owner's decisions before it starts.
+
+- **Deals, free games and game announcements/news:** see "v1.1 — Deals" above.
+- **Achievements in the detail view:** unlocked / total (Steam Web API, already an allowed host).
+- **Notification center:** a bell in the top bar collecting updates, store problems and items that came from the sync folder.
 
 ## Backlog (post-v1)
 

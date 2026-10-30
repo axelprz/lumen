@@ -86,10 +86,7 @@
                         Command="{Binding DataContext.AddCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                         CommandParameter="{Binding}"
                         Content="{l:Loc Discover_Add}"
-                        Style="{StaticResource Lumen.Button}"
-                        Background="{DynamicResource Lumen.Brush.Accent}"
-                        BorderBrush="{DynamicResource Lumen.Brush.Accent}"
-                        Foreground="White"
+                        Style="{StaticResource Lumen.Button.Primary}"
                         Margin="12,0,0,0" />
                 <Button x:Name="Ignore"
                         Command="{Binding DataContext.IgnoreCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"

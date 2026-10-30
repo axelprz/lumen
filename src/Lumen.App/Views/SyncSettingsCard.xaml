@@ -35,7 +35,7 @@
       <!-- Both the folder and this PC already have data: ask before anything is written -->
       <Border Margin="0,16,0,0" Padding="16" CornerRadius="8"
               Background="{DynamicResource Lumen.Brush.Surface}"
-              BorderBrush="{DynamicResource Lumen.Brush.Accent}" BorderThickness="1"
+              BorderBrush="{DynamicResource Lumen.Brush.Brand}" BorderThickness="1"
               Visibility="{Binding HasChoice, Converter={StaticResource BoolToVisibility}}">
         <StackPanel>
           <TextBlock Text="{l:Loc Settings_Sync_Choice_Title}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold" TextWrapping="Wrap" />
@@ -48,10 +48,7 @@
           <WrapPanel Margin="0,16,0,0">
             <Button Command="{Binding MergeCommand}"
                     Content="{l:Loc Settings_Sync_Merge}"
-                    Style="{StaticResource Lumen.Button}"
-                    Background="{DynamicResource Lumen.Brush.Accent}"
-                    BorderBrush="{DynamicResource Lumen.Brush.Accent}"
-                    Foreground="White"
+                    Style="{StaticResource Lumen.Button.Primary}"
                     FontWeight="SemiBold"
                     Margin="0,0,12,8" />
             <Button Command="{Binding UseFolderCommand}" Content="{l:Loc Settings_Sync_UseFolder}" Style="{StaticResource Lumen.Button}" Margin="0,0,12,8" />

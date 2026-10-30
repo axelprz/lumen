@@ -7,14 +7,14 @@
             Background="{TemplateBinding Background}"
             BorderBrush="{TemplateBinding BorderBrush}"
             BorderThickness="{TemplateBinding BorderThickness}"
-            CornerRadius="6">
+            CornerRadius="10">
       <!-- No Margin here: TextBox/PasswordBox already apply their Padding to the text inside the content host.
            Binding it again doubled the inset (typed text started far from where the placeholder is). -->
       <ScrollViewer x:Name="PART_ContentHost" Focusable="False" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
     </Border>
     <ControlTemplate.Triggers>
       <Trigger Property="IsKeyboardFocusWithin" Value="True">
-        <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
+        <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Brand}" />
       </Trigger>
       <Trigger Property="IsEnabled" Value="False">
         <Setter TargetName="Bd" Property="Opacity" Value="0.5" />
@@ -23,10 +23,10 @@
   </ControlTemplate>
 
   <Style TargetType="TextBox">
-    <Setter Property="Background" Value="{DynamicResource Lumen.Brush.Surface}" />
+    <Setter Property="Background" Value="{DynamicResource Lumen.Brush.Input}" />
     <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
     <Setter Property="CaretBrush" Value="{DynamicResource Lumen.Brush.Text}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Divider}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Lumen.Brush.FillBorder}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="Padding" Value="8,7" />
     <Setter Property="FontSize" Value="14" />
@@ -34,10 +34,10 @@
   </Style>
 
   <Style TargetType="PasswordBox">
-    <Setter Property="Background" Value="{DynamicResource Lumen.Brush.Surface}" />
+    <Setter Property="Background" Value="{DynamicResource Lumen.Brush.Input}" />
     <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
     <Setter Property="CaretBrush" Value="{DynamicResource Lumen.Brush.Text}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Divider}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource Lumen.Brush.FillBorder}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="Padding" Value="8,7" />
     <Setter Property="FontSize" Value="14" />
@@ -48,13 +48,5 @@
     <Setter Property="FontSize" Value="13" />
     <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.TextMuted}" />
     <Setter Property="Margin" Value="0,0,0,6" />
-  </Style>
-
-  <Style x:Key="Lumen.Card" TargetType="Border">
-    <Setter Property="Background" Value="{DynamicResource Lumen.Brush.Sidebar}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Divider}" />
-    <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="CornerRadius" Value="10" />
-    <Setter Property="Padding" Value="24" />
   </Style>
 </ResourceDictionary>

@@ -117,10 +117,7 @@
         <Button DockPanel.Dock="Right"
                 Command="{Binding NextCommand}"
                 Content="{Binding NextText}"
-                Style="{StaticResource Lumen.Button}"
-                Background="{DynamicResource Lumen.Brush.Accent}"
-                BorderBrush="{DynamicResource Lumen.Brush.Accent}"
-                Foreground="White"
+                Style="{StaticResource Lumen.Button.Primary}"
                 FontWeight="SemiBold"
                 Padding="28,9" />
         <Button DockPanel.Dock="Left"

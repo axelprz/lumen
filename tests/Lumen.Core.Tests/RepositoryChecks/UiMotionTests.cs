@@ -26,6 +26,18 @@ public sealed partial class UiMotionTests
     }
 
     [Fact]
+    public void AmbientBreathing_IsSlowCappedAndChecksTheSetting()
+    {
+        // Ambience is the one long-running animation: a few frames a second, off with "Animation effects" or a hidden window.
+        var code = File.ReadAllText(Path.Combine(_appDir, "Services", "Motion.cs"));
+
+        code.ShouldContain("Timeline.SetDesiredFrameRate(breath, AmbientFrameRate)");
+        Regex.Match(code, @"AmbientFrameRate = (?<fps>\d+);").Groups["fps"].Value.ShouldNotBeEmpty();
+        int.Parse(Regex.Match(code, @"AmbientFrameRate = (?<fps>\d+);").Groups["fps"].Value).ShouldBeLessThanOrEqualTo(30);
+        code.ShouldContain("var run = offset >= 0 && Enabled && element.IsVisible && !minimized;");
+    }
+
+    [Fact]
     public void AnimationsOutsideMotion_AreOnlyTheOnesThatCheckTheSetting()
     {
         // Allowed: Motion itself, and AccentService (it checks Motion.Enabled before animating).

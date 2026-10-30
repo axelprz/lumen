@@ -16,8 +16,7 @@
 
       <StackPanel Visibility="{Binding IsDisconnected, Converter={StaticResource BoolToVisibility}}">
         <Button Command="{Binding ConnectCommand}" Content="{l:Loc SteamWeb_SignIn}" HorizontalAlignment="Left"
-                Style="{StaticResource Lumen.Button}" Background="{DynamicResource Lumen.Brush.Accent}"
-                BorderBrush="{DynamicResource Lumen.Brush.Accent}" Foreground="White" FontWeight="SemiBold" />
+                Style="{StaticResource Lumen.Button.Primary}" FontWeight="SemiBold" />
         <TextBlock Text="{l:Loc SteamWeb_HowItWorks}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,12,0,0"
                    Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
       </StackPanel>

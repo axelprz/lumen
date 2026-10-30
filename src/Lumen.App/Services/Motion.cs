@@ -215,6 +215,124 @@ public static class Motion
         }
     }
 
+    /// <summary>One way of the ambient "breathing" (a full cycle is twice this). Ambience, not feedback, so slower than the interaction rule.</summary>
+    public static readonly Duration Ambient = new(TimeSpan.FromSeconds(4));
+
+    /// <summary>Lowest opacity an ambient light fades to while breathing (it goes back up to 1).</summary>
+    private const double AmbientLow = 0.55;
+
+    /// <summary>Ambient lights only need a few frames a second: keeps the idle cost near zero.</summary>
+    private const int AmbientFrameRate = 20;
+
+    /// <summary>
+    /// Set on an ambient light (the window's background glows) to make it breathe slowly; the value is its phase offset
+    /// in seconds, a negative value turns it off. It runs only while the element is visible and its window is not minimized,
+    /// and stays still at full strength when Windows' "Animation effects" is off.
+    /// </summary>
+    public static readonly DependencyProperty BreatheProperty =
+        DependencyProperty.RegisterAttached("Breathe", typeof(double), typeof(Motion), new PropertyMetadata(-1.0, OnBreatheChanged));
+
+    public static double GetBreathe(DependencyObject element) => (double)element.GetValue(BreatheProperty);
+
+    public static void SetBreathe(DependencyObject element, double value) => element.SetValue(BreatheProperty, value);
+
+    private static readonly DependencyProperty BreathingProperty =
+        DependencyProperty.RegisterAttached("Breathing", typeof(bool), typeof(Motion), new PropertyMetadata(false));
+
+    private static void OnBreatheChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (sender is not FrameworkElement element)
+        {
+            return;
+        }
+
+        element.IsVisibleChanged -= OnBreatheVisibleChanged;
+        element.Loaded -= OnBreatheLoaded;
+        if ((double)e.NewValue >= 0)
+        {
+            element.IsVisibleChanged += OnBreatheVisibleChanged;
+            element.Loaded += OnBreatheLoaded;
+        }
+
+        UpdateBreath(element);
+    }
+
+    private static void OnBreatheLoaded(object sender, RoutedEventArgs e)
+    {
+        var element = (FrameworkElement)sender;
+        if (Window.GetWindow(element) is { } window)
+        {
+            // Minimized windows draw nothing: stop the clock instead of ticking for nobody.
+            window.StateChanged -= OnBreatheWindowStateChanged;
+            window.StateChanged += OnBreatheWindowStateChanged;
+        }
+
+        UpdateBreath(element);
+    }
+
+    private static void OnBreatheVisibleChanged(object sender, DependencyPropertyChangedEventArgs e) => UpdateBreath((FrameworkElement)sender);
+
+    private static void OnBreatheWindowStateChanged(object? sender, EventArgs e)
+    {
+        if (sender is Window window)
+        {
+            foreach (var element in Breathers(window))
+            {
+                UpdateBreath(element);
+            }
+        }
+    }
+
+    private static IEnumerable<FrameworkElement> Breathers(DependencyObject root)
+    {
+        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+        {
+            var child = VisualTreeHelper.GetChild(root, i);
+            if (child is FrameworkElement element && GetBreathe(element) >= 0)
+            {
+                yield return element;
+            }
+
+            // Ambient lights sit near the top of the window: a shallow walk is enough.
+            if (child is Panel or Decorator or ContentPresenter)
+            {
+                foreach (var nested in Breathers(child))
+                {
+                    yield return nested;
+                }
+            }
+        }
+    }
+
+    private static void UpdateBreath(FrameworkElement element)
+    {
+        var offset = GetBreathe(element);
+        var minimized = Window.GetWindow(element)?.WindowState == WindowState.Minimized;
+        var run = offset >= 0 && Enabled && element.IsVisible && !minimized;
+        if (run == (bool)element.GetValue(BreathingProperty))
+        {
+            return;
+        }
+
+        element.SetValue(BreathingProperty, run);
+        element.BeginAnimation(UIElement.OpacityProperty, null);
+        element.Opacity = 1;
+        if (!run)
+        {
+            return;
+        }
+
+        var breath = new DoubleAnimation(1, AmbientLow, Ambient)
+        {
+            AutoReverse = true,
+            RepeatBehavior = RepeatBehavior.Forever,
+            BeginTime = TimeSpan.FromSeconds(-offset), // start part-way through, so two lights are out of step
+            EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut },
+        };
+        Timeline.SetDesiredFrameRate(breath, AmbientFrameRate);
+        element.BeginAnimation(UIElement.OpacityProperty, breath);
+    }
+
     /// <summary>Hover/focus scale for an element (say, a tile's cover). 1 or less means "off".</summary>
     public static readonly DependencyProperty HoverScaleProperty =
         DependencyProperty.RegisterAttached("HoverScale", typeof(double), typeof(Motion), new PropertyMetadata(1.0, OnHoverScaleChanged));

@@ -5,10 +5,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <ControlTemplate x:Key="Lumen.ComboToggle" TargetType="ToggleButton">
     <Border x:Name="Bd"
-            Background="{DynamicResource Lumen.Brush.Surface}"
-            BorderBrush="{DynamicResource Lumen.Brush.Divider}"
+            Background="{DynamicResource Lumen.Brush.Input}"
+            BorderBrush="{DynamicResource Lumen.Brush.FillBorder}"
             BorderThickness="1"
-            CornerRadius="6">
+            CornerRadius="10">
       <TextBlock Text="&#xE70D;"
                  FontFamily="{StaticResource Lumen.Font.Icons}"
                  FontSize="10"
@@ -45,7 +45,7 @@
                               Margin="12,0,32,0"
                               VerticalAlignment="Center"
                               IsHitTestVisible="False" />
-            <Border x:Name="FocusRing" BorderThickness="1" CornerRadius="6" BorderBrush="Transparent" IsHitTestVisible="False" />
+            <Border x:Name="FocusRing" BorderThickness="1" CornerRadius="10" BorderBrush="Transparent" IsHitTestVisible="False" />
             <Popup IsOpen="{TemplateBinding IsDropDownOpen}"
                    Placement="Bottom"
                    AllowsTransparency="True"
@@ -54,7 +54,7 @@
               <Border Background="{DynamicResource Lumen.Brush.Surface}"
                       BorderBrush="{DynamicResource Lumen.Brush.Divider}"
                       BorderThickness="1"
-                      CornerRadius="6"
+                      CornerRadius="10"
                       Margin="0,4,0,0"
                       Padding="4"
                       MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
@@ -67,7 +67,7 @@
           </Grid>
           <ControlTemplate.Triggers>
             <Trigger Property="IsKeyboardFocusWithin" Value="True">
-              <Setter TargetName="FocusRing" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
+              <Setter TargetName="FocusRing" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Brand}" />
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -83,7 +83,7 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="ComboBoxItem">
-          <Border x:Name="Bd" Background="Transparent" CornerRadius="4" Padding="{TemplateBinding Padding}">
+          <Border x:Name="Bd" Background="Transparent" CornerRadius="6" Padding="{TemplateBinding Padding}">
             <ContentPresenter />
           </Border>
           <ControlTemplate.Triggers>
@@ -91,7 +91,7 @@
               <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Lumen.Brush.SurfaceHover}" />
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
-              <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Accent}" />
+              <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.BrandText}" />
             </Trigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
