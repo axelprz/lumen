@@ -41,7 +41,7 @@ Dependency direction: `App → Platform.Windows → Providers → Data → Core`
 | Sync folder | `Lumen.Core/Sync/*`, `Lumen.App/Services/SyncCoordinator.cs`, `ViewModels/SyncSettingsViewModel.cs` | §6 "Sync folder" |
 | Updates, release | `Lumen.Core/Updates/*`, `Lumen.Platform.Windows/Updates`, `.github/workflows/release.yml` | §9 |
 | Windows access | `Lumen.Platform.Windows/*` (registry, processes, DPAPI, hotkeys, gamepad, window interop) | Keep thin |
-| UI | `Lumen.App/Views`, `ViewModels`, `Themes`, `Resources/Strings*.resx` | §8. UI font Exo 2 in `Assets/Fonts` (embedded resources, OFL); Mica: `Platform.Windows/Windowing/SystemBackdrop.cs` + `Lumen.App/Services/MicaBackdrop.cs` (swaps `Lumen.Brush.Backdrop`/`SidebarBackdrop` for translucent ones); type scale tokens `Lumen.FontSize.*` and `Lumen.Text.*` styles in `Themes/Theme.Dark.xaml` |
+| UI | `Lumen.App/Views`, `ViewModels`, `Themes`, `Resources/Strings*.resx` | §8. UI font Exo 2 in `Assets/Fonts` (embedded resources, OFL); Motion: `Lumen.App/Services/Motion.cs` (durations, "Animation effects" check, page-in, `Motion.HoverScale`); Mica: `Platform.Windows/Windowing/SystemBackdrop.cs` + `Lumen.App/Services/MicaBackdrop.cs` (swaps `Lumen.Brush.Backdrop`/`SidebarBackdrop` for translucent ones); type scale tokens `Lumen.FontSize.*` and `Lumen.Text.*` styles in `Themes/Theme.Dark.xaml` |
 | Tests | `tests/Lumen.{Core,Data,Providers}.Tests` | Fakes for sync in `Core.Tests/Sync/SyncFakes.cs` |
 
 ## 2. Key libraries
