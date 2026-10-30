@@ -302,6 +302,7 @@ public static class AppHost
         builder.Services.AddSingleton<QuickSearchViewModel>();
         builder.Services.AddSingleton<QuickSearchWindow>();
         builder.Services.AddSingleton<FirstRunViewModel>();
+        builder.Services.AddSingleton<AboutViewModel>();
         builder.Services.AddSingleton<SettingsViewModel>();
         builder.Services.AddSingleton<ToastService>();
         builder.Services.AddSingleton<SidebarFooterViewModel>();

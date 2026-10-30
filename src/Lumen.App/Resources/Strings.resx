@@ -1503,4 +1503,25 @@ Continue?</value>
   <data name="Settings_Tab_SyncUpdates" xml:space="preserve">
     <value>Sync &amp; updates</value>
   </data>
+  <data name="Settings_Tab_About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="About_Tagline" xml:space="preserve">
+    <value>A game-first launcher for Windows that brings every store and your apps together.</value>
+  </data>
+  <data name="About_Copyright" xml:space="preserve">
+    <value>(c) 2026 Axel Ismael Perez. Free software under the GNU GPL v3 or later.</value>
+  </data>
+  <data name="About_Privacy" xml:space="preserve">
+    <value>No telemetry or analytics: Lumen only talks to the stores, the artwork sources and GitHub (for updates).</value>
+  </data>
+  <data name="About_Repository" xml:space="preserve">
+    <value>View on GitHub</value>
+  </data>
+  <data name="About_Notices" xml:space="preserve">
+    <value>Third-party licenses</value>
+  </data>
+  <data name="About_BuiltWith" xml:space="preserve">
+    <value>Built with</value>
+  </data>
 </root>

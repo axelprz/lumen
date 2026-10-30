@@ -20,6 +20,7 @@ public sealed partial class SettingsViewModel(
     ArtworkSettingsViewModel artwork,
     SyncSettingsViewModel sync,
     UpdateSettingsViewModel updates,
+    AboutViewModel about,
     IMergeRuleStore mergeRules,
     LibraryService library,
     ILocalizer localizer) : ObservableObject
@@ -48,6 +49,8 @@ public sealed partial class SettingsViewModel(
     public SyncSettingsViewModel Sync { get; } = sync;
 
     public UpdateSettingsViewModel Updates { get; } = updates;
+
+    public AboutViewModel About { get; } = about;
 
     public bool HasLibraryStatus => !string.IsNullOrEmpty(LibraryStatus);
 

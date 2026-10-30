@@ -54,7 +54,7 @@ Every URI and file location must be verified on a real machine when implemented 
 - **Merging:** the same game owned on several stores appears once; the detail view lets the user pick which store to launch/install from. Automatic merge by normalized title; manual merge/split always available.
 - Manual items: drag & drop an `.exe`, `.lnk` or URL, or add via dialog.
 - Collections (mixed games + apps) and Favorites.
-- Per-item overrides: title, artwork (cover, hero, logo, icon), hidden flag, launch arguments.
+- Per-item overrides: title, artwork (cover, hero, logo, icon), hidden flag. (Launch arguments: backlog, owner 2026-10-30.)
 - Filters: type (all/games/apps), store, installed/not installed, collection. Instant search as you type.
 - Sort: name, last played, playtime, recently added.
 
@@ -97,10 +97,11 @@ Every URI and file location must be verified on a real machine when implemented 
 - Unsigned builds in v1 (SmartScreen warning documented in the README). Code signing evaluated later.
 
 ### 4.7 Settings
-- Language, theme accents on/off, start with Windows, minimize to tray, hotkey.
-- Stores: enable/disable each, custom library paths, Steam key + SteamID64, Epic/GOG connect/disconnect.
+- Language, start with Windows, minimize to tray, hotkey.
+- Stores: Steam key + SteamID64, Steam website sign-in, Epic/GOG connect/disconnect.
 - Artwork: SteamGridDB key, clear cache.
-- Sync folder; update channel (Settings → Updates); about/licenses (not done yet).
+- Sync folder; update channel (Settings → Updates); About (version, license, repository, third-party licenses; the license texts ship next to Lumen.exe).
+- Moved to the backlog by the owner (2026-10-30): theme accents on/off, enable/disable each store, custom library paths, per-item launch arguments.
 
 ## 5. Milestones
 
@@ -193,6 +194,8 @@ Owner decisions and the incidents behind them, newest last. Add a line (with the
 - **2026-10-30 · Detail and closing panels (M10 second pass, step E):** the detail gets a Back button, a hero card with Play and a star button, and glass stat cards; achievements stay a possible next feature. Covering panels (detail, Discover apps, routine preview/editor) now also animate when closing: they hide at once and a still picture of them fades away (140 ms), so focus and gamepad behavior don't change.
 - **2026-10-30 · Collections and Routines (M10 second pass, step F):** collection cards in a tinted grid; routine rows show their steps as a short chain ("Discord → Spotify → Wait 2 s"), with the less used actions as icon buttons. Routine icons from the JSON `icon` field are not used yet (one lightning glyph for all).
 - **2026-10-30 · Settings and overlays (M10 second pass, step G, the last one):** Settings in four tabs (General / Accounts & stores / Artwork / Sync & updates) with switches for on/off options; the first-run wizard as a modal card over a 95 % dimmed window; quick search restyled. This closes the template pass; what's left of M10 is the owner's approval and the leftovers in CLAUDE.md.
+- **2026-10-30 · 1.0 scope (owner):** of the Settings items still missing, only **About and licenses** goes into 1.0; theme accents on/off, enable/disable each store, custom library paths and per-item launch arguments move to the backlog. The Mica tint stays as it is (confirmed). The owner takes the README screenshots and verifies the `VERIFY` items on his PC, where GOG Galaxy, the Xbox app, EA app, Ubisoft Connect and Battle.net are installed.
+- **2026-10-30 · Licenses:** `LICENSE.txt` (GPL) and `THIRD-PARTY-NOTICES.txt` ship next to Lumen.exe. The notices list every bundled component with the license and copyright its package publishes, plus the full MIT, Apache-2.0 (official text from apache.org), WebView2 SDK and SIL OFL texts. A repo test fails when a project references a package the notices don't name.
 - **2026-10-30 · Updates:** Velopack 1.2.161. Default channel beta until 1.0. Notice = Settings card + one tray balloon per version (no banner in the window). The user presses Download and chooses when to restart. Builds are unsigned in v1 (SmartScreen warning documented in the README).
 
 ## v1.1 — Deals (owner request, 2026-10-28)
@@ -221,6 +224,8 @@ Ideas the owner wants to keep in sight; none is planned yet. Each needs the owne
 - **Notification center:** a bell in the top bar collecting updates, store problems and items that came from the sync folder.
 
 ## Backlog (post-v1)
+
+- From the v1 Settings list (owner, 2026-10-30): theme accents on/off, enable/disable each store, custom library paths, per-item launch arguments.
 
 - Owned-not-installed for Xbox, Ubisoft, EA, Battle.net.
 - Routine actions: run script/command, window placement/monitors, power plan, audio device, Focus/Do Not Disturb.

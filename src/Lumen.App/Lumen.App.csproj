@@ -22,6 +22,11 @@
     <Resource Include="Assets\Fonts\*.ttf" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Shipped next to Lumen.exe: the GPL text and the licenses of everything bundled (Settings -> About opens it). -->
+    <None Include="..\..\LICENSE" Link="LICENSE.txt" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\THIRD-PARTY-NOTICES.txt" Link="THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Lumen.Core\Lumen.Core.csproj" />
     <ProjectReference Include="..\Lumen.Data\Lumen.Data.csproj" />
     <ProjectReference Include="..\Lumen.Providers\Lumen.Providers.csproj" />
