@@ -20,6 +20,15 @@ public partial class MainWindow : Window
         _images = images;
         InitializeComponent();
         DataContext = viewModel;
+
+        // A page change slides and fades the new page in (nothing moves when Windows' "Animation effects" is off).
+        viewModel.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(ShellViewModel.SelectedSection))
+            {
+                Motion.PageIn(PageHost);
+            }
+        };
     }
 
     /// <summary>The page area next to the sidebar (the gamepad starts there).</summary>

@@ -19,7 +19,6 @@ public sealed partial class AccentService
 {
     private const string BrushKey = "Lumen.Brush.Accent";
     private const string ColorKey = "Lumen.Color.Accent";
-    private static readonly Duration FadeDuration = new(TimeSpan.FromMilliseconds(450));
 
     private readonly ILogger<AccentService> _logger;
     private readonly Color _default;
@@ -74,8 +73,17 @@ public sealed partial class AccentService
 
         try
         {
-            var animation = new ColorAnimation(color, FadeDuration) { EasingFunction = new QuadraticEase() };
-            _color.BeginAnimation(AccentColor.ColorProperty, animation);
+            if (Motion.Enabled)
+            {
+                var animation = new ColorAnimation(color, Motion.Hero) { EasingFunction = new QuadraticEase() };
+                _color.BeginAnimation(AccentColor.ColorProperty, animation);
+            }
+            else
+            {
+                _color.BeginAnimation(AccentColor.ColorProperty, null);
+                _color.Color = color; // "Animation effects" is off: no fade
+            }
+
             Current = color;
         }
         catch (InvalidOperationException ex)

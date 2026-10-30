@@ -6,6 +6,7 @@
              xmlns:l="clr-namespace:Lumen.App.Localization"
              xmlns:vm="clr-namespace:Lumen.App.ViewModels"
              xmlns:conv="clr-namespace:Lumen.App.Converters"
+             xmlns:services="clr-namespace:Lumen.App.Services"
              DataContextChanged="OnDataContextChanged">
   <UserControl.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
@@ -22,7 +23,7 @@
                 AutomationProperties.Name="{Binding Title}">
           <Button.Template>
             <ControlTemplate TargetType="Button">
-              <Grid>
+              <Grid services:Motion.HoverScale="1.04">
                 <!-- Hover/focus glow, same recipe as the Library tiles: brush plus mask, collapsed until needed -->
                 <Border x:Name="Glow" Margin="-14" CornerRadius="22" Visibility="Collapsed" IsHitTestVisible="False"
                         Background="{DynamicResource Lumen.Brush.Accent}" Opacity="0.55">

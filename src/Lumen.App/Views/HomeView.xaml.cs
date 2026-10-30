@@ -7,8 +7,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 using Lumen.App.Converters;
+using Lumen.App.Services;
 using Lumen.App.ViewModels;
 
 namespace Lumen.App.Views;
@@ -16,7 +16,6 @@ namespace Lumen.App.Views;
 /// <summary>View concerns only: crossfading the blurred background, lazy covers, pointing at a tile, wheel scrolling.</summary>
 public partial class HomeView : UserControl
 {
-    private static readonly Duration FadeDuration = new(TimeSpan.FromMilliseconds(500));
     private static readonly ImagePathConverter Images = new();
     private HomeViewModel? _vm;
     private bool _showingA;
@@ -57,8 +56,8 @@ public partial class HomeView : UserControl
         _showingA = !_showingA;
 
         incoming.Source = Images.Convert(path!, typeof(ImageSource), "640", CultureInfo.InvariantCulture) as ImageSource;
-        incoming.BeginAnimation(OpacityProperty, new DoubleAnimation(incoming.Source is null ? 0 : 1, FadeDuration));
-        outgoing.BeginAnimation(OpacityProperty, new DoubleAnimation(0, FadeDuration));
+        Motion.To(incoming, OpacityProperty, incoming.Source is null ? 0 : 1, Motion.Hero);
+        Motion.To(outgoing, OpacityProperty, 0, Motion.Hero);
     }
 
     private void OnTileLoaded(object sender, RoutedEventArgs e)
