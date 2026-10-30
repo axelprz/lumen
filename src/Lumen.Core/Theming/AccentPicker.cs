@@ -154,6 +154,24 @@ public static class AccentPicker
         return best;
     }
 
+    /// <summary>Strongest saturation of a glow: above this a vivid cover (a pure red, say) clashes with the dark UI.</summary>
+    public const double GlowMaxSaturation = 0.5;
+
+    /// <summary>Lightness range of a glow: not so dark it vanishes on the background, not so light it washes out.</summary>
+    public const double GlowMinLightness = 0.42;
+
+    public const double GlowMaxLightness = 0.58;
+
+    /// <summary>
+    /// A calmer version of an accent for decoration around art (hover glow, ring): same hue, saturation capped at
+    /// <see cref="GlowMaxSaturation"/>, lightness kept inside the glow range. Greys stay grey.
+    /// </summary>
+    public static Rgb Soften(Rgb color)
+    {
+        var (h, s, l) = color.ToHsl();
+        return Rgb.FromHsl(h, Math.Min(s, GlowMaxSaturation), Math.Clamp(l, GlowMinLightness, GlowMaxLightness));
+    }
+
     /// <summary>
     /// Keeps hue and saturation and moves lightness until white text on the color reaches
     /// <see cref="MinTextContrast"/> and the color on <paramref name="background"/> reaches

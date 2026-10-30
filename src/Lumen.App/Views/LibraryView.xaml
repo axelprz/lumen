@@ -44,8 +44,8 @@
         <StackPanel>
           <Grid services:Motion.HoverScale="1.04">
           <!-- Hover/focus glow: the accent fading out around the cover. Plain brushes and a mask, no bitmap effects (those cost scroll frames); collapsed (free) until needed. -->
-          <Border x:Name="Glow" Margin="-20" CornerRadius="26" Visibility="Collapsed" IsHitTestVisible="False"
-                  Background="{Binding GlowBrush}" Opacity="0.85">
+          <Border x:Name="Glow" Margin="-16" CornerRadius="24" Visibility="Collapsed" IsHitTestVisible="False"
+                  Background="{Binding GlowBrush}" Opacity="0.45">
             <Border.OpacityMask>
               <RadialGradientBrush>
                 <GradientStop Color="#FF000000" Offset="0.7" />

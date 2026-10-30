@@ -117,7 +117,7 @@ public sealed partial class LibraryTileViewModel : ObservableObject
         }
 
         _glowRequested = true;
-        var picked = await Task.Run(() => CoverColor.Pick(path));
+        var picked = await Task.Run(() => CoverColor.PickGlow(path));
         if (picked is { } rgb)
         {
             GlowBrush = CoverColor.Frozen(Color.FromRgb(rgb.R, rgb.G, rgb.B));
