@@ -107,7 +107,8 @@ public sealed class UiSurfaceTests
     {
         var xaml = File.ReadAllText(Path.Combine(_appDir, "Views", "LibraryView.xaml"));
 
-        xaml.ShouldContain("<Border Grid.Row=\"0\" Style=\"{StaticResource Lumen.Card}\"");
+        xaml.ShouldContain("<Border x:Name=\"HeaderCard\" Grid.Row=\"0\" Style=\"{StaticResource Lumen.Card}\"");
+        File.ReadAllText(Path.Combine(_appDir, "Views", "LibraryView.xaml.cs")).ShouldContain("RowsHost.Tag = tilesWidth;");
         xaml.ShouldContain("<TextBlock Text=\"{Binding StoreName}\" Style=\"{StaticResource Lumen.Text.Badge}\" />");
         // Scroll performance (M5): no per-tile bitmap effects in the grid.
         xaml.ShouldNotContain("DropShadowEffect");
