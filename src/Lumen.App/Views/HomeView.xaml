@@ -71,7 +71,7 @@
                        Foreground="{DynamicResource Lumen.Brush.TextMuted}" HorizontalAlignment="Center" VerticalAlignment="Center" />
           </Grid>
         </Button>
-        <TextBlock Text="{Binding Title}" Margin="2,8,2,0" FontSize="13" TextTrimming="CharacterEllipsis" />
+        <TextBlock Text="{Binding Title}" Margin="2,8,2,0" FontSize="{StaticResource Lumen.FontSize.Small}" TextTrimming="CharacterEllipsis" />
       </StackPanel>
       <DataTemplate.Triggers>
         <DataTrigger Binding="{Binding HasCover}" Value="True">
@@ -129,7 +129,7 @@
                    Stretch="Uniform"
                    Visibility="{Binding HasLogo, Converter={StaticResource BoolToVisibility}}"
                    AutomationProperties.Name="{Binding FeaturedTitle}" />
-            <TextBlock Text="{Binding FeaturedTitle}" FontSize="44" FontWeight="SemiBold" TextWrapping="Wrap" MaxWidth="720" HorizontalAlignment="Left">
+            <TextBlock Text="{Binding FeaturedTitle}" FontSize="{StaticResource Lumen.FontSize.Display}" FontWeight="SemiBold" TextWrapping="Wrap" MaxWidth="720" HorizontalAlignment="Left">
               <TextBlock.Style>
                 <Style TargetType="TextBlock">
                   <Style.Triggers>
@@ -140,7 +140,7 @@
                 </Style>
               </TextBlock.Style>
             </TextBlock>
-            <TextBlock Text="{Binding FeaturedFacts}" FontSize="15" Margin="0,16,0,0" Foreground="{DynamicResource Lumen.Brush.Text}" Opacity="0.85" />
+            <TextBlock Text="{Binding FeaturedFacts}" FontSize="{StaticResource Lumen.FontSize.Lead}" Margin="0,16,0,0" Foreground="{DynamicResource Lumen.Brush.Text}" Opacity="0.85" />
             <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
               <Button Command="{Binding PlayCommand}"
                       Content="{Binding ActionText}"
@@ -149,7 +149,7 @@
                       Background="{DynamicResource Lumen.Brush.Accent}"
                       BorderBrush="{DynamicResource Lumen.Brush.Accent}"
                       Foreground="White"
-                      FontSize="16"
+                      FontSize="{StaticResource Lumen.FontSize.BodyLarge}"
                       FontWeight="SemiBold"
                       Padding="40,11"
                       Margin="0,0,12,0" />
@@ -159,7 +159,7 @@
                       VerticalAlignment="Center"
                       AutomationProperties.Name="{l:Loc Home_Details}">
                 <StackPanel Orientation="Horizontal">
-                  <TextBlock Text="&#xE946;" Style="{StaticResource Lumen.Text.Icon}" FontSize="13" Margin="0,0,8,0" />
+                  <TextBlock Text="&#xE946;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,0,8,0" />
                   <TextBlock Text="{l:Loc Home_Details}" />
                 </StackPanel>
               </Button>
@@ -170,12 +170,12 @@
         <Border Margin="0,8,0,0" Padding="14,10" CornerRadius="6" HorizontalAlignment="Left"
                 Background="{DynamicResource Lumen.Brush.Surface}" BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="1"
                 Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}">
-          <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="14" />
+          <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" />
         </Border>
 
         <!-- Pinned routines: a click runs the routine (one that needs review opens its preview instead) -->
         <StackPanel Margin="0,24,0,0" Visibility="{Binding HasPinnedRoutines, Converter={StaticResource BoolToVisibility}}">
-          <TextBlock Text="{l:Loc Home_PinnedRoutines}" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,14" />
+          <TextBlock Text="{l:Loc Home_PinnedRoutines}" FontSize="{StaticResource Lumen.FontSize.Section}" FontWeight="SemiBold" Margin="0,0,0,14" />
           <ItemsControl ItemsSource="{Binding PinnedRoutines}" Focusable="False">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
@@ -206,11 +206,11 @@
                     </ControlTemplate>
                   </Button.Template>
                   <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="&#xE768;" Style="{StaticResource Lumen.Text.Icon}" FontSize="16" Margin="0,0,12,0" VerticalAlignment="Center"
+                    <TextBlock Text="&#xE768;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.BodyLarge}" Margin="0,0,12,0" VerticalAlignment="Center"
                                Foreground="{DynamicResource Lumen.Brush.Accent}" />
                     <StackPanel VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource Lumen.Brush.Text}" />
-                      <TextBlock Text="{Binding Caption}" FontSize="12" Margin="0,2,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+                      <TextBlock Text="{Binding Name}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold" Foreground="{DynamicResource Lumen.Brush.Text}" />
+                      <TextBlock Text="{Binding Caption}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,2,0,0" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
                     </StackPanel>
                   </StackPanel>
                 </Button>
@@ -222,14 +222,14 @@
         <!-- Nothing to feature yet -->
         <StackPanel Margin="0,40,0,0" Visibility="{Binding HasNoGames, Converter={StaticResource BoolToVisibility}}">
           <TextBlock Text="{l:Loc Nav_Home}" Style="{StaticResource Lumen.Text.PageTitle}" />
-          <TextBlock Text="{l:Loc Home_NoGames}" FontSize="15" Margin="0,12,0,0" TextWrapping="Wrap" MaxWidth="560" HorizontalAlignment="Left"
+          <TextBlock Text="{l:Loc Home_NoGames}" FontSize="{StaticResource Lumen.FontSize.Lead}" Margin="0,12,0,0" TextWrapping="Wrap" MaxWidth="560" HorizontalAlignment="Left"
                      Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
         </StackPanel>
 
         <!-- Continue playing -->
         <StackPanel Margin="0,36,0,0" Visibility="{Binding HasFeatured, Converter={StaticResource BoolToVisibility}}">
-          <TextBlock Text="{l:Loc Home_ContinuePlaying}" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,14" />
-          <TextBlock Text="{l:Loc Home_NoHistory}" FontSize="14" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
+          <TextBlock Text="{l:Loc Home_ContinuePlaying}" FontSize="{StaticResource Lumen.FontSize.Section}" FontWeight="SemiBold" Margin="0,0,0,14" />
+          <TextBlock Text="{l:Loc Home_NoHistory}" FontSize="{StaticResource Lumen.FontSize.Body}" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
             <TextBlock.Style>
               <Style TargetType="TextBlock">
                 <Style.Triggers>
@@ -256,7 +256,7 @@
 
         <!-- Favorites -->
         <StackPanel Margin="0,28,0,0" Visibility="{Binding HasFavorites, Converter={StaticResource BoolToVisibility}}">
-          <TextBlock Text="{l:Loc Collections_Favorites}" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,14" />
+          <TextBlock Text="{l:Loc Collections_Favorites}" FontSize="{StaticResource Lumen.FontSize.Section}" FontWeight="SemiBold" Margin="0,0,0,14" />
           <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled" Focusable="False"
                         Margin="-16,-16,-16,-10" PreviewMouseWheel="OnRowMouseWheel">
             <ItemsControl ItemsSource="{Binding Favorites}" ItemTemplate="{StaticResource HomeTile}" Focusable="False" Margin="16,16,16,10">
@@ -271,7 +271,7 @@
 
         <!-- Quick apps: a compact dock of icons; a click opens the app -->
         <StackPanel Margin="0,24,0,0" Visibility="{Binding HasQuickApps, Converter={StaticResource BoolToVisibility}}">
-          <TextBlock Text="{l:Loc Home_QuickApps}" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,14" />
+          <TextBlock Text="{l:Loc Home_QuickApps}" FontSize="{StaticResource Lumen.FontSize.Section}" FontWeight="SemiBold" Margin="0,0,0,14" />
           <ItemsControl ItemsSource="{Binding QuickApps}" Focusable="False">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>
@@ -308,10 +308,10 @@
                       <Image Source="{Binding IconPath, Converter={StaticResource ImagePath}, ConverterParameter=96}"
                              RenderOptions.BitmapScalingMode="HighQuality"
                              Visibility="{Binding HasIcon, Converter={StaticResource BoolToVisibility}}" />
-                      <TextBlock x:Name="Initial" Text="{Binding Initial}" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"
+                      <TextBlock x:Name="Initial" Text="{Binding Initial}" FontSize="{StaticResource Lumen.FontSize.Title}" HorizontalAlignment="Center" VerticalAlignment="Center"
                                  Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
                     </Grid>
-                    <TextBlock Text="{Binding Title}" FontSize="12" Margin="0,8,0,0" TextAlignment="Center" TextTrimming="CharacterEllipsis"
+                    <TextBlock Text="{Binding Title}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,8,0,0" TextAlignment="Center" TextTrimming="CharacterEllipsis"
                                Foreground="{DynamicResource Lumen.Brush.Text}" />
                   </StackPanel>
                 </Button>

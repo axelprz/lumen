@@ -10,16 +10,16 @@
   </UserControl.Resources>
   <Border Style="{StaticResource Lumen.Card}">
     <StackPanel>
-      <TextBlock Text="{l:Loc Settings_Sync_Title}" FontSize="18" FontWeight="SemiBold" />
+      <TextBlock Text="{l:Loc Settings_Sync_Title}" FontSize="{StaticResource Lumen.FontSize.Subtitle}" FontWeight="SemiBold" />
       <TextBlock Text="{l:Loc Settings_Sync_Description}"
                  Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                  TextWrapping="Wrap"
-                 FontSize="14"
+                 FontSize="{StaticResource Lumen.FontSize.Body}"
                  Margin="0,6,0,16" />
 
       <!-- Where and how it is going -->
-      <TextBlock Text="{Binding FolderText}" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
-      <TextBlock Text="{Binding StatusText}" FontSize="13" Margin="0,4,0,0" TextWrapping="Wrap">
+      <TextBlock Text="{Binding FolderText}" FontSize="{StaticResource Lumen.FontSize.Body}" FontWeight="SemiBold" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding StatusText}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,4,0,0" TextWrapping="Wrap">
         <TextBlock.Style>
           <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.TextMuted}" />
@@ -38,13 +38,13 @@
               BorderBrush="{DynamicResource Lumen.Brush.Accent}" BorderThickness="1"
               Visibility="{Binding HasChoice, Converter={StaticResource BoolToVisibility}}">
         <StackPanel>
-          <TextBlock Text="{l:Loc Settings_Sync_Choice_Title}" FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap" />
-          <TextBlock Text="{l:Loc Settings_Sync_Choice_Description}" FontSize="13" Margin="0,6,0,10" TextWrapping="Wrap"
+          <TextBlock Text="{l:Loc Settings_Sync_Choice_Title}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold" TextWrapping="Wrap" />
+          <TextBlock Text="{l:Loc Settings_Sync_Choice_Description}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,6,0,10" TextWrapping="Wrap"
                      Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
           <TextBlock Text="{l:Loc Settings_Sync_Choice_Folder}" Style="{StaticResource Lumen.Text.Label}" Margin="0" />
-          <TextBlock Text="{Binding FolderSummary}" FontSize="13" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding FolderSummary}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" />
           <TextBlock Text="{l:Loc Settings_Sync_Choice_ThisPc}" Style="{StaticResource Lumen.Text.Label}" Margin="0,8,0,0" />
-          <TextBlock Text="{Binding ThisPcSummary}" FontSize="13" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding ThisPcSummary}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" />
           <WrapPanel Margin="0,16,0,0">
             <Button Command="{Binding MergeCommand}"
                     Content="{l:Loc Settings_Sync_Merge}"
@@ -58,7 +58,7 @@
             <Button Command="{Binding UseThisPcCommand}" Content="{l:Loc Settings_Sync_UseThisPc}" Style="{StaticResource Lumen.Button}" Margin="0,0,12,8" />
             <Button Command="{Binding CancelChoiceCommand}" Content="{l:Loc Settings_Sync_Cancel}" Style="{StaticResource Lumen.Button}" Margin="0,0,0,8" />
           </WrapPanel>
-          <TextBlock Text="{l:Loc Settings_Sync_Merge_Hint}" FontSize="12" TextWrapping="Wrap" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+          <TextBlock Text="{l:Loc Settings_Sync_Merge_Hint}" FontSize="{StaticResource Lumen.FontSize.Caption}" TextWrapping="Wrap" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
         </StackPanel>
       </Border>
 
@@ -82,9 +82,9 @@
                 IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBool}}" />
       </WrapPanel>
 
-      <TextBlock Text="{Binding Notice}" FontSize="14" Margin="0,8,0,0" TextWrapping="Wrap"
+      <TextBlock Text="{Binding Notice}" FontSize="{StaticResource Lumen.FontSize.Body}" Margin="0,8,0,0" TextWrapping="Wrap"
                  Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}" />
-      <TextBlock Text="{Binding Message}" FontSize="14" Margin="0,8,0,0" TextWrapping="Wrap"
+      <TextBlock Text="{Binding Message}" FontSize="{StaticResource Lumen.FontSize.Body}" Margin="0,8,0,0" TextWrapping="Wrap"
                  Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                  Visibility="{Binding HasMessage, Converter={StaticResource BoolToVisibility}}" />
 
@@ -92,7 +92,7 @@
       <Expander Header="{l:Loc Settings_Sync_Details}" Margin="0,8,0,0"
                 Foreground="{DynamicResource Lumen.Brush.Text}"
                 Visibility="{Binding HasProblems, Converter={StaticResource BoolToVisibility}}">
-        <TextBlock Text="{Binding ProblemsText}" FontSize="12" Margin="0,6,0,0" TextWrapping="Wrap" IsHitTestVisible="False"
+        <TextBlock Text="{Binding ProblemsText}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,6,0,0" TextWrapping="Wrap" IsHitTestVisible="False"
                    Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
       </Expander>
     </StackPanel>

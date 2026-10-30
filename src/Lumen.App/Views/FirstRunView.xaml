@@ -16,7 +16,7 @@
       <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
     </Style>
     <Style x:Key="StepBody" TargetType="TextBlock">
-      <Setter Property="FontSize" Value="15" />
+      <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Lead}" />
       <Setter Property="TextWrapping" Value="Wrap" />
       <Setter Property="Margin" Value="0,10,0,24" />
       <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.TextMuted}" />
@@ -38,7 +38,7 @@
               Style="{StaticResource Lumen.Button}"
               VerticalAlignment="Center" />
       <TextBlock DockPanel.Dock="Left" Text="{l:Loc App_Title}" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
-      <TextBlock Text="{Binding StepText}" Margin="20,0,0,0" FontSize="14" VerticalAlignment="Center"
+      <TextBlock Text="{Binding StepText}" Margin="20,0,0,0" FontSize="{StaticResource Lumen.FontSize.Body}" VerticalAlignment="Center"
                  Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
     </DockPanel>
 
@@ -65,7 +65,7 @@
         <StackPanel Visibility="{Binding IsStoresStep, Converter={StaticResource BoolToVisibility}}">
           <TextBlock Text="{l:Loc FirstRun_Stores_Title}" Style="{StaticResource StepTitle}" />
           <TextBlock Text="{l:Loc FirstRun_Stores_Body}" Style="{StaticResource StepBody}" />
-          <TextBlock Text="{Binding StoresSummary}" FontSize="15" FontWeight="SemiBold" Margin="0,0,0,12" />
+          <TextBlock Text="{Binding StoresSummary}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold" Margin="0,0,0,12" />
           <ItemsControl ItemsSource="{Binding Stores}" Focusable="False">
             <ItemsControl.ItemTemplate>
               <DataTemplate DataType="{x:Type vm:StoreRow}">
@@ -73,9 +73,9 @@
                   <DockPanel>
                     <TextBlock x:Name="Icon" DockPanel.Dock="Left" Text="&#xE73E;" Style="{StaticResource Lumen.Text.Icon}"
                                Foreground="{DynamicResource Lumen.Brush.Success}" Margin="0,0,14,0" />
-                    <TextBlock DockPanel.Dock="Right" Text="{Binding Detail}" FontSize="14" VerticalAlignment="Center"
+                    <TextBlock DockPanel.Dock="Right" Text="{Binding Detail}" FontSize="{StaticResource Lumen.FontSize.Body}" VerticalAlignment="Center"
                                Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
-                    <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Name}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold" VerticalAlignment="Center" />
                   </DockPanel>
                 </Border>
                 <DataTemplate.Triggers>
@@ -87,7 +87,7 @@
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
-          <TextBlock Text="{l:Loc FirstRun_Stores_Hint}" FontSize="13" TextWrapping="Wrap" Margin="0,12,0,0"
+          <TextBlock Text="{l:Loc FirstRun_Stores_Hint}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" Margin="0,12,0,0"
                      Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
         </StackPanel>
 

@@ -23,7 +23,8 @@
   </Window.Resources>
 
   <!-- Margin leaves room for the shadow inside the transparent window -->
-  <Border Margin="16"
+  <Border x:Name="Card"
+          Margin="16"
           Background="{DynamicResource Lumen.Brush.Sidebar}"
           BorderBrush="{DynamicResource Lumen.Brush.Divider}"
           BorderThickness="1"
@@ -36,14 +37,14 @@
       <Grid>
         <TextBox x:Name="SearchBox"
                  Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}"
-                 FontSize="18"
+                 FontSize="{StaticResource Lumen.FontSize.Subtitle}"
                  Height="44"
                  Padding="36,0,8,0"
                  VerticalContentAlignment="Center"
                  AutomationProperties.Name="{l:Loc QuickSearch_Title}" />
         <TextBlock Text="&#xE721;"
                    Style="{StaticResource Lumen.Text.Icon}"
-                   FontSize="16"
+                   FontSize="{StaticResource Lumen.FontSize.BodyLarge}"
                    Margin="12,0,0,0"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Center"
@@ -87,10 +88,10 @@
         <ListBox.ItemTemplate>
           <DataTemplate DataType="{x:Type vm:QuickSearchResult}">
             <DockPanel>
-              <TextBlock DockPanel.Dock="Right" Text="{Binding ActionText}" FontSize="13" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.85" />
+              <TextBlock DockPanel.Dock="Right" Text="{Binding ActionText}" FontSize="{StaticResource Lumen.FontSize.Small}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.85" />
               <StackPanel>
-                <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                <TextBlock Text="{Binding Detail}" FontSize="12" Margin="0,2,0,0" Opacity="0.7" TextTrimming="CharacterEllipsis" />
+                <TextBlock Text="{Binding Title}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                <TextBlock Text="{Binding Detail}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,2,0,0" Opacity="0.7" TextTrimming="CharacterEllipsis" />
               </StackPanel>
             </DockPanel>
           </DataTemplate>
@@ -99,7 +100,7 @@
 
       <TextBlock Text="{Binding Notice}"
                  Foreground="{DynamicResource Lumen.Brush.TextMuted}"
-                 FontSize="14"
+                 FontSize="{StaticResource Lumen.FontSize.Body}"
                  TextWrapping="Wrap"
                  Margin="4,10,4,4"
                  Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}" />

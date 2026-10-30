@@ -161,7 +161,7 @@ public static class Motion
     /// A panel that covers the page (a game's detail, the routine editor, Discover apps) appearing: fades in while
     /// sliding up a little, once it has been laid out. Nothing happens when animations are off.
     /// </summary>
-    public static void PanelIn(UIElement panel)
+    public static void PanelIn(UIElement panel, Duration? duration = null)
     {
         if (!Enabled)
         {
@@ -180,8 +180,8 @@ public static class Motion
         slide.Y = 16;
         _ = panel.Dispatcher.BeginInvoke(DispatcherPriority.Background, () =>
         {
-            To(panel, UIElement.OpacityProperty, 1, Normal);
-            To(slide, TranslateTransform.YProperty, 0, Normal);
+            To(panel, UIElement.OpacityProperty, 1, duration ?? Normal);
+            To(slide, TranslateTransform.YProperty, 0, duration ?? Normal);
         });
     }
 

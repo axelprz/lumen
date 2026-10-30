@@ -10,11 +10,11 @@
   </UserControl.Resources>
   <Border Style="{StaticResource Lumen.Card}">
     <StackPanel>
-      <TextBlock Text="{l:Loc Settings_Artwork_Title}" FontSize="18" FontWeight="SemiBold" />
+      <TextBlock Text="{l:Loc Settings_Artwork_Title}" FontSize="{StaticResource Lumen.FontSize.Subtitle}" FontWeight="SemiBold" />
       <TextBlock Text="{l:Loc Settings_Artwork_Description}"
                  Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                  TextWrapping="Wrap"
-                 FontSize="14"
+                 FontSize="{StaticResource Lumen.FontSize.Body}"
                  Margin="0,6,0,20" />
 
       <DockPanel Margin="0,0,0,6">
@@ -24,7 +24,7 @@
                 Foreground="{DynamicResource Lumen.Brush.Accent}">
           <Button.Template>
             <ControlTemplate TargetType="Button">
-              <TextBlock Text="{l:Loc Settings_Sgdb_GetKey}" FontSize="13" TextDecorations="Underline" Foreground="{TemplateBinding Foreground}" />
+              <TextBlock Text="{l:Loc Settings_Sgdb_GetKey}" FontSize="{StaticResource Lumen.FontSize.Small}" TextDecorations="Underline" Foreground="{TemplateBinding Foreground}" />
             </ControlTemplate>
           </Button.Template>
         </Button>
@@ -33,7 +33,7 @@
       <PasswordBox x:Name="SgdbKeyBox" />
       <TextBlock Text="{l:Loc Settings_Sgdb_KeySaved}"
                  Foreground="{DynamicResource Lumen.Brush.TextMuted}"
-                 FontSize="12"
+                 FontSize="{StaticResource Lumen.FontSize.Caption}"
                  Margin="0,6,0,0"
                  Visibility="{Binding IsKeySaved, Converter={StaticResource BoolToVisibility}}" />
 
@@ -60,7 +60,7 @@
 
       <TextBlock Text="{Binding Status}"
                  TextWrapping="Wrap"
-                 FontSize="14"
+                 FontSize="{StaticResource Lumen.FontSize.Body}"
                  Margin="0,8,0,0"
                  Visibility="{Binding HasStatus, Converter={StaticResource BoolToVisibility}}">
         <TextBlock.Style>

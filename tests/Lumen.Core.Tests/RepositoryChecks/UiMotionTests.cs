@@ -50,6 +50,7 @@ public sealed partial class UiMotionTests
     [Theory]
     [InlineData("HomeView.xaml.cs", "Motion.Stagger(Sections)")]
     [InlineData("LibraryView.xaml.cs", "Motion.Stagger(PageBlocks)")]
+    [InlineData("SettingsView.xaml.cs", "Motion.Stagger(PageBlocks)")]
     [InlineData("CollectionsView.xaml.cs", "Motion.Stagger(PageBlocks)")]
     [InlineData("RoutinesView.xaml.cs", "Motion.Stagger(PageBlocks)")]
     public void HomeAndLibrary_StaggerTheirBlocksOnLoad(string file, string call)
@@ -66,16 +67,23 @@ public sealed partial class UiMotionTests
         File.ReadAllText(Path.Combine(_appDir, "Views", file)).ShouldContain("Motion.ShowIn=\"True\"");
     }
 
-    [Theory]
-    [InlineData("GameDetailView.xaml")]
-    [InlineData("CollectionsView.xaml")]
-    [InlineData("RoutinesView.xaml")]
-    public void ReworkedViews_UseTheTypeScale(string file)
+    [Fact]
+    public void EveryView_UsesTheTypeScale()
     {
-        // The listed sizes have a token (Label 11 … Display 44); a literal one is a view that skipped the scale.
-        var xaml = File.ReadAllText(Path.Combine(_appDir, "Views", file));
+        // The scale sizes (Label 11 … Display 44) have tokens; a literal one is a view that skipped the scale.
+        var offenders = Directory.EnumerateFiles(Path.Combine(_appDir, "Views"), "*.xaml")
+            .Where(path => LiteralScaleSize().IsMatch(File.ReadAllText(path)))
+            .Select(Path.GetFileName)
+            .ToList();
 
-        LiteralScaleSize().Matches(xaml).Select(m => m.Value).ShouldBeEmpty();
+        offenders.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void FirstRun_AndQuickSearch_ComeInWithMotion()
+    {
+        File.ReadAllText(Path.Combine(_appDir, "Views", "MainWindow.xaml")).ShouldContain("Motion.ShowIn=\"True\"");
+        File.ReadAllText(Path.Combine(_appDir, "Views", "QuickSearchWindow.xaml.cs")).ShouldContain("Motion.PanelIn(");
     }
 
     [GeneratedRegex("FontSize=\"(11|12|13|14|15|16|18|20|24|32|44)\"")]

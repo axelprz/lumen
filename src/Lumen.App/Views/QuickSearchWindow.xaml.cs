@@ -4,6 +4,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using Lumen.App.Services;
 using Lumen.App.ViewModels;
 
 namespace Lumen.App.Views;
@@ -35,6 +36,7 @@ public partial class QuickSearchWindow : Window
         Left = area.Left + (area.Width - Width) / 2;
         Top = area.Top + area.Height * 0.22;
         Show();
+        Motion.PanelIn(Card, Motion.Fast); // quick: it opens while the user is already typing
         Activate();
         SearchBox.Focus();
         Keyboard.Focus(SearchBox);

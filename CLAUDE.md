@@ -11,7 +11,7 @@ Lumen is a game-first launcher for Windows (C# + WPF, .NET 10) that unifies ever
 
 - **Done:** M0–M9 (2026-10-30). M5 Steam family uses the website sign-in (2026-10-29). M8: routine engine (#36), Routines page (#39), routines from tray/quick search/Home (#41), sync folder engine (#42), sync folder in Settings (#43). M9: Velopack updates + release workflow (#44); the owner tagged the first pre-releases (`v0.1.0-beta.*`) and reported the release/update flow ready (2026-10-30).
 - **Next, in order:**
-  1. **M10 UI rework (PLAN §4.9).** First the owner picks the font from a sample (Inter / Outfit / Exo 2 / Rajdhani): prepare the sample, then plan the PRs. Keep scroll performance, contrast rules, visible keyboard/gamepad focus, motion ≤ 250 ms respecting "Animation effects".
+  1. **M10 UI rework (PLAN §4.9): code done, owner approval pending.** Font Exo 2 (#46), Mica and cover glow (#47), motion (#48), Home/Library entrance (#49), detail/collections/routines (#50), Settings and overlays (this PR). The owner approves the look on real use; fix what he reports before moving on.
   2. **1.0 hardening:** bug bash on real machines with every store installed, screenshots of the reworked UI, tag `v1.0.0` (the default update channel flips to stable by itself at 1.0).
   3. **v1.1 Deals** (PLAN): opt-in, new network hosts, needs the owner's decisions first; no card/bank advice.
 - **Small leftovers:**

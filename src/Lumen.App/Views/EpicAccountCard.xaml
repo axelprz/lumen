@@ -10,8 +10,8 @@
   </UserControl.Resources>
   <Border Style="{StaticResource Lumen.Card}">
     <StackPanel>
-      <TextBlock Text="{l:Loc EpicAccount_Title}" FontSize="18" FontWeight="SemiBold" />
-      <TextBlock Text="{l:Loc EpicAccount_Description}" TextWrapping="Wrap" FontSize="14" Margin="0,6,0,16"
+      <TextBlock Text="{l:Loc EpicAccount_Title}" FontSize="{StaticResource Lumen.FontSize.Subtitle}" FontWeight="SemiBold" />
+      <TextBlock Text="{l:Loc EpicAccount_Description}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" Margin="0,6,0,16"
                  Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
 
       <!-- Not connected -->
@@ -22,7 +22,7 @@
 
         <!-- After the browser opens: paste the code -->
         <StackPanel Margin="0,16,0,0" Visibility="{Binding IsEnteringCode, Converter={StaticResource BoolToVisibility}}">
-          <TextBlock Text="{l:Loc EpicAccount_Steps}" TextWrapping="Wrap" FontSize="14" LineHeight="22" Margin="0,0,0,12" />
+          <TextBlock Text="{l:Loc EpicAccount_Steps}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" LineHeight="22" Margin="0,0,0,12" />
           <TextBlock Text="{l:Loc EpicAccount_CodeLabel}" Style="{StaticResource Lumen.Text.Label}" />
           <DockPanel>
             <Button DockPanel.Dock="Right" Command="{Binding CancelSignInCommand}" Content="{l:Loc Detail_Cancel}"
@@ -43,14 +43,14 @@
 
       <!-- Connected -->
       <StackPanel Visibility="{Binding IsConnected, Converter={StaticResource BoolToVisibility}}">
-        <TextBlock Text="{Binding AccountText}" FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap" />
-        <TextBlock Text="{l:Loc EpicAccount_WhatLumenCanDo}" TextWrapping="Wrap" FontSize="13" Margin="0,8,0,16"
+        <TextBlock Text="{Binding AccountText}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold" TextWrapping="Wrap" />
+        <TextBlock Text="{l:Loc EpicAccount_WhatLumenCanDo}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,8,0,16"
                    Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
         <Button Command="{Binding DisconnectCommand}" Content="{l:Loc SteamFamily_Disconnect}" HorizontalAlignment="Left"
                 Style="{StaticResource Lumen.Button}" />
       </StackPanel>
 
-      <TextBlock Text="{Binding Status}" TextWrapping="Wrap" FontSize="14" Margin="0,16,0,0"
+      <TextBlock Text="{Binding Status}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Body}" Margin="0,16,0,0"
                  Visibility="{Binding HasStatus, Converter={StaticResource BoolToVisibility}}">
         <TextBlock.Style>
           <Style TargetType="TextBlock">
