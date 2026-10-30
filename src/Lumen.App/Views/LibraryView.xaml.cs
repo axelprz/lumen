@@ -61,6 +61,15 @@ public partial class LibraryView : UserControl
         }
     }
 
+    // View concern: the glow color comes from the cover and is worked out the first time a tile is pointed at or focused.
+    private async void OnTileInteract(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: LibraryTileViewModel tile })
+        {
+            await tile.EnsureGlowAsync();
+        }
+    }
+
     // View concern: the tile menu is created only when the user opens it (right click or the menu key).
     private void OnTileContextMenuOpening(object sender, ContextMenuEventArgs e)
     {

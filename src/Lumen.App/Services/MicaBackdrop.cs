@@ -19,8 +19,8 @@ public sealed class MicaBackdrop : IDisposable
 {
     private const string BackdropKey = "Lumen.Brush.Backdrop";
     private const string SidebarKey = "Lumen.Brush.SidebarBackdrop";
-    private const byte BackdropAlpha = 0xD9;
-    private const byte SidebarAlpha = 0xC7;
+    private const byte BackdropAlpha = 0xB0;
+    private const byte SidebarAlpha = 0x8C;
 
     private readonly Window _window;
     private readonly Color _backdrop;

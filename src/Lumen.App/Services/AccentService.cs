@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Copyright (C) 2026 Axel Ismael Perez (AxelPRZ)
 
-using System.IO;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
 using Lumen.Core.Theming;
 using Microsoft.Extensions.Logging;
 
@@ -21,7 +19,6 @@ public sealed partial class AccentService
 {
     private const string BrushKey = "Lumen.Brush.Accent";
     private const string ColorKey = "Lumen.Color.Accent";
-    private const int SampleWidth = 64;
     private static readonly Duration FadeDuration = new(TimeSpan.FromMilliseconds(450));
 
     private readonly ILogger<AccentService> _logger;
@@ -87,36 +84,7 @@ public sealed partial class AccentService
         }
     }
 
-    private static Rgb? PickFrom(string path)
-    {
-        if (!File.Exists(path))
-        {
-            return null;
-        }
-
-        try
-        {
-            var image = new BitmapImage();
-            image.BeginInit();
-            image.UriSource = new Uri(path, UriKind.Absolute);
-            image.CacheOption = BitmapCacheOption.OnLoad;
-            image.CreateOptions = BitmapCreateOptions.IgnoreColorProfile;
-            image.DecodePixelWidth = SampleWidth;
-            image.EndInit();
-            image.Freeze();
-
-            var bgra = new FormatConvertedBitmap(image, PixelFormats.Bgra32, null, 0);
-            var stride = bgra.PixelWidth * 4;
-            var pixels = new byte[stride * bgra.PixelHeight];
-            bgra.CopyPixels(pixels, stride, 0);
-
-            return AccentPicker.Pick(pixels) is { } picked ? AccentPicker.Fit(picked, AccentPicker.DarkBackground) : null;
-        }
-        catch (Exception ex) when (ex is IOException or NotSupportedException or FileFormatException or UnauthorizedAccessException or ArgumentException or InvalidOperationException)
-        {
-            return null; // a broken image just keeps the default accent
-        }
-    }
+    private static Rgb? PickFrom(string path) => CoverColor.Pick(path);
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Could not change the accent color")]
     private partial void LogFadeFailed(Exception exception);

@@ -39,15 +39,16 @@
     <DataTemplate x:Key="TileTemplate" DataType="{x:Type vm:LibraryTileViewModel}">
       <!-- The menu is built when it opens (OnTileContextMenuOpening), not for every tile that scrolls into view -->
       <Border x:Name="Tile" Width="168" Margin="0,0,20,24" Background="Transparent" ToolTip="{Binding Title}"
-              Loaded="OnTileLoaded" ContextMenuOpening="OnTileContextMenuOpening">
+              Loaded="OnTileLoaded" ContextMenuOpening="OnTileContextMenuOpening"
+              MouseEnter="OnTileInteract" GotKeyboardFocus="OnTileInteract">
         <StackPanel>
           <Grid>
           <!-- Hover/focus glow: the accent fading out around the cover. Plain brushes and a mask, no bitmap effects (those cost scroll frames); collapsed (free) until needed. -->
-          <Border x:Name="Glow" Margin="-14" CornerRadius="22" Visibility="Collapsed" IsHitTestVisible="False"
-                  Background="{DynamicResource Lumen.Brush.Accent}" Opacity="0.55">
+          <Border x:Name="Glow" Margin="-20" CornerRadius="26" Visibility="Collapsed" IsHitTestVisible="False"
+                  Background="{Binding GlowBrush}" Opacity="0.85">
             <Border.OpacityMask>
               <RadialGradientBrush>
-                <GradientStop Color="#FF000000" Offset="0.62" />
+                <GradientStop Color="#FF000000" Offset="0.7" />
                 <GradientStop Color="#00000000" Offset="1" />
               </RadialGradientBrush>
             </Border.OpacityMask>
@@ -148,11 +149,16 @@
         </StackPanel>
       </Border>
       <DataTemplate.Triggers>
+        <!-- Pointed at or focused: the glow, plus a crisp ring in the same color so it also reads on pale covers -->
         <Trigger SourceName="Tile" Property="IsMouseOver" Value="True">
           <Setter TargetName="Glow" Property="Visibility" Value="Visible" />
+          <Setter TargetName="Cover" Property="BorderThickness" Value="2" />
+          <Setter TargetName="Cover" Property="BorderBrush" Value="{Binding GlowBrush}" />
         </Trigger>
         <Trigger SourceName="Tile" Property="IsKeyboardFocusWithin" Value="True">
           <Setter TargetName="Glow" Property="Visibility" Value="Visible" />
+          <Setter TargetName="Cover" Property="BorderThickness" Value="2" />
+          <Setter TargetName="Cover" Property="BorderBrush" Value="{Binding GlowBrush}" />
         </Trigger>
         <DataTrigger Binding="{Binding IsInstalled}" Value="False">
           <Setter TargetName="Cover" Property="Opacity" Value="0.5" />
