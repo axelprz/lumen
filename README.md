@@ -70,6 +70,7 @@ Lumen has no servers of its own and sends no analytics or telemetry. Everything 
 - **Epic and GOG sign-in and library services**: only if you connect that account.
 - **Steam's website**: only inside Lumen's built-in Steam sign-in browser, if you choose to sign in.
 - **GitHub Releases**: to look for and download Lumen updates. Nothing about you is sent.
+- **Deals** (optional, off until you turn it on in Settings): the Epic Games Store's free-games list and CheapShark's prices for the stores Lumen supports. Nothing about you is sent; a price search sends only the game's name.
 
 Opening a link in your browser (a store page, for example) is done by your browser, not by Lumen.
 
