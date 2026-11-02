@@ -373,6 +373,9 @@
   <data name="Detail_Achievements" xml:space="preserve">
     <value>Logros</value>
   </data>
+  <data name="Detail_ViewAchievements" xml:space="preserve">
+    <value>Ver en Steam</value>
+  </data>
   <data name="Detail_AchievementsCount" xml:space="preserve">
     <value>{0} de {1}</value>
   </data>

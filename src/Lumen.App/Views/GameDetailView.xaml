@@ -385,6 +385,10 @@
         <!-- Steam achievements: unlocked of total -->
         <Border Style="{StaticResource Lumen.Card}" Padding="20,18" Margin="0,0,0,16"
                 Visibility="{Binding ShowAchievements, Converter={StaticResource BoolToVisibility}}">
+          <DockPanel>
+            <Button DockPanel.Dock="Right" Command="{Binding ViewAchievementsCommand}" Content="{l:Loc Detail_ViewAchievements}"
+                    Style="{StaticResource Lumen.Button}" VerticalAlignment="Center" Margin="16,0,0,0"
+                    Visibility="{Binding HasAchievementCount, Converter={StaticResource BoolToVisibility}}" />
           <StackPanel>
             <TextBlock Text="{l:Loc Detail_Achievements}" Style="{StaticResource InfoLabel}" />
             <TextBlock Text="{Binding AchievementsCountText}" Style="{StaticResource InfoValue}"
@@ -395,6 +399,7 @@
             <TextBlock Text="{Binding AchievementsNote}" TextWrapping="Wrap" Margin="0,8,0,0" FontSize="{StaticResource Lumen.FontSize.Caption}"
                        Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
           </StackPanel>
+          </DockPanel>
         </Border>
       </StackPanel>
     </ScrollViewer>

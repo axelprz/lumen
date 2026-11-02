@@ -111,7 +111,7 @@ public sealed class SteamAchievementsTests
         var first = await service.GetAsync("1000010", CancellationToken.None);
         var second = await service.GetAsync("1000010", CancellationToken.None);
 
-        first.ShouldBe(new AchievementsResult(AchievementsStatus.Available, 2, 4));
+        first.ShouldBe(new AchievementsResult(AchievementsStatus.Available, 2, 4, SteamId));
         first.Percent.ShouldBe(50);
         second.ShouldBe(first);
         _http.Requests.Count.ShouldBe(1);
