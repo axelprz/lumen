@@ -514,7 +514,7 @@ public sealed partial class SyncFolderService : IDisposable
     {
         var docs = new Dictionary<string, Doc>(StringComparer.Ordinal);
         var config = await _state.ReadConfigAsync(ct).ConfigureAwait(false);
-        if (folderHasConfig || config.Language is not null || config.MinimizeToTray is not null || config.Hotkey is not null || config.HasUserData)
+        if (folderHasConfig || config.HasSettings || config.HasUserData)
         {
             docs[ConfigKey] = new Doc(PortableConfigJson.Hash(config), config);
         }

@@ -35,6 +35,8 @@ public sealed class LocalPortableState(
         var language = await settings.GetAsync(LocalSettingKeys.Language, ct).ConfigureAwait(false);
         var closeToTray = await settings.GetAsync(LocalSettingKeys.CloseToTray, ct).ConfigureAwait(false);
         var hotkey = await settings.GetAsync(LocalSettingKeys.Hotkey, ct).ConfigureAwait(false);
+        var channel = await settings.GetAsync(LocalSettingKeys.UpdateChannel, ct).ConfigureAwait(false);
+        var checkUpdates = await settings.GetAsync(LocalSettingKeys.UpdateCheckAutomatically, ct).ConfigureAwait(false);
         var choices = await appChoices.LoadAsync(ct).ConfigureAwait(false);
 
         var raw = new PortableConfig
@@ -48,6 +50,8 @@ public sealed class LocalPortableState(
                 .ToDictionary(kv => kv.Key, kv => kv.Value),
             IgnoredApps = choices.Where(kv => kv.Value == AppChoice.Ignored && AppCuration.IsCandidateSource(kv.Key.Source))
                 .Select(kv => kv.Key).Order(Comparer<ItemRef>.Create((a, b) => string.CompareOrdinal(a.ToString(), b.ToString()))).ToList(),
+            UpdateChannel = channel is "stable" or "beta" ? channel : null,
+            CheckUpdatesAutomatically = checkUpdates is null ? null : checkUpdates != "0",
         };
         return PortableConfigJson.Parse(PortableConfigJson.Write(raw)).Config ?? raw;
     }
@@ -68,6 +72,8 @@ public sealed class LocalPortableState(
         changed |= await SetIfDifferentAsync(LocalSettingKeys.Language, incoming.Language, ct).ConfigureAwait(false);
         changed |= await SetIfDifferentAsync(LocalSettingKeys.CloseToTray, incoming.MinimizeToTray is { } m ? (m ? "1" : "0") : null, ct).ConfigureAwait(false);
         changed |= await SetIfDifferentAsync(LocalSettingKeys.Hotkey, incoming.Hotkey, ct).ConfigureAwait(false);
+        changed |= await SetIfDifferentAsync(LocalSettingKeys.UpdateChannel, incoming.UpdateChannel, ct).ConfigureAwait(false);
+        changed |= await SetIfDifferentAsync(LocalSettingKeys.UpdateCheckAutomatically, incoming.CheckUpdatesAutomatically is { } c ? (c ? "1" : "0") : null, ct).ConfigureAwait(false);
 
         var received = new List<string>();
         var current = (await manualItems.GetAllAsync(ct).ConfigureAwait(false)).ToDictionary(i => i.Id);

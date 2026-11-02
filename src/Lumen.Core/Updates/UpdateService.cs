@@ -74,6 +74,9 @@ public sealed partial class UpdateService : IDisposable
     /// <summary>Something the page shows changed.</summary>
     public event EventHandler? Changed;
 
+    /// <summary>The user changed the channel or "check automatically" (the sync folder shares them).</summary>
+    public event EventHandler? SettingsChanged;
+
     /// <summary>A version the user wasn't told about yet was found (once per version): for the tray notice.</summary>
     public event EventHandler<UpdateOffer>? Announce;
 
@@ -83,9 +86,7 @@ public sealed partial class UpdateService : IDisposable
     /// <summary>Reads the saved choices, and notes a download that was waiting for a restart. Call once at start-up.</summary>
     public async Task InitializeAsync(CancellationToken ct)
     {
-        var saved = await _settings.GetAsync(LocalSettingKeys.UpdateChannel, ct).ConfigureAwait(false);
-        Channel = UpdateChannels.TryParse(saved, out var channel) ? channel : UpdateChannels.DefaultFor(_client.CurrentVersion);
-        CheckAutomatically = await _settings.GetAsync(LocalSettingKeys.UpdateCheckAutomatically, ct).ConfigureAwait(false) != "0";
+        await ReadSettingsAsync(ct).ConfigureAwait(false);
 
         if (State != UpdateState.NotInstalled && _client.PendingRestart is { } pending)
         {
@@ -109,6 +110,30 @@ public sealed partial class UpdateService : IDisposable
         _ = RunLoopAsync(_loop.Token);
     }
 
+    /// <summary>
+    /// Reads the channel and "check automatically" again (the sync folder brought other values). A different channel
+    /// forgets what was found, as when the user changes it.
+    /// </summary>
+    public async Task ReloadSettingsAsync(CancellationToken ct)
+    {
+        var before = Channel;
+        await ReadSettingsAsync(ct).ConfigureAwait(false);
+        if (Channel != before && State is UpdateState.Available or UpdateState.UpToDate or UpdateState.Failed)
+        {
+            Offer = null;
+            State = UpdateState.Idle;
+        }
+
+        RaiseChanged();
+    }
+
+    private async Task ReadSettingsAsync(CancellationToken ct)
+    {
+        var saved = await _settings.GetAsync(LocalSettingKeys.UpdateChannel, ct).ConfigureAwait(false);
+        Channel = UpdateChannels.TryParse(saved, out var channel) ? channel : UpdateChannels.DefaultFor(_client.CurrentVersion);
+        CheckAutomatically = await _settings.GetAsync(LocalSettingKeys.UpdateCheckAutomatically, ct).ConfigureAwait(false) != "0";
+    }
+
     public async Task SetChannelAsync(UpdateChannel channel, CancellationToken ct)
     {
         if (channel == Channel)
@@ -127,6 +152,7 @@ public sealed partial class UpdateService : IDisposable
         }
 
         RaiseChanged();
+        SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public async Task SetCheckAutomaticallyAsync(bool value, CancellationToken ct)
@@ -134,6 +160,7 @@ public sealed partial class UpdateService : IDisposable
         CheckAutomatically = value;
         await _settings.SetAsync(LocalSettingKeys.UpdateCheckAutomatically, value ? "1" : "0", ct).ConfigureAwait(false);
         RaiseChanged();
+        SettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>Looks for a new version. <paramref name="manual"/> (the user pressed the button) skips the tray notice.</summary>

@@ -37,6 +37,41 @@ public sealed class PortableJsonTests
     }
 
     [Fact]
+    public void Config_UpdateSettings_AreReadAndWritten()
+    {
+        var parsed = PortableConfigJson.Parse("""{ "schema": 1, "updates": { "channel": "stable", "checkAutomatically": false } }""");
+
+        parsed.Config!.UpdateChannel.ShouldBe("stable");
+        parsed.Config.CheckUpdatesAutomatically.ShouldBe(false);
+        parsed.Problems.ShouldBeEmpty();
+
+        var written = JsonNode.Parse(PortableConfigJson.Write(new PortableConfig { UpdateChannel = "beta", CheckUpdatesAutomatically = true }))!;
+        written["updates"]!["channel"]!.GetValue<string>().ShouldBe("beta");
+        written["updates"]!["checkAutomatically"]!.GetValue<bool>().ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Merge_UpdateSettings_FolderFirst_ThenThisPc()
+    {
+        var merged = SyncMerge.MergeConfig(
+            new PortableConfig { UpdateChannel = "stable" },
+            new PortableConfig { UpdateChannel = "beta", CheckUpdatesAutomatically = false });
+
+        merged.UpdateChannel.ShouldBe("stable");
+        merged.CheckUpdatesAutomatically.ShouldBe(false);
+    }
+
+    [Fact]
+    public void Config_UnknownUpdateChannel_IsIgnoredNotFatal()
+    {
+        var parsed = PortableConfigJson.Parse("""{ "schema": 1, "updates": { "channel": "nightly" } }""");
+
+        parsed.IsValid.ShouldBeTrue();
+        parsed.Config!.UpdateChannel.ShouldBeNull();
+        parsed.Problems.ShouldHaveSingleItem();
+    }
+
+    [Fact]
     public void Config_ManualItemsFollowTheDialogRules_BadOnesAreSkipped()
     {
         var parsed = PortableConfigJson.Parse($$"""

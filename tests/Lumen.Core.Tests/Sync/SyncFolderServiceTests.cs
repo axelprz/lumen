@@ -88,6 +88,23 @@ public sealed class SyncFolderServiceTests
     }
 
     [Fact]
+    public async Task UpdateChannel_AndAutomaticChecks_TravelToTheOtherPc()
+    {
+        var a = Pc();
+        await SeedAsync(a);
+        a.Settings.Values[LocalSettingKeys.UpdateChannel] = "stable";
+        a.Settings.Values[LocalSettingKeys.UpdateCheckAutomatically] = "0";
+        await a.AttachAsync();
+        _cloud["config.json"].ShouldContain("\"channel\": \"stable\"");
+        var b = Pc();
+        await b.AttachAsync();
+
+        b.Settings.Values[LocalSettingKeys.UpdateChannel].ShouldBe("stable");
+        b.Settings.Values[LocalSettingKeys.UpdateCheckAutomatically].ShouldBe("0");
+        b.AppliedEvents.ShouldContain(e => e.ConfigChanged);
+    }
+
+    [Fact]
     public async Task Settled_NextPassDoesNothing()
     {
         var a = Pc();
