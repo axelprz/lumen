@@ -145,6 +145,9 @@
         <!-- Best deals today, only the stores Lumen supports -->
         <TextBlock Text="{l:Loc Deals_Best_Title}" Style="{StaticResource Deals.SectionTitle}" Visibility="{Binding HasBestDeals, Converter={StaticResource BoolToVisibility}}" />
         <ItemsControl ItemsSource="{Binding BestDeals}" ItemTemplate="{StaticResource Deals.PriceRow}" Focusable="False" />
+        <!-- Steam's top sellers: what is popular right now, never paid placement -->
+        <TextBlock Text="{l:Loc Deals_Trending_Title}" Style="{StaticResource Deals.SectionTitle}" Visibility="{Binding HasTopSellers, Converter={StaticResource BoolToVisibility}}" />
+        <ItemsControl ItemsSource="{Binding TopSellers}" ItemTemplate="{StaticResource Deals.PriceRow}" Focusable="False" />
         <TextBlock Text="{l:Loc Deals_PricesNote}" FontSize="{StaticResource Lumen.FontSize.Caption}" TextWrapping="Wrap" Margin="0,4,0,0"
                    Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
         <!-- CheapShark asks for a link back -->

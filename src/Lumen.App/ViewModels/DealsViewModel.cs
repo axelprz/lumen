@@ -55,12 +55,14 @@ public sealed partial class DealsViewModel : ObservableObject
     private readonly ILocalSettings _settings;
     private readonly FreeGamesService _service;
     private readonly PriceDealsService _prices;
+    private readonly TrendingService _trending;
     private readonly ILauncher _shell;
     private readonly ILocalizer _loc;
     private readonly ILogger<DealsViewModel> _logger;
     private readonly SynchronizationContext _ui;
     private FreeGamesSnapshot? _snapshot;
     private BestDealsSnapshot? _best;
+    private TrendingSnapshot? _top;
     private PriceSearchSnapshot? _search;
     private bool _loading;
     private bool _loaded;
@@ -88,11 +90,12 @@ public sealed partial class DealsViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(NoteText))]
     private int _note;
 
-    public DealsViewModel(ILocalSettings settings, FreeGamesService service, PriceDealsService prices, ILauncher shell, ILocalizer loc, ILogger<DealsViewModel> logger)
+    public DealsViewModel(ILocalSettings settings, FreeGamesService service, PriceDealsService prices, TrendingService trending, ILauncher shell, ILocalizer loc, ILogger<DealsViewModel> logger)
     {
         _settings = settings;
         _service = service;
         _prices = prices;
+        _trending = trending;
         _shell = shell;
         _loc = loc;
         _logger = logger;
@@ -115,6 +118,11 @@ public sealed partial class DealsViewModel : ObservableObject
     public ObservableCollection<PriceGameRow> SearchResults { get; } = [];
 
     public bool HasBestDeals => BestDeals.Count > 0;
+
+    /// <summary>Steam's top sellers, listed after the best deals.</summary>
+    public ObservableCollection<PriceRow> TopSellers { get; } = [];
+
+    public bool HasTopSellers => TopSellers.Count > 0;
 
     public bool HasSearchResults => SearchResults.Count > 0;
 
@@ -175,6 +183,7 @@ public sealed partial class DealsViewModel : ObservableObject
         {
             _snapshot = null;
             _best = null;
+            _top = null;
             _search = null;
             SearchText = string.Empty;
             SearchState = (int)SearchOutcome.None;
@@ -258,6 +267,7 @@ public sealed partial class DealsViewModel : ObservableObject
         {
             _snapshot = await _service.GetAsync(refresh, CancellationToken.None);
             _best = await _prices.BestAsync(refresh, CancellationToken.None);
+            _top = await _trending.GetAsync(refresh, CancellationToken.None);
             _loaded = true;
             Rebuild();
         }
@@ -326,6 +336,15 @@ public sealed partial class DealsViewModel : ObservableObject
             BestDeals.Add(new PriceRow(deal.Title, deal.Store, Money(deal.Sale), Detail(deal), deal.Url));
         }
 
+        TopSellers.Clear();
+        foreach (var game in _top?.Games ?? [])
+        {
+            var detail = game.DiscountPercent > 0
+                ? string.Format(CultureInfo.CurrentCulture, _loc["Deals_PriceDetail"], game.DiscountPercent, Money(game.Normal))
+                : _loc["Deals_PriceRegular"];
+            TopSellers.Add(new PriceRow(game.Title, "Steam", Money(game.Sale), detail, game.Url));
+        }
+
         SearchResults.Clear();
         foreach (var game in _search?.Games ?? [])
         {
@@ -336,6 +355,7 @@ public sealed partial class DealsViewModel : ObservableObject
         }
 
         OnPropertyChanged(nameof(HasBestDeals));
+        OnPropertyChanged(nameof(HasTopSellers));
         OnPropertyChanged(nameof(HasSearchResults));
         OnPropertyChanged(nameof(SearchNoteText));
     }

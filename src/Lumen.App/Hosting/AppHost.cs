@@ -139,6 +139,10 @@ public static class AppHost
         builder.Services.AddSingleton<IFreeGamesSource>(_ => new EpicFreeGamesClient(DealsHttp()));
         builder.Services.AddSingleton<IPriceDealsSource>(_ => new CheapSharkClient(DealsHttp()));
         builder.Services.AddSingleton<PriceDealsService>();
+        builder.Services.AddSingleton(_ => new SteamStoreClient(DealsHttp()));
+        builder.Services.AddSingleton<IFreeGamesSource>(sp => sp.GetRequiredService<SteamStoreClient>());
+        builder.Services.AddSingleton<ITrendingSource>(sp => sp.GetRequiredService<SteamStoreClient>());
+        builder.Services.AddSingleton<TrendingService>();
         builder.Services.AddSingleton<FreeGamesService>();
         builder.Services.AddSingleton<DealsViewModel>();
 

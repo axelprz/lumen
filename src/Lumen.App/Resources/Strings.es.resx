@@ -53,16 +53,16 @@
     <value>Ofertas</value>
   </data>
   <data name="Settings_Deals" xml:space="preserve">
-    <value>Mostrar juegos gratis en Ofertas (consulta a la Epic Games Store y a CheapShark)</value>
+    <value>Mostrar juegos gratis en Ofertas (consulta a la Epic Games Store, a la tienda de Steam y a CheapShark)</value>
   </data>
   <data name="Deals_Subtitle" xml:space="preserve">
-    <value>Juegos gratis de las tiendas que soporta Lumen que podés reclamar ahora mismo.</value>
+    <value>Juegos gratis, precios y lo más vendido de las tiendas que soporta Lumen.</value>
   </data>
   <data name="Deals_OptIn_Title" xml:space="preserve">
     <value>Activar Ofertas</value>
   </data>
   <data name="Deals_OptIn_Body" xml:space="preserve">
-    <value>Ofertas está apagada hasta que la actives. Cuando está encendida, Lumen consulta a dos servicios: la Epic Games Store (store-site-backend-static.ak.epicgames.com) por sus juegos gratis, y CheapShark (www.cheapshark.com) por precios y ofertas en las tiendas que soporta Lumen. Con los pedidos no viaja nada tuyo: ni cuenta, ni biblioteca, ni ID. Una búsqueda de precios envía solo el nombre que escribís. Los enlaces se abren en tu navegador. Podés volver a apagarla en Ajustes.</value>
+    <value>Ofertas está apagada hasta que la actives. Cuando está encendida, Lumen consulta a tres servicios: la Epic Games Store (store-site-backend-static.ak.epicgames.com) por sus juegos gratis, la tienda de Steam (store.steampowered.com) por sus juegos gratis y lo más vendido, y CheapShark (www.cheapshark.com) por precios y ofertas en las tiendas que soporta Lumen. Con los pedidos no viaja nada tuyo: ni cuenta, ni biblioteca, ni ID. Una búsqueda de precios envía solo el nombre que escribís. Los enlaces se abren en tu navegador. Podés volver a apagarla en Ajustes.</value>
   </data>
   <data name="Deals_OptIn_Enable" xml:space="preserve">
     <value>Activar</value>
@@ -156,6 +156,9 @@
   </data>
   <data name="Deals_PricesFrom" xml:space="preserve">
     <value>Precios de</value>
+  </data>
+  <data name="Deals_Trending_Title" xml:space="preserve">
+    <value>Lo más vendido en Steam</value>
   </data>
   <data name="Nav_Settings" xml:space="preserve">
     <value>Configuración</value>

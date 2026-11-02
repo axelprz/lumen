@@ -1,0 +1,26 @@
+{
+  "0": { "id": "cat_spotlight", "name": "Spotlights", "items": [ { "id": "spot", "name": "A promo banner" } ] },
+  "specials": {
+    "id": "cat_specials",
+    "name": "Specials",
+    "items": [
+      { "id": 1000010, "type": 0, "name": "Sample Free Promo", "discounted": true, "discount_percent": 100, "original_price": 999, "final_price": 0, "currency": "USD", "discount_expiration": 1793750000 },
+      { "id": 1000011, "type": 0, "name": "Sample Half Price", "discounted": true, "discount_percent": 50, "original_price": 2000, "final_price": 1000, "currency": "USD", "discount_expiration": 1793750000 },
+      { "id": 1000012, "type": 0, "name": "Sample Free No End", "discounted": true, "discount_percent": 100, "original_price": 0, "final_price": 0, "currency": "USD" },
+      { "id": "../x", "type": 0, "name": "Sample Bad Id", "discounted": true, "discount_percent": 100, "original_price": 100, "final_price": 0, "currency": "USD" },
+      { "id": 1000013, "type": 0, "discounted": true, "discount_percent": 100, "original_price": 100, "final_price": 0, "currency": "USD" }
+    ]
+  },
+  "top_sellers": {
+    "id": "cat_topsellers",
+    "name": "Top Sellers",
+    "items": [
+      { "id": 1000020, "type": 0, "name": "Sample Top One", "discounted": false, "discount_percent": 0, "original_price": 5999, "final_price": 5999, "currency": "USD" },
+      { "id": 1000020, "type": 0, "name": "Sample Top One", "discounted": false, "discount_percent": 0, "original_price": 5999, "final_price": 5999, "currency": "USD" },
+      { "id": 1000021, "type": 0, "name": "Sample Top Two", "discounted": true, "discount_percent": 25, "original_price": 4000, "final_price": 3000, "currency": "USD" },
+      { "id": 1000022, "type": 0, "name": "Sample Free To Play", "discounted": false, "discount_percent": 0, "original_price": 0, "final_price": 0, "currency": "USD" },
+      { "id": 1000023, "type": 0, "name": "Sample Broken Price", "discounted": false, "discount_percent": 0, "original_price": "x", "final_price": 100, "currency": "USD" }
+    ]
+  },
+  "status": 1
+}

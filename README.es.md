@@ -70,7 +70,7 @@ Lumen no tiene servidores propios y no envía analíticas ni telemetría. Todo l
 - **Servicios de inicio de sesión y biblioteca de Epic y GOG**: solo si conectás esa cuenta.
 - **La web de Steam**: solo dentro del navegador de inicio de sesión de Steam que trae Lumen, si elegís iniciar sesión.
 - **GitHub Releases**: para buscar y bajar actualizaciones de Lumen. No se envía nada tuyo.
-- **Ofertas** (opcional, apagada hasta que la actives en Ajustes): la lista de juegos gratis de la Epic Games Store y los precios de CheapShark para las tiendas que soporta Lumen. No se envía nada tuyo; una búsqueda de precios envía solo el nombre del juego.
+- **Ofertas** (opcional, apagada hasta que la actives en Ajustes): las listas de juegos gratis de la Epic Games Store y de la tienda de Steam, lo más vendido de Steam y los precios de CheapShark para las tiendas que soporta Lumen. No se envía nada tuyo; una búsqueda de precios envía solo el nombre del juego.
 
 Abrir un enlace en tu navegador (por ejemplo, la página de una tienda) lo hace tu navegador, no Lumen.
 

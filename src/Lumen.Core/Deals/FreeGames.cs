@@ -36,7 +36,8 @@ public static partial class DealUrls
 
     /// <summary>
     /// An <c>https</c> address on one of the hosts Lumen links to (never a script, file or other scheme). CheapShark is
-    /// only accepted for its home page and its <c>/redirect?dealID=…</c> link, which opens the offer in the store.
+    /// only accepted for its home page and its <c>/redirect?dealID=…</c> link, which opens the offer in the store, and Steam's
+    /// store only for a game's page (<c>/app/&lt;id&gt;/</c>).
     /// </summary>
     public static bool IsSafeToOpen(string? url)
     {
@@ -50,8 +51,16 @@ public static partial class DealUrls
             return (uri.AbsolutePath == "/" && uri.Query.Length == 0) || (uri.AbsolutePath == "/redirect" && CheapSharkQuery().IsMatch(uri.Query));
         }
 
+        if (uri.Host.Equals("store.steampowered.com", StringComparison.OrdinalIgnoreCase))
+        {
+            return uri.Query.Length == 0 && SteamAppPath().IsMatch(uri.AbsolutePath);
+        }
+
         return AllowedHosts.Contains(uri.Host, StringComparer.OrdinalIgnoreCase);
     }
+
+    [System.Text.RegularExpressions.GeneratedRegex(@"^/app/[0-9]{1,11}/?$")]
+    private static partial System.Text.RegularExpressions.Regex SteamAppPath();
 
     [System.Text.RegularExpressions.GeneratedRegex(@"^\?dealID=[A-Za-z0-9%]{10,120}$")]
     private static partial System.Text.RegularExpressions.Regex CheapSharkQuery();
