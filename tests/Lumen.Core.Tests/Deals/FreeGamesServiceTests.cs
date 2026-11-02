@@ -130,7 +130,7 @@ public sealed class FreeGamesServiceTests
 
     [Theory]
     [InlineData("https://store.epicgames.com/en-US/p/x", true)]
-    [InlineData("https://store.epicgames.com/en-US/p/x", true)]
+    [InlineData("https://www.gamerpower.com/open/x", false)]
     [InlineData("https://steamcito.com.ar/machete-del-ahorro-en-gaming-en-argentina", true)]
     [InlineData("http://store.epicgames.com/x", false)]
     [InlineData("https://evil.example.com/x", false)]
