@@ -9,6 +9,7 @@ using Lumen.Core;
 using Lumen.Core.Artwork;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
+using Lumen.Core.Notifications;
 using Lumen.Core.Platform;
 using Lumen.Data;
 using Lumen.Data.Migrations;
@@ -311,6 +312,8 @@ public static class AppHost
         builder.Services.AddSingleton<AboutViewModel>();
         builder.Services.AddSingleton<SettingsViewModel>();
         builder.Services.AddSingleton<ToastService>();
+        builder.Services.AddSingleton<NotificationCenter>();
+        builder.Services.AddSingleton<NotificationsViewModel>();
         builder.Services.AddSingleton<SidebarFooterViewModel>();
         builder.Services.AddSingleton<ShellViewModel>();
         builder.Services.AddSingleton<MainWindow>();

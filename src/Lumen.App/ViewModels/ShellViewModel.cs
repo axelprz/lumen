@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using Lumen.App.Services;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
+using Lumen.Core.Notifications;
 
 namespace Lumen.App.ViewModels;
 
@@ -20,7 +21,7 @@ public sealed partial class ShellViewModel : ObservableObject
     [ObservableProperty]
     private SectionViewModel? _selectedSection;
 
-    public ShellViewModel(ILocalizer localizer, HomeViewModel home, LibraryViewModel library, SettingsViewModel settings, AccentService accent, FirstRunViewModel firstRun, CollectionsViewModel collections, RoutinesViewModel routines, ToastService toasts, SidebarFooterViewModel footer)
+    public ShellViewModel(ILocalizer localizer, HomeViewModel home, LibraryViewModel library, SettingsViewModel settings, AccentService accent, FirstRunViewModel firstRun, CollectionsViewModel collections, RoutinesViewModel routines, ToastService toasts, SidebarFooterViewModel footer, NotificationsViewModel notifications)
     {
         ArgumentNullException.ThrowIfNull(localizer);
         ArgumentNullException.ThrowIfNull(home);
@@ -31,6 +32,7 @@ public sealed partial class ShellViewModel : ObservableObject
         _accent = accent;
         _routines = routines;
         Toasts = toasts;
+        Notifications = notifications;
         Footer = footer;
         FirstRun = firstRun;
         Home = home;
@@ -45,6 +47,14 @@ public sealed partial class ShellViewModel : ObservableObject
             new SectionViewModel(ShellSection.Settings, "Nav_Settings", "", localizer, settings),
         ];
 
+        // An entry of the bell opens the page that explains it (a game that failed to start has nothing to open).
+        notifications.OpenRequested += (_, kind) =>
+        {
+            if (kind != NotificationKind.Launch)
+            {
+                SelectedSection = Sections.First(s => s.Section == (kind == NotificationKind.Sync ? ShellSection.Library : ShellSection.Settings));
+            }
+        };
         routines.ReviewRequested += (_, _) => SelectedSection = Sections.First(s => s.Section == ShellSection.Routines);
         home.DetailRequested += (_, item) => _ = ShowDetailFromHomeAsync(item);
         home.RoutinesRequested += (_, _) => SelectedSection = Sections.First(s => s.Section == ShellSection.Routines);
@@ -139,6 +149,8 @@ public sealed partial class ShellViewModel : ObservableObject
 
     /// <summary>Short notices in the bottom-right corner.</summary>
     public ToastService Toasts { get; }
+
+    public NotificationsViewModel Notifications { get; }
 
     /// <summary>Steam account and CPU/RAM monitor at the bottom of the sidebar.</summary>
     public SidebarFooterViewModel Footer { get; }
