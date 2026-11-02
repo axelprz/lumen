@@ -431,7 +431,7 @@
     <value>Argumentos de lanzamiento</value>
   </data>
   <data name="Detail_LaunchArgsHint" xml:space="preserve">
-    <value>Se pasan al juego cuando Lumen lo inicia por Steam, por ejemplo -windowed. Solo los usa Lumen; las opciones de lanzamiento de Steam no cambian. Dejalo vacío para no usar ninguno.</value>
+    <value>Se pasan al juego cuando Lumen lo inicia por Steam, por ejemplo -windowed. Solo los usa Lumen; las opciones de lanzamiento de Steam no cambian. Steam te pide confirmar cada vez que el juego arranca con ellos. Dejalo vacío para no usar ninguno.</value>
   </data>
   <data name="Detail_LaunchArgsInvalid" xml:space="preserve">
     <value>No se pueden usar esos argumentos: tienen que estar en una sola línea, de hasta 2000 caracteres.</value>

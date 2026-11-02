@@ -431,7 +431,7 @@
     <value>Launch arguments</value>
   </data>
   <data name="Detail_LaunchArgsHint" xml:space="preserve">
-    <value>Passed to the game when Lumen starts it through Steam, for example -windowed. Only Lumen uses them; Steam's own launch options stay as they are. Leave it empty for none.</value>
+    <value>Passed to the game when Lumen starts it through Steam, for example -windowed. Only Lumen uses them; Steam's own launch options stay as they are. Steam asks you to confirm each time the game starts with them. Leave it empty for none.</value>
   </data>
   <data name="Detail_LaunchArgsInvalid" xml:space="preserve">
     <value>Those arguments can't be used: keep them on one line, up to 2000 characters.</value>
