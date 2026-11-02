@@ -59,17 +59,10 @@ public sealed class FreeGamesService(IEnumerable<IFreeGamesSource> sources, Time
     public static FreeGamesSnapshot Merge(IReadOnlyList<FreeGamesResult> results, DateTimeOffset now)
     {
         var all = results.Where(r => r.Ok).SelectMany(r => r.Games).ToList();
-        // The Epic feed is the authority for the Epic store: a giveaway another service lists for that store is the same game under another name.
-        var epicFeed = all.Any(g => g.Source == "epic");
         var games = new List<FreeGame>();
         var seen = new HashSet<string>(StringComparer.Ordinal);
         foreach (var game in all)
         {
-            if (epicFeed && game.Source != "epic" && game.Store == "Epic Games Store")
-            {
-                continue;
-            }
-
             if (seen.Add(Key(game)))
             {
                 games.Add(game);
