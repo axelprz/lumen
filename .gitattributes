@@ -10,5 +10,6 @@
 *.sh      text eol=lf
 *.png     binary
 *.jpg     binary
+*.webp    binary
 *.ico     binary
 *.yml     text eol=lf

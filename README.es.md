@@ -4,7 +4,32 @@
 
 Lumen es un launcher gratuito y de código abierto para Windows que reúne todos tus juegos y apps en un solo lugar. Steam, Epic, GOG, Xbox / Microsoft Store, Ubisoft Connect, EA app y Battle.net aparecen en una única biblioteca —instalados o no— junto a las apps que elijas. Lanzás cualquier cosa en dos segundos, con mouse, atajo de teclado o joystick.
 
-> **Estado:** desarrollo inicial; hay pre-releases disponibles en la [página de Releases](https://github.com/axelprz/lumen/releases). Ver [el plan de la v1](docs/PLAN-v1.md).
+> **Estado:** beta, camino a la 1.0; hay pre-releases disponibles en la [página de Releases](https://github.com/axelprz/lumen/releases). Ver [el plan de la v1](docs/PLAN-v1.md).
+
+![Inicio de Lumen: el juego destacado en una tarjeta, rutinas fijadas, Seguir jugando y Favoritos](docs/screenshots/home.webp)
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/library.webp" alt="Biblioteca: todas las tiendas en una grilla, con filtros" /></td>
+    <td><img src="docs/screenshots/detail.webp" alt="Detalle de un juego: Jugar, favorito, tiempo de juego y última sesión" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Biblioteca: todas las tiendas en una grilla</sub></td>
+    <td align="center"><sub>Detalle de un juego</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/settings.webp" alt="Configuración en pestañas" /></td>
+    <td valign="middle">
+
+**Oscuro, calmo y rápido.** Tarjetas de vidrio, luz ambiente suave, colores tomados del arte de cada juego, animaciones fluidas que respetan los "Efectos de animación" de Windows, y el mismo estilo en el menú de la bandeja y en la búsqueda rápida con <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>Espacio</kbd>.
+
+</td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Configuración</sub></td>
+    <td></td>
+  </tr>
+</table>
 
 ## Instalación
 

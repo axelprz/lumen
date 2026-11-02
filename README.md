@@ -4,7 +4,32 @@
 
 Lumen is a free, open-source launcher for Windows that brings all your games and apps into one place. Steam, Epic, GOG, Xbox / Microsoft Store, Ubisoft Connect, EA app and Battle.net show up in a single library — installed or not — next to the apps you choose. Launch anything in two seconds, with a mouse, a keyboard shortcut or a gamepad.
 
-> **Status:** early development; pre-releases are available on the [Releases page](https://github.com/axelprz/lumen/releases). See [the v1 plan](docs/PLAN-v1.md).
+> **Status:** beta, on its way to 1.0; pre-releases are available on the [Releases page](https://github.com/axelprz/lumen/releases). See [the v1 plan](docs/PLAN-v1.md).
+
+![Lumen's Home: the featured game in a hero card, pinned routines, Continue playing and Favorites](docs/screenshots/home.webp)
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/library.webp" alt="Library: every store in one grid, with filters" /></td>
+    <td><img src="docs/screenshots/detail.webp" alt="A game's detail: Play, favorite, playtime and last session" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Library: every store in one grid</sub></td>
+    <td align="center"><sub>A game's detail</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/settings.webp" alt="Settings in tabs" /></td>
+    <td valign="middle">
+
+**Calm, dark and fast.** Glass cards, soft ambient light, colors taken from each game's art, smooth motion that respects Windows' "Animation effects", and the same look for the tray menu and the <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>Space</kbd> quick search.
+
+</td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Settings</sub></td>
+    <td></td>
+  </tr>
+</table>
 
 ## Installing
 
