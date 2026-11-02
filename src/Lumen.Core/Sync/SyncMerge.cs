@@ -22,6 +22,7 @@ public static class SyncMerge
             Hotkey = folder.Hotkey ?? local.Hotkey,
             UpdateChannel = folder.UpdateChannel ?? local.UpdateChannel,
             CheckUpdatesAutomatically = folder.CheckUpdatesAutomatically ?? local.CheckUpdatesAutomatically,
+            DynamicAccent = folder.DynamicAccent ?? local.DynamicAccent,
             ManualItems = folder.ManualItems.Concat(local.ManualItems.Where(l => folder.ManualItems.All(f => f.Id != l.Id))).ToList(),
             Overrides = local.Overrides.Concat(folder.Overrides).GroupBy(kv => kv.Key).ToDictionary(g => g.Key, g => g.Last().Value),
             IgnoredApps = folder.IgnoredApps.Union(local.IgnoredApps).ToList(),

@@ -62,6 +62,21 @@ public sealed class PortableJsonTests
     }
 
     [Fact]
+    public void Config_DynamicAccent_RoundTripsAndMerges()
+    {
+        var parsed = PortableConfigJson.Parse("""{ "schema": 1, "ui": { "dynamicAccent": false } }""");
+
+        parsed.Config!.DynamicAccent.ShouldBe(false);
+        parsed.Problems.ShouldBeEmpty();
+
+        var written = JsonNode.Parse(PortableConfigJson.Write(new PortableConfig { DynamicAccent = true }))!;
+        written["ui"]!["dynamicAccent"]!.GetValue<bool>().ShouldBeTrue();
+
+        SyncMerge.MergeConfig(new PortableConfig(), new PortableConfig { DynamicAccent = false }).DynamicAccent.ShouldBe(false);
+        SyncMerge.MergeConfig(new PortableConfig { DynamicAccent = true }, new PortableConfig { DynamicAccent = false }).DynamicAccent.ShouldBe(true);
+    }
+
+    [Fact]
     public void Config_UnknownUpdateChannel_IsIgnoredNotFatal()
     {
         var parsed = PortableConfigJson.Parse("""{ "schema": 1, "updates": { "channel": "nightly" } }""");
