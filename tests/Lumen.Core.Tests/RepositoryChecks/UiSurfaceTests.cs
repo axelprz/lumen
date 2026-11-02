@@ -152,6 +152,18 @@ public sealed class UiSurfaceTests
     }
 
     [Fact]
+    public void QuickSearch_GroupsResults_ShowsArt_AndExplainsItsKeys()
+    {
+        var xaml = File.ReadAllText(Path.Combine(_appDir, "Views", "QuickSearchWindow.xaml"));
+        xaml.ShouldContain("<PropertyGroupDescription PropertyName=\"GroupTitle\" />");
+        xaml.ShouldContain("Binding Art.Path, Converter={StaticResource ImagePath}");
+        xaml.ShouldContain("{l:Loc QuickSearch_KeyDetail}");
+
+        File.ReadAllText(Path.Combine(_appDir, "Views", "QuickSearchWindow.xaml.cs"))
+            .ShouldContain("case Key.Enter when Keyboard.Modifiers == ModifierKeys.Control:");
+    }
+
+    [Fact]
     public void LanguageSwitch_AlsoSetsTheFormatCulture()
     {
         File.ReadAllText(Path.Combine(_appDir, "Localization", "LocalizationService.cs"))

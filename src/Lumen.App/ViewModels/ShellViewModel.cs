@@ -186,6 +186,14 @@ public sealed partial class ShellViewModel : ObservableObject
         }
     }
 
+    /// <summary>Shows an item's detail in the library (quick search, Ctrl+Enter). Closing it stays in the library.</summary>
+    public Task ShowDetailAsync(LibraryItem item)
+    {
+        _returnToHome = false;
+        SelectedSection = Sections.First(s => s.Section == ShellSection.Library);
+        return Library.ShowDetailAsync(item);
+    }
+
     // Home has no detail view of its own: show it in the library, and come back to Home when it closes.
     private async Task ShowDetailFromHomeAsync(LibraryItem item)
     {

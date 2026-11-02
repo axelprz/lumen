@@ -3,26 +3,71 @@
 
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
+using System.Net.Http;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Lumen.Core.Artwork;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
 using Lumen.Core.Routines;
 
 namespace Lumen.App.ViewModels;
 
-/// <summary>One line in the quick search list.</summary>
-public sealed record QuickSearchResult(LibraryItem? Item, string Title, string Detail, string ActionText, string? RoutineId = null)
+/// <summary>Which block of the quick search list a result belongs to (also the order of the blocks).</summary>
+public enum QuickSearchGroup
 {
+    Recent,
+    PinnedRoutines,
+    Games,
+    Apps,
+    Routines,
+}
+
+/// <summary>One line in the quick search list: a thumbnail (cover, icon or a routine glyph), title, details, action.</summary>
+public sealed partial class QuickSearchResult(LibraryItem? item, string title, string detail, string actionText, QuickSearchGroup group, string groupTitle, string? routineId = null)
+    : ObservableObject
+{
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasCover), nameof(HasIcon))]
+    private TileArt? _art;
+
+    public LibraryItem? Item { get; } = item;
+
+    public string Title { get; } = title;
+
+    public string Detail { get; } = detail;
+
+    public string ActionText { get; } = actionText;
+
+    public string? RoutineId { get; } = routineId;
+
+    public QuickSearchGroup Group { get; } = group;
+
+    /// <summary>The heading of its block; results are rebuilt on every search, so it is written in the current language.</summary>
+    public string GroupTitle { get; } = groupTitle;
+
+    public bool IsRoutine => RoutineId is not null;
+
+    public bool HasCover => Art is { IsIcon: false };
+
+    public bool HasIcon => Art is { IsIcon: true };
+
+    public string Initial => Title.Length == 0 ? "?" : StringInfo.GetNextTextElement(Title).ToUpper(CultureInfo.CurrentCulture);
+
     public override string ToString() => Title;
 }
 
 /// <summary>
-/// The quick search box (PLAN-v1 §4.3): opened by the global shortcut or the tray, it searches the whole library
-/// (games and apps) as you type; Enter runs the selected result (play, open or install) and closes the box.
+/// The quick search box (PLAN-v1 §4.3): opened by the global shortcut or the tray. Empty, it offers recently played
+/// games and pinned routines; typing searches games, apps and routines, shown in blocks. Enter runs the selected result
+/// (play, open, install or run) and closes the box; Ctrl+Enter opens a game's detail in Lumen instead.
 /// </summary>
 public sealed partial class QuickSearchViewModel : ObservableObject
 {
+    /// <summary>Recently played games offered when the box opens empty.</summary>
+    public const int RecentCount = 6;
+
     private readonly LibraryService _library;
     private readonly LaunchService _launcher;
     private readonly QuickSearch _search;
@@ -30,6 +75,8 @@ public sealed partial class QuickSearchViewModel : ObservableObject
     private readonly ILocalizer _localizer;
     private readonly RoutineService _routineService;
     private readonly RoutinesViewModel _routines;
+    private readonly ArtworkService _artwork;
+    private readonly CollectionService _collections;
 
     [ObservableProperty]
     private string _query = string.Empty;
@@ -41,7 +88,7 @@ public sealed partial class QuickSearchViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(HasNotice))]
     private string? _notice;
 
-    public QuickSearchViewModel(LibraryService library, LaunchService launcher, QuickSearch search, LibraryViewModel libraryView, ILocalizer localizer, RoutineService routineService, RoutinesViewModel routines)
+    public QuickSearchViewModel(LibraryService library, LaunchService launcher, QuickSearch search, LibraryViewModel libraryView, ILocalizer localizer, RoutineService routineService, RoutinesViewModel routines, ArtworkService artwork, CollectionService collections)
     {
         _routineService = routineService;
         _routines = routines;
@@ -50,10 +97,15 @@ public sealed partial class QuickSearchViewModel : ObservableObject
         _search = search;
         _libraryView = libraryView;
         _localizer = localizer;
+        _artwork = artwork;
+        _collections = collections;
     }
 
     /// <summary>Raised after a result was started, so the window can close.</summary>
     public event EventHandler? Done;
+
+    /// <summary>Raised by Ctrl+Enter on a game or app: show its detail in the main window.</summary>
+    public event EventHandler<LibraryItem>? DetailRequested;
 
     public ObservableCollection<QuickSearchResult> Results { get; } = [];
 
@@ -114,18 +166,48 @@ public sealed partial class QuickSearchViewModel : ObservableObject
         }
     }
 
+    /// <summary>Ctrl+Enter: the selected game's (or app's) detail in Lumen. Routines have no detail; they run as with Enter.</summary>
+    [RelayCommand]
+    private async Task OpenDetailAsync()
+    {
+        var result = Selected ?? Results.FirstOrDefault();
+        if (result?.Item is { } item)
+        {
+            Done?.Invoke(this, EventArgs.Empty);
+            DetailRequested?.Invoke(this, item);
+        }
+        else if (result is not null)
+        {
+            await RunAsync(result);
+        }
+    }
+
     private void Refresh()
     {
         Notice = Query.Trim().Length > 0 ? null : Notice;
         Results.Clear();
-        foreach (var item in _search.Find(_library.Items, Query).Where(i => LaunchService.PrimaryAction(i.Primary) is not null))
+        if (Query.Trim().Length == 0)
         {
-            Results.Add(Result(item));
+            AddSuggestions();
         }
-
-        foreach (var entry in RoutineLookup.Find(_routineService.Entries, Query, CultureInfo.CurrentUICulture))
+        else
         {
-            Results.Add(RoutineResult(entry));
+            // Games first, then apps (each keeps the search order), then routines.
+            var found = _search.Find(_library.Items, Query).Where(i => LaunchService.PrimaryAction(i.Primary) is not null).ToList();
+            foreach (var item in found.Where(i => i.Kind != ItemKind.App))
+            {
+                Results.Add(Result(item, QuickSearchGroup.Games, "QuickSearch_GroupGames"));
+            }
+
+            foreach (var item in found.Where(i => i.Kind == ItemKind.App))
+            {
+                Results.Add(Result(item, QuickSearchGroup.Apps, "QuickSearch_GroupApps"));
+            }
+
+            foreach (var entry in RoutineLookup.Find(_routineService.Entries, Query, CultureInfo.CurrentUICulture))
+            {
+                Results.Add(RoutineResult(entry, QuickSearchGroup.Routines, "QuickSearch_GroupRoutines"));
+            }
         }
 
         Selected = Results.FirstOrDefault();
@@ -133,25 +215,59 @@ public sealed partial class QuickSearchViewModel : ObservableObject
         {
             Notice = _localizer[Query.Trim().Length > 0 ? "QuickSearch_NoMatches" : "QuickSearch_Hint"];
         }
+
+        foreach (var result in Results.Where(r => r.Item is not null).ToList())
+        {
+            _ = LoadArtAsync(result);
+        }
     }
 
-    private QuickSearchResult RoutineResult(RoutineEntry entry)
+    // Empty box: what was played last and the pinned routines, so something starts without typing.
+    private void AddSuggestions()
+    {
+        var recent = HomeFeed.Build(_library.Items, _library.FirstSeen, _collections.Favorites).ContinuePlaying
+            .Where(i => LaunchService.PrimaryAction(i.Primary) is not null)
+            .Take(RecentCount);
+        foreach (var item in recent)
+        {
+            Results.Add(Result(item, QuickSearchGroup.Recent, "QuickSearch_GroupRecent"));
+        }
+
+        foreach (var entry in RoutineLookup.Pinned(_routineService.Entries, CultureInfo.CurrentUICulture))
+        {
+            Results.Add(RoutineResult(entry, QuickSearchGroup.PinnedRoutines, "QuickSearch_GroupPinned"));
+        }
+    }
+
+    private async Task LoadArtAsync(QuickSearchResult result)
+    {
+        try
+        {
+            result.Art = await TileArt.LoadAsync(_artwork, result.Item!);
+        }
+        catch (Exception ex) when (ex is IOException or HttpRequestException or TaskCanceledException or InvalidOperationException)
+        {
+            // No picture: the initial stays.
+        }
+    }
+
+    private QuickSearchResult RoutineResult(RoutineEntry entry, QuickSearchGroup group, string groupKey)
     {
         var needsReview = entry.State == RoutineTrustState.NeedsReview;
         var detail = needsReview
             ? $"{_localizer["QuickSearch_Routine"]} · {_localizer["Routine_State_NeedsReview"]}"
             : _localizer["QuickSearch_Routine"];
-        return new QuickSearchResult(null, RoutineLookup.NameOf(entry, CultureInfo.CurrentUICulture), detail, _localizer[needsReview ? "Routine_Review" : "Routine_Run"], entry.Id);
+        return new QuickSearchResult(null, RoutineLookup.NameOf(entry, CultureInfo.CurrentUICulture), detail,
+            _localizer[needsReview ? "Routine_Review" : "Routine_Run"], group, _localizer[groupKey], entry.Id);
     }
 
-    private QuickSearchResult Result(LibraryItem item)
+    private QuickSearchResult Result(LibraryItem item, QuickSearchGroup group, string groupKey)
     {
-        var kind = _localizer[item.Kind == ItemKind.App ? "QuickSearch_App" : "QuickSearch_Game"];
         var stores = string.Join(" · ", item.Entries.Select(_libraryView.StoreNameOf).Distinct());
         var detail = item.IsInstalled || item.Kind == ItemKind.App
-            ? $"{kind} · {stores}"
-            : $"{kind} · {stores} · {_localizer["QuickSearch_NotInstalled"]}";
+            ? stores
+            : $"{stores} · {_localizer["QuickSearch_NotInstalled"]}";
         var action = _localizer[!item.IsInstalled ? "Action_Install" : item.Kind == ItemKind.App ? "Action_Open" : "Action_Play"];
-        return new QuickSearchResult(item, item.Title, detail, action);
+        return new QuickSearchResult(item, item.Title, detail, action, group, _localizer[groupKey]);
     }
 }
