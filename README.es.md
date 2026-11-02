@@ -59,6 +59,27 @@ Actualizaciones: Lumen busca una versión nueva al iniciar y una vez por día (l
 - La v1 no carga plugins ni temas de terceros.
 - Las rutinas importadas se muestran completas y hay que aprobarlas antes de poder ejecutarlas.
 
+## Política de privacidad
+
+Lumen no tiene servidores propios y no envía analíticas ni telemetría. Todo lo que guarda (ajustes, caché de la biblioteca, claves protegidas con DPAPI) queda en tu PC, más la carpeta de sync que elijas si activás la sincronización. Las únicas conexiones de red que hace, cada una solo para la función que la necesita, son:
+
+- **Steam Web API y el CDN de imágenes de Steam**: tu biblioteca, horas jugadas y portadas. Tu API key de Steam y tu SteamID64 van solo a Steam.
+- **SteamGridDB**: ilustraciones. Tu key de SteamGridDB va solo a SteamGridDB.
+- **Servicios de inicio de sesión y biblioteca de Epic y GOG**: solo si conectás esa cuenta.
+- **La web de Steam**: solo dentro del navegador de inicio de sesión de Steam que trae Lumen, si elegís iniciar sesión.
+- **GitHub Releases**: para buscar y bajar actualizaciones de Lumen. No se envía nada tuyo.
+
+Abrir un enlace en tu navegador (por ejemplo, la página de una tienda) lo hace tu navegador, no Lumen.
+
+## Política de firma de código
+
+Los releases de Lumen **todavía no están firmados** (ver [Instalación](#instalación)). Estamos pidiendo la firma de código gratuita para proyectos de código abierto de la [SignPath Foundation](https://signpath.org/). Esta sección describe la política que vamos a seguir; el instalador sigue sin firmar hasta que la solicitud se apruebe, y entonces se va a actualizar este texto.
+
+- **Qué se firma:** solo los archivos que genera el workflow de releases de GitHub Actions de este repositorio a partir de un commit con tag, nunca un build hecho en la PC de un desarrollador.
+- **Roles:** autor, revisor y aprobador son hoy la misma persona, el dueño del proyecto y único mantenedor, [Axel Ismael Perez (AxelPRZ)](https://github.com/axelprz).
+- **Aprobación:** cada release lo aprueba el aprobador antes de firmarse. Solo pueden aprobar los miembros con un rol de firma, y todos tienen que usar autenticación multifactor en GitHub y en el servicio de firma.
+- **Privacidad:** ver la política de privacidad de arriba. Firmar no agrega nada a lo que Lumen envía.
+
 ## Requisitos
 
 - Windows 10 (22H2) o Windows 11, x64
