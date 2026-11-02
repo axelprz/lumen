@@ -91,6 +91,16 @@ internal sealed class InMemoryOverrides : IItemOverrideStore
 
         return Task.CompletedTask;
     }
+
+    public Task SetArgsAsync(IEnumerable<ItemRef> refs, string? args, CancellationToken ct)
+    {
+        foreach (var itemRef in refs)
+        {
+            Overrides[itemRef] = (Overrides.GetValueOrDefault(itemRef) ?? new ItemOverride(null, false)) with { Args = LaunchOptions.Clean(args) };
+        }
+
+        return Task.CompletedTask;
+    }
 }
 
 internal sealed class InMemoryAppChoices : IAppChoiceStore

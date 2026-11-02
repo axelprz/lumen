@@ -47,7 +47,7 @@ public sealed class LocalPortableState(
             Hotkey = Hotkey.TryParse(hotkey, out _) ? hotkey!.Trim() : null,
             ManualItems = await manualItems.GetAllAsync(ct).ConfigureAwait(false),
             Overrides = (await overrides.LoadAsync(ct).ConfigureAwait(false))
-                .Where(kv => kv.Value.Title is not null || kv.Value.Hidden)
+                .Where(kv => kv.Value.Title is not null || kv.Value.Hidden || kv.Value.Args is not null)
                 .ToDictionary(kv => kv.Key, kv => kv.Value),
             IgnoredApps = choices.Where(kv => kv.Value == AppChoice.Ignored && AppCuration.IsCandidateSource(kv.Key.Source))
                 .Select(kv => kv.Key).Order(Comparer<ItemRef>.Create((a, b) => string.CompareOrdinal(a.ToString(), b.ToString()))).ToList(),
@@ -178,6 +178,12 @@ public sealed class LocalPortableState(
                 await overrides.SetHiddenAsync([itemRef], wanted.Hidden, ct).ConfigureAwait(false);
                 changed = true;
             }
+
+            if (have?.Args != wanted.Args)
+            {
+                await overrides.SetArgsAsync([itemRef], wanted.Args, ct).ConfigureAwait(false);
+                changed = true;
+            }
         }
 
         foreach (var (itemRef, have) in current.Where(kv => !incoming.ContainsKey(kv.Key)))
@@ -191,6 +197,12 @@ public sealed class LocalPortableState(
             if (have.Hidden)
             {
                 await overrides.SetHiddenAsync([itemRef], false, ct).ConfigureAwait(false);
+                changed = true;
+            }
+
+            if (have.Args is not null)
+            {
+                await overrides.SetArgsAsync([itemRef], null, ct).ConfigureAwait(false);
                 changed = true;
             }
         }

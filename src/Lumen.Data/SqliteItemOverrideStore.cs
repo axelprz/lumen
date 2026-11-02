@@ -12,15 +12,15 @@ public sealed class SqliteItemOverrideStore(ISqliteConnectionFactory connectionF
     public async Task<IReadOnlyDictionary<ItemRef, ItemOverride>> LoadAsync(CancellationToken ct)
     {
         await using var connection = await connectionFactory.OpenAsync(ct).ConfigureAwait(false);
-        var rows = await connection.QueryAsync<(string Ref, string? Title, long Hidden)>(new CommandDefinition(
-            "SELECT ref, title, hidden FROM item_overrides;", cancellationToken: ct)).ConfigureAwait(false);
+        var rows = await connection.QueryAsync<(string Ref, string? Title, long Hidden, string? Args)>(new CommandDefinition(
+            "SELECT ref, title, hidden, args FROM item_overrides;", cancellationToken: ct)).ConfigureAwait(false);
 
         var result = new Dictionary<ItemRef, ItemOverride>();
         foreach (var row in rows)
         {
             if (ItemRef.TryParse(row.Ref, out var itemRef))
             {
-                result[itemRef] = new ItemOverride(row.Title, row.Hidden == 1);
+                result[itemRef] = new ItemOverride(row.Title, row.Hidden == 1, row.Args);
             }
         }
 
@@ -43,6 +43,14 @@ public sealed class SqliteItemOverrideStore(ISqliteConnectionFactory connectionF
             hidden ? 1 : 0,
             ct);
 
+    public Task SetArgsAsync(IEnumerable<ItemRef> refs, string? args, CancellationToken ct) =>
+        UpsertAsync(
+            refs,
+            "INSERT INTO item_overrides (ref, title, hidden, args, updated_at) VALUES (@Ref, NULL, 0, @Value, @Now) " +
+            "ON CONFLICT(ref) DO UPDATE SET args = excluded.args, updated_at = excluded.updated_at;",
+            LaunchOptions.Clean(args),
+            ct);
+
     private async Task UpsertAsync(IEnumerable<ItemRef> refs, string sql, object? value, CancellationToken ct)
     {
         var now = DateTimeOffset.UtcNow.ToString("O", CultureInfo.InvariantCulture);
@@ -56,7 +64,7 @@ public sealed class SqliteItemOverrideStore(ISqliteConnectionFactory connectionF
 
         // A row with no custom title that isn't hidden says nothing: drop it.
         await connection.ExecuteAsync(new CommandDefinition(
-            "DELETE FROM item_overrides WHERE title IS NULL AND hidden = 0;", transaction: transaction, cancellationToken: ct)).ConfigureAwait(false);
+            "DELETE FROM item_overrides WHERE title IS NULL AND hidden = 0 AND args IS NULL;", transaction: transaction, cancellationToken: ct)).ConfigureAwait(false);
         await transaction.CommitAsync(ct).ConfigureAwait(false);
     }
 }

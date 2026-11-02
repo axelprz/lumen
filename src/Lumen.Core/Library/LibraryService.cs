@@ -343,10 +343,16 @@ public sealed partial class LibraryService
             return item;
         }
 
+        // Launch arguments live in the entry's own launch, so every way of playing it (Home, detail, quick search) carries them.
+        var primary = LaunchOptions.Apply(item.Primary, overrides.GetValueOrDefault(item.Primary.Ref)?.Args);
+        var entries = item.Entries.Select(e => e == item.Primary ? primary : LaunchOptions.Apply(e, overrides.GetValueOrDefault(e.Ref)?.Args)).ToList();
         return item with
         {
+            Entries = entries,
+            Primary = primary,
             CustomTitle = found.Select(o => o!.Title).FirstOrDefault(t => t is not null),
             IsHidden = found.Any(o => o!.Hidden),
+            LaunchArguments = LaunchOptions.Supports(item.Primary) ? LaunchOptions.Clean(overrides.GetValueOrDefault(item.Primary.Ref)?.Args) : null,
         };
     }
 

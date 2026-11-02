@@ -424,6 +424,18 @@
   <data name="Detail_RenameHint" xml:space="preserve">
     <value>Este nombre lo usa solo Lumen; la tienda conserva el suyo. Dejalo vacío para usar el nombre de la tienda ({0}).</value>
   </data>
+  <data name="Detail_LaunchArgs" xml:space="preserve">
+    <value>Argumentos de lanzamiento…</value>
+  </data>
+  <data name="Detail_LaunchArgsLabel" xml:space="preserve">
+    <value>Argumentos de lanzamiento</value>
+  </data>
+  <data name="Detail_LaunchArgsHint" xml:space="preserve">
+    <value>Se pasan al juego cuando Lumen lo inicia por Steam, por ejemplo -windowed. Solo los usa Lumen; las opciones de lanzamiento de Steam no cambian. Dejalo vacío para no usar ninguno.</value>
+  </data>
+  <data name="Detail_LaunchArgsInvalid" xml:space="preserve">
+    <value>No se pueden usar esos argumentos: tienen que estar en una sola línea, de hasta 2000 caracteres.</value>
+  </data>
   <data name="Detail_Save" xml:space="preserve">
     <value>Guardar</value>
   </data>

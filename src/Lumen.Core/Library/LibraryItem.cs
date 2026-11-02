@@ -18,6 +18,12 @@ public sealed record LibraryItem(IReadOnlyList<LibraryEntry> Entries, LibraryEnt
     /// <summary>The user hid this item: it only shows with the "Hidden" filter.</summary>
     public bool IsHidden { get; init; }
 
+    /// <summary>The user's launch arguments, already part of <see cref="Primary"/>'s launch; null when none.</summary>
+    public string? LaunchArguments { get; init; }
+
+    /// <summary>The primary entry's launch can carry arguments (see <see cref="LaunchOptions"/>).</summary>
+    public bool SupportsLaunchArguments => LaunchOptions.Supports(Primary);
+
     public string Title => CustomTitle ?? Primary.Title;
 
     /// <summary>The name the store gives it (what "Restore original name" goes back to).</summary>
@@ -62,8 +68,8 @@ public interface IMergeRuleStore
     Task ResetAsync(CancellationToken ct);
 }
 
-/// <summary>The user's per-entry choices: a custom title and whether it is hidden.</summary>
-public sealed record ItemOverride(string? Title, bool Hidden)
+/// <summary>The user's per-entry choices: a custom title, whether it is hidden and launch arguments (<see cref="LaunchOptions"/>).</summary>
+public sealed record ItemOverride(string? Title, bool Hidden, string? Args = null)
 {
     /// <summary>Longest custom title accepted (matches <c>config.schema.json</c>).</summary>
     public const int MaxTitleLength = 120;
@@ -90,4 +96,7 @@ public interface IItemOverrideStore
     Task SetTitleAsync(IEnumerable<ItemRef> refs, string? title, CancellationToken ct);
 
     Task SetHiddenAsync(IEnumerable<ItemRef> refs, bool hidden, CancellationToken ct);
+
+    /// <summary>Sets (or with null, clears) the launch arguments; the text is cleaned with <see cref="LaunchOptions.Clean"/>.</summary>
+    Task SetArgsAsync(IEnumerable<ItemRef> refs, string? args, CancellationToken ct);
 }

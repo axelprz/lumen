@@ -292,6 +292,11 @@ public static class PortableConfigJson
                     var copy = (JsonObject)entry.DeepClone();
                     copy.Remove("title");
                     copy.Remove("hidden");
+                    if (key.StartsWith("steam:", StringComparison.Ordinal))
+                    {
+                        copy.Remove("args"); // Lumen manages the arguments of Steam games; other entries' stay as they were
+                    }
+
                     merged[key] = copy;
                 }
             }
@@ -299,7 +304,7 @@ public static class PortableConfigJson
 
         foreach (var (itemRef, item) in overrides)
         {
-            if (item.Title is null && !item.Hidden)
+            if (item.Title is null && !item.Hidden && item.Args is null)
             {
                 continue;
             }
@@ -314,6 +319,11 @@ public static class PortableConfigJson
             if (item.Hidden)
             {
                 ordered["hidden"] = true;
+            }
+
+            if (item.Args is not null)
+            {
+                ordered["args"] = item.Args;
             }
 
             foreach (var (key, value) in entry)
@@ -473,9 +483,20 @@ public static class PortableConfigJson
 
             var title = ItemOverride.CleanTitle(Text(entry["title"]));
             var hidden = entry["hidden"] is JsonValue h && h.TryGetValue<bool>(out var flag) && flag;
-            if (title is not null || hidden)
+            // Arguments reach a game through Steam only; the file is untrusted, so they must pass the same check as typed ones.
+            string? args = null;
+            if (itemRef.Source == "steam" && Text(entry["args"]) is { } rawArgs)
             {
-                result[itemRef] = new ItemOverride(title, hidden);
+                args = LaunchOptions.Clean(rawArgs);
+                if (args is null)
+                {
+                    problems.Add($"overrides[\"{key}\"].args is not valid launch arguments; ignored.");
+                }
+            }
+
+            if (title is not null || hidden || args is not null)
+            {
+                result[itemRef] = new ItemOverride(title, hidden, args);
             }
         }
 
