@@ -59,6 +59,27 @@ Updates: Lumen looks for a new version when it starts and once a day (you can tu
 - No third-party plugins or themes are loaded in v1.
 - Imported routines are shown in full and must be approved before they can run.
 
+## Privacy policy
+
+Lumen has no servers of its own and sends no analytics or telemetry. Everything it stores (settings, library cache, DPAPI-protected keys) stays on your PC, plus the sync folder you choose if you turn sync on. The only network connections it makes, each one only for the feature that needs it, are:
+
+- **Steam Web API and Steam's image CDN**: your library, playtime and covers. Your Steam Web API key and SteamID64 go to Steam only.
+- **SteamGridDB**: artwork. Your SteamGridDB key goes to SteamGridDB only.
+- **Epic and GOG sign-in and library services**: only if you connect that account.
+- **Steam's website**: only inside Lumen's built-in Steam sign-in browser, if you choose to sign in.
+- **GitHub Releases**: to look for and download Lumen updates. Nothing about you is sent.
+
+Opening a link in your browser (a store page, for example) is done by your browser, not by Lumen.
+
+## Code signing policy
+
+Lumen's releases are **not signed yet** (see [Installing](#installing)). We are applying for free code signing for open-source projects from the [SignPath Foundation](https://signpath.org/). This section describes the policy we will follow; the installer stays unsigned until the application is approved, and the text below will then be updated.
+
+- **What is signed:** only the files produced by this repository's GitHub Actions release workflow from a tagged commit, never a build made on a developer's PC.
+- **Roles:** author, reviewer and approver are the same person today, the project owner and only maintainer, [Axel Ismael Perez (AxelPRZ)](https://github.com/axelprz).
+- **Approval:** each release is approved by the approver before it is signed. Only members with a signing role can approve, and all of them must use multi-factor authentication on GitHub and on the signing service.
+- **Privacy:** see the privacy policy above. Signing adds nothing to what Lumen sends.
+
 ## Requirements
 
 - Windows 10 (22H2) or Windows 11, x64
