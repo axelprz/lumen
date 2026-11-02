@@ -31,6 +31,9 @@ public sealed partial class SteamSettingsViewModel : ObservableObject
 {
     public const string ApiKeyPage = "https://steamcommunity.com/dev/apikey";
 
+    /// <summary>The same page opened by the Steam app itself (its browser already has the user signed in).</summary>
+    public const string ApiKeyPageInSteam = "steam://openurl/" + ApiKeyPage;
+
     private readonly ISecretStore _secrets;
     private readonly ILocalSettings _settings;
     private readonly SteamProvider _steam;
@@ -150,6 +153,20 @@ public sealed partial class SteamSettingsViewModel : ObservableObject
     [RelayCommand]
     private Task OpenApiKeyPageAsync() =>
         _launcher.StartAsync(new LaunchSpec(LaunchKind.Uri, ApiKeyPage), CancellationToken.None);
+
+    // Friends' feedback: the browser may not be signed in to Steam, the Steam app is. Without Steam installed the browser opens instead.
+    [RelayCommand]
+    private async Task OpenApiKeyPageInSteamAsync()
+    {
+        try
+        {
+            await _launcher.StartAsync(new LaunchSpec(LaunchKind.Uri, ApiKeyPageInSteam), CancellationToken.None);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            await _launcher.StartAsync(new LaunchSpec(LaunchKind.Uri, ApiKeyPage), CancellationToken.None);
+        }
+    }
 
     private void SetStatus(StatusKind kind, string key, params object[] args)
     {
