@@ -54,6 +54,20 @@ public sealed class FreeGamesServiceTests
     }
 
     [Fact]
+    public void Merge_AnEpicGiveawayFromAnotherService_IsDroppedWhenTheEpicFeedAnswered_EvenWithAnotherName()
+    {
+        var epic = Game("epic", "Sorry We're Closed") with { Store = "Epic Games Store" };
+        var other = Game("gamerpower", "Sorry We're Closed - Special Edition") with { Store = "Epic Games Store" };
+        var steam = Game("gamerpower", "Another Game") with { Store = "Steam" };
+
+        FreeGamesService.Merge([new FreeGamesResult(true, [epic]), new FreeGamesResult(true, [other, steam])], Now)
+            .Games.Select(g => g.Title).ShouldBe(["Another Game", "Sorry We're Closed"]);
+
+        // With the Epic feed down, the giveaway list is all there is for Epic: keep it.
+        FreeGamesService.Merge([FreeGamesResult.Failed, new FreeGamesResult(true, [other])], Now).Games.ShouldHaveSingleItem();
+    }
+
+    [Fact]
     public void Merge_FreeNowAndComingLaterOfTheSameTitle_AreBothKept()
     {
         var snapshot = FreeGamesService.Merge([new FreeGamesResult(true, [Game("epic", "Quest"), Game("epic", "Quest", startsInDays: 7)])], Now);

@@ -4,6 +4,7 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using Lumen.Core.Deals;
 
 namespace Lumen.Providers.Deals;
@@ -14,7 +15,7 @@ namespace Lumen.Providers.Deals;
 /// Only giveaways of games on a store Lumen supports are kept (owner, 2026-11-02): other stores and DRM-free pages
 /// (itch.io and the like) are left out, and so are other kinds (loot, beta access).
 /// </summary>
-public sealed class GamerPowerClient(HttpClient http) : IFreeGamesSource
+public sealed partial class GamerPowerClient(HttpClient http) : IFreeGamesSource
 {
     public const string SiteUrl = "https://www.gamerpower.com/";
 
@@ -85,7 +86,7 @@ public sealed class GamerPowerClient(HttpClient http) : IFreeGamesSource
         var games = new List<FreeGame>();
         foreach (var item in array.OfType<JsonObject>())
         {
-            var title = Text(item["title"]);
+            var title = CleanTitle(Text(item["title"]));
             var url = Text(item["open_giveaway_url"]);
             var type = Text(item["type"]);
             var status = Text(item["status"]);
@@ -114,6 +115,21 @@ public sealed class GamerPowerClient(HttpClient http) : IFreeGamesSource
 
         return new FreeGamesResult(true, games);
     }
+
+    /// <summary>GamerPower names a giveaway "Name (Epic Games) Giveaway": the game's own name is what is shown and compared.</summary>
+    public static string? CleanTitle(string? title)
+    {
+        if (title is null)
+        {
+            return null;
+        }
+
+        var clean = GiveawaySuffix().Replace(title, string.Empty).Trim();
+        return clean.Length == 0 ? title : clean;
+    }
+
+    [GeneratedRegex(@"\s*(\([^)]*\))?\s*Giveaway\s*$", RegexOptions.IgnoreCase)]
+    private static partial Regex GiveawaySuffix();
 
     // The stores of Lumen named in a platforms text ("PC, Steam, itch.io" -> Steam), in the order given, once each.
     private static List<string> StoresOf(string? platforms) =>

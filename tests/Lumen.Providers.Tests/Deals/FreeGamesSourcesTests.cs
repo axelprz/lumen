@@ -84,7 +84,7 @@ public sealed class FreeGamesSourcesTests
         var result = GamerPowerClient.Parse(Fixtures.Read("deals/gamerpower_giveaways.json"));
 
         result.Ok.ShouldBeTrue();
-        result.Games.Select(g => g.Title).ShouldBe(["Sample Giveaway Game (Steam) Giveaway", "Sample Endless Game", "Sample Steam And Itch"]);
+        result.Games.Select(g => g.Title).ShouldBe(["Sample Giveaway Game", "Sample Endless Game", "Sample Steam And Itch"]);
 
         var first = result.Games[0];
         first.Store.ShouldBe("Steam");
@@ -98,6 +98,17 @@ public sealed class FreeGamesSourcesTests
         endless.Store.ShouldBe("GOG");
         result.Games[2].Store.ShouldBe("Steam"); // itch.io is not one of Lumen's stores
         result.Games.ShouldAllBe(g => DealUrls.IsSafeToOpen(g.Url));
+    }
+
+    [Theory]
+    [InlineData("Sorry We're Closed (Epic Games) Giveaway", "Sorry We're Closed")]
+    [InlineData("Some Game Giveaway", "Some Game")]
+    [InlineData("Some Game (Steam) giveaway", "Some Game")]
+    [InlineData("Plain Name", "Plain Name")]
+    [InlineData("Giveaway", "Giveaway")]
+    public void GamerPower_CleanTitle_DropsTheGiveawaySuffix(string raw, string expected)
+    {
+        GamerPowerClient.CleanTitle(raw).ShouldBe(expected);
     }
 
     [Fact]
