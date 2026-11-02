@@ -4,7 +4,7 @@
 namespace Lumen.Core.Deals;
 
 /// <summary>One free game (or giveaway) as a service reported it.</summary>
-/// <param name="Source">Which service said so ("epic", "gamerpower").</param>
+/// <param name="Source">Which service said so ("epic").</param>
 /// <param name="Store">Where to claim it, as the service names it ("Epic Games Store", "Steam, PC").</param>
 /// <param name="Url">The page to open in the user's browser; always one that <see cref="DealUrls.IsSafeToOpen"/> accepts.</param>
 /// <param name="StartsAt">Set for games that become free later; null when free now.</param>
@@ -32,7 +32,7 @@ public interface IFreeGamesSource
 /// <summary>Links that come from a service's answer are untrusted: only these may be opened.</summary>
 public static class DealUrls
 {
-    private static readonly string[] AllowedHosts = ["store.epicgames.com", "www.gamerpower.com", "steamcito.com.ar"];
+    private static readonly string[] AllowedHosts = ["store.epicgames.com", "steamcito.com.ar"];
 
     /// <summary>An <c>https</c> address on one of the hosts Lumen links to (never a script, file or other scheme).</summary>
     public static bool IsSafeToOpen(string? url) =>

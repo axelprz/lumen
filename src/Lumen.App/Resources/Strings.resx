@@ -53,7 +53,7 @@
     <value>Deals</value>
   </data>
   <data name="Settings_Deals" xml:space="preserve">
-    <value>Show free games in Deals (contacts Epic Games Store and GamerPower)</value>
+    <value>Show free games in Deals (contacts the Epic Games Store)</value>
   </data>
   <data name="Deals_Subtitle" xml:space="preserve">
     <value>Free games from the stores Lumen supports that you can claim right now.</value>
@@ -62,7 +62,7 @@
     <value>Turn on Deals</value>
   </data>
   <data name="Deals_OptIn_Body" xml:space="preserve">
-    <value>Deals is off until you turn it on. When it is on, Lumen asks two services for the free games: the Epic Games Store (store-site-backend-static.ak.epicgames.com) and GamerPower (www.gamerpower.com). Nothing about you goes with the request: no account, no library, no ID. Links open in your browser. You can turn it off again in Settings.</value>
+    <value>Deals is off until you turn it on. When it is on, Lumen asks the Epic Games Store (store-site-backend-static.ak.epicgames.com) for its free games. Nothing about you goes with the request: no account, no library, no ID. Links open in your browser. You can turn it off again in Settings.</value>
   </data>
   <data name="Deals_OptIn_Enable" xml:space="preserve">
     <value>Turn on</value>
@@ -101,10 +101,7 @@
     <value>Couldn't load the free games. Check your connection and try Refresh.</value>
   </data>
   <data name="Deals_Partial" xml:space="preserve">
-    <value>One of the services did not answer, so this list may be incomplete.</value>
-  </data>
-  <data name="Deals_Attribution" xml:space="preserve">
-    <value>Giveaways from</value>
+    <value>A service did not answer, so this list may be incomplete.</value>
   </data>
   <data name="Deals_Saving_Title" xml:space="preserve">
     <value>Saving in Argentina</value>

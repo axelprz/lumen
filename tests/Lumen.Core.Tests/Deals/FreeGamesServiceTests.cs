@@ -10,7 +10,7 @@ public sealed class FreeGamesServiceTests
     private static readonly DateTimeOffset Now = new(2026, 11, 3, 12, 0, 0, TimeSpan.Zero);
 
     private static FreeGame Game(string source, string title, int? endsInDays = 5, int? startsInDays = null) =>
-        new(source, title, "Store", "https://www.gamerpower.com/open/x", startsInDays is { } s ? Now.AddDays(s) : null, endsInDays is { } e ? Now.AddDays(e) : null, null);
+        new(source, title, "Store", "https://store.epicgames.com/en-US/p/x", startsInDays is { } s ? Now.AddDays(s) : null, endsInDays is { } e ? Now.AddDays(e) : null, null);
 
     private sealed class Source(string id, Func<FreeGamesResult> answer) : IFreeGamesSource
     {
@@ -47,7 +47,7 @@ public sealed class FreeGamesServiceTests
     public void Merge_TheSameGameFromTwoSources_IsListedOnce_KeepingTheFirstSource()
     {
         var snapshot = FreeGamesService.Merge(
-            [new FreeGamesResult(true, [Game("epic", "Sample Quest")]), new FreeGamesResult(true, [Game("gamerpower", "SAMPLE  quest!")])],
+            [new FreeGamesResult(true, [Game("epic", "Sample Quest")]), new FreeGamesResult(true, [Game("other", "SAMPLE  quest!")])],
             Now);
 
         snapshot.Games.ShouldHaveSingleItem().Source.ShouldBe("epic");
@@ -57,11 +57,11 @@ public sealed class FreeGamesServiceTests
     public void Merge_OtherEpicGiveawaysFromGamerPower_AreKept_OnlyTheSameTitleIsDropped()
     {
         var epic = Game("epic", "Sorry We're Closed") with { Store = "Epic Games Store" };
-        var same = Game("gamerpower", "Sorry We're Closed") with { Store = "Epic Games Store" };
-        var other = Game("gamerpower", "Horse Racing") with { Store = "Epic Games Store" };
+        var same = Game("other", "Sorry We're Closed") with { Store = "Epic Games Store" };
+        var other = Game("other", "Horse Racing") with { Store = "Epic Games Store" };
 
         FreeGamesService.Merge([new FreeGamesResult(true, [epic]), new FreeGamesResult(true, [same, other])], Now)
-            .Games.Select(g => (g.Title, g.Source)).ShouldBe([("Horse Racing", "gamerpower"), ("Sorry We're Closed", "epic")], ignoreOrder: true);
+            .Games.Select(g => (g.Title, g.Source)).ShouldBe([("Horse Racing", "other"), ("Sorry We're Closed", "epic")], ignoreOrder: true);
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public sealed class FreeGamesServiceTests
 
     [Theory]
     [InlineData("https://store.epicgames.com/en-US/p/x", true)]
-    [InlineData("https://www.gamerpower.com/open/x", true)]
+    [InlineData("https://store.epicgames.com/en-US/p/x", true)]
     [InlineData("https://steamcito.com.ar/machete-del-ahorro-en-gaming-en-argentina", true)]
     [InlineData("http://store.epicgames.com/x", false)]
     [InlineData("https://evil.example.com/x", false)]

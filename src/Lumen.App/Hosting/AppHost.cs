@@ -134,10 +134,9 @@ public static class AppHost
             sp.GetRequiredService<ILocalSettings>()));
         builder.Services.AddSingleton<IMetadataCache, SqliteMetadataCache>();
 
-        // Deals (M13, off until the user turns it on): the free-games feeds. Plain HttpClient, no account or identifier in any request,
+        // Deals (M13, off until the user turns it on): the free-games feed. Plain HttpClient, no account or identifier in any request,
         // answers capped at 2 MB. Hosts are listed in CLAUDE.md security rule 4.
         builder.Services.AddSingleton<IFreeGamesSource>(_ => new EpicFreeGamesClient(DealsHttp()));
-        builder.Services.AddSingleton<IFreeGamesSource>(_ => new GamerPowerClient(DealsHttp()));
         builder.Services.AddSingleton<FreeGamesService>();
         builder.Services.AddSingleton<DealsViewModel>();
 
