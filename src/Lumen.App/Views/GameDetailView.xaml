@@ -176,6 +176,8 @@
                 <MenuItem Header="{l:Loc Detail_RestoreTitle}" Command="{Binding RestoreTitleCommand}"
                           Visibility="{Binding HasCustomTitle, Converter={StaticResource BoolToVisibility}}" />
                 <MenuItem Header="{Binding HideText}" Command="{Binding ToggleHiddenCommand}" />
+                <MenuItem Header="{l:Loc Detail_LaunchArgs}" Command="{Binding StartLaunchArgsCommand}"
+                          Visibility="{Binding SupportsLaunchArguments, Converter={StaticResource BoolToVisibility}}" />
                 <Separator />
                 <MenuItem Header="{l:Loc Tile_ChangeCover}" Command="{Binding ChangeCoverCommand}" />
                 <MenuItem Header="{l:Loc Detail_ChangeBackground}" Command="{Binding ChangeBackgroundCommand}" />
@@ -274,6 +276,31 @@
               <Button Command="{Binding SaveRenameCommand}" Content="{l:Loc Detail_Save}" Style="{StaticResource Lumen.Button.Primary}"
                       Margin="0,0,8,0" />
               <Button Command="{Binding CancelRenameCommand}" Content="{l:Loc Detail_Cancel}" Style="{StaticResource Lumen.Button}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <!-- Launch arguments (Steam games) -->
+        <Border Margin="0,4,0,12" Padding="16" CornerRadius="12" MaxWidth="640" HorizontalAlignment="Left"
+                Background="{DynamicResource Lumen.Brush.Glass}" BorderBrush="{DynamicResource Lumen.Brush.GlassBorder}" BorderThickness="1"
+                Visibility="{Binding IsEditingLaunchArgs, Converter={StaticResource BoolToVisibility}}">
+          <StackPanel>
+            <TextBlock Text="{l:Loc Detail_LaunchArgsLabel}" Style="{StaticResource InfoLabel}" />
+            <TextBox Text="{Binding LaunchArgsText, UpdateSourceTrigger=PropertyChanged}"
+                     MaxLength="2000" Height="36" VerticalContentAlignment="Center" Padding="8,0"
+                     IsVisibleChanged="OnEditorVisibleChanged"
+                     AutomationProperties.Name="{l:Loc Detail_LaunchArgsLabel}">
+              <TextBox.InputBindings>
+                <KeyBinding Key="Return" Command="{Binding SaveLaunchArgsCommand}" />
+                <KeyBinding Key="Escape" Command="{Binding CancelLaunchArgsCommand}" />
+              </TextBox.InputBindings>
+            </TextBox>
+            <TextBlock Text="{l:Loc Detail_LaunchArgsHint}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,8,0,12"
+                       Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+            <StackPanel Orientation="Horizontal">
+              <Button Command="{Binding SaveLaunchArgsCommand}" Content="{l:Loc Detail_Save}" Style="{StaticResource Lumen.Button.Primary}"
+                      Margin="0,0,8,0" />
+              <Button Command="{Binding CancelLaunchArgsCommand}" Content="{l:Loc Detail_Cancel}" Style="{StaticResource Lumen.Button}" />
             </StackPanel>
           </StackPanel>
         </Border>

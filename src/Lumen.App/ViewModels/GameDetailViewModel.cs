@@ -89,6 +89,12 @@ public sealed partial class GameDetailViewModel : ObservableObject
     private string _renameText = string.Empty;
 
     [ObservableProperty]
+    private bool _isEditingLaunchArgs;
+
+    [ObservableProperty]
+    private string _launchArgsText = string.Empty;
+
+    [ObservableProperty]
     private bool _isMerging;
 
     [ObservableProperty]
@@ -199,6 +205,11 @@ public sealed partial class GameDetailViewModel : ObservableObject
     public bool HasCollections => CollectionChoices.Count > 0;
 
     public bool HasCustomTitle => Item.CustomTitle is not null;
+
+    /// <summary>Steam games can start with arguments; manual items have their own field in their editor.</summary>
+    public bool SupportsLaunchArguments => Item.SupportsLaunchArguments;
+
+    public bool HasLaunchArguments => Item.LaunchArguments is not null;
 
     public string HideText => _s.Localizer[Item.IsHidden ? "Tile_Unhide" : "Tile_Hide"];
 
@@ -335,6 +346,7 @@ public sealed partial class GameDetailViewModel : ObservableObject
     private void StartCollections()
     {
         IsRenaming = false;
+        IsEditingLaunchArgs = false;
         IsMerging = false;
         NewCollectionName = string.Empty;
         RefreshCollections();
@@ -385,6 +397,7 @@ public sealed partial class GameDetailViewModel : ObservableObject
     [RelayCommand]
     private void StartRename()
     {
+        IsEditingLaunchArgs = false;
         IsMerging = false;
         IsChoosingCollections = false;
         RenameText = Item.Title;
@@ -416,6 +429,36 @@ public sealed partial class GameDetailViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void StartLaunchArgs()
+    {
+        IsRenaming = false;
+        IsMerging = false;
+        IsChoosingCollections = false;
+        Notice = null;
+        LaunchArgsText = Item.LaunchArguments ?? string.Empty;
+        IsEditingLaunchArgs = true;
+    }
+
+    [RelayCommand]
+    private void CancelLaunchArgs() => IsEditingLaunchArgs = false;
+
+    /// <summary>Saves the arguments on the primary entry; empty clears them. Text that is not valid is refused, not cut.</summary>
+    [RelayCommand]
+    private async Task SaveLaunchArgsAsync()
+    {
+        var args = LaunchOptions.Clean(LaunchArgsText);
+        if (args is null && !string.IsNullOrWhiteSpace(LaunchArgsText))
+        {
+            Notice = _s.Localizer["Detail_LaunchArgsInvalid"];
+            return;
+        }
+
+        IsEditingLaunchArgs = false;
+        await _s.Overrides.SetArgsAsync([Item.Primary.Ref], args, CancellationToken.None);
+        await _s.Library.ReloadUserChoicesAsync(CancellationToken.None);
+    }
+
+    [RelayCommand]
     private async Task ToggleHiddenAsync()
     {
         await _s.Overrides.SetHiddenAsync(Item.Entries.Select(e => e.Ref), !Item.IsHidden, CancellationToken.None);
@@ -426,6 +469,7 @@ public sealed partial class GameDetailViewModel : ObservableObject
     private void StartMerge()
     {
         IsRenaming = false;
+        IsEditingLaunchArgs = false;
         IsChoosingCollections = false;
         MergeSearch = string.Empty;
         MergeCandidates = [];
