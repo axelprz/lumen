@@ -147,6 +147,17 @@
                 </Border>
 
                 <Border Style="{StaticResource Settings.Row}">
+                  <DockPanel>
+                    <CheckBox DockPanel.Dock="Right"
+                              IsChecked="{Binding Deals.IsEnabled}"
+                              Style="{StaticResource Lumen.Switch}"
+                              VerticalAlignment="Center"
+                              AutomationProperties.Name="{l:Loc Settings_Deals}" />
+                    <TextBlock Text="{l:Loc Settings_Deals}" Style="{StaticResource Settings.RowLabel}" Margin="0,0,16,0" />
+                  </DockPanel>
+                </Border>
+
+                <Border Style="{StaticResource Settings.Row}">
                   <StackPanel>
                     <DockPanel>
                       <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">

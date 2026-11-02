@@ -21,6 +21,7 @@ public sealed partial class SettingsViewModel(
     SyncSettingsViewModel sync,
     UpdateSettingsViewModel updates,
     AboutViewModel about,
+    DealsViewModel deals,
     IMergeRuleStore mergeRules,
     LibraryService library,
     ILocalizer localizer) : ObservableObject
@@ -52,6 +53,9 @@ public sealed partial class SettingsViewModel(
 
     public AboutViewModel About { get; } = about;
 
+    /// <summary>Owns the Deals switch (off by default); Settings shows it too.</summary>
+    public DealsViewModel Deals { get; } = deals;
+
     public bool HasLibraryStatus => !string.IsNullOrEmpty(LibraryStatus);
 
     public async Task InitializeAsync(CancellationToken ct)
@@ -61,6 +65,7 @@ public sealed partial class SettingsViewModel(
         await Epic.InitializeAsync(ct);
         await Gog.InitializeAsync(ct);
         await Artwork.InitializeAsync(ct);
+        await Deals.InitializeAsync(ct);
     }
 
     /// <summary>Forgets "separate", "merge" and "always use" decisions so games are grouped automatically again.</summary>

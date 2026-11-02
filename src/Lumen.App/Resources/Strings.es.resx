@@ -49,6 +49,75 @@
   <data name="Notify_Launch_Title" xml:space="preserve">
     <value>Un juego no arrancó</value>
   </data>
+  <data name="Nav_Deals" xml:space="preserve">
+    <value>Ofertas</value>
+  </data>
+  <data name="Settings_Deals" xml:space="preserve">
+    <value>Mostrar juegos gratis en Ofertas (consulta a Epic Games Store y GamerPower)</value>
+  </data>
+  <data name="Deals_Subtitle" xml:space="preserve">
+    <value>Juegos gratis y regalos que podés reclamar ahora mismo.</value>
+  </data>
+  <data name="Deals_OptIn_Title" xml:space="preserve">
+    <value>Activar Ofertas</value>
+  </data>
+  <data name="Deals_OptIn_Body" xml:space="preserve">
+    <value>Ofertas está apagada hasta que la actives. Cuando está encendida, Lumen le pide los juegos gratis a dos servicios: Epic Games Store (store-site-backend-static.ak.epicgames.com) y GamerPower (www.gamerpower.com). Con el pedido no viaja nada tuyo: ni cuenta, ni biblioteca, ni ID. Los enlaces se abren en tu navegador. Podés volver a apagarla en Ajustes.</value>
+  </data>
+  <data name="Deals_OptIn_Enable" xml:space="preserve">
+    <value>Activar</value>
+  </data>
+  <data name="Deals_Refresh" xml:space="preserve">
+    <value>Actualizar</value>
+  </data>
+  <data name="Deals_Loading" xml:space="preserve">
+    <value>Buscando juegos gratis…</value>
+  </data>
+  <data name="Deals_FreeNow_Title" xml:space="preserve">
+    <value>Gratis ahora</value>
+  </data>
+  <data name="Deals_Upcoming_Title" xml:space="preserve">
+    <value>Próximamente</value>
+  </data>
+  <data name="Deals_FreeUntil" xml:space="preserve">
+    <value>Gratis hasta el {0}</value>
+  </data>
+  <data name="Deals_FreeFrom" xml:space="preserve">
+    <value>Gratis desde el {0}</value>
+  </data>
+  <data name="Deals_NoEndDate" xml:space="preserve">
+    <value>Sin fecha de fin anunciada</value>
+  </data>
+  <data name="Deals_Worth" xml:space="preserve">
+    <value>Normalmente {0}</value>
+  </data>
+  <data name="Deals_Open" xml:space="preserve">
+    <value>Abrir</value>
+  </data>
+  <data name="Deals_Empty" xml:space="preserve">
+    <value>No hay juegos gratis por ahora. Volvé a mirar más tarde.</value>
+  </data>
+  <data name="Deals_Failed" xml:space="preserve">
+    <value>No se pudieron cargar los juegos gratis. Revisá tu conexión y probá con Actualizar.</value>
+  </data>
+  <data name="Deals_Partial" xml:space="preserve">
+    <value>Uno de los servicios no respondió, así que esta lista puede estar incompleta.</value>
+  </data>
+  <data name="Deals_Attribution" xml:space="preserve">
+    <value>Regalos de</value>
+  </data>
+  <data name="Deals_Saving_Title" xml:space="preserve">
+    <value>Ahorro en Argentina</value>
+  </data>
+  <data name="Deals_Saving_Body" xml:space="preserve">
+    <value>Para ahorrar en juegos en Argentina, mirá Steamcito: una web de la comunidad con una extensión para el navegador y una guía de ahorro muy bien actualizadas. Te recomendamos revisar las dos, tienen muy buena información.</value>
+  </data>
+  <data name="Deals_Saving_OpenGuide" xml:space="preserve">
+    <value>Abrir la guía de ahorro</value>
+  </data>
+  <data name="Deals_Saving_OpenSite" xml:space="preserve">
+    <value>Visitar Steamcito</value>
+  </data>
   <data name="Nav_Settings" xml:space="preserve">
     <value>Configuración</value>
   </data>
