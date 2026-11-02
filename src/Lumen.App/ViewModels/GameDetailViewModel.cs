@@ -9,6 +9,7 @@ using Lumen.Core.Artwork;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
 using Lumen.Core.Platform;
+using Lumen.Providers.Steam;
 
 namespace Lumen.App.ViewModels;
 
@@ -24,7 +25,8 @@ public sealed record DetailServices(
     IDialogService Dialogs,
     IFileSystem FileSystem,
     ILocalizer Localizer,
-    Func<LibraryEntry, string> StoreName);
+    Func<LibraryEntry, string> StoreName,
+    SteamAchievementsService? Achievements = null);
 
 /// <summary>One store a merged game can be played from, as shown in the detail view's selector.</summary>
 public sealed record StoreChoice(LibraryEntry Entry, string Label)
@@ -89,6 +91,15 @@ public sealed partial class GameDetailViewModel : ObservableObject
     private string _renameText = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowAchievements))]
+    [NotifyPropertyChangedFor(nameof(HasAchievementCount))]
+    [NotifyPropertyChangedFor(nameof(AchievementsCountText))]
+    [NotifyPropertyChangedFor(nameof(AchievementsPercent))]
+    [NotifyPropertyChangedFor(nameof(AchievementsPercentText))]
+    [NotifyPropertyChangedFor(nameof(AchievementsNote))]
+    private AchievementsResult? _achievements;
+
+    [ObservableProperty]
     private bool _isEditingLaunchArgs;
 
     [ObservableProperty]
@@ -142,7 +153,17 @@ public sealed partial class GameDetailViewModel : ObservableObject
         var lastPlayed = LibraryFilter.LastPlayed(item);
         LastPlayedText = lastPlayed is null ? loc["Detail_NeverPlayed"] : lastPlayed.Value.LocalDateTime.ToString("D", CultureInfo.CurrentCulture);
         InstallPath = item.Entries.Select(e => e.InstallDirectory).FirstOrDefault(d => !string.IsNullOrWhiteSpace(d)) ?? loc["Detail_NotInstalledPath"];
+
+        // Steam games owned by the account (not family-shared ones) show their achievements once Steam answers.
+        var steam = item.Entries.FirstOrDefault(e => e.Ref.Source == SteamProvider.SourceId && !e.Extra.ContainsKey("family"));
+        if (steam is not null && services.Achievements is not null)
+        {
+            _ = LoadAchievementsAsync(services.Achievements, steam.Ref.ExternalId);
+        }
     }
+
+    private async Task LoadAchievementsAsync(SteamAchievementsService service, string appId) =>
+        Achievements = await service.GetAsync(appId, CancellationToken.None);
 
     public LibraryItem Item { get; }
 
@@ -205,6 +226,31 @@ public sealed partial class GameDetailViewModel : ObservableObject
     public bool HasCollections => CollectionChoices.Count > 0;
 
     public bool HasCustomTitle => Item.CustomTitle is not null;
+
+    /// <summary>The achievements card: Steam games that have achievements, or that need a key or sign-in to show them.</summary>
+    public bool ShowAchievements => Achievements is { Status: not AchievementsStatus.NotAvailable };
+
+    public bool HasAchievementCount => Achievements is { Status: AchievementsStatus.Available };
+
+    public double AchievementsPercent => Achievements?.Percent ?? 0;
+
+    public string? AchievementsCountText => Achievements is { Status: AchievementsStatus.Available } a
+        ? string.Format(CultureInfo.CurrentCulture, _s.Localizer["Detail_AchievementsCount"], a.Unlocked, a.Total)
+        : null;
+
+    public string? AchievementsPercentText => Achievements is { Status: AchievementsStatus.Available } a
+        ? string.Format(CultureInfo.CurrentCulture, _s.Localizer["Detail_AchievementsPercent"], a.Percent)
+        : null;
+
+    /// <summary>Why the numbers are missing (no key, private profile, Steam unreachable); the percentage when they are there.</summary>
+    public string? AchievementsNote => Achievements?.Status switch
+    {
+        AchievementsStatus.Available => AchievementsPercentText,
+        AchievementsStatus.NeedsSetup => _s.Localizer["Detail_AchievementsNeedsSetup"],
+        AchievementsStatus.Private => _s.Localizer["Detail_AchievementsPrivate"],
+        AchievementsStatus.Failed => _s.Localizer["Detail_AchievementsFailed"],
+        _ => null,
+    };
 
     /// <summary>Steam games can start with arguments; manual items have their own field in their editor.</summary>
     public bool SupportsLaunchArguments => Item.SupportsLaunchArguments;

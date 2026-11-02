@@ -23,9 +23,15 @@ public enum SteamApiError
     RateLimited,
     Network,
     Unexpected,
+
+    /// <summary>The game has no achievements (Steam answers "Requested app has no stats").</summary>
+    NoAchievements,
 }
 
 public sealed record SteamOwnedGamesResult(SteamApiError Error, IReadOnlyList<SteamOwnedGame> Games, string? Detail = null);
+
+/// <summary>How many achievements of one game the account has unlocked, out of how many the game has.</summary>
+public sealed record SteamAchievementsResult(SteamApiError Error, int Unlocked, int Total, string? Detail = null);
 
 /// <summary>
 /// Steam Web API: <c>IPlayerService/GetOwnedGames/v1</c>. Steam only accepts the key as a query
@@ -124,6 +130,104 @@ public sealed partial class SteamWebApi(HttpClient http)
         return new(SteamApiError.None, result);
     }
 
+    /// <summary>Unlocked and total achievements of one game (<c>ISteamUserStats/GetPlayerAchievements/v1</c>), with the Web API key.</summary>
+    public Task<SteamAchievementsResult> GetAchievementsAsync(string apiKey, string steamId64, string appId, CancellationToken ct)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        return GetAchievementsCoreAsync("key=" + Uri.EscapeDataString(apiKey), steamId64, appId, ct);
+    }
+
+    /// <summary>The same with the account's own web token (signed in on Steam's website; no key needed).</summary>
+    public Task<SteamAchievementsResult> GetAchievementsWithTokenAsync(string accessToken, string steamId64, string appId, CancellationToken ct)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(accessToken);
+        return GetAchievementsCoreAsync("access_token=" + Uri.EscapeDataString(accessToken), steamId64, appId, ct);
+    }
+
+    private async Task<SteamAchievementsResult> GetAchievementsCoreAsync(string credential, string steamId64, string appId, CancellationToken ct)
+    {
+        if (!IsValidSteamId64(steamId64))
+        {
+            throw new ArgumentException("Not a SteamID64.", nameof(steamId64));
+        }
+
+        if (string.IsNullOrEmpty(appId) || !appId.All(char.IsAsciiDigit))
+        {
+            throw new ArgumentException("Not a Steam app id.", nameof(appId));
+        }
+
+        var uri = new Uri($"{BaseAddress}ISteamUserStats/GetPlayerAchievements/v1/?{credential}&steamid={steamId64}&appid={appId}&format=json");
+
+        HttpResponseMessage response;
+        try
+        {
+            response = await http.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, ct).ConfigureAwait(false);
+        }
+        catch (HttpRequestException ex)
+        {
+            return new(SteamApiError.Network, 0, 0, ex.HttpRequestError.ToString());
+        }
+        catch (TaskCanceledException) when (!ct.IsCancellationRequested)
+        {
+            return new(SteamApiError.Network, 0, 0, "Timeout");
+        }
+
+        using (response)
+        {
+            var code = ((int)response.StatusCode).ToString(CultureInfo.InvariantCulture);
+            if (response.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                return new(SteamApiError.RateLimited, 0, 0, code);
+            }
+
+            // Steam explains "no stats" (400) and "profile is not public" (403) in the JSON body, so read it before judging the status.
+            var body = await response.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+            var parsed = ParseAchievements(body);
+            if (response.IsSuccessStatusCode)
+            {
+                return parsed;
+            }
+
+            return parsed.Error is SteamApiError.NoAchievements or SteamApiError.PrivateProfile
+                ? parsed
+                : new(response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden ? SteamApiError.InvalidKey : SteamApiError.Unexpected, 0, 0, code);
+        }
+    }
+
+    /// <summary>Parses the GetPlayerAchievements JSON body: counts of unlocked and total, or what Steam said was wrong.</summary>
+    public static SteamAchievementsResult ParseAchievements(string json)
+    {
+        PlayerStatsEnvelope? envelope;
+        try
+        {
+            envelope = JsonSerializer.Deserialize<PlayerStatsEnvelope>(json);
+        }
+        catch (JsonException ex)
+        {
+            return new(SteamApiError.Unexpected, 0, 0, "Invalid JSON: " + ex.Message);
+        }
+
+        var stats = envelope?.PlayerStats;
+        if (stats is null)
+        {
+            return new(SteamApiError.Unexpected, 0, 0, "No playerstats");
+        }
+
+        if (stats.Success != true)
+        {
+            // VERIFY: the wording of Steam's error text ("Requested app has no stats", "Profile is not public").
+            var error = stats.Error ?? string.Empty;
+            return error.Contains("no stats", StringComparison.OrdinalIgnoreCase) ? new(SteamApiError.NoAchievements, 0, 0)
+                : error.Contains("not public", StringComparison.OrdinalIgnoreCase) ? new(SteamApiError.PrivateProfile, 0, 0)
+                : new(SteamApiError.Unexpected, 0, 0, "Steam reported a failure");
+        }
+
+        var achievements = stats.Achievements;
+        return achievements is null or { Count: 0 }
+            ? new(SteamApiError.NoAchievements, 0, 0)
+            : new(SteamApiError.None, achievements.Count(a => a.Achieved == 1), achievements.Count);
+    }
+
     /// <summary>A SteamID64 for an individual account: 17 digits starting with 7656119.</summary>
     public static bool IsValidSteamId64(string? value) => value is not null && SteamId64Pattern().IsMatch(value);
 
@@ -150,6 +254,30 @@ public sealed partial class SteamWebApi(HttpClient http)
 
     [GeneratedRegex(@"steamcommunity\.com/profiles/(?<id>7656119\d{10})(?:/|$|\?)", RegexOptions.IgnoreCase)]
     private static partial Regex ProfileUrlPattern();
+
+    private sealed class PlayerStatsEnvelope
+    {
+        [JsonPropertyName("playerstats")]
+        public PlayerStatsDto? PlayerStats { get; init; }
+    }
+
+    private sealed class PlayerStatsDto
+    {
+        [JsonPropertyName("success")]
+        public bool? Success { get; init; }
+
+        [JsonPropertyName("error")]
+        public string? Error { get; init; }
+
+        [JsonPropertyName("achievements")]
+        public List<AchievementDto>? Achievements { get; init; }
+    }
+
+    private sealed class AchievementDto
+    {
+        [JsonPropertyName("achieved")]
+        public int Achieved { get; init; }
+    }
 
     private sealed class OwnedGamesEnvelope
     {

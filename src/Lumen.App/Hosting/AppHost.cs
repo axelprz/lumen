@@ -107,6 +107,11 @@ public static class AppHost
             sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<SteamWebSession>>()));
         builder.Services.AddSingleton<ISteamWebSession>(sp => sp.GetRequiredService<SteamWebSession>());
         builder.Services.AddSingleton(sp => new SteamFamilyAccess(sp.GetRequiredService<ISteamWebSession>(), sp.GetRequiredService<SteamAccountApi>()));
+        builder.Services.AddSingleton(sp => new SteamAchievementsService(
+            sp.GetRequiredService<SteamWebApi>(),
+            sp.GetRequiredService<ISecretStore>(),
+            sp.GetRequiredService<ILocalSettings>(),
+            sp.GetRequiredService<SteamFamilyAccess>()));
         builder.Services.AddSingleton(sp => new SteamAccount(
             sp.GetRequiredService<SteamAccountApi>(),
             sp.GetRequiredService<ISecretStore>(),
