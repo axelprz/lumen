@@ -370,6 +370,24 @@
   <data name="Detail_Stores" xml:space="preserve">
     <value>Stores</value>
   </data>
+  <data name="Detail_Achievements" xml:space="preserve">
+    <value>Achievements</value>
+  </data>
+  <data name="Detail_AchievementsCount" xml:space="preserve">
+    <value>{0} of {1}</value>
+  </data>
+  <data name="Detail_AchievementsPercent" xml:space="preserve">
+    <value>{0:0}% unlocked</value>
+  </data>
+  <data name="Detail_AchievementsNeedsSetup" xml:space="preserve">
+    <value>Add your Steam Web API key, or sign in on Steam's website, in Settings to see your achievements.</value>
+  </data>
+  <data name="Detail_AchievementsPrivate" xml:space="preserve">
+    <value>Steam hides them because the game details of your profile are private.</value>
+  </data>
+  <data name="Detail_AchievementsFailed" xml:space="preserve">
+    <value>Couldn't reach Steam for the achievements. Try again later.</value>
+  </data>
   <data name="Detail_Playtime" xml:space="preserve">
     <value>Playtime</value>
   </data>

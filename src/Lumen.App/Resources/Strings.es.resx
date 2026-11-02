@@ -370,6 +370,24 @@
   <data name="Detail_Stores" xml:space="preserve">
     <value>Tiendas</value>
   </data>
+  <data name="Detail_Achievements" xml:space="preserve">
+    <value>Logros</value>
+  </data>
+  <data name="Detail_AchievementsCount" xml:space="preserve">
+    <value>{0} de {1}</value>
+  </data>
+  <data name="Detail_AchievementsPercent" xml:space="preserve">
+    <value>{0:0}% desbloqueado</value>
+  </data>
+  <data name="Detail_AchievementsNeedsSetup" xml:space="preserve">
+    <value>Cargá tu clave de la API de Steam, o iniciá sesión en la web de Steam, desde Ajustes para ver tus logros.</value>
+  </data>
+  <data name="Detail_AchievementsPrivate" xml:space="preserve">
+    <value>Steam los oculta porque los detalles de juego de tu perfil son privados.</value>
+  </data>
+  <data name="Detail_AchievementsFailed" xml:space="preserve">
+    <value>No se pudo consultar a Steam por los logros. Probá de nuevo más tarde.</value>
+  </data>
   <data name="Detail_Playtime" xml:space="preserve">
     <value>Tiempo de juego</value>
   </data>

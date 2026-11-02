@@ -1,0 +1,13 @@
+{
+  "playerstats": {
+    "steamID": "76561190000000001",
+    "gameName": "Sample Quest",
+    "achievements": [
+      { "apiname": "ACH_ONE", "achieved": 1, "unlocktime": 1790000001 },
+      { "apiname": "ACH_TWO", "achieved": 0, "unlocktime": 0 },
+      { "apiname": "ACH_THREE", "achieved": 1, "unlocktime": 1790000300 },
+      { "apiname": "ACH_FOUR", "achieved": 0, "unlocktime": 0 }
+    ],
+    "success": true
+  }
+}

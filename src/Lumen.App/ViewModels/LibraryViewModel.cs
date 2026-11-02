@@ -11,6 +11,7 @@ using Lumen.Core.Library;
 using Lumen.Core.Localization;
 using Lumen.Core.Platform;
 using Lumen.Core.Settings;
+using Lumen.Providers.Steam;
 using Microsoft.Extensions.Logging;
 
 namespace Lumen.App.ViewModels;
@@ -36,6 +37,7 @@ public sealed partial class LibraryViewModel : ObservableObject
     private readonly ILocalSettings _settings;
     private readonly ILauncher _shell;
     private readonly IFileSystem _fileSystem;
+    private readonly SteamAchievementsService _achievements;
     private int _columnCount = 1;
     private readonly ILocalizer _localizer;
     private readonly ILogger<LibraryViewModel> _logger;
@@ -67,9 +69,11 @@ public sealed partial class LibraryViewModel : ObservableObject
         ILocalSettings settings,
         ILauncher shell,
         IFileSystem fileSystem,
+        SteamAchievementsService achievements,
         ILocalizer localizer,
         ILogger<LibraryViewModel> logger)
     {
+        _achievements = achievements;
         _filter = filter;
         _settings = settings;
         _shell = shell;
@@ -453,7 +457,7 @@ public sealed partial class LibraryViewModel : ObservableObject
     {
         var detail = new GameDetailViewModel(
             item,
-            new DetailServices(_launcher, _shell, _artwork, _mergeRules, _overrides, _collections, _library, _dialogs, _fileSystem, _localizer, StoreNameOf),
+            new DetailServices(_launcher, _shell, _artwork, _mergeRules, _overrides, _collections, _library, _dialogs, _fileSystem, _localizer, StoreNameOf, _achievements),
             () => Detail = null);
         detail.ArtworkChanged += (_, _) => RefreshTiles(t => t.Item.Entries.Any(e => detail.Item.Entries.Contains(e)));
         Detail = detail;

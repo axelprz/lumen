@@ -1,0 +1,6 @@
+{
+  "playerstats": {
+    "error": "Profile is not public",
+    "success": false
+  }
+}
