@@ -47,6 +47,42 @@
         </DockPanel>
       </Border>
     </DataTemplate>
+
+    <!-- One offer of the best deals: name and store on the left, price on the right -->
+    <DataTemplate x:Key="Deals.PriceRow" DataType="{x:Type vm:PriceRow}">
+      <Border Style="{StaticResource Lumen.Card}" Padding="18,14" Margin="0,0,0,10">
+        <DockPanel>
+          <Button DockPanel.Dock="Right" Style="{StaticResource Lumen.Button}" Margin="16,0,0,0" VerticalAlignment="Center" Content="{l:Loc Deals_Open}"
+                  Command="{Binding DataContext.OpenUrlCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Url}"
+                  AutomationProperties.Name="{Binding Title}" />
+          <StackPanel DockPanel.Dock="Right" Margin="16,0,0,0" VerticalAlignment="Center" MinWidth="90">
+            <TextBlock Text="{Binding PriceText}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold" HorizontalAlignment="Right" />
+          </StackPanel>
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="{Binding Title}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+            <TextBlock FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,4,0,0" TextWrapping="Wrap" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
+              <Run Text="{Binding Store, Mode=OneWay}" /><Run Text=" · " /><Run Text="{Binding DetailText, Mode=OneWay}" />
+            </TextBlock>
+          </StackPanel>
+        </DockPanel>
+      </Border>
+    </DataTemplate>
+
+    <!-- One game of a search: the best store and every store's price -->
+    <DataTemplate x:Key="Deals.GameRow" DataType="{x:Type vm:PriceGameRow}">
+      <Border Style="{StaticResource Lumen.Card}" Padding="18,14" Margin="0,0,0,10">
+        <DockPanel>
+          <Button DockPanel.Dock="Right" Style="{StaticResource Lumen.Button}" Margin="16,0,0,0" VerticalAlignment="Center" Content="{l:Loc Deals_Open}"
+                  Command="{Binding DataContext.OpenUrlCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Url}"
+                  AutomationProperties.Name="{Binding Title}" />
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="{Binding Title}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+            <TextBlock Text="{Binding BestText}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,4,0,0" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding StoresText}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,2,0,0" TextWrapping="Wrap" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+          </StackPanel>
+        </DockPanel>
+      </Border>
+    </DataTemplate>
   </UserControl.Resources>
 
   <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
@@ -74,6 +110,22 @@
       </Border>
 
       <StackPanel Visibility="{Binding IsEnabled, Converter={StaticResource BoolToVisibility}}">
+        <!-- Price search: only the typed text is sent -->
+        <DockPanel Margin="0,18,0,0">
+          <Button DockPanel.Dock="Right" Command="{Binding SearchCommand}" Content="{l:Loc Deals_Search_Button}" Style="{StaticResource Lumen.Button.Primary}" Margin="8,0,0,0" />
+          <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" MaxLength="80" Height="38" VerticalContentAlignment="Center" Padding="10,0"
+                   AutomationProperties.Name="{l:Loc Deals_Search_Label}" ToolTip="{l:Loc Deals_Search_Label}">
+            <TextBox.InputBindings>
+              <KeyBinding Key="Return" Command="{Binding SearchCommand}" />
+            </TextBox.InputBindings>
+          </TextBox>
+        </DockPanel>
+        <TextBlock Text="{l:Loc Deals_Search_Hint}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,6,0,0" TextWrapping="Wrap"
+                   Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+        <TextBlock Text="{Binding SearchNoteText}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,10,0,0" TextWrapping="Wrap"
+                   Foreground="{DynamicResource Lumen.Brush.TextMuted}" Visibility="{Binding HasSearchNote, Converter={StaticResource BoolToVisibility}}" />
+        <ItemsControl ItemsSource="{Binding SearchResults}" ItemTemplate="{StaticResource Deals.GameRow}" Focusable="False" Margin="0,12,0,0" />
+
         <TextBlock Text="{l:Loc Deals_Loading}" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,16,0,0"
                    Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                    Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
@@ -89,6 +141,18 @@
         <TextBlock Text="{Binding NoteText}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,12,0,0"
                    Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                    Visibility="{Binding HasNote, Converter={StaticResource BoolToVisibility}}" />
+
+        <!-- Best deals today, only the stores Lumen supports -->
+        <TextBlock Text="{l:Loc Deals_Best_Title}" Style="{StaticResource Deals.SectionTitle}" Visibility="{Binding HasBestDeals, Converter={StaticResource BoolToVisibility}}" />
+        <ItemsControl ItemsSource="{Binding BestDeals}" ItemTemplate="{StaticResource Deals.PriceRow}" Focusable="False" />
+        <TextBlock Text="{l:Loc Deals_PricesNote}" FontSize="{StaticResource Lumen.FontSize.Caption}" TextWrapping="Wrap" Margin="0,4,0,0"
+                   Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+        <!-- CheapShark asks for a link back -->
+        <DockPanel Margin="0,12,0,0">
+          <TextBlock Text="{l:Loc Deals_PricesFrom}" FontSize="{StaticResource Lumen.FontSize.Caption}" VerticalAlignment="Center" Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+          <Button Command="{Binding OpenCheapSharkCommand}" Content="cheapshark.com" Style="{StaticResource Lumen.Button}" Padding="10,4" Margin="8,0,0,0"
+                  FontSize="{StaticResource Lumen.FontSize.Caption}" HorizontalAlignment="Left" />
+        </DockPanel>
       </StackPanel>
 
       <!-- Saving in Argentina: only links to Steamcito (opened in the browser), always shown -->

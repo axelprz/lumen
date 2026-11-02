@@ -30,14 +30,29 @@ public interface IFreeGamesSource
 }
 
 /// <summary>Links that come from a service's answer are untrusted: only these may be opened.</summary>
-public static class DealUrls
+public static partial class DealUrls
 {
     private static readonly string[] AllowedHosts = ["store.epicgames.com", "steamcito.com.ar"];
 
-    /// <summary>An <c>https</c> address on one of the hosts Lumen links to (never a script, file or other scheme).</summary>
-    public static bool IsSafeToOpen(string? url) =>
-        Uri.TryCreate(url, UriKind.Absolute, out var uri)
-        && uri.Scheme == Uri.UriSchemeHttps
-        && string.IsNullOrEmpty(uri.UserInfo)
-        && AllowedHosts.Contains(uri.Host, StringComparer.OrdinalIgnoreCase);
+    /// <summary>
+    /// An <c>https</c> address on one of the hosts Lumen links to (never a script, file or other scheme). CheapShark is
+    /// only accepted for its home page and its <c>/redirect?dealID=…</c> link, which opens the offer in the store.
+    /// </summary>
+    public static bool IsSafeToOpen(string? url)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps || !string.IsNullOrEmpty(uri.UserInfo))
+        {
+            return false;
+        }
+
+        if (uri.Host.Equals("www.cheapshark.com", StringComparison.OrdinalIgnoreCase))
+        {
+            return (uri.AbsolutePath == "/" && uri.Query.Length == 0) || (uri.AbsolutePath == "/redirect" && CheapSharkQuery().IsMatch(uri.Query));
+        }
+
+        return AllowedHosts.Contains(uri.Host, StringComparer.OrdinalIgnoreCase);
+    }
+
+    [System.Text.RegularExpressions.GeneratedRegex(@"^\?dealID=[A-Za-z0-9%]{10,120}$")]
+    private static partial System.Text.RegularExpressions.Regex CheapSharkQuery();
 }

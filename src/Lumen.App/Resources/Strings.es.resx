@@ -53,7 +53,7 @@
     <value>Ofertas</value>
   </data>
   <data name="Settings_Deals" xml:space="preserve">
-    <value>Mostrar juegos gratis en Ofertas (consulta a la Epic Games Store)</value>
+    <value>Mostrar juegos gratis en Ofertas (consulta a la Epic Games Store y a CheapShark)</value>
   </data>
   <data name="Deals_Subtitle" xml:space="preserve">
     <value>Juegos gratis de las tiendas que soporta Lumen que podés reclamar ahora mismo.</value>
@@ -62,7 +62,7 @@
     <value>Activar Ofertas</value>
   </data>
   <data name="Deals_OptIn_Body" xml:space="preserve">
-    <value>Ofertas está apagada hasta que la actives. Cuando está encendida, Lumen le pide sus juegos gratis a la Epic Games Store (store-site-backend-static.ak.epicgames.com). Con el pedido no viaja nada tuyo: ni cuenta, ni biblioteca, ni ID. Los enlaces se abren en tu navegador. Podés volver a apagarla en Ajustes.</value>
+    <value>Ofertas está apagada hasta que la actives. Cuando está encendida, Lumen consulta a dos servicios: la Epic Games Store (store-site-backend-static.ak.epicgames.com) por sus juegos gratis, y CheapShark (www.cheapshark.com) por precios y ofertas en las tiendas que soporta Lumen. Con los pedidos no viaja nada tuyo: ni cuenta, ni biblioteca, ni ID. Una búsqueda de precios envía solo el nombre que escribís. Los enlaces se abren en tu navegador. Podés volver a apagarla en Ajustes.</value>
   </data>
   <data name="Deals_OptIn_Enable" xml:space="preserve">
     <value>Activar</value>
@@ -114,6 +114,48 @@
   </data>
   <data name="Deals_Saving_OpenSite" xml:space="preserve">
     <value>Visitar Steamcito</value>
+  </data>
+  <data name="Deals_Search_Label" xml:space="preserve">
+    <value>Buscar el precio de un juego</value>
+  </data>
+  <data name="Deals_Search_Button" xml:space="preserve">
+    <value>Buscar</value>
+  </data>
+  <data name="Deals_Search_Hint" xml:space="preserve">
+    <value>Solo se envía el nombre que escribís. Se comparan únicamente las tiendas que soporta Lumen.</value>
+  </data>
+  <data name="Deals_Search_NoResults" xml:space="preserve">
+    <value>No hay precios para ese nombre en las tiendas que soporta Lumen.</value>
+  </data>
+  <data name="Deals_Search_Failed" xml:space="preserve">
+    <value>No se pudieron obtener los precios. Revisá tu conexión y probá de nuevo.</value>
+  </data>
+  <data name="Deals_Search_TooShort" xml:space="preserve">
+    <value>Escribí entre {0} y {1} caracteres.</value>
+  </data>
+  <data name="Deals_Search_Best" xml:space="preserve">
+    <value>Mejor: {0} · {1}</value>
+  </data>
+  <data name="Deals_Best_Title" xml:space="preserve">
+    <value>Mejores ofertas de hoy</value>
+  </data>
+  <data name="Deals_Price" xml:space="preserve">
+    <value>US${0:0.00}</value>
+  </data>
+  <data name="Deals_PriceFree" xml:space="preserve">
+    <value>Gratis</value>
+  </data>
+  <data name="Deals_PriceDetail" xml:space="preserve">
+    <value>-{0:0}% · normalmente {1}</value>
+  </data>
+  <data name="Deals_PriceRegular" xml:space="preserve">
+    <value>Precio normal</value>
+  </data>
+  <data name="Deals_PricesNote" xml:space="preserve">
+    <value>Los precios están en dólares y no incluyen impuestos.</value>
+  </data>
+  <data name="Deals_PricesFrom" xml:space="preserve">
+    <value>Precios de</value>
   </data>
   <data name="Nav_Settings" xml:space="preserve">
     <value>Configuración</value>
