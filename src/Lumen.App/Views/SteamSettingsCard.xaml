@@ -26,19 +26,34 @@
                  Margin="0,6,0,16" />
 
       <DockPanel Margin="0,0,0,6">
-        <Button DockPanel.Dock="Right"
-                Command="{Binding OpenApiKeyPageCommand}"
-                Cursor="Hand"
-                Background="Transparent"
-                BorderThickness="0"
-                Padding="0"
-                Foreground="{DynamicResource Lumen.Brush.BrandText}">
-          <Button.Template>
-            <ControlTemplate TargetType="Button">
-              <TextBlock Text="{l:Loc Settings_Steam_GetKey}" FontSize="{StaticResource Lumen.FontSize.Small}" TextDecorations="Underline" Foreground="{TemplateBinding Foreground}" />
-            </ControlTemplate>
-          </Button.Template>
-        </Button>
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+          <Button Command="{Binding OpenApiKeyPageCommand}"
+                  Cursor="Hand"
+                  Background="Transparent"
+                  BorderThickness="0"
+                  Padding="0"
+                  Foreground="{DynamicResource Lumen.Brush.BrandText}">
+            <Button.Template>
+              <ControlTemplate TargetType="Button">
+                <TextBlock Text="{l:Loc Settings_Steam_GetKey}" FontSize="{StaticResource Lumen.FontSize.Small}" TextDecorations="Underline" Foreground="{TemplateBinding Foreground}" />
+              </ControlTemplate>
+            </Button.Template>
+          </Button>
+          <Button Command="{Binding OpenApiKeyPageInSteamCommand}"
+                  Cursor="Hand"
+                  Background="Transparent"
+                  BorderThickness="0"
+                  Padding="0"
+                  Margin="14,0,0,0"
+                  ToolTip="{l:Loc Settings_Steam_OpenInSteamTip}"
+                  Foreground="{DynamicResource Lumen.Brush.BrandText}">
+            <Button.Template>
+              <ControlTemplate TargetType="Button">
+                <TextBlock Text="{l:Loc Settings_Steam_OpenInSteam}" FontSize="{StaticResource Lumen.FontSize.Small}" TextDecorations="Underline" Foreground="{TemplateBinding Foreground}" />
+              </ControlTemplate>
+            </Button.Template>
+          </Button>
+        </StackPanel>
         <TextBlock Text="{l:Loc Settings_Steam_KeyLabel}" Style="{StaticResource Lumen.Text.Label}" Margin="0" />
       </DockPanel>
       <PasswordBox x:Name="ApiKeyBox" />

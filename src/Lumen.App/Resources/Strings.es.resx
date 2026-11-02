@@ -220,6 +220,12 @@
   <data name="Settings_Steam_KeyLabel" xml:space="preserve">
     <value>API key de Steam</value>
   </data>
+  <data name="Settings_Steam_OpenInSteam" xml:space="preserve">
+    <value>Abrir en Steam</value>
+  </data>
+  <data name="Settings_Steam_OpenInSteamTip" xml:space="preserve">
+    <value>Abre la página en la app de Steam, donde ya tenés la sesión iniciada.</value>
+  </data>
   <data name="Settings_Steam_GetKey" xml:space="preserve">
     <value>Conseguir una key</value>
   </data>
