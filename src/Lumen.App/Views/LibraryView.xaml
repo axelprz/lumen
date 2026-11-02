@@ -19,7 +19,7 @@
     <!-- Per-tile menu built by the view model (store choice, separate, edit/remove). Separators have no command. -->
     <ContextMenu x:Key="TileMenu" x:Shared="False" ItemsSource="{Binding MenuItems}">
       <ContextMenu.ItemContainerStyle>
-        <Style TargetType="MenuItem">
+        <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
           <Setter Property="Header" Value="{Binding Header}" />
           <Setter Property="Command" Value="{Binding Command}" />
           <Style.Triggers>
@@ -27,7 +27,7 @@
               <Setter Property="Template">
                 <Setter.Value>
                   <ControlTemplate TargetType="MenuItem">
-                    <Separator Margin="0,2" />
+                    <Separator Style="{StaticResource {x:Static MenuItem.SeparatorStyleKey}}" />
                   </ControlTemplate>
                 </Setter.Value>
               </Setter>

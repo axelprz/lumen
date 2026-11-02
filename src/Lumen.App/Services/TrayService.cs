@@ -156,10 +156,10 @@ public sealed partial class TrayService(
         }
 
         menu.Items.Clear();
-        menu.Items.Add(Item(localizer["Tray_Open"], ShowWindow, bold: true));
+        menu.Items.Add(Item(localizer["Tray_Open"], ShowWindow, GlyphOpen, bold: true));
         if (OpenQuickSearch is { } openSearch)
         {
-            menu.Items.Add(Item(string.Format(CultureInfo.CurrentCulture, localizer["Tray_QuickSearch"], hotkeys.Current), openSearch));
+            menu.Items.Add(Item(string.Format(CultureInfo.CurrentCulture, localizer["Tray_QuickSearch"], hotkeys.Current), openSearch, GlyphSearch));
         }
 
         var recent = HomeFeed.Build(library.Items, library.FirstSeen, collections.Favorites).ContinuePlaying
@@ -172,7 +172,7 @@ public sealed partial class TrayService(
             menu.Items.Add(new MenuItem { Header = new TextBlock { Text = localizer["Tray_Recent"] }, IsEnabled = false });
             foreach (var item in recent)
             {
-                menu.Items.Add(Item(item.Title, () => _ = LaunchAsync(item)));
+                menu.Items.Add(Item(item.Title, () => _ = LaunchAsync(item), GlyphPlay));
             }
         }
 
@@ -180,7 +180,7 @@ public sealed partial class TrayService(
         if (usable.Count > 0)
         {
             menu.Items.Add(new Separator());
-            var submenu = new MenuItem { Header = new TextBlock { Text = localizer["Tray_Routines"] } };
+            var submenu = new MenuItem { Header = new TextBlock { Text = localizer["Tray_Routines"] }, Icon = Glyph(GlyphRoutine) };
             foreach (var entry in usable)
             {
                 var name = RoutineLookup.NameOf(entry, CultureInfo.CurrentUICulture);
@@ -193,7 +193,7 @@ public sealed partial class TrayService(
         }
 
         menu.Items.Add(new Separator());
-        menu.Items.Add(Item(localizer["Tray_Exit"], () => _ = ExitAsync()));
+        menu.Items.Add(Item(localizer["Tray_Exit"], () => _ = ExitAsync(), GlyphExit));
     }
 
     private async Task LaunchAsync(LibraryItem item)
@@ -208,16 +208,33 @@ public sealed partial class TrayService(
     }
 
     // Titles go in as plain text (no access keys), so a game called "_Hello" keeps its underscore.
-    private static MenuItem Item(string text, Action onClick, bool bold = false)
+    // Segoe Fluent Icons glyphs for the menu rows.
+    private const string GlyphOpen = "\uE706";
+    private const string GlyphSearch = "\uE721";
+    private const string GlyphPlay = "\uE768";
+    private const string GlyphRoutine = "\uE945";
+    private const string GlyphExit = "\uE7E8";
+
+    private static MenuItem Item(string text, Action onClick, string? glyph = null, bool bold = false)
     {
         var item = new MenuItem
         {
             Header = new TextBlock { Text = text },
             FontWeight = bold ? FontWeights.SemiBold : FontWeights.Normal,
+            Icon = glyph is null ? null : Glyph(glyph),
         };
         item.Click += (_, _) => onClick();
         return item;
     }
+
+    private static TextBlock Glyph(string glyph) => new()
+    {
+        Text = glyph,
+        FontFamily = (System.Windows.Media.FontFamily)Application.Current.Resources["Lumen.Font.Icons"],
+        FontWeight = FontWeights.Normal,
+        HorizontalAlignment = HorizontalAlignment.Center,
+        VerticalAlignment = VerticalAlignment.Center,
+    };
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Could not show the tray notice")]
     private partial void LogHintFailed(Exception exception);

@@ -1,0 +1,100 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- Copyright (C) 2026 Axel Ismael Perez (AxelPRZ) -->
+<!-- Menus (M10): the tray menu, the detail's "More" and the tile menu. Popups are their own windows, so they stay opaque. -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <SolidColorBrush x:Key="Lumen.Brush.Menu" Color="#FF121723" />
+
+  <!-- The card every menu (and submenu) sits on -->
+  <Style x:Key="Lumen.MenuCard" TargetType="Border">
+    <Setter Property="Background" Value="{DynamicResource Lumen.Brush.Menu}" />
+    <Setter Property="BorderBrush" Value="#26FFFFFF" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="12" />
+    <Setter Property="Padding" Value="4,6" />
+    <Setter Property="MinWidth" Value="200" />
+  </Style>
+
+  <Style TargetType="ContextMenu" BasedOn="{StaticResource {x:Type ContextMenu}}">
+    <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
+    <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Small}" />
+    <Setter Property="HasDropShadow" Value="False" />
+    <Setter Property="OverridesDefaultStyle" Value="True" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="ContextMenu">
+          <Border Style="{StaticResource Lumen.MenuCard}">
+            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- A thin line between groups -->
+  <Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Separator">
+          <Border Height="1" Margin="12,5" Background="{DynamicResource Lumen.Brush.Divider}" />
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- One row: optional glyph (Icon), the text, an arrow for submenus; the pointed-at row gets the brand tint -->
+  <Style TargetType="MenuItem">
+    <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="MenuItem">
+          <Grid>
+            <Border x:Name="Bd" Background="Transparent" BorderBrush="Transparent" BorderThickness="1" CornerRadius="8" Padding="10,7" Margin="2,1">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ContentPresenter x:Name="IconHost" Grid.Column="0" ContentSource="Icon" Width="16" Margin="0,0,10,0" VerticalAlignment="Center" />
+                <ContentPresenter Grid.Column="1" ContentSource="Header" RecognizesAccessKey="True" VerticalAlignment="Center" />
+                <TextBlock x:Name="Arrow" Grid.Column="2" Text="&#xE76C;" FontFamily="{StaticResource Lumen.Font.Icons}" FontSize="{StaticResource Lumen.FontSize.Label}"
+                           Margin="18,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource Lumen.Brush.TextMuted}" Visibility="Collapsed" />
+              </Grid>
+            </Border>
+            <Popup x:Name="PART_Popup"
+                   Placement="Right"
+                   HorizontalOffset="4"
+                   VerticalOffset="-7"
+                   AllowsTransparency="True"
+                   Focusable="False"
+                   PopupAnimation="Fade"
+                   IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}">
+              <Border Style="{StaticResource Lumen.MenuCard}">
+                <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" />
+              </Border>
+            </Popup>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <Trigger Property="Icon" Value="{x:Null}">
+              <Setter TargetName="IconHost" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+            <Trigger Property="Role" Value="SubmenuHeader">
+              <Setter TargetName="Arrow" Property="Visibility" Value="Visible" />
+            </Trigger>
+            <Trigger Property="IsHighlighted" Value="True">
+              <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Lumen.Brush.BrandSoft}" />
+              <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.BrandBorder}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.TextMuted}" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+</ResourceDictionary>
