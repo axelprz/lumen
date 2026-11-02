@@ -37,6 +37,8 @@ When a release is published, download it from the [Releases page](https://github
 
 Lumen is **not code-signed yet**, so Windows SmartScreen may say "Windows protected your PC" the first time. Choose **More info → Run anyway**. You can check the source and the release workflow in this repository.
 
+If your Windows has **Smart App Control** turned on, it can block unsigned apps and offers no "Run anyway". In that case Lumen will only run after you turn Smart App Control off (Windows Security → App & browser control), which is your decision to make, or once Lumen is signed.
+
 Updates: Lumen looks for a new version when it starts and once a day (you can turn that off in Settings → Updates). It never downloads or installs by itself: you press *Download* and then *Restart to update*. Until version 1.0 every release is a pre-release, so the default channel is Beta.
 
 ## What it does (v1 goals)
@@ -71,14 +73,9 @@ Lumen has no servers of its own and sends no analytics or telemetry. Everything 
 
 Opening a link in your browser (a store page, for example) is done by your browser, not by Lumen.
 
-## Code signing policy
+## Code signing
 
-Lumen's releases are **not signed yet** (see [Installing](#installing)). We are applying for free code signing for open-source projects from the [SignPath Foundation](https://signpath.org/). This section describes the policy we will follow; the installer stays unsigned until the application is approved, and the text below will then be updated.
-
-- **What is signed:** only the files produced by this repository's GitHub Actions release workflow from a tagged commit, never a build made on a developer's PC.
-- **Roles:** author, reviewer and approver are the same person today, the project owner and only maintainer, [Axel Ismael Perez (AxelPRZ)](https://github.com/axelprz).
-- **Approval:** each release is approved by the approver before it is signed. Only members with a signing role can approve, and all of them must use multi-factor authentication on GitHub and on the signing service.
-- **Privacy:** see the privacy policy above. Signing adds nothing to what Lumen sends.
+The first versions of Lumen are **not code-signed**. We plan to apply for free code signing for open-source projects (SignPath Foundation) once the project has more visibility; this section will then describe the signing policy. Until then, every release is built by this repository's GitHub Actions workflow from a tagged commit, so you can check the source and the workflow yourself.
 
 ## Requirements
 

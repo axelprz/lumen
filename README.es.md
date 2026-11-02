@@ -37,6 +37,8 @@ Cuando haya un release publicado, bajalo de la [página de Releases](https://git
 
 Lumen **todavía no está firmado digitalmente**, así que la primera vez Windows SmartScreen puede decir "Windows protegió su PC". Elegí **Más información → Ejecutar de todas formas**. Podés revisar el código y el workflow de releases en este repositorio.
 
+Si tu Windows tiene **Smart App Control** activado, puede bloquear apps sin firmar y no ofrece "Ejecutar de todas formas". En ese caso Lumen solo va a correr si apagás Smart App Control (Seguridad de Windows → Control de aplicaciones y navegador), una decisión que es tuya, o cuando Lumen esté firmado.
+
 Actualizaciones: Lumen busca una versión nueva al iniciar y una vez por día (lo podés apagar en Ajustes → Actualizaciones). Nunca descarga ni instala solo: vos apretás *Descargar* y después *Reiniciar para actualizar*. Hasta la versión 1.0 todos los releases son pre-releases, por eso el canal por defecto es Beta.
 
 ## Qué hace (objetivos de la v1)
@@ -71,14 +73,9 @@ Lumen no tiene servidores propios y no envía analíticas ni telemetría. Todo l
 
 Abrir un enlace en tu navegador (por ejemplo, la página de una tienda) lo hace tu navegador, no Lumen.
 
-## Política de firma de código
+## Firma de código
 
-Los releases de Lumen **todavía no están firmados** (ver [Instalación](#instalación)). Estamos pidiendo la firma de código gratuita para proyectos de código abierto de la [SignPath Foundation](https://signpath.org/). Esta sección describe la política que vamos a seguir; el instalador sigue sin firmar hasta que la solicitud se apruebe, y entonces se va a actualizar este texto.
-
-- **Qué se firma:** solo los archivos que genera el workflow de releases de GitHub Actions de este repositorio a partir de un commit con tag, nunca un build hecho en la PC de un desarrollador.
-- **Roles:** autor, revisor y aprobador son hoy la misma persona, el dueño del proyecto y único mantenedor, [Axel Ismael Perez (AxelPRZ)](https://github.com/axelprz).
-- **Aprobación:** cada release lo aprueba el aprobador antes de firmarse. Solo pueden aprobar los miembros con un rol de firma, y todos tienen que usar autenticación multifactor en GitHub y en el servicio de firma.
-- **Privacidad:** ver la política de privacidad de arriba. Firmar no agrega nada a lo que Lumen envía.
+Las primeras versiones de Lumen **no están firmadas digitalmente**. Pensamos pedir la firma de código gratuita para proyectos de código abierto (SignPath Foundation) cuando el proyecto tenga más visibilidad; entonces esta sección va a describir la política de firma. Mientras tanto, cada release lo genera el workflow de GitHub Actions de este repositorio a partir de un commit con tag, así que podés revisar el código y el workflow vos mismo.
 
 ## Requisitos
 
