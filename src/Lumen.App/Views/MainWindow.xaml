@@ -197,7 +197,70 @@
             <ColumnDefinition Width="2*" MinWidth="220" MaxWidth="440" />
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
           </Grid.ColumnDefinitions>
+          <!-- The bell: updates, store problems, what came from the sync folder, games that did not start -->
+          <Grid Grid.Column="3" DataContext="{Binding Notifications}" Margin="12,0,0,0" VerticalAlignment="Center">
+            <Button x:Name="BellButton" Command="{Binding ToggleCommand}" Style="{StaticResource Lumen.Button.Icon}"
+                    ToolTip="{l:Loc Notify_Title}" AutomationProperties.Name="{l:Loc Notify_Title}">
+              <TextBlock Text="&#xE7ED;" Style="{StaticResource Lumen.Text.Icon}" />
+            </Button>
+            <Border HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-4,-4,0" MinWidth="16" Padding="4,0" CornerRadius="4"
+                    Background="{DynamicResource Lumen.Brush.Brand}" IsHitTestVisible="False"
+                    Visibility="{Binding HasItems, Converter={StaticResource BoolToVisibility}}">
+              <TextBlock Text="{Binding CountText}" FontSize="{StaticResource Lumen.FontSize.Label}" FontWeight="SemiBold" Foreground="White"
+                         HorizontalAlignment="Center" />
+            </Border>
+            <Popup IsOpen="{Binding IsOpen, Mode=TwoWay}" PlacementTarget="{Binding ElementName=BellButton}" Placement="Bottom"
+                   HorizontalOffset="-330" VerticalOffset="6" StaysOpen="False" AllowsTransparency="True" PopupAnimation="None">
+              <Border Width="368" Padding="14" CornerRadius="10" Margin="0,0,8,8"
+                      Background="{DynamicResource Lumen.Brush.Menu}" BorderBrush="#26FFFFFF" BorderThickness="1">
+                <StackPanel>
+                  <DockPanel Margin="0,0,0,10">
+                    <Button DockPanel.Dock="Right" Command="{Binding ClearAllCommand}" Content="{l:Loc Notify_ClearAll}" Style="{StaticResource Lumen.Button}"
+                            Padding="10,4" FontSize="{StaticResource Lumen.FontSize.Caption}"
+                            Visibility="{Binding HasItems, Converter={StaticResource BoolToVisibility}}" />
+                    <TextBlock Text="{l:Loc Notify_Title}" FontSize="{StaticResource Lumen.FontSize.BodyLarge}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                  </DockPanel>
+                  <TextBlock Text="{l:Loc Notify_Empty}" FontSize="{StaticResource Lumen.FontSize.Small}" TextWrapping="Wrap" Margin="0,4,0,6"
+                             Foreground="{DynamicResource Lumen.Brush.TextMuted}"
+                             Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}" />
+                  <ScrollViewer MaxHeight="360" VerticalScrollBarVisibility="Auto" Focusable="False">
+                    <ItemsControl ItemsSource="{Binding Rows}" Focusable="False">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:NotificationRow}">
+                          <DockPanel Margin="0,0,0,6">
+                            <Button DockPanel.Dock="Right" Style="{StaticResource Lumen.Button.Icon}" Padding="8" Margin="6,0,0,0" VerticalAlignment="Top"
+                                    Command="{Binding DataContext.DismissCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    CommandParameter="{Binding}" ToolTip="{l:Loc Notify_Dismiss}" AutomationProperties.Name="{l:Loc Notify_Dismiss}">
+                              <TextBlock Text="&#xE711;" Style="{StaticResource Lumen.Text.Icon}" FontSize="{StaticResource Lumen.FontSize.Caption}" />
+                            </Button>
+                            <Button Style="{StaticResource Lumen.Button}" HorizontalContentAlignment="Stretch" Padding="12,10"
+                                    Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    CommandParameter="{Binding}" AutomationProperties.Name="{Binding Title}">
+                              <DockPanel>
+                                <TextBlock DockPanel.Dock="Left" Text="{Binding Glyph}" Style="{StaticResource Lumen.Text.Icon}" VerticalAlignment="Top"
+                                           Foreground="{DynamicResource Lumen.Brush.BrandText}" Margin="0,2,12,0" />
+                                <StackPanel>
+                                  <DockPanel>
+                                    <TextBlock DockPanel.Dock="Right" Text="{Binding TimeText}" FontSize="{StaticResource Lumen.FontSize.Label}" Margin="8,2,0,0"
+                                               Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="{StaticResource Lumen.FontSize.Small}" TextTrimming="CharacterEllipsis" />
+                                  </DockPanel>
+                                  <TextBlock Text="{Binding Message}" FontSize="{StaticResource Lumen.FontSize.Caption}" TextWrapping="Wrap" Margin="0,3,0,0"
+                                             Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+                                </StackPanel>
+                              </DockPanel>
+                            </Button>
+                          </DockPanel>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </ScrollViewer>
+                </StackPanel>
+              </Border>
+            </Popup>
+          </Grid>
           <ItemsControl Grid.Column="2" ItemsSource="{Binding Home.TopBarRoutines}" Focusable="False" VerticalAlignment="Center">
             <ItemsControl.ItemsPanel>
               <ItemsPanelTemplate>

@@ -28,6 +28,27 @@
   <data name="Nav_Routines" xml:space="preserve">
     <value>Routines</value>
   </data>
+  <data name="Notify_Title" xml:space="preserve">
+    <value>Notifications</value>
+  </data>
+  <data name="Notify_Empty" xml:space="preserve">
+    <value>Nothing new. Updates, store problems and what arrives from the sync folder show up here.</value>
+  </data>
+  <data name="Notify_ClearAll" xml:space="preserve">
+    <value>Clear all</value>
+  </data>
+  <data name="Notify_Dismiss" xml:space="preserve">
+    <value>Dismiss</value>
+  </data>
+  <data name="Notify_StoreProblem_Title" xml:space="preserve">
+    <value>{0} has a problem</value>
+  </data>
+  <data name="Notify_StoreProblem_Message" xml:space="preserve">
+    <value>The last scan could not read it completely. Check its connection in Settings.</value>
+  </data>
+  <data name="Notify_Launch_Title" xml:space="preserve">
+    <value>A game did not start</value>
+  </data>
   <data name="Nav_Settings" xml:space="preserve">
     <value>Settings</value>
   </data>

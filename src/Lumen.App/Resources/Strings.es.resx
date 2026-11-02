@@ -28,6 +28,27 @@
   <data name="Nav_Routines" xml:space="preserve">
     <value>Rutinas</value>
   </data>
+  <data name="Notify_Title" xml:space="preserve">
+    <value>Avisos</value>
+  </data>
+  <data name="Notify_Empty" xml:space="preserve">
+    <value>Nada nuevo. Acá aparecen las actualizaciones, los problemas de las tiendas y lo que llega por la carpeta de sync.</value>
+  </data>
+  <data name="Notify_ClearAll" xml:space="preserve">
+    <value>Limpiar todo</value>
+  </data>
+  <data name="Notify_Dismiss" xml:space="preserve">
+    <value>Descartar</value>
+  </data>
+  <data name="Notify_StoreProblem_Title" xml:space="preserve">
+    <value>{0} tiene un problema</value>
+  </data>
+  <data name="Notify_StoreProblem_Message" xml:space="preserve">
+    <value>El último escaneo no pudo leerla por completo. Revisá su conexión en Ajustes.</value>
+  </data>
+  <data name="Notify_Launch_Title" xml:space="preserve">
+    <value>Un juego no arrancó</value>
+  </data>
   <data name="Nav_Settings" xml:space="preserve">
     <value>Configuración</value>
   </data>
