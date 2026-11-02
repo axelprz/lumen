@@ -81,6 +81,22 @@ public sealed class LibraryAutoRefreshTests : IDisposable
     }
 
     [Fact]
+    public async Task ARequestDuringAScan_WaitsForTheGapAfterIt()
+    {
+        // The old race: a request mid-scan set a short timer that could fire after the scan ended but before the gap
+        // was known, scanning twice in a row (seen as a flaky ScansAreSpacedOut on a loaded CPU).
+        _provider.ScanTime = TimeSpan.FromMilliseconds(150); // shorter than the 300 ms activation delay
+        using var refresh = new LibraryAutoRefresh(_library, NullLogger<LibraryAutoRefresh>.Instance, TimeSpan.FromMilliseconds(10), TimeSpan.FromSeconds(30));
+        refresh.OnWindowActivated();
+        await WaitUntil(() => _provider.Scans == 1);
+
+        refresh.OnWindowActivated(); // arrives while the slow scan is still running
+        await Task.Delay(1500);
+
+        _provider.Scans.ShouldBe(1);
+    }
+
+    [Fact]
     public async Task AfterDispose_NothingRuns()
     {
         var refresh = new LibraryAutoRefresh(_library, NullLogger<LibraryAutoRefresh>.Instance, TimeSpan.FromMilliseconds(10), TimeSpan.Zero);
@@ -114,6 +130,9 @@ public sealed class LibraryAutoRefreshTests : IDisposable
 
         public bool Installed { get; set; }
 
+        /// <summary>How long each scan takes (to catch requests that arrive mid-scan).</summary>
+        public TimeSpan ScanTime { get; set; }
+
         public int Scans => Volatile.Read(ref _scans);
 
         public string Source => "fake";
@@ -122,10 +141,15 @@ public sealed class LibraryAutoRefreshTests : IDisposable
 
         public ProviderCapabilities Capabilities => ProviderCapabilities.InstalledScan;
 
-        public Task<ProviderResult> ScanInstalledAsync(CancellationToken ct)
+        public async Task<ProviderResult> ScanInstalledAsync(CancellationToken ct)
         {
             Interlocked.Increment(ref _scans);
-            return Task.FromResult(ProviderResult.FromScan([Game("fake", "1", "Sample", installed: Installed)], []));
+            if (ScanTime > TimeSpan.Zero)
+            {
+                await Task.Delay(ScanTime, ct);
+            }
+
+            return ProviderResult.FromScan([Game("fake", "1", "Sample", installed: Installed)], []);
         }
 
         public Task<ProviderResult> ScanOwnedAsync(CancellationToken ct) => Task.FromResult(ProviderResult.NotConfigured("n/a"));

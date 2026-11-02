@@ -106,7 +106,7 @@ public sealed class GogProvider(IRegistryReader registry, IFileSystem fileSystem
         }
     }
 
-    /// <summary>VERIFY: opens the game's page in GOG Galaxy, where the user installs it.</summary>
+    /// <summary>Opens the game's page in GOG Galaxy, where the user installs it (verified by the owner, 2026-11-02).</summary>
     public static LaunchSpec InstallFor(string gameId) => new(LaunchKind.Uri, $"goggalaxy://openGameView/{gameId}");
 
     internal static IReadOnlyList<LibraryEntry> ToOwnedEntries(IEnumerable<GogOwnedGame> games) =>

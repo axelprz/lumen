@@ -18,6 +18,9 @@ namespace Lumen.App.Services;
 public sealed partial class AccentService
 {
     private const string BrushKey = "Lumen.Brush.Accent";
+
+    /// <summary>The same accent made calmer for glows and rings around art (AccentPicker.Soften), following every fade.</summary>
+    private const string GlowBrushKey = "Lumen.Brush.AccentGlow";
     private const string ColorKey = "Lumen.Color.Accent";
 
     private readonly ILogger<AccentService> _logger;
@@ -38,6 +41,15 @@ public sealed partial class AccentService
         var brush = new SolidColorBrush(_default);
         BindingOperations.SetBinding(brush, SolidColorBrush.ColorProperty, new Binding { Source = _color, Path = new PropertyPath(AccentColor.ColorProperty) });
         resources[BrushKey] = brush;
+
+        var glow = new SolidColorBrush(_default);
+        BindingOperations.SetBinding(glow, SolidColorBrush.ColorProperty, new Binding
+        {
+            Source = _color,
+            Path = new PropertyPath(AccentColor.ColorProperty),
+            Converter = new Converters.SoftenColorConverter(),
+        });
+        resources[GlowBrushKey] = glow;
         Current = _default;
     }
 
