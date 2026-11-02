@@ -11,13 +11,31 @@ namespace Lumen.Providers.Deals;
 /// <summary>
 /// GamerPower's list of free games and giveaways on PC stores (no account, no key; its terms ask for a visible link back
 /// to gamerpower.com, which the Deals page shows). The request carries only the filters, nothing about the user.
-/// Giveaways of other kinds (loot, beta access) are left out.
+/// Only giveaways of games on a store Lumen supports are kept (owner, 2026-11-02): other stores and DRM-free pages
+/// (itch.io and the like) are left out, and so are other kinds (loot, beta access).
 /// </summary>
 public sealed class GamerPowerClient(HttpClient http) : IFreeGamesSource
 {
     public const string SiteUrl = "https://www.gamerpower.com/";
 
     public const string FeedUrl = "https://www.gamerpower.com/api/giveaways?platform=pc&type=game&sort-by=popularity";
+
+    /// <summary>
+    /// The platform names GamerPower uses for the stores Lumen has (its <c>platforms</c> text is a comma-separated list such
+    /// as "PC, Steam"), with the name shown to the user.
+    /// </summary>
+    public static readonly IReadOnlyDictionary<string, string> LumenStores = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Steam"] = "Steam",
+        ["Epic Games Store"] = "Epic Games Store",
+        ["GOG"] = "GOG",
+        ["Ubisoft"] = "Ubisoft Connect",
+        ["Ubisoft Connect"] = "Ubisoft Connect",
+        ["Origin"] = "EA app",
+        ["EA"] = "EA app",
+        ["EA app"] = "EA app",
+        ["Battle.net"] = "Battle.net",
+    };
 
     public string Id => "gamerpower";
 
@@ -77,11 +95,17 @@ public sealed class GamerPowerClient(HttpClient http) : IFreeGamesSource
                 continue;
             }
 
+            var stores = StoresOf(Text(item["platforms"]));
+            if (stores.Count == 0)
+            {
+                continue; // not on a store Lumen supports
+            }
+
             var worth = Text(item["worth"]);
             games.Add(new FreeGame(
                 "gamerpower",
                 title,
-                Text(item["platforms"]) ?? "PC",
+                string.Join(", ", stores),
                 url!,
                 null,
                 End(Text(item["end_date"])),
@@ -90,6 +114,14 @@ public sealed class GamerPowerClient(HttpClient http) : IFreeGamesSource
 
         return new FreeGamesResult(true, games);
     }
+
+    // The stores of Lumen named in a platforms text ("PC, Steam, itch.io" -> Steam), in the order given, once each.
+    private static List<string> StoresOf(string? platforms) =>
+        (platforms ?? string.Empty).Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+        .Select(p => LumenStores.TryGetValue(p, out var name) ? name : null)
+        .OfType<string>()
+        .Distinct(StringComparer.Ordinal)
+        .ToList();
 
     // "2026-11-10 23:59:00" (UTC), or "N/A" when it has no end.
     private static DateTimeOffset? End(string? text) =>

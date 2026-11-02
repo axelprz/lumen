@@ -56,7 +56,7 @@
     <value>Show free games in Deals (contacts Epic Games Store and GamerPower)</value>
   </data>
   <data name="Deals_Subtitle" xml:space="preserve">
-    <value>Free games and giveaways you can claim right now.</value>
+    <value>Free games from the stores Lumen supports that you can claim right now.</value>
   </data>
   <data name="Deals_OptIn_Title" xml:space="preserve">
     <value>Turn on Deals</value>
