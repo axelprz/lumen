@@ -139,6 +139,19 @@ public sealed class UiSurfaceTests
     }
 
     [Fact]
+    public void Menus_ShareOneStyle_IncludingTheTileMenu()
+    {
+        File.ReadAllText(Path.Combine(_appDir, "App.xaml")).ShouldContain("Themes/Controls/Menus.xaml");
+        var menus = File.ReadAllText(Path.Combine(_appDir, "Themes", "Controls", "Menus.xaml"));
+        menus.ShouldContain("<Style TargetType=\"MenuItem\">");
+        menus.ShouldContain("x:Key=\"{x:Static MenuItem.SeparatorStyleKey}\"");
+
+        // A local item style without BasedOn would drop the shared look.
+        File.ReadAllText(Path.Combine(_appDir, "Views", "LibraryView.xaml"))
+            .ShouldContain("<Style TargetType=\"MenuItem\" BasedOn=\"{StaticResource {x:Type MenuItem}}\">");
+    }
+
+    [Fact]
     public void LanguageSwitch_AlsoSetsTheFormatCulture()
     {
         File.ReadAllText(Path.Combine(_appDir, "Localization", "LocalizationService.cs"))
