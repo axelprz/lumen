@@ -827,6 +827,9 @@
   <data name="Settings_CloseToTray" xml:space="preserve">
     <value>Keep Lumen in the notification area when I close the window</value>
   </data>
+  <data name="Settings_DynamicAccent" xml:space="preserve">
+    <value>Color the glows with the artwork of each game</value>
+  </data>
   <data name="Settings_StartWithWindows" xml:space="preserve">
     <value>Start Lumen with Windows (in the notification area)</value>
   </data>

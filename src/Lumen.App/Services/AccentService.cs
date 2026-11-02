@@ -27,6 +27,8 @@ public sealed partial class AccentService
     private readonly Color _default;
     private readonly AccentColor _color;
     private int _version;
+    private bool _enabled = true;
+    private string? _lastImage;
 
     public AccentService(ILogger<AccentService> logger)
     {
@@ -56,9 +58,45 @@ public sealed partial class AccentService
     /// <summary>The accent currently applied (or being faded to).</summary>
     public Color Current { get; private set; }
 
+    /// <summary>
+    /// "Dynamic accent" in Settings. Off: the accent stays Lumen's default whatever is on screen. Turning it back on
+    /// brings back the color of what is on screen.
+    /// </summary>
+    public bool Enabled
+    {
+        get => _enabled;
+        set
+        {
+            if (_enabled == value)
+            {
+                return;
+            }
+
+            _enabled = value;
+            if (value)
+            {
+                if (_lastImage is not null)
+                {
+                    _ = ApplyFromImageAsync(_lastImage);
+                }
+            }
+            else
+            {
+                _version++;
+                FadeTo(_default);
+            }
+        }
+    }
+
     /// <summary>Fades to the accent of the image at <paramref name="imagePath"/>, or back to the default when it has none.</summary>
     public async Task ApplyFromImageAsync(string? imagePath)
     {
+        _lastImage = imagePath;
+        if (!_enabled)
+        {
+            return;
+        }
+
         var version = ++_version;
         var picked = imagePath is null ? null : await Task.Run(() => PickFrom(imagePath)).ConfigureAwait(true);
         if (version != _version)
@@ -72,6 +110,7 @@ public sealed partial class AccentService
     /// <summary>Back to Lumen's default accent.</summary>
     public void Reset()
     {
+        _lastImage = null;
         _version++;
         FadeTo(_default);
     }

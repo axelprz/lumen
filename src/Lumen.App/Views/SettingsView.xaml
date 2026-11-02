@@ -127,6 +127,17 @@
                 <Border Style="{StaticResource Settings.Row}">
                   <DockPanel>
                     <CheckBox DockPanel.Dock="Right"
+                              IsChecked="{Binding Window.DynamicAccent}"
+                              Style="{StaticResource Lumen.Switch}"
+                              VerticalAlignment="Center"
+                              AutomationProperties.Name="{l:Loc Settings_DynamicAccent}" />
+                    <TextBlock Text="{l:Loc Settings_DynamicAccent}" Style="{StaticResource Settings.RowLabel}" Margin="0,0,16,0" />
+                  </DockPanel>
+                </Border>
+
+                <Border Style="{StaticResource Settings.Row}">
+                  <DockPanel>
+                    <CheckBox DockPanel.Dock="Right"
                               IsChecked="{Binding Window.StartWithWindows}"
                               Style="{StaticResource Lumen.Switch}"
                               VerticalAlignment="Center"

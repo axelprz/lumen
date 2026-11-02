@@ -37,6 +37,7 @@ public sealed class LocalPortableState(
         var hotkey = await settings.GetAsync(LocalSettingKeys.Hotkey, ct).ConfigureAwait(false);
         var channel = await settings.GetAsync(LocalSettingKeys.UpdateChannel, ct).ConfigureAwait(false);
         var checkUpdates = await settings.GetAsync(LocalSettingKeys.UpdateCheckAutomatically, ct).ConfigureAwait(false);
+        var dynamicAccent = await settings.GetAsync(LocalSettingKeys.DynamicAccent, ct).ConfigureAwait(false);
         var choices = await appChoices.LoadAsync(ct).ConfigureAwait(false);
 
         var raw = new PortableConfig
@@ -52,6 +53,7 @@ public sealed class LocalPortableState(
                 .Select(kv => kv.Key).Order(Comparer<ItemRef>.Create((a, b) => string.CompareOrdinal(a.ToString(), b.ToString()))).ToList(),
             UpdateChannel = channel is "stable" or "beta" ? channel : null,
             CheckUpdatesAutomatically = checkUpdates is null ? null : checkUpdates != "0",
+            DynamicAccent = dynamicAccent is null ? null : dynamicAccent != "0",
         };
         return PortableConfigJson.Parse(PortableConfigJson.Write(raw)).Config ?? raw;
     }
@@ -74,6 +76,8 @@ public sealed class LocalPortableState(
         changed |= await SetIfDifferentAsync(LocalSettingKeys.Hotkey, incoming.Hotkey, ct).ConfigureAwait(false);
         changed |= await SetIfDifferentAsync(LocalSettingKeys.UpdateChannel, incoming.UpdateChannel, ct).ConfigureAwait(false);
         changed |= await SetIfDifferentAsync(LocalSettingKeys.UpdateCheckAutomatically, incoming.CheckUpdatesAutomatically is { } c ? (c ? "1" : "0") : null, ct).ConfigureAwait(false);
+
+        changed |= await SetIfDifferentAsync(LocalSettingKeys.DynamicAccent, incoming.DynamicAccent is { } a ? (a ? "1" : "0") : null, ct).ConfigureAwait(false);
 
         var received = new List<string>();
         var current = (await manualItems.GetAllAsync(ct).ConfigureAwait(false)).ToDictionary(i => i.Id);

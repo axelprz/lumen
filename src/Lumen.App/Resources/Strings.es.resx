@@ -827,6 +827,9 @@
   <data name="Settings_CloseToTray" xml:space="preserve">
     <value>Al cerrar la ventana, dejar Lumen en el área de notificación</value>
   </data>
+  <data name="Settings_DynamicAccent" xml:space="preserve">
+    <value>Colorear los brillos con el arte de cada juego</value>
+  </data>
   <data name="Settings_StartWithWindows" xml:space="preserve">
     <value>Iniciar Lumen con Windows (en el área de notificación)</value>
   </data>

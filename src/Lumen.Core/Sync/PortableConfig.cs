@@ -36,12 +36,15 @@ public sealed record PortableConfig
     /// <summary><c>updates.checkAutomatically</c>; null when this PC never chose.</summary>
     public bool? CheckUpdatesAutomatically { get; init; }
 
+    /// <summary><c>ui.dynamicAccent</c>: the game's artwork tints the accent; null when this PC never chose.</summary>
+    public bool? DynamicAccent { get; init; }
+
     /// <summary>True when there is something the user made (manual items, renames, hidden games, ignored apps), as opposed to plain preferences.</summary>
     public bool HasUserData => ManualItems.Count > 0 || Overrides.Count > 0 || IgnoredApps.Count > 0;
 
     /// <summary>Any setting is set here (language, window, shortcut, updates): with one, the config is worth sharing.</summary>
     public bool HasSettings => Language is not null || MinimizeToTray is not null || Hotkey is not null
-        || UpdateChannel is not null || CheckUpdatesAutomatically is not null;
+        || UpdateChannel is not null || CheckUpdatesAutomatically is not null || DynamicAccent is not null;
 }
 
 /// <summary>The outcome of reading a <c>config.json</c>.</summary>
@@ -106,6 +109,7 @@ public static class PortableConfigJson
             IgnoredApps = ReadIgnoredApps(root["ignoredApps"], problems),
             UpdateChannel = ReadUpdateChannel(root, problems),
             CheckUpdatesAutomatically = ReadBool(root["updates"], "checkAutomatically", problems),
+            DynamicAccent = ReadBool(root["ui"], "dynamicAccent", problems),
         };
         return new PortableConfigParse(config, problems, false);
     }
@@ -126,6 +130,11 @@ public static class PortableConfigJson
         if (config.MinimizeToTray is { } minimize)
         {
             ui["minimizeToTray"] = minimize;
+        }
+
+        if (config.DynamicAccent is { } accent)
+        {
+            ui["dynamicAccent"] = accent;
         }
 
         if (ui.Count > 0)

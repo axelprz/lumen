@@ -98,6 +98,9 @@ public static class LocalSettingKeys
     /// <summary>"0" when closing the window should exit Lumen; anything else (default) keeps it in the tray.</summary>
     public const string CloseToTray = "ui.closeToTray";
 
+    /// <summary>"0" keeps the accent at Lumen's default; anything else (default) lets each game's artwork tint it.</summary>
+    public const string DynamicAccent = "ui.dynamicAccent";
+
     /// <summary>The quick search shortcut as text ("Alt+Shift+Space", <see cref="Shell.Hotkey"/>); missing = default.</summary>
     public const string Hotkey = "ui.hotkey";
 

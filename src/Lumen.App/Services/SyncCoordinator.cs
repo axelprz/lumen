@@ -87,7 +87,7 @@ public sealed partial class SyncCoordinator
         updates.SettingsChanged += (_, _) => _ui.Post(_ => sync.NotifyLocalChanged(), null);
         window.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName == nameof(WindowSettingsViewModel.CloseToTray))
+            if (e.PropertyName is nameof(WindowSettingsViewModel.CloseToTray) or nameof(WindowSettingsViewModel.DynamicAccent))
             {
                 sync.NotifyLocalChanged();
             }

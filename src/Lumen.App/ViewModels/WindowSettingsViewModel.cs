@@ -25,6 +25,7 @@ public sealed partial class WindowSettingsViewModel : ObservableObject
     private readonly IStartupRegistration _startup;
     private readonly HotkeyService _hotkeys;
     private readonly ILocalizer _localizer;
+    private readonly AccentService _accent;
     private readonly ILogger<WindowSettingsViewModel> _logger;
     private bool _loading;
 
@@ -41,12 +42,14 @@ public sealed partial class WindowSettingsViewModel : ObservableObject
         IStartupRegistration startup,
         HotkeyService hotkeys,
         ILocalizer localizer,
+        AccentService accent,
         ILogger<WindowSettingsViewModel> logger)
     {
         _settings = settings;
         _startup = startup;
         _hotkeys = hotkeys;
         _localizer = localizer;
+        _accent = accent;
         _logger = logger;
         hotkeys.Changed += (_, _) => RefreshHotkey();
         localizer.CultureChanged += (_, _) => RefreshHotkey();
@@ -105,12 +108,17 @@ public sealed partial class WindowSettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool _startWithWindows;
 
+    /// <summary>Each game's artwork tints the accent (glows around art). Off keeps Lumen's default color.</summary>
+    [ObservableProperty]
+    private bool _dynamicAccent = true;
+
     public async Task InitializeAsync(CancellationToken ct)
     {
         _loading = true;
         try
         {
             CloseToTray = await _settings.GetAsync(LocalSettingKeys.CloseToTray, ct) != "0";
+            DynamicAccent = await _settings.GetAsync(LocalSettingKeys.DynamicAccent, ct) != "0";
             StartWithWindows = _startup.IsEnabled();
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -128,6 +136,15 @@ public sealed partial class WindowSettingsViewModel : ObservableObject
         if (!_loading)
         {
             _ = SaveAsync(value);
+        }
+    }
+
+    partial void OnDynamicAccentChanged(bool value)
+    {
+        _accent.Enabled = value;
+        if (!_loading)
+        {
+            _ = SaveDynamicAccentAsync(value);
         }
     }
 
@@ -163,6 +180,18 @@ public sealed partial class WindowSettingsViewModel : ObservableObject
         try
         {
             await _settings.SetAsync(LocalSettingKeys.CloseToTray, closeToTray ? "1" : "0", CancellationToken.None);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            LogSaveFailed(ex); // still applies for this session
+        }
+    }
+
+    private async Task SaveDynamicAccentAsync(bool value)
+    {
+        try
+        {
+            await _settings.SetAsync(LocalSettingKeys.DynamicAccent, value ? "1" : "0", CancellationToken.None);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
