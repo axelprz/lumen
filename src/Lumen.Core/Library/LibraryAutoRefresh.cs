@@ -100,6 +100,14 @@ public sealed partial class LibraryAutoRefresh : IDisposable
                 return;
             }
 
+            // A scan is running: run once more after it, with the usual gap. Starting a timer now could fire after
+            // that scan ends but before the gap is known, and scan twice in a row.
+            if (_scanning)
+            {
+                _pending = true;
+                return;
+            }
+
             // Respect the gap between automatic scans: wait until it has passed.
             var sinceLast = _lastScan == DateTimeOffset.MinValue ? TimeSpan.MaxValue : DateTimeOffset.UtcNow - _lastScan;
             var wait = sinceLast < _minimumGap ? MaxOf(delay, _minimumGap - sinceLast) : delay;

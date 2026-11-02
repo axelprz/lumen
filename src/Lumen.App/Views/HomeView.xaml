@@ -71,9 +71,9 @@
           <Button.Template>
             <ControlTemplate TargetType="Button">
               <Grid services:Motion.HoverScale="1.04">
-                <!-- Hover/focus glow in the game's color: brush plus mask, collapsed until needed -->
+                <!-- Hover/focus glow in the game's color, softened like the Library glow: brush plus mask, collapsed until needed -->
                 <Border x:Name="Glow" Margin="-14" CornerRadius="26" Visibility="Collapsed" IsHitTestVisible="False"
-                        Background="{DynamicResource Lumen.Brush.Accent}" Opacity="0.4">
+                        Background="{DynamicResource Lumen.Brush.AccentGlow}" Opacity="0.4">
                   <Border.OpacityMask>
                     <RadialGradientBrush>
                       <GradientStop Color="#FF000000" Offset="0.62" />
@@ -93,11 +93,11 @@
               </Grid>
               <ControlTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                  <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
+                  <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.AccentGlow}" />
                   <Setter TargetName="Glow" Property="Visibility" Value="Visible" />
                 </Trigger>
                 <Trigger Property="IsKeyboardFocused" Value="True">
-                  <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.Accent}" />
+                  <Setter TargetName="Frame" Property="BorderBrush" Value="{DynamicResource Lumen.Brush.AccentGlow}" />
                   <Setter TargetName="Glow" Property="Visibility" Value="Visible" />
                 </Trigger>
               </ControlTemplate.Triggers>

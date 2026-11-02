@@ -15,11 +15,8 @@ Lumen is a game-first launcher for Windows (C# + WPF, .NET 10) that unifies ever
   1. **1.0 hardening** (scope decided 2026-10-30, PLAN §7): About and licenses (done in its PR); the owner verifies the `VERIFY` items on his PC (GOG Galaxy, Xbox app, EA, Ubisoft, Battle.net installed); README screenshots (he takes them, we wire them in English and Spanish); fix the small leftovers below; then he tags `v1.0.0` (the default update channel flips to stable by itself at 1.0).
   2. **v1.1 Deals** (PLAN): opt-in, new network hosts, needs the owner's decisions first; no card/bank advice.
 - **Small leftovers:**
-  - GOG Galaxy install URI is still `// VERIFY`; Xbox GDK games unverified
-  - Hollow Knight shows no Steam data (owner report, never investigated)
   - the update channel and "check automatically" are not synced yet (the schema has `updates` keys; the sync keeps them untouched)
-  - `LibraryAutoRefreshTests.ScansAreSpacedOut` is timing-sensitive and can fail on a loaded CPU
-  - M10 loose ends: the Library is the heaviest page to open (the owner said the stutter felt better after #57; measure before touching it again); Home tiles glow with the global accent, which is not softened like the Library glow (`AccentPicker.Soften`)
+  - M10 loose ends: the Library is the heaviest page to open (the owner said the stutter felt better after #57; measure before touching it again)
 - **Owner test notes:** a Steam game ignored Undo and Force close (the tracked process ended, a window stayed); the owner accepted this, and apps close fine.
 
 ## How to work

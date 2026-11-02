@@ -31,6 +31,8 @@
   <SolidColorBrush x:Key="Lumen.Brush.SidebarBackdrop" Color="{StaticResource Lumen.Color.Sidebar}" />
   <SolidColorBrush x:Key="Lumen.Brush.CoverEdge" Color="#24FFFFFF" />
   <SolidColorBrush x:Key="Lumen.Brush.Accent" Color="{StaticResource Lumen.Color.Accent}" />
+  <!-- The accent made calmer for glows around art (AccentService keeps it in step with the accent) -->
+  <SolidColorBrush x:Key="Lumen.Brush.AccentGlow" Color="#FF5C86C9" />
   <SolidColorBrush x:Key="Lumen.Brush.Success" Color="#FF34D399" />
   <SolidColorBrush x:Key="Lumen.Brush.Warning" Color="#FFFBBF24" />
   <SolidColorBrush x:Key="Lumen.Brush.Error" Color="#FFF2766B" />

@@ -164,6 +164,15 @@ public sealed class UiSurfaceTests
     }
 
     [Fact]
+    public void HomeGlow_UsesTheSoftenedAccent()
+    {
+        var home = File.ReadAllText(Path.Combine(_appDir, "Views", "HomeView.xaml"));
+        home.ShouldContain("Background=\"{DynamicResource Lumen.Brush.AccentGlow}\"");
+        home.ShouldNotContain("Background=\"{DynamicResource Lumen.Brush.Accent}\"");
+        File.ReadAllText(Path.Combine(_appDir, "Services", "AccentService.cs")).ShouldContain("Converter = new Converters.SoftenColorConverter()");
+    }
+
+    [Fact]
     public void LanguageSwitch_AlsoSetsTheFormatCulture()
     {
         File.ReadAllText(Path.Combine(_appDir, "Localization", "LocalizationService.cs"))
