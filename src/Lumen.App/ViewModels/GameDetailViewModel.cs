@@ -64,6 +64,7 @@ public sealed partial class GameDetailViewModel : ObservableObject
 {
     private readonly DetailServices _s;
     private readonly Action _close;
+    private readonly string? _achievementsAppId;
     private bool _loadingChoices;
 
     [ObservableProperty]
@@ -97,6 +98,7 @@ public sealed partial class GameDetailViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(AchievementsPercent))]
     [NotifyPropertyChangedFor(nameof(AchievementsPercentText))]
     [NotifyPropertyChangedFor(nameof(AchievementsNote))]
+    [NotifyPropertyChangedFor(nameof(AchievementsUrl))]
     private AchievementsResult? _achievements;
 
     [ObservableProperty]
@@ -154,10 +156,12 @@ public sealed partial class GameDetailViewModel : ObservableObject
         LastPlayedText = lastPlayed is null ? loc["Detail_NeverPlayed"] : lastPlayed.Value.LocalDateTime.ToString("D", CultureInfo.CurrentCulture);
         InstallPath = item.Entries.Select(e => e.InstallDirectory).FirstOrDefault(d => !string.IsNullOrWhiteSpace(d)) ?? loc["Detail_NotInstalledPath"];
 
-        // Steam games owned by the account (not family-shared ones) show their achievements once Steam answers.
-        var steam = item.Entries.FirstOrDefault(e => e.Ref.Source == SteamProvider.SourceId && !e.Extra.ContainsKey("family"));
+        // Steam games show their achievements once Steam answers. Family-shared games too: what a borrower unlocks
+        // is recorded on the borrower's own account (VERIFY with a family game that was played).
+        var steam = item.Entries.FirstOrDefault(e => e.Ref.Source == SteamProvider.SourceId);
         if (steam is not null && services.Achievements is not null)
         {
+            _achievementsAppId = steam.Ref.ExternalId;
             _ = LoadAchievementsAsync(services.Achievements, steam.Ref.ExternalId);
         }
     }
@@ -229,6 +233,12 @@ public sealed partial class GameDetailViewModel : ObservableObject
 
     /// <summary>The achievements card: Steam games that have achievements, or that need a key or sign-in to show them.</summary>
     public bool ShowAchievements => Achievements is { Status: not AchievementsStatus.NotAvailable };
+
+    /// <summary>Steam's own page with the achievements of this account for this game; null until the counts are known.</summary>
+    public string? AchievementsUrl => Achievements is { Status: AchievementsStatus.Available, SteamId64: { } id } && _achievementsAppId is { } app
+        && SteamWebApi.IsValidSteamId64(id) && app.All(char.IsAsciiDigit)
+        ? $"https://steamcommunity.com/profiles/{id}/stats/{app}/achievements"
+        : null;
 
     public bool HasAchievementCount => Achievements is { Status: AchievementsStatus.Available };
 
@@ -472,6 +482,16 @@ public sealed partial class GameDetailViewModel : ObservableObject
     {
         IsRenaming = false;
         return SetTitleAsync(null);
+    }
+
+    /// <summary>Opens Steam's achievements page in the user's browser (not a Lumen request).</summary>
+    [RelayCommand]
+    private async Task ViewAchievementsAsync()
+    {
+        if (AchievementsUrl is { } url)
+        {
+            await _s.Shell.StartAsync(new LaunchSpec(LaunchKind.Uri, url), CancellationToken.None);
+        }
     }
 
     [RelayCommand]

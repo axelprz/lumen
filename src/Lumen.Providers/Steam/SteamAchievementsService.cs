@@ -26,7 +26,8 @@ public enum AchievementsStatus
     Failed,
 }
 
-public sealed record AchievementsResult(AchievementsStatus Status, int Unlocked = 0, int Total = 0)
+/// <param name="SteamId64">Whose achievements these are (for the link to Steam's page); set when <see cref="AchievementsStatus.Available"/>.</param>
+public sealed record AchievementsResult(AchievementsStatus Status, int Unlocked = 0, int Total = 0, string? SteamId64 = null)
 {
     /// <summary>Unlocked as a share of the total, 0 to 100.</summary>
     public double Percent => Total <= 0 ? 0 : 100.0 * Unlocked / Total;
@@ -84,7 +85,7 @@ public sealed partial class SteamAchievementsService(
                 LogAnswer(appId, "sign-in", viaToken.Error, viaToken.Detail);
                 // A "private" answer to the token is not final: the key may be treated differently, so try it too.
                 tokenSaidPrivate = viaToken.Error == SteamApiError.PrivateProfile;
-                if (!tokenSaidPrivate && Map(viaToken) is { } mine)
+                if (!tokenSaidPrivate && Map(viaToken, token.SteamId) is { } mine)
                 {
                     return mine;
                 }
@@ -99,7 +100,7 @@ public sealed partial class SteamAchievementsService(
 
             var viaKey = await api.GetAchievementsAsync(apiKey, steamId, appId, ct).ConfigureAwait(false);
             LogAnswer(appId, "key", viaKey.Error, viaKey.Detail);
-            return Map(viaKey) ?? new AchievementsResult(AchievementsStatus.Failed);
+            return Map(viaKey, steamId) ?? new AchievementsResult(AchievementsStatus.Failed);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
@@ -111,9 +112,9 @@ public sealed partial class SteamAchievementsService(
     private partial void LogAnswer(string appId, string credential, SteamApiError error, string? detail);
 
     // null = this credential did not work, try the next one.
-    private static AchievementsResult? Map(SteamAchievementsResult result) => result.Error switch
+    private static AchievementsResult? Map(SteamAchievementsResult result, string steamId) => result.Error switch
     {
-        SteamApiError.None => new AchievementsResult(AchievementsStatus.Available, result.Unlocked, result.Total),
+        SteamApiError.None => new AchievementsResult(AchievementsStatus.Available, result.Unlocked, result.Total, steamId),
         SteamApiError.NoAchievements => new AchievementsResult(AchievementsStatus.NotAvailable),
         SteamApiError.PrivateProfile => new AchievementsResult(AchievementsStatus.Private),
         _ => null,
