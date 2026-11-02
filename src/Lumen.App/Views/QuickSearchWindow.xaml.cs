@@ -10,8 +10,8 @@ using Lumen.App.ViewModels;
 namespace Lumen.App.Views;
 
 /// <summary>
-/// The small search box over any app. Keys are view concerns: ↑/↓ move the selection, Enter runs it, Esc or
-/// clicking elsewhere hides the box. The window is reused, never closed until Lumen exits.
+/// The small search box over any app. Keys are view concerns: ↑/↓ move the selection, Enter runs it, Ctrl+Enter
+/// opens its detail in Lumen, Esc or clicking elsewhere hides the box. The window is reused, never closed until Lumen exits.
 /// </summary>
 public partial class QuickSearchWindow : Window
 {
@@ -70,6 +70,10 @@ public partial class QuickSearchWindow : Window
                 break;
             case Key.Up:
                 _viewModel.MoveSelection(-1);
+                e.Handled = true;
+                break;
+            case Key.Enter when Keyboard.Modifiers == ModifierKeys.Control:
+                _viewModel.OpenDetailCommand.Execute(null);
                 e.Handled = true;
                 break;
             case Key.Enter:

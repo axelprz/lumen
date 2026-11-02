@@ -90,6 +90,14 @@ public partial class App : Application
             _hotkeys.Pressed += (_, _) => _quickSearch.Open();
             _tray.OpenQuickSearch = _quickSearch.Open;
 
+            // Ctrl+Enter in quick search: bring Lumen forward on that item's detail.
+            var shell = _host.Services.GetRequiredService<ShellViewModel>();
+            _host.Services.GetRequiredService<QuickSearchViewModel>().DetailRequested += (_, item) =>
+            {
+                _tray.ShowWindow();
+                _ = shell.ShowDetailAsync(item);
+            };
+
             // Sync folder: pick up the one chosen before, and show a balloon when manual items arrive from it.
             var syncCoordinator = _host.Services.GetRequiredService<SyncCoordinator>();
             syncCoordinator.Notify += _tray.Notify;

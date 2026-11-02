@@ -1524,4 +1524,40 @@ Continue?</value>
   <data name="About_BuiltWith" xml:space="preserve">
     <value>Built with</value>
   </data>
+  <data name="QuickSearch_GroupRecent" xml:space="preserve">
+    <value>Recently played</value>
+  </data>
+  <data name="QuickSearch_GroupPinned" xml:space="preserve">
+    <value>Pinned routines</value>
+  </data>
+  <data name="QuickSearch_GroupGames" xml:space="preserve">
+    <value>Games</value>
+  </data>
+  <data name="QuickSearch_GroupApps" xml:space="preserve">
+    <value>Apps</value>
+  </data>
+  <data name="QuickSearch_GroupRoutines" xml:space="preserve">
+    <value>Routines</value>
+  </data>
+  <data name="QuickSearch_KeyMove" xml:space="preserve">
+    <value>move</value>
+  </data>
+  <data name="QuickSearch_KeyRun" xml:space="preserve">
+    <value>play or open</value>
+  </data>
+  <data name="QuickSearch_KeyDetail" xml:space="preserve">
+    <value>see details</value>
+  </data>
+  <data name="QuickSearch_KeyClose" xml:space="preserve">
+    <value>close</value>
+  </data>
+  <data name="QuickSearch_KeyEnter" xml:space="preserve">
+    <value>Enter</value>
+  </data>
+  <data name="QuickSearch_KeyCtrlEnter" xml:space="preserve">
+    <value>Ctrl+Enter</value>
+  </data>
+  <data name="QuickSearch_KeyEsc" xml:space="preserve">
+    <value>Esc</value>
+  </data>
 </root>

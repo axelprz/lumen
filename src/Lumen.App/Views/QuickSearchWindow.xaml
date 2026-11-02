@@ -5,9 +5,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:l="clr-namespace:Lumen.App.Localization"
         xmlns:vm="clr-namespace:Lumen.App.ViewModels"
+        xmlns:conv="clr-namespace:Lumen.App.Converters"
         Title="{l:Loc QuickSearch_Title}"
         Icon="/Assets/Lumen.ico"
-        Width="640"
+        Width="680"
         SizeToContent="Height"
         WindowStyle="None"
         ResizeMode="NoResize"
@@ -20,6 +21,34 @@
         TextOptions.TextFormattingMode="Display">
   <Window.Resources>
     <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    <conv:ImagePathConverter x:Key="ImagePath" />
+    <!-- Results in blocks (Recent, Pinned routines, Games, Apps, Routines), in the order the view model adds them -->
+    <CollectionViewSource x:Key="GroupedResults" Source="{Binding Results}">
+      <CollectionViewSource.GroupDescriptions>
+        <PropertyGroupDescription PropertyName="GroupTitle" />
+      </CollectionViewSource.GroupDescriptions>
+    </CollectionViewSource>
+
+    <!-- A key and what it does, for the footer -->
+    <Style x:Key="QuickSearch.Key" TargetType="Border">
+      <Setter Property="Background" Value="{DynamicResource Lumen.Brush.Fill}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource Lumen.Brush.FillBorder}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="5" />
+      <Setter Property="Padding" Value="6,1" />
+      <Setter Property="Margin" Value="0,0,6,0" />
+    </Style>
+    <Style x:Key="QuickSearch.KeyText" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Label}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
+    </Style>
+    <Style x:Key="QuickSearch.KeyLabel" TargetType="TextBlock">
+      <Setter Property="FontSize" Value="{StaticResource Lumen.FontSize.Caption}" />
+      <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.TextMuted}" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Margin" Value="0,0,16,0" />
+    </Style>
   </Window.Resources>
 
   <!-- Margin leaves room for the shadow inside the transparent window -->
@@ -28,48 +57,60 @@
           Background="{DynamicResource Lumen.Brush.Sidebar}"
           BorderBrush="#26FFFFFF"
           BorderThickness="1"
-          CornerRadius="18"
-          Padding="14">
+          CornerRadius="18">
     <Border.Effect>
-      <DropShadowEffect BlurRadius="24" ShadowDepth="4" Opacity="0.5" Color="Black" />
+      <DropShadowEffect BlurRadius="28" ShadowDepth="6" Opacity="0.55" Color="Black" />
     </Border.Effect>
     <StackPanel>
-      <Grid>
+      <!-- Search -->
+      <Grid Margin="14,14,14,0">
         <TextBox x:Name="SearchBox"
                  Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}"
                  FontSize="{StaticResource Lumen.FontSize.Subtitle}"
-                 Height="44"
-                 Padding="36,0,8,0"
+                 Height="48"
+                 Padding="44,0,12,0"
                  VerticalContentAlignment="Center"
                  AutomationProperties.Name="{l:Loc QuickSearch_Title}" />
         <TextBlock Text="&#xE721;"
                    Style="{StaticResource Lumen.Text.Icon}"
                    FontSize="{StaticResource Lumen.FontSize.BodyLarge}"
-                   Margin="12,0,0,0"
+                   Foreground="{DynamicResource Lumen.Brush.BrandText}"
+                   Margin="16,0,0,0"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Center"
                    IsHitTestVisible="False" />
       </Grid>
 
       <ListBox x:Name="ResultList"
-               ItemsSource="{Binding Results}"
+               ItemsSource="{Binding Source={StaticResource GroupedResults}}"
                SelectedItem="{Binding Selected}"
                Foreground="{DynamicResource Lumen.Brush.Text}"
                Background="Transparent"
                BorderThickness="0"
-               Margin="0,8,0,0"
+               Margin="8,6,8,0"
                Focusable="False"
                HorizontalContentAlignment="Stretch"
                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                ScrollViewer.VerticalScrollBarVisibility="Disabled"
                AutomationProperties.Name="{l:Loc QuickSearch_Results}">
+        <ListBox.GroupStyle>
+          <GroupStyle>
+            <GroupStyle.HeaderTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding Name}" FontSize="{StaticResource Lumen.FontSize.Label}" FontWeight="Bold"
+                           Foreground="{DynamicResource Lumen.Brush.BrandText}" Margin="12,10,0,4" />
+              </DataTemplate>
+            </GroupStyle.HeaderTemplate>
+          </GroupStyle>
+        </ListBox.GroupStyle>
         <ListBox.ItemContainerStyle>
           <Style TargetType="ListBoxItem">
             <Setter Property="Focusable" Value="False" />
+            <Setter Property="Foreground" Value="{DynamicResource Lumen.Brush.Text}" />
             <Setter Property="Template">
               <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
-                  <Border x:Name="Row" Background="Transparent" CornerRadius="12" Padding="12,9">
+                  <Border x:Name="Row" Background="Transparent" CornerRadius="12" Padding="8,7" Margin="0,1">
                     <ContentPresenter />
                   </Border>
                   <ControlTemplate.Triggers>
@@ -89,12 +130,42 @@
         <ListBox.ItemTemplate>
           <DataTemplate DataType="{x:Type vm:QuickSearchResult}">
             <DockPanel>
-              <TextBlock DockPanel.Dock="Right" Text="{Binding ActionText}" FontSize="{StaticResource Lumen.FontSize.Small}" VerticalAlignment="Center" Margin="12,0,0,0" Opacity="0.85" />
-              <StackPanel>
+              <!-- Thumbnail: the cover (or the app's icon), a lightning glyph for routines, the initial until art loads -->
+              <Grid DockPanel.Dock="Left" Width="40" Height="40" Margin="0,0,12,0">
+                <Border CornerRadius="9" Background="#1AFFFFFF" />
+                <TextBlock x:Name="Initial" Text="{Binding Initial}" FontSize="{StaticResource Lumen.FontSize.BodyLarge}" FontWeight="Bold" Opacity="0.7"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <TextBlock x:Name="RoutineGlyph" Text="&#xE945;" Style="{StaticResource Lumen.Text.Icon}" HorizontalAlignment="Center"
+                           Foreground="{DynamicResource Lumen.Brush.Warning}" Visibility="Collapsed" />
+                <Border x:Name="Cover" CornerRadius="9" Visibility="Collapsed">
+                  <Border.Background>
+                    <ImageBrush ImageSource="{Binding Art.Path, Converter={StaticResource ImagePath}, ConverterParameter=96}" Stretch="UniformToFill" />
+                  </Border.Background>
+                </Border>
+                <Image x:Name="Icon" Margin="5" Visibility="Collapsed" RenderOptions.BitmapScalingMode="HighQuality"
+                       Source="{Binding Art.Path, Converter={StaticResource ImagePath}, ConverterParameter=64}" />
+              </Grid>
+              <TextBlock DockPanel.Dock="Right" Text="{Binding ActionText}" FontSize="{StaticResource Lumen.FontSize.Small}" FontWeight="SemiBold"
+                         VerticalAlignment="Center" Margin="12,0,6,0" Opacity="0.85" />
+              <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="{Binding Title}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
                 <TextBlock Text="{Binding Detail}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,2,0,0" Opacity="0.7" TextTrimming="CharacterEllipsis" />
               </StackPanel>
             </DockPanel>
+            <DataTemplate.Triggers>
+              <DataTrigger Binding="{Binding IsRoutine}" Value="True">
+                <Setter TargetName="Initial" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="RoutineGlyph" Property="Visibility" Value="Visible" />
+              </DataTrigger>
+              <DataTrigger Binding="{Binding HasCover}" Value="True">
+                <Setter TargetName="Initial" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="Cover" Property="Visibility" Value="Visible" />
+              </DataTrigger>
+              <DataTrigger Binding="{Binding HasIcon}" Value="True">
+                <Setter TargetName="Initial" Property="Visibility" Value="Collapsed" />
+                <Setter TargetName="Icon" Property="Visibility" Value="Visible" />
+              </DataTrigger>
+            </DataTemplate.Triggers>
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>
@@ -103,8 +174,22 @@
                  Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                  FontSize="{StaticResource Lumen.FontSize.Body}"
                  TextWrapping="Wrap"
-                 Margin="4,10,4,4"
+                 Margin="20,12,20,4"
                  Visibility="{Binding HasNotice, Converter={StaticResource BoolToVisibility}}" />
+
+      <!-- Footer: the keys -->
+      <Border BorderBrush="{DynamicResource Lumen.Brush.Divider}" BorderThickness="0,1,0,0" Margin="0,10,0,0" Padding="18,10">
+        <WrapPanel>
+          <Border Style="{StaticResource QuickSearch.Key}"><TextBlock Text="↑ ↓" Style="{StaticResource QuickSearch.KeyText}" /></Border>
+          <TextBlock Text="{l:Loc QuickSearch_KeyMove}" Style="{StaticResource QuickSearch.KeyLabel}" />
+          <Border Style="{StaticResource QuickSearch.Key}"><TextBlock Text="{l:Loc QuickSearch_KeyEnter}" Style="{StaticResource QuickSearch.KeyText}" /></Border>
+          <TextBlock Text="{l:Loc QuickSearch_KeyRun}" Style="{StaticResource QuickSearch.KeyLabel}" />
+          <Border Style="{StaticResource QuickSearch.Key}"><TextBlock Text="{l:Loc QuickSearch_KeyCtrlEnter}" Style="{StaticResource QuickSearch.KeyText}" /></Border>
+          <TextBlock Text="{l:Loc QuickSearch_KeyDetail}" Style="{StaticResource QuickSearch.KeyLabel}" />
+          <Border Style="{StaticResource QuickSearch.Key}"><TextBlock Text="{l:Loc QuickSearch_KeyEsc}" Style="{StaticResource QuickSearch.KeyText}" /></Border>
+          <TextBlock Text="{l:Loc QuickSearch_KeyClose}" Style="{StaticResource QuickSearch.KeyLabel}" />
+        </WrapPanel>
+      </Border>
     </StackPanel>
   </Border>
 </Window>
