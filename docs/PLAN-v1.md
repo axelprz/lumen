@@ -54,7 +54,7 @@ Every URI and file location must be verified on a real machine when implemented 
 - **Merging:** the same game owned on several stores appears once; the detail view lets the user pick which store to launch/install from. Automatic merge by normalized title; manual merge/split always available.
 - Manual items: drag & drop an `.exe`, `.lnk` or URL, or add via dialog.
 - Collections (mixed games + apps) and Favorites.
-- Per-item overrides: title, artwork (cover, hero, logo, icon), hidden flag. (Launch arguments: backlog, owner 2026-10-30.)
+- Per-item overrides: title, artwork (cover, hero, logo, icon), hidden flag; launch arguments in M11 (owner, 2026-11-02).
 - Filters: type (all/games/apps), store, installed/not installed, collection. Instant search as you type.
 - Sort: name, last played, playtime, recently added.
 
@@ -101,7 +101,7 @@ Every URI and file location must be verified on a real machine when implemented 
 - Stores: Steam key + SteamID64, Steam website sign-in, Epic/GOG connect/disconnect.
 - Artwork: SteamGridDB key, clear cache.
 - Sync folder; update channel (Settings → Updates); About (version, license, repository, third-party licenses; the license texts ship next to Lumen.exe).
-- Moved to the backlog by the owner (2026-10-30): theme accents on/off, enable/disable each store, custom library paths, per-item launch arguments.
+- **Back in v1 (owner, 2026-11-02), milestone M11:** theme accents on/off, enable/disable each store, custom library paths, per-item launch arguments.
 
 ## 5. Milestones
 
@@ -119,8 +119,11 @@ Each milestone ends with a working, tested build on `main`. Order matters; later
 | M7 | **Tray, hotkey, gamepad** — tray icon/menu, global hotkey quick search, gamepad navigation | All three work as in §4.3 | Done |
 | M8 | **Routines** — schema loader/validator, action executor, trust model, import preview, sync folder watcher, UI | §4.5 complete | Done (2026-10-30) |
 | M9 | **Updates & release** — Velopack integration, release workflow, portable zip, update UI, channels | Tagging a version (pre-release tags until 1.0) publishes an installable, self-updating release | Done (2026-10-30; the owner tagged the first pre-releases and reported it ready) |
-| M10 | **UI rework** (owner request, 2026-10-28) — see §4.9 | The owner approves the new look on real use; every screen and the gamepad still work | **Next**; the owner picks the font from a sample first |
-| — | **1.0 hardening** — bug bash on real machines with every store installed, docs, screenshots (of the reworked UI) | Tagging `v1.0.0` releases | After M10 |
+| M10 | **UI rework** (owner request, 2026-10-28) — see §4.9 | The owner approves the new look on real use; every screen and the gamepad still work | Done (2026-11-02): first pass #46–#51, template pass #53–#60, menus #63, quick search #64 |
+| M11 | **Settings completion** (owner, 2026-11-02) — theme accents on/off; enable/disable each store; custom library paths; per-item launch arguments | Each works from Settings / the detail, survives a restart, and follows the security rules (read-only toward stores, arguments only where the launch can carry them) | **Next** |
+| M12 | **Achievements and notification center** (owner, 2026-11-02) — Steam achievements (unlocked / total) in the detail; a bell in the top bar collecting updates, store problems and sync-folder arrivals | Achievements show for Steam games with a key or a sign-in; the bell lists what happened and clears | After M11 |
+| M13 | **Deals** (moved into v1 by the owner, 2026-11-02) — see "Deals" below | Opt-in section with price search, deals, free games and trending, under the security conditions listed there | After M12; **needs the owner's decisions first** |
+| — | **1.0 hardening** — bug bash on real machines with every store installed, docs, screenshots (of the reworked UI) | Tagging `v1.0.0` releases | Partly done: About and licenses, store verification by the owner, README screenshots, betas `v0.2.0-beta.1`–`4` with friends. Last: friends' feedback, then the tag |
 
 ### 4.8 Account security (Steam, Epic, GOG sign-ins)
 
@@ -138,9 +141,9 @@ Owner requirement: nobody outside the person using Lumen may be able to get at t
   - Epic and GOG keep their web sign-in with the pasted code.
 - Any change to these flows is reviewed by the owner before merging.
 
-### 4.9 UI rework (M10, before 1.0)
+### 4.9 UI rework (M10, done)
 
-**Status (2026-10-30):** first pass in #46–#51 (font, Mica and glow, motion, entrance, detail/collections/routines, Settings and overlays). **Second pass** from the owner's HTML template (same day), one PR per step: A design base (palette, brand, glass, buttons, ambient lights) → B shell (sidebar, top bar with Ctrl+K search and a pinned routine, toasts) → B2 sidebar footer (Steam profile, CPU/RAM monitor) → C Home → D Library → E detail (animated close too) → F Collections and Routines → G Settings tabs, wizard and quick search. Details and rules: ARCHITECTURE §8 "Look and motion".
+**Status: done (2026-11-02).** Template pass #53–#60 (A–G below), fixes #62 (crash leaving a section with a panel open), menus #63, quick search #64, Home glow #66. Before that: first pass in #46–#51 (font, Mica and glow, motion, entrance, detail/collections/routines, Settings and overlays). **Second pass** from the owner's HTML template (same day), one PR per step: A design base (palette, brand, glass, buttons, ambient lights) → B shell (sidebar, top bar with Ctrl+K search and a pinned routine, toasts) → B2 sidebar footer (Steam profile, CPU/RAM monitor) → C Home → D Library → E detail (animated close too) → F Collections and Routines → G Settings tabs, wizard and quick search. Details and rules: ARCHITECTURE §8 "Look and motion".
 
 Owner request (2026-10-28): before 1.0, a modern, futuristic look that makes people want to use Lumen. It should be friendly and striking, at home next to Steam and other launchers. Same screens and features; this is the look, motion and type.
 
@@ -200,11 +203,12 @@ Owner decisions and the incidents behind them, newest last. Add a line (with the
 - **2026-11-01 · Menus and quick search (owner request):** the tray menu and every other menu take the new style; quick search gets the new look plus four additions the owner picked: recently played and pinned routines when the box is empty, thumbnails, results grouped by kind, and a key footer with Ctrl+Enter to open the detail.
 - **2026-11-02 · Owner verification and leftovers:** the owner verified GOG Galaxy (including the install link), the Xbox app (GDK games), EA app, Ubisoft Connect and Battle.net on his PC, and took the README screenshots. Hollow Knight now shows its Steam data (the old report no longer reproduces). Home's cover glow uses the softened accent like the Library. Auto-refresh: a request that arrives during a scan now waits for it and then for the gap (it could scan twice in a row; it was the "flaky" `ScansAreSpacedOut`).
 - **2026-11-02 · Update settings travel with the sync folder:** `config.json`'s `updates.channel` and `updates.checkAutomatically` (already in the schema) are now read, written and merged like the other settings; a change in Settings → Updates is shared, and one arriving from the folder applies at once (a different channel forgets what was found).
+- **2026-11-02 · v1 scope widened (owner):** everything left pending comes into v1 before tagging `v1.0.0`: the four Settings items (M11: theme accents on/off, enable/disable each store, custom library paths, per-item launch arguments), achievements in the detail and a notification center (M12), and Deals (M13, needs the owner's decisions on sources, hosts and opt-in first). M10 is done. Betas `v0.2.0-beta.1`–`4` are out with friends testing.
 - **2026-10-30 · Updates:** Velopack 1.2.161. Default channel beta until 1.0. Notice = Settings card + one tray balloon per version (no banner in the window). The user presses Download and chooses when to restart. Builds are unsigned in v1 (SmartScreen warning documented in the README).
 
-## v1.1 — Deals (owner request, 2026-10-28)
+## Deals (owner request 2026-10-28; moved from 1.1 into v1, milestone M13, on 2026-11-02)
 
-A "Deals" section so players stay on top of offers and what's new. Planned for 1.1, after 1.0 is stable.
+A "Deals" section so players stay on top of offers and what's new. Part of v1 (M13) since 2026-11-02; it still needs the owner's decisions below before any code.
 
 - **Search a game → price comparison** across stores, with the historical low. Sources to evaluate: CheapShark (no key), IsThereAnyDeal (free app key).
 - **Best deals of the week** across all stores.
@@ -221,15 +225,9 @@ A "Deals" section so players stay on top of offers and what's new. Planned for 1
 
 ## Possible next features (owner, 2026-10-30)
 
-Ideas the owner wants to keep in sight; none is planned yet. Each needs the owner's decisions before it starts.
-
-- **Deals, free games and game announcements/news:** see "v1.1 — Deals" above.
-- **Achievements in the detail view:** unlocked / total (Steam Web API, already an allowed host).
-- **Notification center:** a bell in the top bar collecting updates, store problems and items that came from the sync folder.
+All three moved into v1 on 2026-11-02: achievements and the notification center are M12, Deals (with free games and news) is M13.
 
 ## Backlog (post-v1)
-
-- From the v1 Settings list (owner, 2026-10-30): theme accents on/off, enable/disable each store, custom library paths, per-item launch arguments.
 
 - Owned-not-installed for Xbox, Ubisoft, EA, Battle.net.
 - Routine actions: run script/command, window placement/monitors, power plan, audio device, Focus/Do Not Disturb.
@@ -237,4 +235,4 @@ Ideas the owner wants to keep in sight; none is planned yet. Each needs the owne
 - Full-screen gamepad mode.
 - Code signing.
 - Plugin system (only with a clear security model).
-- Achievements, news, friends.
+- Game news, friends.
