@@ -42,7 +42,12 @@ Dependency direction: `App → Platform.Windows → Providers → Data → Core`
 | Updates, release | `Lumen.Core/Updates/*`, `Lumen.Platform.Windows/Updates`, `.github/workflows/release.yml` | §9 |
 | Windows access | `Lumen.Platform.Windows/*` (registry, processes, DPAPI, hotkeys, gamepad, window interop) | Keep thin |
 | UI | `Lumen.App/Views`, `ViewModels`, `Themes`, `Resources/Strings*.resx` | §8. UI font Exo 2 in `Assets/Fonts` (embedded resources, OFL); Motion: `Lumen.App/Services/Motion.cs` (durations, "Animation effects" check, page-in, `Motion.HoverScale`); Mica: `Platform.Windows/Windowing/SystemBackdrop.cs` + `Lumen.App/Services/MicaBackdrop.cs` (swaps `Lumen.Brush.Backdrop`/`SidebarBackdrop` for translucent ones); type scale tokens `Lumen.FontSize.*` and `Lumen.Text.*` styles in `Themes/Theme.Dark.xaml` |
-| Tests | `tests/Lumen.{Core,Data,Providers}.Tests` | Fakes for sync in `Core.Tests/Sync/SyncFakes.cs` |
+| Theme and controls | `Lumen.App/Themes/Theme.Dark.xaml` (palette, brand, glass, ambient brushes), `Themes/Controls/{Buttons,Surfaces,Inputs,ComboBox,Sidebar,Menus}.xaml` | §8 "Template look"; chrome uses the brand, art uses the game accent |
+| Shell (sidebar, top bar, toasts, footer) | `Views/MainWindow.xaml(.cs)`, `ViewModels/ShellViewModel.cs`, `SectionViewModel.cs`, `SidebarFooterViewModel.cs`, `Services/ToastService.cs`, `Lumen.Providers/Steam/SteamLocalProfile.cs`, `Platform.Windows/WindowsSystemUsage.cs` | §8 "Shell", "Sidebar footer", "Toasts" |
+| Quick search, tray menu | `Views/QuickSearchWindow.xaml(.cs)`, `ViewModels/QuickSearchViewModel.cs`, `Services/TrayService.cs` | §8 "Quick search", "Menus" |
+| About, licenses | `ViewModels/AboutViewModel.cs`, `THIRD-PARTY-NOTICES.txt`, `LICENSE` (both copied next to Lumen.exe) | `RepositoryChecks/LicenseNoticeTests` |
+| Language formats | `Lumen.Core/Localization/FormatCulture.cs`, `Lumen.App/Localization/LocalizationService.cs` | numbers and dates follow the chosen language |
+| Tests | `tests/Lumen.{Core,Data,Providers}.Tests` | Fakes for sync in `Core.Tests/Sync/SyncFakes.cs`; UI rules in `Core.Tests/RepositoryChecks` |
 
 ## 2. Key libraries
 
