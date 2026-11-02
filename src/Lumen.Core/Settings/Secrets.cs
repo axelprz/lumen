@@ -101,6 +101,9 @@ public static class LocalSettingKeys
     /// <summary>"0" keeps the accent at Lumen's default; anything else (default) lets each game's artwork tint it.</summary>
     public const string DynamicAccent = "ui.dynamicAccent";
 
+    /// <summary>"1" once the user turned Deals on (off by default). Never synced: it is this PC's consent to contact the services.</summary>
+    public const string DealsEnabled = "deals.enabled";
+
     /// <summary>The quick search shortcut as text ("Alt+Shift+Space", <see cref="Shell.Hotkey"/>); missing = default.</summary>
     public const string Hotkey = "ui.hotkey";
 

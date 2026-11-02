@@ -355,6 +355,9 @@
           <DataTemplate DataType="{x:Type vm:CollectionsViewModel}">
             <views:CollectionsView />
           </DataTemplate>
+          <DataTemplate DataType="{x:Type vm:DealsViewModel}">
+            <views:DealsView />
+          </DataTemplate>
           <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
             <views:SettingsView />
           </DataTemplate>

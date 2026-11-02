@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1001,
+    "title": "Sample Giveaway Game (Steam) Giveaway",
+    "worth": "$9.99",
+    "type": "Game",
+    "platforms": "PC, Steam",
+    "end_date": "2026-11-10 23:59:00",
+    "status": "Active",
+    "open_giveaway_url": "https://www.gamerpower.com/open/sample-giveaway-game"
+  },
+  {
+    "id": 1002,
+    "title": "Sample Endless Game",
+    "worth": "N/A",
+    "type": "Game",
+    "platforms": "PC, GOG",
+    "end_date": "N/A",
+    "status": "Active",
+    "open_giveaway_url": "https://www.gamerpower.com/open/sample-endless-game"
+  },
+  {
+    "id": 1003,
+    "title": "Sample Loot Pack",
+    "worth": "$5.00",
+    "type": "Loot",
+    "platforms": "PC",
+    "end_date": "N/A",
+    "status": "Active",
+    "open_giveaway_url": "https://www.gamerpower.com/open/sample-loot"
+  },
+  {
+    "id": 1004,
+    "title": "Sample Expired Game",
+    "worth": "$1.00",
+    "type": "Game",
+    "platforms": "PC",
+    "end_date": "2026-10-01 00:00:00",
+    "status": "Expired",
+    "open_giveaway_url": "https://www.gamerpower.com/open/sample-expired"
+  },
+  {
+    "id": 1005,
+    "title": "Sample Unsafe Link",
+    "worth": "$1.00",
+    "type": "Game",
+    "platforms": "PC",
+    "end_date": "N/A",
+    "status": "Active",
+    "open_giveaway_url": "javascript:alert(1)"
+  },
+  {
+    "id": 1006,
+    "title": "Sample Other Host",
+    "worth": "$1.00",
+    "type": "Game",
+    "platforms": "PC",
+    "end_date": "N/A",
+    "status": "Active",
+    "open_giveaway_url": "https://evil.example.com/open/x"
+  }
+]

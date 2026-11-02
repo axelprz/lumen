@@ -7,6 +7,7 @@ using Lumen.App.ViewModels;
 using Lumen.App.Views;
 using Lumen.Core;
 using Lumen.Core.Artwork;
+using Lumen.Core.Deals;
 using Lumen.Core.Library;
 using Lumen.Core.Localization;
 using Lumen.Core.Notifications;
@@ -21,6 +22,7 @@ using Lumen.Platform.Windows.Updates;
 using Lumen.Platform.Windows.Security;
 using Lumen.Providers;
 using Lumen.Providers.Apps;
+using Lumen.Providers.Deals;
 using Lumen.Providers.BattleNet;
 using Lumen.Providers.Ea;
 using Lumen.Providers.Epic;
@@ -131,6 +133,13 @@ public static class AppHost
             sp.GetRequiredService<ISecretStore>(),
             sp.GetRequiredService<ILocalSettings>()));
         builder.Services.AddSingleton<IMetadataCache, SqliteMetadataCache>();
+
+        // Deals (M13, off until the user turns it on): the free-games feeds. Plain HttpClient, no account or identifier in any request,
+        // answers capped at 2 MB. Hosts are listed in CLAUDE.md security rule 4.
+        builder.Services.AddSingleton<IFreeGamesSource>(_ => new EpicFreeGamesClient(DealsHttp()));
+        builder.Services.AddSingleton<IFreeGamesSource>(_ => new GamerPowerClient(DealsHttp()));
+        builder.Services.AddSingleton<FreeGamesService>();
+        builder.Services.AddSingleton<DealsViewModel>();
 
         // GOG sign-in (M5): tokens only travel to auth.gog.com / embed.gog.com, on a plain HttpClient (GOG's token
         // endpoint takes them in the query string, which must never be logged).
@@ -319,6 +328,13 @@ public static class AppHost
         builder.Services.AddSingleton<MainWindow>();
 
         return builder.Build();
+    }
+
+    private static HttpClient DealsHttp()
+    {
+        var http = new HttpClient { Timeout = TimeSpan.FromSeconds(20), MaxResponseContentBufferSize = 2_000_000 };
+        http.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent());
+        return http;
     }
 
     private static string UserAgent() => "Lumen/" + (typeof(AppHost).Assembly.GetName().Version?.ToString(3) ?? "0.0.0");

@@ -21,7 +21,7 @@ public sealed partial class ShellViewModel : ObservableObject
     [ObservableProperty]
     private SectionViewModel? _selectedSection;
 
-    public ShellViewModel(ILocalizer localizer, HomeViewModel home, LibraryViewModel library, SettingsViewModel settings, AccentService accent, FirstRunViewModel firstRun, CollectionsViewModel collections, RoutinesViewModel routines, ToastService toasts, SidebarFooterViewModel footer, NotificationsViewModel notifications)
+    public ShellViewModel(ILocalizer localizer, HomeViewModel home, LibraryViewModel library, SettingsViewModel settings, AccentService accent, FirstRunViewModel firstRun, CollectionsViewModel collections, RoutinesViewModel routines, ToastService toasts, SidebarFooterViewModel footer, NotificationsViewModel notifications, DealsViewModel deals)
     {
         ArgumentNullException.ThrowIfNull(localizer);
         ArgumentNullException.ThrowIfNull(home);
@@ -44,6 +44,7 @@ public sealed partial class ShellViewModel : ObservableObject
             new SectionViewModel(ShellSection.Library, "Nav_Library", "", localizer, library),
             new SectionViewModel(ShellSection.Collections, "Nav_Collections", "", localizer, collections),
             new SectionViewModel(ShellSection.Routines, "Nav_Routines", "", localizer, routines),
+            new SectionViewModel(ShellSection.Deals, "Nav_Deals", "\uE8EC", localizer, deals),
             new SectionViewModel(ShellSection.Settings, "Nav_Settings", "", localizer, settings),
         ];
 

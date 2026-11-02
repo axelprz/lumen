@@ -1,0 +1,69 @@
+{
+  "data": {
+    "Catalog": {
+      "searchStore": {
+        "elements": [
+          {
+            "title": "Sample Free Quest",
+            "productSlug": "sample-free-quest/home",
+            "price": { "totalPrice": { "discountPrice": 0, "fmtPrice": { "originalPrice": "$19.99" } } },
+            "promotions": {
+              "promotionalOffers": [
+                { "promotionalOffers": [
+                  { "startDate": "2026-11-01T15:00:00.000Z", "endDate": "2026-11-08T15:00:00.000Z", "discountSetting": { "discountType": "PERCENTAGE", "discountPercentage": 0 } }
+                ] }
+              ],
+              "upcomingPromotionalOffers": []
+            }
+          },
+          {
+            "title": "Sample Coming Soon",
+            "offerMappings": [ { "pageSlug": "sample-coming-soon", "pageType": "productHome" } ],
+            "price": { "totalPrice": { "discountPrice": 1499, "fmtPrice": { "originalPrice": "$14.99" } } },
+            "promotions": {
+              "promotionalOffers": [],
+              "upcomingPromotionalOffers": [
+                { "promotionalOffers": [
+                  { "startDate": "2026-11-08T15:00:00.000Z", "endDate": "2026-11-15T15:00:00.000Z", "discountSetting": { "discountType": "PERCENTAGE", "discountPercentage": 0 } }
+                ] }
+              ]
+            }
+          },
+          {
+            "title": "Sample Half Price",
+            "productSlug": "sample-half-price",
+            "promotions": {
+              "promotionalOffers": [
+                { "promotionalOffers": [
+                  { "startDate": "2026-11-01T15:00:00.000Z", "endDate": "2026-11-08T15:00:00.000Z", "discountSetting": { "discountType": "PERCENTAGE", "discountPercentage": 50 } }
+                ] }
+              ],
+              "upcomingPromotionalOffers": []
+            }
+          },
+          {
+            "title": "Sample Odd Slug",
+            "productSlug": "evil/../slug?x=1",
+            "promotions": {
+              "promotionalOffers": [
+                { "promotionalOffers": [
+                  { "startDate": "2026-11-01T15:00:00.000Z", "endDate": "2026-11-08T15:00:00.000Z", "discountSetting": { "discountType": "PERCENTAGE", "discountPercentage": 0 } }
+                ] }
+              ],
+              "upcomingPromotionalOffers": []
+            }
+          },
+          {
+            "productSlug": "no-title",
+            "promotions": { "promotionalOffers": [], "upcomingPromotionalOffers": [] }
+          },
+          {
+            "title": "Sample Never Free",
+            "productSlug": "sample-never-free",
+            "promotions": null
+          }
+        ]
+      }
+    }
+  }
+}

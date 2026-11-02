@@ -12,6 +12,7 @@ public enum ShellSection
     Library,
     Collections,
     Routines,
+    Deals,
     Settings,
 }
 
