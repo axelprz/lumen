@@ -79,15 +79,15 @@ public sealed class FreeGamesSourcesTests
     }
 
     [Fact]
-    public void GamerPower_KeepsActiveGamesWithSafeLinks_AndLeavesOutLootExpiredAndOtherHosts()
+    public void GamerPower_KeepsActiveGamesOnLumensStoresWithSafeLinks_AndLeavesOutTheRest()
     {
         var result = GamerPowerClient.Parse(Fixtures.Read("deals/gamerpower_giveaways.json"));
 
         result.Ok.ShouldBeTrue();
-        result.Games.Select(g => g.Title).ShouldBe(["Sample Giveaway Game (Steam) Giveaway", "Sample Endless Game"]);
+        result.Games.Select(g => g.Title).ShouldBe(["Sample Giveaway Game (Steam) Giveaway", "Sample Endless Game", "Sample Steam And Itch"]);
 
         var first = result.Games[0];
-        first.Store.ShouldBe("PC, Steam");
+        first.Store.ShouldBe("Steam");
         first.Worth.ShouldBe("$9.99");
         first.EndsAt.ShouldBe(new DateTimeOffset(2026, 11, 10, 23, 59, 0, TimeSpan.Zero));
         first.Url.ShouldBe("https://www.gamerpower.com/open/sample-giveaway-game");
@@ -95,6 +95,8 @@ public sealed class FreeGamesSourcesTests
         var endless = result.Games[1];
         endless.EndsAt.ShouldBeNull();
         endless.Worth.ShouldBeNull();
+        endless.Store.ShouldBe("GOG");
+        result.Games[2].Store.ShouldBe("Steam"); // itch.io is not one of Lumen's stores
         result.Games.ShouldAllBe(g => DealUrls.IsSafeToOpen(g.Url));
     }
 
