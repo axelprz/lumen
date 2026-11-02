@@ -53,7 +53,7 @@
     <value>Ofertas</value>
   </data>
   <data name="Settings_Deals" xml:space="preserve">
-    <value>Mostrar juegos gratis en Ofertas (consulta a Epic Games Store y GamerPower)</value>
+    <value>Mostrar juegos gratis en Ofertas (consulta a la Epic Games Store)</value>
   </data>
   <data name="Deals_Subtitle" xml:space="preserve">
     <value>Juegos gratis de las tiendas que soporta Lumen que podés reclamar ahora mismo.</value>
@@ -62,7 +62,7 @@
     <value>Activar Ofertas</value>
   </data>
   <data name="Deals_OptIn_Body" xml:space="preserve">
-    <value>Ofertas está apagada hasta que la actives. Cuando está encendida, Lumen le pide los juegos gratis a dos servicios: Epic Games Store (store-site-backend-static.ak.epicgames.com) y GamerPower (www.gamerpower.com). Con el pedido no viaja nada tuyo: ni cuenta, ni biblioteca, ni ID. Los enlaces se abren en tu navegador. Podés volver a apagarla en Ajustes.</value>
+    <value>Ofertas está apagada hasta que la actives. Cuando está encendida, Lumen le pide sus juegos gratis a la Epic Games Store (store-site-backend-static.ak.epicgames.com). Con el pedido no viaja nada tuyo: ni cuenta, ni biblioteca, ni ID. Los enlaces se abren en tu navegador. Podés volver a apagarla en Ajustes.</value>
   </data>
   <data name="Deals_OptIn_Enable" xml:space="preserve">
     <value>Activar</value>
@@ -101,10 +101,7 @@
     <value>No se pudieron cargar los juegos gratis. Revisá tu conexión y probá con Actualizar.</value>
   </data>
   <data name="Deals_Partial" xml:space="preserve">
-    <value>Uno de los servicios no respondió, así que esta lista puede estar incompleta.</value>
-  </data>
-  <data name="Deals_Attribution" xml:space="preserve">
-    <value>Regalos de</value>
+    <value>Un servicio no respondió, así que esta lista puede estar incompleta.</value>
   </data>
   <data name="Deals_Saving_Title" xml:space="preserve">
     <value>Ahorro en Argentina</value>

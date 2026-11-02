@@ -28,8 +28,6 @@ public sealed partial class DealsViewModel : ObservableObject
 
     public const string SteamcitoGuide = "https://steamcito.com.ar/machete-del-ahorro-en-gaming-en-argentina";
 
-    public const string GamerPowerSite = "https://www.gamerpower.com/";
-
     private enum NoteKind
     {
         None,
@@ -153,9 +151,6 @@ public sealed partial class DealsViewModel : ObservableObject
 
     [RelayCommand]
     private Task OpenSteamcitoSiteAsync() => OpenUrlAsync(SteamcitoSite);
-
-    [RelayCommand]
-    private Task OpenGamerPowerAsync() => OpenUrlAsync(GamerPowerSite);
 
     private async Task LoadAsync(bool refresh)
     {

@@ -89,14 +89,6 @@
         <TextBlock Text="{Binding NoteText}" TextWrapping="Wrap" FontSize="{StaticResource Lumen.FontSize.Small}" Margin="0,12,0,0"
                    Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                    Visibility="{Binding HasNote, Converter={StaticResource BoolToVisibility}}" />
-
-        <!-- GamerPower's terms ask for a visible link back to its site -->
-        <DockPanel Margin="0,16,0,0">
-          <TextBlock Text="{l:Loc Deals_Attribution}" FontSize="{StaticResource Lumen.FontSize.Caption}" VerticalAlignment="Center"
-                     Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
-          <Button Command="{Binding OpenGamerPowerCommand}" Content="gamerpower.com" Style="{StaticResource Lumen.Button}"
-                  Padding="10,4" Margin="8,0,0,0" FontSize="{StaticResource Lumen.FontSize.Caption}" HorizontalAlignment="Left" />
-        </DockPanel>
       </StackPanel>
 
       <!-- Saving in Argentina: only links to Steamcito (opened in the browser), always shown -->
