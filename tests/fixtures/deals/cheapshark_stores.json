@@ -1,0 +1,10 @@
+[
+  { "storeID": "1", "storeName": "Steam", "isActive": 1 },
+  { "storeID": "3", "storeName": "GreenManGaming", "isActive": 1 },
+  { "storeID": "7", "storeName": "GOG", "isActive": 1 },
+  { "storeID": "8", "storeName": "Origin", "isActive": 0 },
+  { "storeID": "11", "storeName": "Humble Store", "isActive": 1 },
+  { "storeID": "13", "storeName": "Uplay", "isActive": 1 },
+  { "storeID": "25", "storeName": "Epic Games Store", "isActive": 1 },
+  { "storeID": "31", "storeName": "Blizzard Shop", "isActive": 0 }
+]

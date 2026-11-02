@@ -53,7 +53,7 @@
     <value>Deals</value>
   </data>
   <data name="Settings_Deals" xml:space="preserve">
-    <value>Show free games in Deals (contacts the Epic Games Store)</value>
+    <value>Show free games in Deals (contacts the Epic Games Store and CheapShark)</value>
   </data>
   <data name="Deals_Subtitle" xml:space="preserve">
     <value>Free games from the stores Lumen supports that you can claim right now.</value>
@@ -62,7 +62,7 @@
     <value>Turn on Deals</value>
   </data>
   <data name="Deals_OptIn_Body" xml:space="preserve">
-    <value>Deals is off until you turn it on. When it is on, Lumen asks the Epic Games Store (store-site-backend-static.ak.epicgames.com) for its free games. Nothing about you goes with the request: no account, no library, no ID. Links open in your browser. You can turn it off again in Settings.</value>
+    <value>Deals is off until you turn it on. When it is on, Lumen asks two services: the Epic Games Store (store-site-backend-static.ak.epicgames.com) for its free games, and CheapShark (www.cheapshark.com) for prices and deals in the stores Lumen supports. Nothing about you goes with the requests: no account, no library, no ID. A price search sends only the name you type. Links open in your browser. You can turn it off again in Settings.</value>
   </data>
   <data name="Deals_OptIn_Enable" xml:space="preserve">
     <value>Turn on</value>
@@ -114,6 +114,48 @@
   </data>
   <data name="Deals_Saving_OpenSite" xml:space="preserve">
     <value>Visit Steamcito</value>
+  </data>
+  <data name="Deals_Search_Label" xml:space="preserve">
+    <value>Search the price of a game</value>
+  </data>
+  <data name="Deals_Search_Button" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Deals_Search_Hint" xml:space="preserve">
+    <value>Only the name you type is sent. Only the stores Lumen supports are compared.</value>
+  </data>
+  <data name="Deals_Search_NoResults" xml:space="preserve">
+    <value>No prices found for that name in the stores Lumen supports.</value>
+  </data>
+  <data name="Deals_Search_Failed" xml:space="preserve">
+    <value>Couldn't get the prices. Check your connection and try again.</value>
+  </data>
+  <data name="Deals_Search_TooShort" xml:space="preserve">
+    <value>Type between {0} and {1} characters.</value>
+  </data>
+  <data name="Deals_Search_Best" xml:space="preserve">
+    <value>Best: {0} · {1}</value>
+  </data>
+  <data name="Deals_Best_Title" xml:space="preserve">
+    <value>Best deals today</value>
+  </data>
+  <data name="Deals_Price" xml:space="preserve">
+    <value>US${0:0.00}</value>
+  </data>
+  <data name="Deals_PriceFree" xml:space="preserve">
+    <value>Free</value>
+  </data>
+  <data name="Deals_PriceDetail" xml:space="preserve">
+    <value>-{0:0}% · normally {1}</value>
+  </data>
+  <data name="Deals_PriceRegular" xml:space="preserve">
+    <value>Regular price</value>
+  </data>
+  <data name="Deals_PricesNote" xml:space="preserve">
+    <value>Prices are in US dollars and do not include taxes.</value>
+  </data>
+  <data name="Deals_PricesFrom" xml:space="preserve">
+    <value>Prices from</value>
   </data>
   <data name="Nav_Settings" xml:space="preserve">
     <value>Settings</value>
