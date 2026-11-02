@@ -53,16 +53,16 @@
     <value>Deals</value>
   </data>
   <data name="Settings_Deals" xml:space="preserve">
-    <value>Show free games in Deals (contacts the Epic Games Store and CheapShark)</value>
+    <value>Show free games in Deals (contacts the Epic Games Store, Steam's store and CheapShark)</value>
   </data>
   <data name="Deals_Subtitle" xml:space="preserve">
-    <value>Free games from the stores Lumen supports that you can claim right now.</value>
+    <value>Free games, prices and top sellers from the stores Lumen supports.</value>
   </data>
   <data name="Deals_OptIn_Title" xml:space="preserve">
     <value>Turn on Deals</value>
   </data>
   <data name="Deals_OptIn_Body" xml:space="preserve">
-    <value>Deals is off until you turn it on. When it is on, Lumen asks two services: the Epic Games Store (store-site-backend-static.ak.epicgames.com) for its free games, and CheapShark (www.cheapshark.com) for prices and deals in the stores Lumen supports. Nothing about you goes with the requests: no account, no library, no ID. A price search sends only the name you type. Links open in your browser. You can turn it off again in Settings.</value>
+    <value>Deals is off until you turn it on. When it is on, Lumen asks three services: the Epic Games Store (store-site-backend-static.ak.epicgames.com) for its free games, Steam's store (store.steampowered.com) for its free games and top sellers, and CheapShark (www.cheapshark.com) for prices and deals in the stores Lumen supports. Nothing about you goes with the requests: no account, no library, no ID. A price search sends only the name you type. Links open in your browser. You can turn it off again in Settings.</value>
   </data>
   <data name="Deals_OptIn_Enable" xml:space="preserve">
     <value>Turn on</value>
@@ -156,6 +156,9 @@
   </data>
   <data name="Deals_PricesFrom" xml:space="preserve">
     <value>Prices from</value>
+  </data>
+  <data name="Deals_Trending_Title" xml:space="preserve">
+    <value>Top sellers on Steam</value>
   </data>
   <data name="Nav_Settings" xml:space="preserve">
     <value>Settings</value>
