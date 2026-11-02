@@ -213,6 +213,41 @@ public sealed class UpdateServiceTests
     }
 
     [Fact]
+    public async Task UserChanges_AreAnnounced_ForTheSyncFolder()
+    {
+        var service = Create();
+        await service.InitializeAsync(CancellationToken.None);
+        var announced = 0;
+        service.SettingsChanged += (_, _) => announced++;
+
+        await service.SetChannelAsync(UpdateChannel.Stable, CancellationToken.None);
+        await service.SetCheckAutomaticallyAsync(false, CancellationToken.None);
+
+        announced.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task Reload_PicksUpValuesFromTheSyncFolder_AndForgetsAnOfferFromTheOldChannel()
+    {
+        _client.Next = V2;
+        var service = Create();
+        await service.InitializeAsync(CancellationToken.None);
+        await service.CheckAsync(manual: true, CancellationToken.None);
+        var announced = 0;
+        service.SettingsChanged += (_, _) => announced++;
+
+        _settings.Values[LocalSettingKeys.UpdateChannel] = "stable";
+        _settings.Values[LocalSettingKeys.UpdateCheckAutomatically] = "0";
+        await service.ReloadSettingsAsync(CancellationToken.None);
+
+        service.Channel.ShouldBe(UpdateChannel.Stable);
+        service.CheckAutomatically.ShouldBeFalse();
+        service.State.ShouldBe(UpdateState.Idle);
+        service.Offer.ShouldBeNull();
+        announced.ShouldBe(0); // not the user's change: nothing to write back
+    }
+
+    [Fact]
     public async Task ChangingTheChannel_IsSaved_AndForgetsWhatWasFound()
     {
         _client.Next = V2;

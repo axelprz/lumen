@@ -13,7 +13,7 @@ namespace Lumen.Core.Sync;
 
 /// <summary>
 /// The part of <c>config.json</c> (<c>docs/schemas/config.schema.json</c>) that Lumen reads and writes. Anything else
-/// in the file (store switches, accents, update channel, artwork choices…) is kept as it is, never dropped.
+/// in the file (store switches, accents, artwork choices…) is kept as it is, never dropped.
 /// A <c>null</c> value means "not set here": reading leaves this PC's value alone, writing leaves the file's value alone.
 /// </summary>
 public sealed record PortableConfig
@@ -30,8 +30,18 @@ public sealed record PortableConfig
 
     public IReadOnlyList<ItemRef> IgnoredApps { get; init; } = [];
 
+    /// <summary>"stable" or "beta" (<c>updates.channel</c>); null when this PC never chose one.</summary>
+    public string? UpdateChannel { get; init; }
+
+    /// <summary><c>updates.checkAutomatically</c>; null when this PC never chose.</summary>
+    public bool? CheckUpdatesAutomatically { get; init; }
+
     /// <summary>True when there is something the user made (manual items, renames, hidden games, ignored apps), as opposed to plain preferences.</summary>
     public bool HasUserData => ManualItems.Count > 0 || Overrides.Count > 0 || IgnoredApps.Count > 0;
+
+    /// <summary>Any setting is set here (language, window, shortcut, updates): with one, the config is worth sharing.</summary>
+    public bool HasSettings => Language is not null || MinimizeToTray is not null || Hotkey is not null
+        || UpdateChannel is not null || CheckUpdatesAutomatically is not null;
 }
 
 /// <summary>The outcome of reading a <c>config.json</c>.</summary>
@@ -94,6 +104,8 @@ public static class PortableConfigJson
             ManualItems = ReadManualItems(root["manualItems"], problems),
             Overrides = ReadOverrides(root["overrides"], problems),
             IgnoredApps = ReadIgnoredApps(root["ignoredApps"], problems),
+            UpdateChannel = ReadUpdateChannel(root, problems),
+            CheckUpdatesAutomatically = ReadBool(root["updates"], "checkAutomatically", problems),
         };
         return new PortableConfigParse(config, problems, false);
     }
@@ -130,6 +142,22 @@ public static class PortableConfigJson
         if (quick.Count > 0)
         {
             root["quickSearch"] = quick;
+        }
+
+        var updates = existing["updates"] is JsonObject oldUpdates ? (JsonObject)oldUpdates.DeepClone() : [];
+        if (config.UpdateChannel is not null)
+        {
+            updates["channel"] = config.UpdateChannel;
+        }
+
+        if (config.CheckUpdatesAutomatically is { } check)
+        {
+            updates["checkAutomatically"] = check;
+        }
+
+        if (updates.Count > 0)
+        {
+            root["updates"] = updates;
         }
 
         if (config.ManualItems.Count > 0)
@@ -184,8 +212,26 @@ public static class PortableConfigJson
 
     private static readonly HashSet<string> Managed = new(StringComparer.Ordinal)
     {
-        "schema", "language", "ui", "quickSearch", "manualItems", "overrides", "ignoredApps",
+        "schema", "language", "ui", "quickSearch", "manualItems", "overrides", "ignoredApps", "updates",
     };
+
+    private static readonly string[] UpdateChannels = ["stable", "beta"];
+
+    private static string? ReadUpdateChannel(JsonObject root, List<string> problems)
+    {
+        if (root["updates"] is not JsonObject updates || updates["channel"] is null)
+        {
+            return null;
+        }
+
+        if (updates["channel"] is JsonValue v && v.TryGetValue<string>(out var channel) && UpdateChannels.Contains(channel))
+        {
+            return channel;
+        }
+
+        problems.Add("\"updates.channel\" must be \"stable\" or \"beta\"; ignored.");
+        return null;
+    }
 
     private static void SetOrKeep(JsonObject root, JsonObject existing, string key, JsonNode? value)
     {

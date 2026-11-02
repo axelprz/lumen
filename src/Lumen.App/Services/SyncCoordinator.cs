@@ -12,6 +12,7 @@ using Lumen.Core.Routines;
 using Lumen.Core.Settings;
 using Lumen.Core.Sync;
 using Microsoft.Extensions.Logging;
+using Lumen.Core.Updates;
 
 namespace Lumen.App.Services;
 
@@ -36,6 +37,7 @@ public sealed partial class SyncCoordinator
     private readonly LanguageSettingsViewModel _language;
     private readonly WindowSettingsViewModel _window;
     private readonly HotkeyService _hotkeys;
+    private readonly UpdateService _updates;
     private readonly ILocalizer _localizer;
     private readonly ILogger<SyncCoordinator> _logger;
     private readonly SynchronizationContext _ui;
@@ -52,6 +54,7 @@ public sealed partial class SyncCoordinator
         LanguageSettingsViewModel language,
         WindowSettingsViewModel window,
         HotkeyService hotkeys,
+        UpdateService updates,
         ILocalizer localizer,
         ILogger<SyncCoordinator> logger)
     {
@@ -66,6 +69,7 @@ public sealed partial class SyncCoordinator
         _language = language;
         _window = window;
         _hotkeys = hotkeys;
+        _updates = updates;
         _localizer = localizer;
         _logger = logger;
         _ui = SynchronizationContext.Current ?? new SynchronizationContext();
@@ -80,6 +84,7 @@ public sealed partial class SyncCoordinator
         library.Changed += (_, _) => sync.NotifyLocalChanged();
         localizer.CultureChanged += (_, _) => sync.NotifyLocalChanged();
         hotkeys.Changed += (_, _) => sync.NotifyLocalChanged();
+        updates.SettingsChanged += (_, _) => _ui.Post(_ => sync.NotifyLocalChanged(), null);
         window.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(WindowSettingsViewModel.CloseToTray))
@@ -249,6 +254,7 @@ public sealed partial class SyncCoordinator
                 await _language.InitializeAsync(CancellationToken.None);
                 await _window.InitializeAsync(CancellationToken.None);
                 await _hotkeys.ReloadAsync(CancellationToken.None);
+                await _updates.ReloadSettingsAsync(CancellationToken.None);
                 await _library.ScanSourceAsync(ManualItem.Source, CancellationToken.None);
                 await _library.ReloadUserChoicesAsync(CancellationToken.None);
             }
