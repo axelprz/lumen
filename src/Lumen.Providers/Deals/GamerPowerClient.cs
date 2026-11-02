@@ -116,7 +116,7 @@ public sealed partial class GamerPowerClient(HttpClient http) : IFreeGamesSource
         return new FreeGamesResult(true, games);
     }
 
-    /// <summary>GamerPower names a giveaway "Name (Epic Games) Giveaway": the game's own name is what is shown and compared.</summary>
+    /// <summary>GamerPower names a giveaway "Name (Epic Games) Giveaway" or "Name (Steam) Key Giveaway": the game's own name is what is shown and compared.</summary>
     public static string? CleanTitle(string? title)
     {
         if (title is null)
@@ -128,7 +128,7 @@ public sealed partial class GamerPowerClient(HttpClient http) : IFreeGamesSource
         return clean.Length == 0 ? title : clean;
     }
 
-    [GeneratedRegex(@"\s*(\([^)]*\))?\s*Giveaway\s*$", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"\s*(\([^)]*\))?\s*(Key\s+)?Giveaway\s*$", RegexOptions.IgnoreCase)]
     private static partial Regex GiveawaySuffix();
 
     // The stores of Lumen named in a platforms text ("PC, Steam, itch.io" -> Steam), in the order given, once each.

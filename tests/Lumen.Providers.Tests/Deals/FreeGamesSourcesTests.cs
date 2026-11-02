@@ -20,13 +20,14 @@ public sealed class FreeGamesSourcesTests
         var result = EpicFreeGamesClient.Parse(Fixtures.Read("deals/epic_free_games.json"), Now);
 
         result.Ok.ShouldBeTrue();
-        result.Games.Select(g => g.Title).ShouldBe(["Sample Free Quest", "Sample Coming Soon", "Sample Odd Slug"]);
+        result.Games.Select(g => g.Title).ShouldBe(["Sample Free Quest", "Sample Coming Soon", "Sample Odd Slug", "Sample Zero Price"]);
 
         var now = result.Games[0];
         now.IsUpcoming.ShouldBeFalse();
         now.EndsAt.ShouldBe(new DateTimeOffset(2026, 11, 8, 15, 0, 0, TimeSpan.Zero));
         now.Url.ShouldBe("https://store.epicgames.com/en-US/p/sample-free-quest");
         now.Worth.ShouldBe("$19.99");
+        result.Games.Single(g => g.Title == "Sample Zero Price").Worth.ShouldBeNull();
         now.Store.ShouldBe("Epic Games Store");
 
         var later = result.Games[1];
@@ -103,6 +104,7 @@ public sealed class FreeGamesSourcesTests
     [Theory]
     [InlineData("Sorry We're Closed (Epic Games) Giveaway", "Sorry We're Closed")]
     [InlineData("Some Game Giveaway", "Some Game")]
+    [InlineData("Dwarven Realms (Steam) Key Giveaway", "Dwarven Realms")]
     [InlineData("Some Game (Steam) giveaway", "Some Game")]
     [InlineData("Plain Name", "Plain Name")]
     [InlineData("Giveaway", "Giveaway")]

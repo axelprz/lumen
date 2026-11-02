@@ -54,6 +54,19 @@
             }
           },
           {
+            "title": "Sample Zero Price",
+            "productSlug": "sample-zero-price",
+            "price": { "totalPrice": { "discountPrice": 0, "fmtPrice": { "originalPrice": "0" } } },
+            "promotions": {
+              "promotionalOffers": [
+                { "promotionalOffers": [
+                  { "startDate": "2026-11-01T15:00:00.000Z", "endDate": "2026-11-08T15:00:00.000Z", "discountSetting": { "discountType": "PERCENTAGE", "discountPercentage": 0 } }
+                ] }
+              ],
+              "upcomingPromotionalOffers": []
+            }
+          },
+          {
             "productSlug": "no-title",
             "promotions": { "promotionalOffers": [], "upcomingPromotionalOffers": [] }
           },

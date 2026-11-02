@@ -73,6 +73,11 @@ public sealed partial class EpicFreeGamesClient(HttpClient http) : IFreeGamesSou
 
             var url = PageUrl(element);
             var worth = Text(element["price"]?["totalPrice"]?["fmtPrice"]?["originalPrice"]);
+            if (worth is not null && !worth.Any(c => c is > '0' and <= '9'))
+            {
+                worth = null; // "0": the feed has no normal price for it
+            }
+
             var current = FreeWindows(element["promotions"]?["promotionalOffers"]).FirstOrDefault(w => w.Start <= now && now < w.End);
             if (current is not null)
             {
