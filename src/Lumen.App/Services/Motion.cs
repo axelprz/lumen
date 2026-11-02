@@ -363,7 +363,8 @@ public static class Motion
             return;
         }
 
-        if (Enabled && element.IsVisible && element.ActualWidth >= 1 && element.ActualHeight >= 1 && VisualTreeHelper.GetParent(element) is Panel parent)
+        if (Enabled && element.IsVisible && element.ActualWidth >= 1 && element.ActualHeight >= 1
+            && VisualTreeHelper.GetParent(element) is Panel parent && PresentationSource.FromVisual(element) is not null)
         {
             LeaveGhost(element, parent);
         }
@@ -371,9 +372,45 @@ public static class Motion
         element.Visibility = Visibility.Collapsed;
     }
 
-    // A still picture of the closing panel, in the same place, that fades out and is then removed. It can't be
-    // focused or clicked. Rendered at 96 DPI: it only lives for a fraction of a second.
+    // The closing picture is only decoration: nothing about it may ever take the app down.
     private static void LeaveGhost(FrameworkElement element, Panel parent)
+    {
+        Image ghost;
+        try
+        {
+            ghost = Picture(element);
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException or OutOfMemoryException)
+        {
+            return;
+        }
+
+        // Added on the next dispatcher turn, before the next frame is drawn (so no flicker): this change can arrive
+        // while WPF is walking the tree (a page being taken down when the user picks another section), and a panel
+        // can't get children then. A page that is gone by then gets no picture.
+        _ = parent.Dispatcher.BeginInvoke(DispatcherPriority.Send, () =>
+        {
+            if (!parent.IsLoaded || !parent.IsVisible || PresentationSource.FromVisual(parent) is null)
+            {
+                return;
+            }
+
+            try
+            {
+                parent.Children.Add(ghost);
+            }
+            catch (InvalidOperationException)
+            {
+                return;
+            }
+
+            FadeAway(ghost, parent);
+        });
+    }
+
+    // A still picture of the closing panel, for the same place. It can't be focused or clicked. Rendered at 96 DPI:
+    // it only lives for a fraction of a second.
+    private static Image Picture(FrameworkElement element)
     {
         var width = element.ActualWidth;
         var height = element.ActualHeight;
@@ -412,8 +449,12 @@ public static class Motion
         Grid.SetRowSpan(ghost, Grid.GetRowSpan(element));
         Grid.SetColumnSpan(ghost, Grid.GetColumnSpan(element));
         Panel.SetZIndex(ghost, Panel.GetZIndex(element));
-        parent.Children.Add(ghost);
+        return ghost;
+    }
 
+    private static void FadeAway(Image ghost, Panel parent)
+    {
+        var slide = (TranslateTransform)ghost.RenderTransform;
         var ease = new CubicEase { EasingMode = EasingMode.EaseIn };
         var fade = new DoubleAnimation(0, Fast) { EasingFunction = ease };
         fade.Completed += (_, _) => parent.Children.Remove(ghost);

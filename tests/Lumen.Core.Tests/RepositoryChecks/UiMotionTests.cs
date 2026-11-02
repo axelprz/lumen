@@ -91,6 +91,19 @@ public sealed partial class UiMotionTests
     }
 
     [Fact]
+    public void ClosingPicture_IsAddedLater_AndCanNeverCrashTheApp()
+    {
+        // Owner crash report (2026-10-30): leaving the Library with a detail open took the app down, because the
+        // picture was added to the page while WPF was taking that page down. It must be added on a later dispatcher
+        // turn, only to a page still on screen, with any failure swallowed.
+        var code = File.ReadAllText(Path.Combine(_appDir, "Services", "Motion.cs"));
+
+        code.ShouldContain("parent.Dispatcher.BeginInvoke(DispatcherPriority.Send, () =>");
+        code.ShouldContain("if (!parent.IsLoaded || !parent.IsVisible || PresentationSource.FromVisual(parent) is null)");
+        code.ShouldContain("catch (InvalidOperationException)");
+    }
+
+    [Fact]
     public void EveryView_UsesTheTypeScale()
     {
         // The scale sizes (Label 11 … Display 44) have tokens; a literal one is a view that skipped the scale.
