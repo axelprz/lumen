@@ -1,6 +1,6 @@
 [
-  { "title": "Sample Portal Game", "dealID": "AAAAAAAAAAbbbbbbbbbb%2B0123456789%3D", "storeID": "1", "gameID": "1001", "salePrice": "4.99", "normalPrice": "19.99", "isOnSale": "1", "savings": "75.037519" },
-  { "title": "Sample Portal Game", "dealID": "CCCCCCCCCCdddddddddd%2B0123456789%3D", "storeID": "7", "gameID": "1001", "salePrice": "5.49", "normalPrice": "19.99", "isOnSale": "1", "savings": "72.536268" },
+  { "title": "Sample Portal Game", "dealID": "AAAAAAAAAAbbbbbbbbbb%2B0123456789%3D", "storeID": "1", "gameID": "1001", "steamAppID": "620", "salePrice": "4.99", "normalPrice": "19.99", "isOnSale": "1", "savings": "75.037519" },
+  { "title": "Sample Portal Game", "dealID": "CCCCCCCCCCdddddddddd%2B0123456789%3D", "storeID": "7", "gameID": "1001", "steamAppID": "../x", "salePrice": "5.49", "normalPrice": "19.99", "isOnSale": "1", "savings": "72.536268" },
   { "title": "Sample Portal Game", "dealID": "EEEEEEEEEEffffffffff%2B0123456789%3D", "storeID": "25", "gameID": "1001", "salePrice": "19.99", "normalPrice": "19.99", "isOnSale": "0", "savings": "0.000000" },
   { "title": "Sample Portal Game", "dealID": "GGGGGGGGGGhhhhhhhhhh%2B0123456789%3D", "storeID": "11", "gameID": "1001", "salePrice": "3.00", "normalPrice": "19.99", "isOnSale": "1", "savings": "85.0" },
   { "title": "Portal Sequel Deluxe Edition", "dealID": "IIIIIIIIIIjjjjjjjjjj%2B0123456789%3D", "storeID": "1", "gameID": "1002", "salePrice": "12.00", "normalPrice": "12.00", "isOnSale": "0", "savings": "0.000000" },

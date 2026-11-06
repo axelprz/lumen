@@ -48,24 +48,89 @@
       </Border>
     </DataTemplate>
 
-    <!-- One offer of the best deals: name and store on the left, price on the right -->
-    <DataTemplate x:Key="Deals.PriceRow" DataType="{x:Type vm:PriceRow}">
-      <Border Style="{StaticResource Lumen.Card}" Padding="18,14" Margin="0,0,0,10">
-        <DockPanel>
-          <Button DockPanel.Dock="Right" Style="{StaticResource Lumen.Button}" Margin="16,0,0,0" VerticalAlignment="Center" Content="{l:Loc Deals_Open}"
-                  Command="{Binding DataContext.OpenUrlCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Url}"
-                  AutomationProperties.Name="{Binding Title}" />
-          <StackPanel DockPanel.Dock="Right" Margin="16,0,0,0" VerticalAlignment="Center" MinWidth="90">
-            <TextBlock Text="{Binding PriceText}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold" HorizontalAlignment="Right" />
-          </StackPanel>
-          <StackPanel VerticalAlignment="Center">
-            <TextBlock Text="{Binding Title}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-            <TextBlock FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,4,0,0" TextWrapping="Wrap" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
-              <Run Text="{Binding Store, Mode=OneWay}" /><Run Text=" · " /><Run Text="{Binding DetailText, Mode=OneWay}" />
-            </TextBlock>
-          </StackPanel>
-        </DockPanel>
+    <!-- One offer as a card: cover (Steam's CDN, or a quiet block when there is none), store and discount tags, name, price -->
+    <DataTemplate x:Key="Deals.Card" DataType="{x:Type vm:PriceRow}">
+      <Border Style="{StaticResource Lumen.Card}" Padding="0" Width="238" Margin="0,0,12,12">
+        <StackPanel>
+          <Grid Height="111">
+            <Border Background="{DynamicResource Lumen.Brush.BrandSoft}" CornerRadius="15,15,0,0" />
+            <Border CornerRadius="15,15,0,0">
+              <Border.Background>
+                <ImageBrush ImageSource="{Binding ImageUrl}" Stretch="UniformToFill" />
+              </Border.Background>
+            </Border>
+            <Border CornerRadius="15,15,0,0">
+              <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                  <GradientStop Color="#00000000" Offset="0.55" />
+                  <GradientStop Color="#990A0D14" Offset="1" />
+                </LinearGradientBrush>
+              </Border.Background>
+            </Border>
+            <Border Style="{StaticResource Lumen.Badge}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8,8,0,0">
+              <TextBlock Text="{Binding Store}" Style="{StaticResource Lumen.Text.Badge}" />
+            </Border>
+            <Border HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,8,8,0">
+              <Border.Style>
+                <Style TargetType="Border" BasedOn="{StaticResource Lumen.Pill}">
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding DiscountText}" Value="{x:Null}">
+                      <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </Border.Style>
+              <TextBlock Text="{Binding DiscountText}" Style="{StaticResource Lumen.Text.Badge}" />
+            </Border>
+          </Grid>
+          <DockPanel Margin="14,12,14,14">
+            <Button DockPanel.Dock="Right" Style="{StaticResource Lumen.Button}" Margin="10,0,0,0" VerticalAlignment="Bottom" Content="{l:Loc Deals_Open}"
+                    Command="{Binding DataContext.OpenUrlCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Url}"
+                    AutomationProperties.Name="{Binding Title}" />
+            <StackPanel>
+              <TextBlock Text="{Binding Title}" FontSize="{StaticResource Lumen.FontSize.Small}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding Title}" />
+              <TextBlock Text="{Binding OldPriceText}" FontSize="{StaticResource Lumen.FontSize.Caption}" Margin="0,6,0,0" TextDecorations="Strikethrough"
+                         Foreground="{DynamicResource Lumen.Brush.TextMuted}">
+                <TextBlock.Style>
+                  <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                      <DataTrigger Binding="{Binding OldPriceText}" Value="{x:Null}">
+                        <Setter Property="Visibility" Value="Hidden" />
+                      </DataTrigger>
+                    </Style.Triggers>
+                  </Style>
+                </TextBlock.Style>
+              </TextBlock>
+              <TextBlock Text="{Binding PriceText}" FontSize="{StaticResource Lumen.FontSize.Lead}" FontWeight="Bold" />
+            </StackPanel>
+          </DockPanel>
+        </StackPanel>
       </Border>
+    </DataTemplate>
+
+    <ItemsPanelTemplate x:Key="Deals.CardPanel">
+      <WrapPanel />
+    </ItemsPanelTemplate>
+
+    <!-- A store filter: the chosen one is the primary button -->
+    <DataTemplate x:Key="Deals.Filter" DataType="{x:Type vm:DealFilter}">
+      <Grid Margin="0,0,8,8">
+        <Button Style="{StaticResource Lumen.Button}" Content="{Binding Label}" Padding="14,6"
+                Command="{Binding DataContext.SelectFilterCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}" />
+        <Button Content="{Binding Label}" Padding="14,6"
+                Command="{Binding DataContext.SelectFilterCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding}">
+          <Button.Style>
+            <Style TargetType="Button" BasedOn="{StaticResource Lumen.Button.Primary}">
+              <Setter Property="Visibility" Value="Collapsed" />
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                  <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </Button.Style>
+        </Button>
+      </Grid>
     </DataTemplate>
 
     <!-- One game of a search: the best store and every store's price -->
@@ -86,7 +151,7 @@
   </UserControl.Resources>
 
   <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
-    <StackPanel Margin="40,28,40,40" MaxWidth="820" HorizontalAlignment="Left">
+    <StackPanel Margin="40,28,40,40" MaxWidth="1080">
       <DockPanel Margin="0,0,0,6">
         <Button DockPanel.Dock="Right" Command="{Binding RefreshCommand}" Content="{l:Loc Deals_Refresh}" Style="{StaticResource Lumen.Button}"
                 VerticalAlignment="Center" Visibility="{Binding IsEnabled, Converter={StaticResource BoolToVisibility}}" />
@@ -130,7 +195,60 @@
                    Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                    Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
 
-        <TextBlock Text="{l:Loc Deals_FreeNow_Title}" Style="{StaticResource Deals.SectionTitle}"
+        <!-- The first free game right now, large -->
+        <Border Margin="0,18,0,0" MinHeight="240" CornerRadius="16" BorderThickness="1" BorderBrush="{DynamicResource Lumen.Brush.GlassBorder}"
+                Background="{DynamicResource Lumen.Brush.BrandSoft}" DataContext="{Binding Hero}">
+          <Border.Style>
+            <Style TargetType="Border">
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                  <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </Border.Style>
+          <Border CornerRadius="15">
+            <Border.Background>
+              <ImageBrush ImageSource="{Binding ImageUrl}" Stretch="UniformToFill" AlignmentY="Top" />
+            </Border.Background>
+            <Border CornerRadius="15" Padding="28" MinHeight="238">
+              <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                  <GradientStop Color="#F20A0D14" Offset="0" />
+                  <GradientStop Color="#B30A0D14" Offset="0.55" />
+                  <GradientStop Color="#330A0D14" Offset="1" />
+                </LinearGradientBrush>
+              </Border.Background>
+              <StackPanel VerticalAlignment="Bottom" MaxWidth="520" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal">
+                  <Border Style="{StaticResource Lumen.Pill}">
+                    <TextBlock Text="{l:Loc Deals_Hero_Badge}" Style="{StaticResource Lumen.Text.Badge}" />
+                  </Border>
+                  <TextBlock Text="{Binding StoreText}" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="{StaticResource Lumen.FontSize.Caption}"
+                             Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
+                </StackPanel>
+                <TextBlock Text="{Binding Title}" Margin="0,12,0,0" FontSize="{StaticResource Lumen.FontSize.Headline}" FontWeight="Bold" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding StatusText}" Margin="0,6,0,0" FontSize="{StaticResource Lumen.FontSize.Small}" Foreground="{DynamicResource Lumen.Brush.BrandText}" />
+                <TextBlock Text="{Binding WorthText}" Margin="0,2,0,0" FontSize="{StaticResource Lumen.FontSize.Caption}" Foreground="{DynamicResource Lumen.Brush.TextMuted}">
+                  <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding WorthText}" Value="{x:Null}">
+                          <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </TextBlock.Style>
+                </TextBlock>
+                <Button Style="{StaticResource Lumen.Button.Primary}" Content="{l:Loc Deals_Claim}" HorizontalAlignment="Left" Margin="0,16,0,0"
+                        Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=ScrollViewer}}" CommandParameter="{Binding}"
+                        AutomationProperties.Name="{Binding Title}" />
+              </StackPanel>
+            </Border>
+          </Border>
+        </Border>
+
+        <TextBlock Text="{l:Loc Deals_FreeNow_More}" Style="{StaticResource Deals.SectionTitle}"
                    Visibility="{Binding HasFreeNow, Converter={StaticResource BoolToVisibility}}" />
         <ItemsControl ItemsSource="{Binding FreeNow}" ItemTemplate="{StaticResource Deals.Row}" Focusable="False" />
 
@@ -142,12 +260,14 @@
                    Foreground="{DynamicResource Lumen.Brush.TextMuted}"
                    Visibility="{Binding HasNote, Converter={StaticResource BoolToVisibility}}" />
 
-        <!-- Best deals today, only the stores Lumen supports -->
-        <TextBlock Text="{l:Loc Deals_Best_Title}" Style="{StaticResource Deals.SectionTitle}" Visibility="{Binding HasBestDeals, Converter={StaticResource BoolToVisibility}}" />
-        <ItemsControl ItemsSource="{Binding BestDeals}" ItemTemplate="{StaticResource Deals.PriceRow}" Focusable="False" />
+        <!-- Filters by store, then the offers as cards (only the stores Lumen supports) -->
+        <ItemsControl ItemsSource="{Binding Filters}" ItemTemplate="{StaticResource Deals.Filter}" ItemsPanel="{StaticResource Deals.CardPanel}" Focusable="False" Margin="0,22,0,0"
+                      Visibility="{Binding HasFilters, Converter={StaticResource BoolToVisibility}}" />
+        <TextBlock Text="{l:Loc Deals_Best_Title}" Style="{StaticResource Deals.SectionTitle}" Margin="0,10,0,12" Visibility="{Binding HasBestDeals, Converter={StaticResource BoolToVisibility}}" />
+        <ItemsControl ItemsSource="{Binding BestDeals}" ItemTemplate="{StaticResource Deals.Card}" ItemsPanel="{StaticResource Deals.CardPanel}" Focusable="False" />
         <!-- Steam's top sellers: what is popular right now, never paid placement -->
         <TextBlock Text="{l:Loc Deals_Trending_Title}" Style="{StaticResource Deals.SectionTitle}" Visibility="{Binding HasTopSellers, Converter={StaticResource BoolToVisibility}}" />
-        <ItemsControl ItemsSource="{Binding TopSellers}" ItemTemplate="{StaticResource Deals.PriceRow}" Focusable="False" />
+        <ItemsControl ItemsSource="{Binding TopSellers}" ItemTemplate="{StaticResource Deals.Card}" ItemsPanel="{StaticResource Deals.CardPanel}" Focusable="False" />
         <TextBlock Text="{l:Loc Deals_PricesNote}" FontSize="{StaticResource Lumen.FontSize.Caption}" TextWrapping="Wrap" Margin="0,4,0,0"
                    Foreground="{DynamicResource Lumen.Brush.TextMuted}" />
         <!-- CheapShark asks for a link back -->

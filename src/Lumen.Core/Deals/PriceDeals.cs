@@ -10,7 +10,7 @@ namespace Lumen.Core.Deals;
 /// <param name="Sale">What it costs now.</param>
 /// <param name="Normal">What it costs without the discount.</param>
 /// <param name="Url">Where to open the offer in the user's browser; always one that <see cref="DealUrls.IsSafeToOpen"/> accepts.</param>
-public sealed record PriceDeal(string DealId, string GameId, string Title, string Store, decimal Sale, decimal Normal, double SavingsPercent, string Url)
+public sealed record PriceDeal(string DealId, string GameId, string Title, string Store, decimal Sale, decimal Normal, double SavingsPercent, string Url, string? SteamAppId = null)
 {
     public bool IsOnSale => SavingsPercent >= 1 && Sale < Normal;
 }

@@ -59,6 +59,24 @@ public static partial class DealUrls
         return AllowedHosts.Contains(uri.Host, StringComparer.OrdinalIgnoreCase);
     }
 
+    /// <summary>A Steam app id: digits only, so it can be put in a store address.</summary>
+    public static bool IsSteamAppId(string? id) => id is not null && SteamAppId().IsMatch(id);
+
+    /// <summary>The app id of a Steam store link (<c>/app/&lt;id&gt;/</c>), or null.</summary>
+    public static string? SteamAppIdOf(string? url) =>
+        Uri.TryCreate(url, UriKind.Absolute, out var uri) && uri.Host.Equals("store.steampowered.com", StringComparison.OrdinalIgnoreCase)
+            && SteamAppPath().IsMatch(uri.AbsolutePath) ? uri.AbsolutePath.Trim('/').Split('/')[1] : null;
+
+    /// <summary>
+    /// The cover of a Steam game on Steam's own CDN (an approved host); null for anything that is not a plain app id.
+    /// It is a plain download with nothing about the user, shown only on the Deals page.
+    /// </summary>
+    public static string? SteamPosterUrl(string? appId) =>
+        IsSteamAppId(appId) ? $"https://cdn.cloudflare.steamstatic.com/steam/apps/{appId}/header.jpg" : null;
+
+    [System.Text.RegularExpressions.GeneratedRegex(@"^[0-9]{1,11}$")]
+    private static partial System.Text.RegularExpressions.Regex SteamAppId();
+
     [System.Text.RegularExpressions.GeneratedRegex(@"^/app/[0-9]{1,11}/?$")]
     private static partial System.Text.RegularExpressions.Regex SteamAppPath();
 
