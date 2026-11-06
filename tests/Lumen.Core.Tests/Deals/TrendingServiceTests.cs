@@ -78,6 +78,28 @@ public sealed class TrendingServiceTests
         DealUrls.IsSafeToOpen(url).ShouldBe(expected);
     }
 
+    [Theory]
+    [InlineData("123", "https://cdn.cloudflare.steamstatic.com/steam/apps/123/header.jpg")]
+    [InlineData("../x", null)]
+    [InlineData("12a", null)]
+    [InlineData("", null)]
+    [InlineData(null, null)]
+    public void SteamPosterUrl_OnlyForAPlainAppId(string? id, string? expected)
+    {
+        DealUrls.SteamPosterUrl(id).ShouldBe(expected);
+    }
+
+    [Theory]
+    [InlineData("https://store.steampowered.com/app/620/", "620")]
+    [InlineData("https://store.steampowered.com/app/620", "620")]
+    [InlineData("https://store.steampowered.com/login/", null)]
+    [InlineData("https://store.epicgames.com/app/620/", null)]
+    [InlineData("not a url", null)]
+    public void SteamAppIdOf_ReadsOnlyAGamesStorePage(string url, string? expected)
+    {
+        DealUrls.SteamAppIdOf(url).ShouldBe(expected);
+    }
+
     private sealed class ThrowingSource : ITrendingSource
     {
         public Task<TrendingResult> TopSellersAsync(CancellationToken ct) => throw new InvalidOperationException("changed format");

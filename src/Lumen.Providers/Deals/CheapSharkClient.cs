@@ -143,7 +143,8 @@ public sealed partial class CheapSharkClient(HttpClient http) : IPriceDealsSourc
             }
 
             var savings = double.TryParse(Text(item["savings"]), NumberStyles.Float, CultureInfo.InvariantCulture, out var s) ? Math.Clamp(s, 0, 100) : 0;
-            deals.Add(new PriceDeal(dealId, gameId, title, store, sale, normal, savings, RedirectUrl(dealId)));
+            var appId = Text(item["steamAppID"]);
+            deals.Add(new PriceDeal(dealId, gameId, title, store, sale, normal, savings, RedirectUrl(dealId), appId is not null && DealUrls.IsSteamAppId(appId) ? appId : null));
         }
 
         return new PriceDealsResult(true, deals);

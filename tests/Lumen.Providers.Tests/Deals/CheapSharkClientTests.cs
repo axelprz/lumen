@@ -70,6 +70,15 @@ public sealed class CheapSharkClientTests
     }
 
     [Fact]
+    public void SteamAppId_IsKeptOnlyWhenItIsPlainDigits()
+    {
+        var stores = new Dictionary<string, string> { ["1"] = "Steam", ["7"] = "GOG", ["25"] = "Epic" };
+        var deals = CheapSharkClient.ParseDeals(Fixtures.Read("deals/cheapshark_deals.json"), stores).Deals;
+
+        deals.Where(d => d.SteamAppId is not null).Select(d => d.SteamAppId).ShouldBe(["620"]);
+    }
+
+    [Fact]
     public async Task Best_AsksForTheStoresOfLumenOnly_AndReadsTheStoreListOnce()
     {
         ServeFixtures(Fixtures.Read("deals/cheapshark_deals.json"));

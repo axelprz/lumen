@@ -15,10 +15,32 @@ using Microsoft.Extensions.Logging;
 namespace Lumen.App.ViewModels;
 
 /// <summary>One free game in the list, written in the current language when the list is built.</summary>
-public sealed record DealRow(string Title, string StoreText, string StatusText, string? WorthText, string Url);
+public sealed record DealRow(string Title, string StoreText, string StatusText, string? WorthText, string Url, string? ImageUrl = null);
 
 /// <summary>One offer in "Best deals".</summary>
-public sealed record PriceRow(string Title, string Store, string PriceText, string DetailText, string Url);
+public sealed record PriceRow(
+    string Title,
+    string Store,
+    string PriceText,
+    string DetailText,
+    string Url,
+    string? ImageUrl = null,
+    string? OldPriceText = null,
+    string? DiscountText = null,
+    decimal Price = 0);
+
+/// <summary>One store filter of the Deals grid. <see cref="Key"/> is "all", "under5" or a store name; the label is written on read.</summary>
+public sealed partial class DealFilter(string key, Func<string> label) : ObservableObject
+{
+    public string Key { get; } = key;
+
+    public string Label => label();
+
+    [ObservableProperty]
+    private bool _isSelected;
+
+    public void Refresh() => OnPropertyChanged(nameof(Label));
+}
 
 /// <summary>One game of a price search: the best price and every store's price.</summary>
 public sealed record PriceGameRow(string Title, string BestText, string StoresText, string Url);
@@ -66,6 +88,7 @@ public sealed partial class DealsViewModel : ObservableObject
     private PriceSearchSnapshot? _search;
     private bool _loading;
     private bool _loaded;
+    private string _filter = "all";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsDisabled))]
@@ -105,6 +128,17 @@ public sealed partial class DealsViewModel : ObservableObject
 
     public bool IsDisabled => !IsEnabled;
 
+    /// <summary>The first free game right now, shown large at the top.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasHero))]
+    private DealRow? _hero;
+
+    public bool HasHero => Hero is not null;
+
+    /// <summary>Store filters of the grids below (all, each store with offers, under 5 dollars).</summary>
+    public ObservableCollection<DealFilter> Filters { get; } = [];
+
+    /// <summary>The other free games right now.</summary>
     public ObservableCollection<DealRow> FreeNow { get; } = [];
 
     public ObservableCollection<DealRow> Upcoming { get; } = [];
@@ -206,6 +240,18 @@ public sealed partial class DealsViewModel : ObservableObject
     private Task RefreshAsync() => LoadAsync(true);
 
     [RelayCommand]
+    private void SelectFilter(DealFilter? filter)
+    {
+        if (filter is null || filter.Key == _filter)
+        {
+            return;
+        }
+
+        _filter = filter.Key;
+        RebuildPrices();
+    }
+
+    [RelayCommand]
     private Task OpenAsync(DealRow? row) => row is null ? Task.CompletedTask : OpenLinkAsync(row.Url);
 
     [RelayCommand]
@@ -305,11 +351,24 @@ public sealed partial class DealsViewModel : ObservableObject
     {
         FreeNow.Clear();
         Upcoming.Clear();
+        Hero = null;
         if (_snapshot is { } snapshot)
         {
             foreach (var game in snapshot.Games)
             {
-                (game.IsUpcoming ? Upcoming : FreeNow).Add(ToRow(game));
+                var row = ToRow(game);
+                if (game.IsUpcoming)
+                {
+                    Upcoming.Add(row);
+                }
+                else if (Hero is null)
+                {
+                    Hero = row;
+                }
+                else
+                {
+                    FreeNow.Add(row);
+                }
             }
 
             Note = (int)(snapshot.AllFailed ? NoteKind.Failed
@@ -330,28 +389,36 @@ public sealed partial class DealsViewModel : ObservableObject
 
     private void RebuildPrices()
     {
+        var best = (_best?.Deals ?? []).Select(deal => new PriceRow(
+            deal.Title, deal.Store, Money(deal.Sale), Detail(deal), deal.Url, DealUrls.SteamPosterUrl(deal.SteamAppId),
+            deal.IsOnSale ? Money(deal.Normal) : null, deal.IsOnSale ? $"-{deal.SavingsPercent.ToString("0", CultureInfo.CurrentCulture)}%" : null, deal.Sale)).ToList();
+        var top = (_top?.Games ?? []).Select(game => new PriceRow(
+            game.Title, "Steam", Money(game.Sale),
+            game.DiscountPercent > 0 ? string.Format(CultureInfo.CurrentCulture, _loc["Deals_PriceDetail"], game.DiscountPercent, Money(game.Normal)) : _loc["Deals_PriceRegular"],
+            game.Url, DealUrls.SteamPosterUrl(game.AppId),
+            game.DiscountPercent > 0 ? Money(game.Normal) : null, game.DiscountPercent > 0 ? $"-{game.DiscountPercent}%" : null, game.Sale)).ToList();
+
+        RebuildFilters(best.Concat(top).Select(r => r.Store).Distinct(StringComparer.OrdinalIgnoreCase).Order(StringComparer.OrdinalIgnoreCase));
+
         BestDeals.Clear();
-        foreach (var deal in _best?.Deals ?? [])
+        foreach (var row in best.Where(Matches))
         {
-            BestDeals.Add(new PriceRow(deal.Title, deal.Store, Money(deal.Sale), Detail(deal), deal.Url));
+            BestDeals.Add(row);
         }
 
         TopSellers.Clear();
-        foreach (var game in _top?.Games ?? [])
+        foreach (var row in top.Where(Matches))
         {
-            var detail = game.DiscountPercent > 0
-                ? string.Format(CultureInfo.CurrentCulture, _loc["Deals_PriceDetail"], game.DiscountPercent, Money(game.Normal))
-                : _loc["Deals_PriceRegular"];
-            TopSellers.Add(new PriceRow(game.Title, "Steam", Money(game.Sale), detail, game.Url));
+            TopSellers.Add(row);
         }
 
         SearchResults.Clear();
         foreach (var game in _search?.Games ?? [])
         {
-            var best = game.Best;
-            var bestText = string.Format(CultureInfo.CurrentCulture, _loc["Deals_Search_Best"], best.Store, Money(best.Sale)) + (best.IsOnSale ? $" (-{best.SavingsPercent.ToString("0", CultureInfo.CurrentCulture)}%)" : string.Empty);
+            var cheapest = game.Best;
+            var bestText = string.Format(CultureInfo.CurrentCulture, _loc["Deals_Search_Best"], cheapest.Store, Money(cheapest.Sale)) + (cheapest.IsOnSale ? $" (-{cheapest.SavingsPercent.ToString("0", CultureInfo.CurrentCulture)}%)" : string.Empty);
             var stores = string.Join(" · ", game.Stores.Select(d => $"{d.Store} {Money(d.Sale)}"));
-            SearchResults.Add(new PriceGameRow(game.Title, bestText, stores, best.Url));
+            SearchResults.Add(new PriceGameRow(game.Title, bestText, stores, cheapest.Url));
         }
 
         OnPropertyChanged(nameof(HasBestDeals));
@@ -359,6 +426,35 @@ public sealed partial class DealsViewModel : ObservableObject
         OnPropertyChanged(nameof(HasSearchResults));
         OnPropertyChanged(nameof(SearchNoteText));
     }
+
+    private bool Matches(PriceRow row) => _filter switch
+    {
+        "all" => true,
+        "under5" => row.Price < 5m,
+        var store => row.Store.Equals(store, StringComparison.OrdinalIgnoreCase),
+    };
+
+    // The chips: All, each store that has offers, Under US$5. A chosen store that no longer has offers goes back to All.
+    private void RebuildFilters(IEnumerable<string> stores)
+    {
+        var keys = new List<(string Key, Func<string> Label)> { ("all", () => _loc["Deals_Filter_All"]) };
+        keys.AddRange(stores.Select(s => (s, (Func<string>)(() => s))));
+        keys.Add(("under5", () => _loc["Deals_Filter_Under5"]));
+        if (!keys.Any(k => k.Key == _filter))
+        {
+            _filter = "all";
+        }
+
+        Filters.Clear();
+        foreach (var (key, label) in keys)
+        {
+            Filters.Add(new DealFilter(key, label) { IsSelected = key == _filter });
+        }
+
+        OnPropertyChanged(nameof(HasFilters));
+    }
+
+    public bool HasFilters => Filters.Count > 2;
 
     // Prices are US dollars (CheapShark): the number follows Lumen's language.
     private string Money(decimal value) =>
@@ -377,7 +473,7 @@ public sealed partial class DealsViewModel : ObservableObject
                 ? string.Format(culture, _loc["Deals_FreeUntil"], end.LocalDateTime.ToString("d", culture))
                 : _loc["Deals_NoEndDate"];
         var worth = game.Worth is null ? null : string.Format(culture, _loc["Deals_Worth"], game.Worth);
-        return new DealRow(game.Title, game.Store, status, worth, game.Url);
+        return new DealRow(game.Title, game.Store, status, worth, game.Url, DealUrls.SteamPosterUrl(DealUrls.SteamAppIdOf(game.Url)));
     }
 
     private async Task SaveEnabledAsync(bool value)

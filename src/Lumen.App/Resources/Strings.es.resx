@@ -160,6 +160,21 @@
   <data name="Deals_Trending_Title" xml:space="preserve">
     <value>Lo más vendido en Steam</value>
   </data>
+  <data name="Deals_Hero_Badge" xml:space="preserve">
+    <value>Gratis ahora</value>
+  </data>
+  <data name="Deals_Claim" xml:space="preserve">
+    <value>Reclamar gratis</value>
+  </data>
+  <data name="Deals_FreeNow_More" xml:space="preserve">
+    <value>Más juegos gratis</value>
+  </data>
+  <data name="Deals_Filter_All" xml:space="preserve">
+    <value>Todos</value>
+  </data>
+  <data name="Deals_Filter_Under5" xml:space="preserve">
+    <value>Menos de US$5</value>
+  </data>
   <data name="Nav_Settings" xml:space="preserve">
     <value>Configuración</value>
   </data>
